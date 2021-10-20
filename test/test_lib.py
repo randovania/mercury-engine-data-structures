@@ -2,7 +2,7 @@ from pathlib import Path
 
 from construct.lib.containers import Container
 
-from retro_data_structures.game_check import Game
+from mercury_engine_data_structures.game_check import Game
 
 
 def _parse_and_build_compare(module, game: Game, file_path: Path, print_data=False, save_file=None):
