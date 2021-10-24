@@ -6,7 +6,7 @@ import logging
 import typing
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional
 
 from mercury_engine_data_structures import formats
 from mercury_engine_data_structures.construct_extensions.json import convert_to_raw_python
@@ -45,6 +45,13 @@ def create_parser():
     decode.add_argument("--format", help="Hint the format of the file. Defaults to extension.")
     decode.add_argument("--re-encode", help="Re-encode afterwards and compares to the original.", action="store_true")
     decode.add_argument("input_path", type=Path, help="Path to the file")
+
+    replace_pkg_file = subparser.add_parser("replace-in-pkg")
+    add_game_argument(replace_pkg_file)
+    replace_pkg_file.add_argument("--pkg-input", type=Path, help="Path to the PKG file")
+    replace_pkg_file.add_argument("--pkg-output", type=Path, help="Path to where write the updated PKG")
+    replace_pkg_file.add_argument("--asset-id", type=int, help="Asset id to replace")
+    replace_pkg_file.add_argument("asset_path", type=Path, help="Path to the updated asset")
 
     compare = subparser.add_parser("compare-files")
     add_game_argument(compare)
@@ -92,18 +99,28 @@ def do_decode(args):
             print(f"{input_path}: Results differ (len(raw): {len(raw)}; len(encoded): {len(encoded)})")
 
 
+def replace_in_pkg(args):
+    game: Game = args.game
+    input_pkg: Path = args.pkg_input
+    output_pkg: Path = args.pkg_output
+    asset_id: int = args.asset_id
+    asset_path: Path = args.asset_path
+
+    pkg = formats.Pkg.parse(input_pkg.read_bytes(), target_game=game)
+    new_file = asset_path.read_bytes()
+
+    pkg.replace_asset(asset_id, new_file)
+
+    output_pkg.write_bytes(pkg.build())
+
+
 def decode_encode_compare_file(file_path: Path, game: Game, file_format: str):
-    construct_class = formats.format_for(file_format)
+    resource_class = formats.format_for(file_format)
 
     try:
         raw = file_path.read_bytes()
-        decoded_from_raw = construct_class.parse(raw, target_game=game)
-
-        sections = []
-        for group in decoded_from_raw.section_groups:
-            sections.extend(group.sections)
-
-        encoded = construct_class.build(decoded_from_raw, target_game=game)
+        resource = resource_class.parse(raw, target_game=game)
+        encoded = resource.build()
 
         if raw != encoded and raw.rstrip(b"\xFF") != encoded:
             return f"{file_path}: Results differ (len(raw): {len(raw)}; len(encoded): {len(encoded)})"
@@ -166,6 +183,8 @@ def main():
 
     if args.command == "decode":
         do_decode(args)
+    elif args.command == "replace-in-pkg":
+        replace_in_pkg(args)
     elif args.command == "compare-files":
         asyncio.run(compare_all_files_in_path(args))
     else:

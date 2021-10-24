@@ -123,3 +123,9 @@ class Pkg(BaseResource):
 
     def get_resource_by_name(self, name: str) -> Optional[bytes]:
         return self.get_resource_by_asset_id(crc.crc64(name.encode("utf-8")))
+
+    def replace_asset(self, asset_id: int, new_file: bytes):
+        for file in self.raw.files:
+            if file.asset_id == asset_id:
+                file.data = new_file
+        raise ValueError(f"Unknown asset id: {asset_id}")
