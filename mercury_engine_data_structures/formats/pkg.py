@@ -7,7 +7,7 @@ from construct import (
     Aligned, FocusedSeq, Rebuild, Seek, Pointer, Prefixed, GreedyBytes,
 )
 
-from mercury_engine_data_structures import crc
+from mercury_engine_data_structures import crc, resource_names
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
@@ -92,6 +92,7 @@ PKG = Struct(
 
             item=Struct(
                 asset_id=Pointer(header_field("asset_id"), AssetId),
+                asset_name=Computed(lambda ctx: resource_names.name_for_asset_id(ctx.asset_id)),
                 data=Prefixed(
                     Rebuild(
                         Computed(lambda ctx: ctx._.item_size),
