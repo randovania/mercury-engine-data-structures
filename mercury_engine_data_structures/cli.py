@@ -78,14 +78,16 @@ def do_decode(args):
     if file_format is None:
         file_format = input_path.suffix[1:]
 
-    construct_class = formats.format_for(file_format)
+    resource_class = formats.format_for(file_format)
 
     raw = input_path.read_bytes()
-    decoded_from_raw = construct_class.parse(raw, target_game=game)
-    print(decoded_from_raw)
+    decoded_resource = resource_class.parse(raw, target_game=game)
+    # print(decoded_from_raw)
+
+    print(decoded_resource.raw)
 
     if re_encode:
-        encoded = construct_class.build(decoded_from_raw, target_game=game)
+        encoded = decoded_resource.build()
         if raw != encoded:
             print(f"{input_path}: Results differ (len(raw): {len(raw)}; len(encoded): {len(encoded)})")
 
