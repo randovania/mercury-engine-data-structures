@@ -1,9 +1,10 @@
+import typing
 from typing import Optional
 
 import construct
 from construct import (
     Struct, PrefixedArray, Int64ul, Int32ul, Hex, Construct, Computed, Array, Tell,
-    Aligned, FocusedSeq, Rebuild, Seek, Pointer, Prefixed, GreedyBytes, Check, Bytes,
+    Aligned, FocusedSeq, Rebuild, Seek, Pointer, Prefixed, GreedyBytes,
 )
 
 from mercury_engine_data_structures import crc
@@ -12,6 +13,46 @@ from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 AssetId = Hex(Int64ul)
+
+
+def offset_for(con: Struct, name: str):
+    result = 0
+    for sc in con.subcons:
+        sc = typing.cast(Construct, sc)
+        if sc.name == name:
+            return result
+        result += sc.sizeof()
+    raise construct.ConstructError(f"Unknown field: {name}")
+
+
+def header_field(field_name: str):
+    offset = offset_for(FileEntry, field_name)
+
+    def result(ctx):
+        parents = [ctx]
+        while "_" in parents[-1]:
+            parents.append(parents[-1]["_"])
+
+        start_headers = None
+        index = None
+
+        for c in reversed(parents):
+            if "_start_headers" in c:
+                start_headers = c["_start_headers"]
+                break
+
+        for c in parents:
+            if "_resource_index" in c:
+                index = c["_resource_index"]
+                break
+
+        if index is None or start_headers is None:
+            raise ValueError("Missing required context key")
+
+        return start_headers + (index * FileEntry.sizeof()) + offset
+
+    return result
+
 
 FileEntry = Struct(
     asset_id=AssetId,
@@ -25,29 +66,47 @@ PKGHeader = Struct(
     file_entries=PrefixedArray(Int32ul, FileEntry),
 )
 
-
 PKG = Struct(
-    header=PKGHeader,
-    header_end=Tell,
-    _skip_end_of_header=Seek(lambda ctx: ctx.header.header_size - ctx.header_end, 1),
+    header_size=Int32ul,
+    _data_section_size_address=Tell,
+    _data_section_size=Int32ul,
+    _num_files=Rebuild(Int32ul, construct.len_(construct.this.files)),
+    _start_headers=Tell,
+    _skip_headers=Seek(lambda ctx: ctx._num_files * FileEntry.sizeof(), 1),
+    _header_end=Tell,
+    _skip_end_of_header=Seek(lambda ctx: ctx.header_size - ctx._header_end, 1),
     _align=AlignTo(8),
-    files_start=Tell,
+    _files_start=Tell,
     files=Array(
-        construct.len_(construct.this.header.file_entries),
+        construct.this._num_files,
         Aligned(8, FocusedSeq(
             "item",
-            entry=Computed(lambda ctx: ctx._.header.file_entries[ctx._index]),
-            start_offset=Tell,
-            start_offset_check=Check(lambda ctx: ctx.start_offset == ctx.entry.start_offset),
+            _resource_index=Computed(lambda ctx: ctx["_index"]),
+
+            actual_start_offset=Tell,
+            start_offset=Pointer(header_field("start_offset"),
+                                 Rebuild(Int32ul, lambda ctx: ctx.actual_start_offset)),
+            end_offset=Pointer(header_field("end_offset"),
+                               Rebuild(Int32ul, lambda ctx: ctx.start_offset + len(ctx.item))),
+            item_size=Computed(lambda ctx: ctx.end_offset - ctx.start_offset),
+
             item=Struct(
-                asset_id=Computed(lambda ctx: ctx._.entry.asset_id),
-                data=Bytes(lambda ctx: ctx._.entry.end_offset - ctx._.entry.start_offset),
+                asset_id=Pointer(header_field("asset_id"), AssetId),
+                data=Prefixed(
+                    Rebuild(
+                        Computed(lambda ctx: ctx._.item_size),
+                        construct.len_(construct.this.data),
+                    ),
+                    GreedyBytes,
+                ),
             ),
-            end_offset=Tell,
-            end_offset_check=Check(lambda ctx: ctx.end_offset == ctx.entry.end_offset),
         )),
     ),
-    files_end=Tell,
+    _files_end=Tell,
+    _update_data_section_size=Pointer(
+        lambda ctx: ctx._data_section_size_address,
+        Rebuild(Int32ul, lambda ctx: ctx._files_end - ctx._files_start),
+    ),
 )
 
 
@@ -57,9 +116,9 @@ class Pkg(BaseResource):
         return PKG
 
     def get_resource_by_asset_id(self, asset_id: AssetId) -> Optional[bytes]:
-        for entry, file in zip(self.raw.header.file_entries, self.raw.files):
-            if entry.asset_id == asset_id:
-                return file
+        for file in self.raw.files:
+            if file.asset_id == asset_id:
+                return file.data
 
     def get_resource_by_name(self, name: str) -> Optional[bytes]:
         return self.get_resource_by_asset_id(crc.crc64(name.encode("utf-8")))
