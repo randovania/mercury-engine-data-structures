@@ -11,6 +11,7 @@ from typing import Optional
 from mercury_engine_data_structures import formats
 from mercury_engine_data_structures.construct_extensions.json import convert_to_raw_python
 from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.pkg_editor import PkgEditor
 
 
 def game_argument_type(s: str) -> Game:
@@ -48,10 +49,16 @@ def create_parser():
 
     replace_pkg_file = subparser.add_parser("replace-in-pkg")
     add_game_argument(replace_pkg_file)
-    replace_pkg_file.add_argument("--pkg-input", type=Path, help="Path to the PKG file")
-    replace_pkg_file.add_argument("--pkg-output", type=Path, help="Path to where write the updated PKG")
-    replace_pkg_file.add_argument("--asset-id", type=int, help="Asset id to replace")
+    replace_pkg_file.add_argument("--pkg-input", type=Path, required=True, help="Path to the PKG file")
+    replace_pkg_file.add_argument("--pkg-output", type=Path, required=True, help="Path to where write the updated PKG")
+    replace_pkg_file.add_argument("--asset-id", type=int, required=True, help="Asset id to replace")
     replace_pkg_file.add_argument("asset_path", type=Path, help="Path to the updated asset")
+
+    find_pkg = subparser.add_parser("find-pkg-for")
+    find_pkg.add_argument("--root", type=Path, required=True, help="Path to the PKG files")
+    group = find_pkg.add_mutually_exclusive_group(required=True)
+    group.add_argument("--asset-name", type=str, help="Asset name to find")
+    group.add_argument("--asset-id", type=int, help="Asset id to find")
 
     compare = subparser.add_parser("compare-files")
     add_game_argument(compare)
@@ -106,12 +113,39 @@ def replace_in_pkg(args):
     asset_id: int = args.asset_id
     asset_path: Path = args.asset_path
 
-    pkg = formats.Pkg.parse(input_pkg.read_bytes(), target_game=game)
+    logging.info("Reading %s", input_pkg)
+    input_bytes = input_pkg.read_bytes()
+
+    logging.info("Parsing...")
+    pkg = formats.Pkg.parse(input_bytes, target_game=game)
+
+    logging.info("Reading %s", asset_path)
     new_file = asset_path.read_bytes()
 
+    logging.info("Replacing asset in pkg")
     pkg.replace_asset(asset_id, new_file)
 
-    output_pkg.write_bytes(pkg.build())
+    logging.info("Building new pkg")
+    encoded = pkg.build()
+
+    logging.info("Writing new pkg to %s", output_pkg)
+    output_pkg.parent.mkdir(parents=True, exist_ok=True)
+    output_pkg.write_bytes(encoded)
+
+    logging.info("Done")
+
+
+def find_pkg_for(args):
+    root: Path = args.root
+    asset_id: int = args.asset_id
+    asset_name: str = args.asset_name
+
+    with PkgEditor.open_pkgs_at(root) as pkg_editor:
+        pkg_editor = typing.cast(PkgEditor, pkg_editor)
+        if asset_id is not None:
+            print(pkg_editor.find_asset_id(asset_id))
+        else:
+            print(pkg_editor.find_name(asset_name))
 
 
 def decode_encode_compare_file(file_path: Path, game: Game, file_format: str):
@@ -185,6 +219,8 @@ def main():
         do_decode(args)
     elif args.command == "replace-in-pkg":
         replace_in_pkg(args)
+    elif args.command == "find-pkg-for":
+        find_pkg_for(args)
     elif args.command == "compare-files":
         asyncio.run(compare_all_files_in_path(args))
     else:

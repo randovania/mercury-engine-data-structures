@@ -128,4 +128,5 @@ class Pkg(BaseResource):
         for file in self.raw.files:
             if file.asset_id == asset_id:
                 file.data = new_file
+                return
         raise ValueError(f"Unknown asset id: {asset_id}")
