@@ -87,7 +87,7 @@ PKG = Struct(
             start_offset=Pointer(header_field("start_offset"),
                                  Rebuild(Int32ul, lambda ctx: ctx.actual_start_offset)),
             end_offset=Pointer(header_field("end_offset"),
-                               Rebuild(Int32ul, lambda ctx: ctx.start_offset + len(ctx.item))),
+                               Rebuild(Int32ul, lambda ctx: ctx.start_offset + len(ctx.item.data))),
             item_size=Computed(lambda ctx: ctx.end_offset - ctx.start_offset),
 
             item=Struct(
