@@ -34,9 +34,8 @@ class PkgEditor:
 
     def find_asset_id(self, asset_id: int) -> Optional[str]:
         for name, header in self.headers.items():
-            for entry in header.file_entries:
-                if entry.asset_id == asset_id:
-                    return name
+            if any(entry.asset_id == asset_id for entry in header.file_entries):
+                return name
 
     def find_name(self, name: str) -> Optional[str]:
         return self.find_asset_id(crc.crc64(name.encode("utf-8")))

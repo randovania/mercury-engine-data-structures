@@ -26,3 +26,7 @@ class BaseResource:
     @property
     def raw(self) -> Container:
         return self._raw
+
+
+AssetType = str
+AssetId = int
