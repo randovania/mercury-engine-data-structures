@@ -60,9 +60,7 @@ BMSSD = Struct(
             float14=VectorArray,
             float15=VectorArray,
             int16=Int32ul,
-            int17=Int32ul,
-            int18=Int32ul,
-            int19=Int32ul,
+            float17=VectorArray,
         )
     ),
     strings_b=PrefixedArray(
