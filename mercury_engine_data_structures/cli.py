@@ -141,9 +141,13 @@ def find_pkg_for(args):
     with PkgEditor.open_pkgs_at(root) as pkg_editor:
         pkg_editor = typing.cast(PkgEditor, pkg_editor)
         if asset_id is not None:
-            print(pkg_editor.find_asset_id(asset_id))
+            items = list(pkg_editor.find_pkgs_for_asset_id(asset_id))
         else:
-            print(pkg_editor.find_name(asset_name))
+            items = list(pkg_editor.find_pkgs_for_name(asset_name))
+
+        print(f"> Pkgs for {asset_id} / {asset_name}:")
+        for it in items:
+            print(it)
 
 
 def decode_encode_compare_file(file_path: Path, game: Game, file_format: str):

@@ -1,9 +1,10 @@
 import contextlib
 from contextlib import ExitStack
 from pathlib import Path
-from typing import BinaryIO, Dict, Optional, Generator
+from typing import BinaryIO, Dict, Optional, Generator, Iterator
 
 from mercury_engine_data_structures import crc
+from mercury_engine_data_structures.formats.base_resource import AssetId
 from mercury_engine_data_structures.formats.pkg import PKGHeader
 from mercury_engine_data_structures.game_check import Game
 
@@ -32,10 +33,21 @@ class PkgEditor:
             }
             yield PkgEditor(files)
 
-    def find_asset_id(self, asset_id: int) -> Optional[str]:
+    def find_pkgs_for_asset_id(self, asset_id: AssetId) -> Iterator[str]:
         for name, header in self.headers.items():
             if any(entry.asset_id == asset_id for entry in header.file_entries):
-                return name
+                yield name
 
-    def find_name(self, name: str) -> Optional[str]:
-        return self.find_asset_id(crc.crc64(name.encode("utf-8")))
+    def find_pkgs_for_name(self, name: str) -> Iterator[str]:
+        yield from self.find_pkgs_for_asset_id(crc.crc64(name.encode("utf-8")))
+
+    def get_asset_with_asset_id(self, asset_id: AssetId, in_pkg: Optional[str] = None) -> bytes:
+        for name, header in self.headers.items():
+            if in_pkg is not None and name != in_pkg:
+                continue
+
+            for entry in header.file_entries:
+                if entry.asset_id == asset_id:
+                    self.files[name].seek(entry.start_offset)
+                    return self.files[name].read(entry.end_offset - entry.start_offset)
+        raise ValueError(f"Unknown asset_id: {asset_id:0x}")

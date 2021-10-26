@@ -9,10 +9,10 @@ from construct import (
 
 from mercury_engine_data_structures import crc, resource_names
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
-from mercury_engine_data_structures.formats.base_resource import BaseResource
+from mercury_engine_data_structures.formats.base_resource import BaseResource, AssetId
 from mercury_engine_data_structures.game_check import Game
 
-AssetId = Hex(Int64ul)
+Construct_AssetId = Hex(Int64ul)
 
 
 def offset_for(con: Struct, name: str):
@@ -55,7 +55,7 @@ def header_field(field_name: str):
 
 
 FileEntry = Struct(
-    asset_id=AssetId,
+    asset_id=Construct_AssetId,
     start_offset=Int32ul,
     end_offset=Int32ul,
 )
@@ -91,7 +91,7 @@ PKG = Struct(
             item_size=Computed(lambda ctx: ctx.end_offset - ctx.start_offset),
 
             item=Struct(
-                asset_id=Pointer(header_field("asset_id"), AssetId),
+                asset_id=Pointer(header_field("asset_id"), Construct_AssetId),
                 asset_name=Computed(lambda ctx: resource_names.name_for_asset_id(ctx.asset_id)),
                 data=Prefixed(
                     Rebuild(
