@@ -96,8 +96,6 @@ def do_decode(args):
 
     raw = input_path.read_bytes()
     decoded_resource = resource_class.parse(raw, target_game=game)
-    # print(decoded_from_raw)
-
     print(decoded_resource.raw)
 
     if re_encode:
