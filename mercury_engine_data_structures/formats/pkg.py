@@ -67,16 +67,21 @@ PKGHeader = Struct(
 )
 
 PKG = Struct(
-    header_size=Int32ul,
+    _header_size=Int32ul,
+
     _data_section_size_address=Tell,
     _data_section_size=Int32ul,
+
     _num_files=Rebuild(Int32ul, construct.len_(construct.this.files)),
     _start_headers=Tell,
     _skip_headers=Seek(lambda ctx: ctx._num_files * FileEntry.sizeof(), 1),
-    _header_end=Tell,
-    _skip_end_of_header=Seek(lambda ctx: ctx.header_size - ctx._header_end, 1),
-    _align=AlignTo(8),
+
+    _align=AlignTo(128),
     _files_start=Tell,
+    _update_header_size=Pointer(
+        0x0,
+        Rebuild(Int32ul, lambda ctx: ctx._files_start - Int32ul.sizeof()),
+    ),
     files=Array(
         construct.this._num_files,
         Aligned(8, FocusedSeq(

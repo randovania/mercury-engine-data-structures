@@ -42,7 +42,6 @@ Object = Struct(
     # num_components=Int32ul,
     # component_0=Component,
     components=PrefixedArray(Int32ul, Component),
-    _2=Probe(lookahead=0x20),
 )
 
 BRFLD = Struct(
