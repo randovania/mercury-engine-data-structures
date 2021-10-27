@@ -18,3 +18,15 @@ def all_asset_id_to_name() -> Dict[int, str]:
 
 def name_for_asset_id(asset_id: int) -> Optional[str]:
     return all_asset_id_to_name().get(asset_id)
+
+
+@functools.lru_cache()
+def all_property_id_to_name() -> Dict[int, str]:
+    path = Path(__file__).parent.joinpath("property_names.json")
+    with path.open() as names_file:
+        names: Dict[str, int] = json.load(names_file)
+
+    return {
+        asset_id: name
+        for name, asset_id in names.items()
+    }
