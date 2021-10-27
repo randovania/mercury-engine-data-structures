@@ -1,11 +1,17 @@
 import construct
 from construct import (
     Struct, Construct, Const, Bytes, CString, Array, GreedyBytes, Int32ul, PrefixedArray, Int16ul,
-    Switch, Probe, Int64ul, Hex,
+    Switch, Int64ul, Hex, HexDisplayedInteger,
 )
 
+from mercury_engine_data_structures import resource_names
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
+
+PropertyEnum = construct.Enum(Hex(Int64ul), **{
+    name: HexDisplayedInteger.new(property_id, "0%sX" % (2 * 8))
+    for property_id, name in resource_names.all_property_id_to_name().items()
+})
 
 component_types = {
     'AUDIO': Struct(
@@ -35,7 +41,7 @@ Object = Struct(
     u7=Array(5, Int32ul),
     # _=Probe(lookahead=0x20),
     s7=CString("utf-8"),
-    property_id=Hex(Int64ul),
+    property_id=PropertyEnum,
     actor_def=CString("utf-8"),
     u10=Array(14, Int32ul),
 
@@ -45,22 +51,33 @@ Object = Struct(
 )
 
 BRFLD = Struct(
-    intro=Bytes(0x33),
+    intro_a=PropertyEnum,
+    intro_b=Hex(Int64ul),
+    intro_c=Hex(Int64ul),
+    intro_d=PropertyEnum,
+    intro_e=PropertyEnum,
+
+    count_for_stuff=Int32ul,
+
+    s1_type=PropertyEnum,
     s1=CString("utf-8"),
-    u2=Const(b'\xd0\x98?4\xe8k\x1b:s'),
+
+    s2_type=PropertyEnum,
     s2=CString("utf-8"),
-    u3=Array(2, Int32ul),
+
+    u3=PropertyEnum,
     s3=PrefixedArray(Int32ul, CString("utf-8")),
     u4=Array(6, Int32ul),
 
     s4=CString("utf-8"),  # expects default
-    u5=Array(3, Int32ul),
+    u5=Int32ul,
+    u5_a=PropertyEnum,
     s5=CString("utf-8"),  # expects default again
-    u6=Array(2, Int32ul),
+    enum_1=PropertyEnum,
 
     maybe_object_count=Int32ul,
 
-    first_object=Object,
+    # first_object=Object,
     # second_object=Object,
 
     # s9=CString("utf-8"),
