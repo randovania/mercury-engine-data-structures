@@ -1,9 +1,9 @@
-from typing import Dict, Union, Type
+from typing import Dict, Union, Type, Iterable
 
 import construct
 from construct import (
     Struct, Construct, Const, Bytes, CString, Array, GreedyBytes, Int32ul, PrefixedArray, Int16ul,
-    Switch, Int64ul, Hex, HexDisplayedInteger, Computed, Float32l, Flag, Probe, Int32sl, Prefixed, )
+    Switch, Int64ul, Hex, HexDisplayedInteger, Computed, Float32l, Flag, Probe, Int32sl, Pass, )
 
 from mercury_engine_data_structures import resource_names
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
@@ -58,10 +58,12 @@ def ConfirmType(name: str):
     )
 
 
-def create_struct(fields: Dict[str, Union[Construct, Type[Construct]]], debug=False):
+def create_struct(fields: Dict[str, Union[Construct, Type[Construct]]],
+                  extra_before_fields: Iterable[Construct] = (), debug=False):
     r = [
         "field_count" / Int32ul,
     ]
+    r.extend(extra_before_fields)
     for name, subcon in fields.items():
         r.extend([
             f"{name}_type" / PropertyEnum,
@@ -78,6 +80,11 @@ def create_struct(fields: Dict[str, Union[Construct, Type[Construct]]], debug=Fa
 
     return Struct(*r)
 
+
+CComponentFields: Dict[str, Union[Construct, Type[Construct]]] = {
+    "bWantsEnabled": Flag,
+    "bUseDefaultValues": Flag,
+}
 
 add_prop("sLevelID", StrId)
 add_prop("sScenarioID", StrId)
@@ -208,39 +215,34 @@ add_prop("CRumbleComponent", create_struct({
 }))
 
 add_prop("CFXComponent", create_struct({
-    "bWantsEnabled": Flag,
-    "bUseDefaultValues": Flag,
+    **CComponentFields,
     "fSelectedHighRadius": Float32l,
     "fSelectedLowRadius": Float32l,
 }))
 
 add_prop("CCollisionComponent", create_struct({
-    "bWantsEnabled": Flag,
-    "bUseDefaultValues": Flag,
+    **CComponentFields,
 }))
 
 add_prop("CAnimationNavMeshItemComponent", create_struct({
-    "bWantsEnabled": Flag,
-    "bUseDefaultValues": Flag,
+    **CComponentFields,
     "tForbiddenEdgesSpawnPoints": make_dict(Struct(
         x=ErrorWithMessage("Not implemented"),
     ), single=False),
 }))
 
 add_prop("CAnimationComponent", create_struct({
-    "bWantsEnabled": Flag,
-    "bUseDefaultValues": Flag,
+    **CComponentFields,
 }))
 
 add_prop("CModelUpdaterComponent", create_struct({
-    "bWantsEnabled": Flag,
-    "bUseDefaultValues": Flag,
+    **CComponentFields,
     "sDefaultModelPath": StrId,
 }))
 
 add_prop("CColliderTriggerComponent", create_struct({
-    "bWantsEnabled": Flag,
-    "bUseDefaultValues": Flag,
+    **CComponentFields,
+    # CTriggerComponent
     "bCallEntityLuaCallback": Flag,
     "iReverb": Int32sl,
     "iLowPassFilter": Int32sl,
@@ -256,31 +258,54 @@ add_prop("CColliderTriggerComponent", create_struct({
         Int32ul,
         Struct(
             "type" / PropertyEnum,
-            "count" / Int32ul,
-
-            "f_type" / PropertyEnum,
-            "f" / Flag,
-
-            "sCharclasses_type" / PropertyEnum,
-            "sCharclasses" / StrId,
-
-            "bEnabled_type" / PropertyEnum,
-            "bEnabled" / Flag,
-
-            "bAlways_type" / PropertyEnum,
-            "bAlways" / Flag,
-
-            "next" / PropertyEnum,
-
-            Probe(),
-            ErrorWithMessage(force_quit),
+            "item" / create_struct({
+                "sCharclasses": StrId,
+                "bEnabled": Flag,
+                "bAlways": Flag,
+                "bDone": Flag,
+                "fExecutesEvery": Float32l,
+                "fExecutesEveryRandomRange": Float32l,
+                "eEvent": PrefixedArray(Int32ul, Struct(
+                )),
+                "vLogicActions": PrefixedArray(
+                    Int32ul,
+                    Struct(
+                        "enum" / PropertyEnum,
+                        "item" / create_struct({
+                            "bCameraToRail": Flag,
+                        })
+                    )
+                ),
+            }, [
+                "f_type" / PropertyEnum,
+                "f" / Flag,
+            ]),
         )
     ),
+
+    # CColliderTriggerComponent
+    "lnkShape": StrId,
+}))
+
+add_prop("CLogicShapeComponent", create_struct({
+    "pLogicShape": PropertyElement,
 }, debug=True))
 
-# add_prop("CAnimationComponent", create_struct({
-#     "bWantsEnabled": Flag,
-#     "bUseDefaultValues": Flag,
+add_prop("game::logic::collision::CPolygonCollectionShape", create_struct({
+    # CShape
+    "vPos": CVector3D,
+    "bIsSolid": Flag,
+
+    # CPolygonCollectionShape
+    "oPolyCollection": PrefixedArray(Int32ul, Struct(
+        vPolys=PropertyEnum,
+        count=Int32ul,
+        # WIP
+    )),
+}, debug=True))
+
+# add_prop("____debug", create_struct({
+#     **CComponentFields,
 # }, debug=True))
 
 # bEnabled_ = PropertyEnum,
@@ -327,7 +352,7 @@ BRFLD = Struct(
     f4=Int32ul,
 
     # dctSublayers
-    f5=PropertyElement,
+    dctSublayers=PropertyElement,
 
     raw=GreedyBytes,
 )
