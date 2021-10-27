@@ -51,3 +51,10 @@ class PkgEditor:
                     self.files[name].seek(entry.start_offset)
                     return self.files[name].read(entry.end_offset - entry.start_offset)
         raise ValueError(f"Unknown asset_id: {asset_id:0x}")
+
+    def all_asset_ids(self):
+        return {
+            entry.asset_id
+            for header in self.headers.values()
+            for entry in header.file_entries
+        }
