@@ -30,12 +30,16 @@ class PointerSet:
         self.types[prop_id] = value
 
     def create_construct(self) -> Struct:
+        fields = {
+            prop_id: hashed_names.all_property_id_to_name()[prop_id] / conn
+            for prop_id, conn in self.types.items()
+        }
         return Struct(
             type=Hex(Int64ul),
             type_name=Computed(lambda ctx: hashed_names.all_property_id_to_name().get(ctx.type)),
-            element=Switch(
+            ptr=Switch(
                 construct.this.type,
-                self.types,
+                fields,
                 ErrorWithMessage(
                     lambda ctx: f"Property {ctx.type} ({hashed_names.all_property_id_to_name().get(ctx.type)}) "
                                 "without assigned type"),

@@ -4,6 +4,7 @@ import construct
 from construct import Construct, Int32ul, Probe, Struct, Adapter
 
 from mercury_engine_data_structures import hashed_names
+from mercury_engine_data_structures.common_types import make_vector
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, ForceQuit
 from mercury_engine_data_structures.hashed_names import PropertyEnum
 
@@ -49,26 +50,28 @@ def Object(fields: Dict[str, Union[Construct, Type[Construct]]], *,
         for name, conn in fields.items()
     }
 
-    r = construct.PrefixedArray(
-        Int32ul,
-        Struct(
-            "type" / PropertyEnum,
-            "item" / construct.Switch(
-                construct.this.type,
-                fields,
-                ErrorWithMessage(
-                    lambda ctx: f"Type {ctx.type} not known, valid types are {all_types}."
-                )
-            )
+    switch = construct.Switch(
+        construct.this.type,
+        fields,
+        ErrorWithMessage(
+            lambda ctx: f"Type {ctx.type} not known, valid types are {all_types}."
         )
     )
+    switch.name = "item"
+    r = ObjectAdapter(make_vector(
+        Struct(
+            "type" / PropertyEnum,
+            switch,
+        )
+    ))
     if debug:
+        r.name = "fields"
         r = construct.FocusedSeq(
             "fields",
-            "fields" / r,
+            r,
             "next_enum" / PropertyEnum,
             "probe" / Probe(lookahead=0x8),
             ForceQuit(),
         )
 
-    return ObjectAdapter(r)
+    return r
