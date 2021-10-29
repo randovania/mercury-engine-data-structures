@@ -44,6 +44,12 @@ class ErrorWithMessage(Construct):
         raise construct.SizeofError("Error does not have size, because it interrupts parsing and building", path=path)
 
 
+def ForceQuit():
+    def force_quit(ctx):
+        raise SystemExit(1)
+    return ErrorWithMessage(force_quit)
+
+
 def LabeledOptional(label, subcon):
     return Optional(
         FocusedSeq(

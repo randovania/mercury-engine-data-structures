@@ -3,6 +3,10 @@ import json
 from pathlib import Path
 from typing import Dict, Optional
 
+import construct
+from construct import Hex, Int64ul
+from construct.lib import HexDisplayedInteger
+
 
 @functools.lru_cache()
 def all_asset_id_to_name() -> Dict[int, str]:
@@ -35,3 +39,9 @@ def all_property_id_to_name() -> Dict[int, str]:
         asset_id: name
         for name, asset_id in names.items()
     }
+
+
+PropertyEnum = construct.Enum(Hex(Int64ul), **{
+    name: HexDisplayedInteger.new(property_id, "0%sX" % (2 * 8))
+    for property_id, name in all_property_id_to_name().items()
+})
