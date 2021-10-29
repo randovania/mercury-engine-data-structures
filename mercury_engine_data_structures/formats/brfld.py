@@ -2,7 +2,7 @@ from typing import Dict, Union, Type
 
 from construct import (
     Struct, Construct, Const, GreedyBytes, Int32ul, Hex,
-    Flag, Int32sl, )
+    Flag, Int32sl, Pass, )
 
 from mercury_engine_data_structures.common_types import (
     StrId, Float, CVector2D, CVector3D, make_dict, make_vector,
@@ -26,6 +26,9 @@ CLogicCamera = Object({
     "fMaxExtraZDist": Float,
     "fDefaultInterp": Float,
 })
+
+TypedValues = PointerSet("base::reflection::CTypedValue")
+TypedValues.add_option("base::global::CRntFile", Struct())
 
 # TODO: figure what's the other part. Maybe Pointer to CEntity?
 CGameLink_CEntity = make_vector(ErrorWithMessage("Not Implemented"))
@@ -125,7 +128,7 @@ ActorComponents.add_option("CRumbleComponent", Object({
 ActorComponents.add_option("CCutsceneComponent", Object({
     "sCutsceneName": StrId,
     "bDisableScenarioEntitiesOnPlay": Flag,
-    # "vOriginalPos": CVector3D,
+    "vOriginalPos": CVector3D,
     "vctCutscenesOffsets": make_vector(CVector3D),
     "vctExtraInvolvedSubareas": make_vector(StrId),
     "vctExtraInvolvedActors": make_vector(Object({
@@ -139,6 +142,42 @@ ActorComponents.add_option("CCutsceneComponent", Object({
     "vctOnBeforeCutsceneStartsLA": make_vector(TriggerLogicActions.create_construct()),
     "vctOnAfterCutsceneEndsLA": make_vector(TriggerLogicActions.create_construct()),
     "bHasSamusAsExtraActor": Flag,
+}))
+
+EXCellSpawnPositionMode = make_enum(["FarthestToSpawnPoint", "ClosestToSpawnPoint"])
+EDynamicSpawnPositionMode = make_enum(["ClosestToPlayer", "FarthestToPlayer", "Random"])
+
+ActorComponents.add_option("CSpawnPointComponent", Object({
+    **CComponentFields,
+    "sOnBeforeGenerate": StrId,
+    "sOnEntityGenerated": StrId,
+    "sStartAnimation": StrId,
+    "bSpawnOnFloor": Flag,
+    "bEntityCheckFloor": Flag,
+    "bCheckCollisions": Flag,
+    "fTimeToActivate": Float,
+    "iMaxNumToGenerate": UInt,
+    "bAllowSpawnInFrustum": Flag,
+    "bStartEnabled": Flag,
+    "bAutomanaged": Flag,
+    "wpSceneShapeId": StrId,
+    "wpCollisionSceneShapeId": StrId,
+    "wpNavigableShape": StrId,
+    "wpAreaOfInterest": StrId,
+    "wpAreaOfInterestEnd": StrId,
+    "fTimeOnAOIEndToUseAsMainAOI": Float,
+    "fSpawnFromXCellProbability": Float,
+    "fSpawnFromXCellProbabilityAfterFirst": Float,
+    "eXCellSpawnPositionMode": EXCellSpawnPositionMode,
+    "bUseDynamicSpawnPosition": Flag,
+    "eDynamicSpawnPositionMode": EDynamicSpawnPositionMode,
+    "tDynamicSpawnPositions": Int32ul,
+    "tXCellTransformTargets": Int32ul,
+    "wpXCellActivationAreaShape": StrId,
+    "sCharClass": StrId,
+    "voActorBlueprint": make_vector(Object({
+        "InnerValue": PropertyEnum,
+    })),
 }))
 
 # CSpawnGroupComponent
