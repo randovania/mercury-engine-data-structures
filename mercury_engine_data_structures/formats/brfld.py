@@ -2,7 +2,7 @@ from typing import Dict, Union, Type
 
 from construct import (
     Struct, Construct, Const, GreedyBytes, Int32ul, Hex,
-    Flag, Int32sl, Pass, )
+    Flag, Int32sl, Pass, Prefixed, )
 
 from mercury_engine_data_structures.common_types import (
     StrId, Float, CVector2D, CVector3D, make_dict, make_vector,
@@ -28,7 +28,7 @@ CLogicCamera = Object({
 })
 
 TypedValues = PointerSet("base::reflection::CTypedValue")
-TypedValues.add_option("base::global::CRntFile", Struct())
+TypedValues.add_option("base::global::CRntFile", Prefixed(Int32ul, GreedyBytes))
 
 # TODO: figure what's the other part. Maybe Pointer to CEntity?
 CGameLink_CEntity = make_vector(ErrorWithMessage("Not Implemented"))
@@ -176,7 +176,7 @@ ActorComponents.add_option("CSpawnPointComponent", Object({
     "wpXCellActivationAreaShape": StrId,
     "sCharClass": StrId,
     "voActorBlueprint": make_vector(Object({
-        "InnerValue": PropertyEnum,
+        "InnerValue": TypedValues.create_construct(),
     })),
 }))
 
