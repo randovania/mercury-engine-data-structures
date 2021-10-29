@@ -3,7 +3,7 @@ from typing import Dict, Union, Type, Iterable
 import construct
 from construct import (
     Struct, Construct, Const, Bytes, CString, Array, GreedyBytes, Int32ul, PrefixedArray, Int16ul,
-    Switch, Int64ul, Hex, HexDisplayedInteger, Computed, Float32l, Flag, Probe, Int32sl, )
+    Switch, Int64ul, Hex, HexDisplayedInteger, Computed, Float32l, Flag, Probe, Int32sl, Pass, )
 
 from mercury_engine_data_structures import resource_names
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
@@ -142,7 +142,9 @@ def make_vector(value: Construct):
     return PrefixedArray(Int32ul, value)
 
 
+CVector2D = Array(2, Float32l)
 CVector3D = Array(3, Float32l)
+CVector4D = Array(4, Float32l)
 
 add_prop("dctSublayers", make_dict(Struct(
     # Sublayer
@@ -234,6 +236,21 @@ add_prop("CModelUpdaterComponent", create_struct({
     "sDefaultModelPath": StrId,
 }))
 
+# CTriggerLogicAction
+add_prop("CCameraToRailLogicAction", create_struct({
+    "bCameraToRail": Flag,
+}))
+add_prop("CLuaCallsLogicAction", create_struct({
+    "sCallbackEntityName": StrId,  # CRntString, but still a string
+    "sCallback": StrId,
+    "bCallbackEntity": Flag,
+    "bCallbackPersistent": Flag,
+}))
+add_prop("CSetActorEnabledLogicAction", create_struct({
+    "wpActor": StrId,
+    "bEnabled": Flag,
+}))
+
 add_prop("CColliderTriggerComponent", create_struct({
     **CComponentFields,
     # CTriggerComponent
@@ -248,32 +265,22 @@ add_prop("CColliderTriggerComponent", create_struct({
     "bCheckAllEntities": Flag,
     "bPersistentState": Flag,
     "sSfxType": StrId,
-    "lstActivationConditions": PrefixedArray(
-        Int32ul,
-        Struct(
-            "type" / PropertyEnum,
-            "item" / create_struct({
-                "sID": StrId,
-                "sCharclasses": StrId,
-                "bEnabled": Flag,
-                "bAlways": Flag,
-                "bDone": Flag,
-                "fExecutesEvery": Float32l,
-                "fExecutesEveryRandomRange": Float32l,
-                "eEvent": PrefixedArray(Int32ul, Struct(
-                )),
-                "vLogicActions": PrefixedArray(
-                    Int32ul,
-                    Struct(
-                        "enum" / PropertyEnum,
-                        "item" / create_struct({
-                            "bCameraToRail": Flag,
-                        })
-                    )
-                ),
-            }),
-        )
-    ),
+    "lstActivationConditions": make_vector(Struct(
+        "type" / PropertyEnum,
+        "item" / create_struct({
+            "sID": StrId,
+            "sCharclasses": StrId,
+            "bEnabled": Flag,
+            "bAlways": Flag,
+            "bDone": Flag,
+            "fExecutesEvery": Float32l,
+            "fExecutesEveryRandomRange": Float32l,
+            "eEvent": make_vector(Struct(
+                # TODO empty?
+            )),
+            "vLogicActions": make_vector(PropertyElement),
+        }),
+    )),
 
     # CColliderTriggerComponent
     "lnkShape": StrId,  # TODO: confirm
@@ -284,6 +291,7 @@ add_prop("CLogicShapeComponent", create_struct({
     "bWantsToGenerateNavMeshEdges": Flag,
 }))
 
+# Logic Shapes
 add_prop("game::logic::collision::CPolygonCollectionShape", create_struct({
     # CShape
     "vPos": CVector3D,
@@ -303,6 +311,16 @@ add_prop("game::logic::collision::CPolygonCollectionShape", create_struct({
         })),
     )),
 }))
+add_prop("game::logic::collision::COBoxShape2D", create_struct({
+    # CShape
+    "vPos": CVector3D,
+    "bIsSolid": Flag,
+
+    # CPolygonCollectionShape
+    "v2Extent": CVector2D,
+    "fDegrees": Float32l,
+    "bOutwardsNormal": Flag,
+}))
 
 add_prop("CCameraRailComponent", create_struct({
     # base::global::CRntVector<SCameraSubRail>
@@ -319,6 +337,25 @@ add_prop("CCameraRailComponent", create_struct({
         "fMinRailSpeed": Float32l,
         "fMaxRailDistance": Float32l,
     }),
+}))
+
+add_prop("CDoorLifeComponent", create_struct({
+    "bWantsEnabled": Flag,
+    "bUseDefaultValues": Flag,
+
+    # door life
+    "fMaxDistanceOpened": Float32l,
+    "wpLeftDoorShieldEntity": StrId,
+    "wpRightDoorShieldEntity": StrId,
+    "fMinTimeOpened": Float32l,
+    "bStayOpen": Flag,
+    "bStartOpened": Flag,
+    "bOnBlackOutOpened": Flag,
+    "bDoorIsWet": Flag,
+    "bFrozenDuringColdown": Flag,
+    "iAreaLeft": Int32ul,
+    "iAreaRight": Int32ul,
+    "aVignettes": Int32ul,
 }))
 
 # add_prop("____debug", create_struct({
