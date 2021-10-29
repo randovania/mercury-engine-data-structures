@@ -2,7 +2,7 @@ from typing import Dict, Union, Type
 
 from construct import (
     Struct, Construct, Const, GreedyBytes, Int32ul, Hex,
-    Flag, Int32sl, Pass, Prefixed, )
+    Flag, Int32sl, Prefixed, )
 
 from mercury_engine_data_structures.common_types import (
     StrId, Float, CVector2D, CVector3D, make_dict, make_vector,
@@ -26,12 +26,13 @@ CLogicCamera = Object({
     "fMaxExtraZDist": Float,
     "fDefaultInterp": Float,
 })
+CFilePathStrId = StrId
 
 TypedValues = PointerSet("base::reflection::CTypedValue")
 TypedValues.add_option("base::global::CRntFile", Prefixed(Int32ul, GreedyBytes))
 
-# TODO: figure what's the other part. Maybe Pointer to CEntity?
-CGameLink_CEntity = make_vector(ErrorWithMessage("Not Implemented"))
+CGameLink_CEntity = StrId
+CGameLink_CActor = StrId
 
 # CTriggerLogicAction
 TriggerLogicActions = PointerSet("CTriggerLogicAction")
@@ -89,6 +90,9 @@ Shapes.add_option("game::logic::collision::COBoxShape2D", Object({
     "bOutwardsNormal": Flag,
 }))
 
+# CXParasiteBehavior
+CXParasiteBehavior = PointerSet("CXParasiteBehavior")
+
 # CActorComponents
 CComponentFields: Dict[str, Union[Construct, Type[Construct]]] = {
     "bWantsEnabled": Flag,
@@ -98,6 +102,10 @@ ActorComponents = PointerSet("CActorComponent")
 
 ActorComponents.add_option("CLogicCameraComponent", Object({
     "rLogicCamera": PointerSet.construct_pointer_for("CLogicCamera", CLogicCamera),
+}))
+
+ActorComponents.add_option("CLandmarkComponent", Object({
+    "sLandmarkID": StrId,
 }))
 
 ActorComponents.add_option("CAudioComponent", Object({
@@ -180,6 +188,11 @@ ActorComponents.add_option("CSpawnPointComponent", Object({
     })),
 }))
 
+ActorComponents.add_option("CXParasiteDropComponent", Object({
+    **CComponentFields,
+    "vectBehaviors": make_vector(CXParasiteBehavior.create_construct())
+}))
+
 # CSpawnGroupComponent
 
 ActorComponents.add_option("CSpawnGroupComponent", Object(CSpawnGroupComponentFields := {
@@ -220,14 +233,43 @@ ActorComponents.add_option("CBossSpawnGroupComponent", Object({
 
 # CSceneComponent
 
+EBreakableTileType = make_enum([
+    "UNDEFINED", "POWERBEAM", "BOMB", "MISSILE",
+    "SUPERMISSILE", "POWERBOMB", "SCREWATTACK",
+    "WEIGHT", "BABYHATCHLING", "SPEEDBOOST",
+])
+EColMat = make_enum([
+    "DEFAULT", "SCENARIO_GENERIC", "FLESH_GENERIC", "DAMAGE_BLOCKED",
+    "METAL", "ENERGY", "DIRT", "ROCK", "ICE", "UNDER_WATER",
+    "UNDER_WATER_SP", "MID_WATER", "MID_WATER_SP", "PUDDLE",
+    "OIL", "END_WORLD",
+])
+
 ActorComponents.add_option("CMaterialFXComponent", Object(CComponentFields))
 ActorComponents.add_option("CModelInstanceComponent", Object({
     **CComponentFields,
     "sModelPath": StrId,
     "vScale": CVector3D,
 }))
+ActorComponents.add_option("CBreakableTileGroupComponent", Object({
+    **CComponentFields,
+    "uGroupId": UInt,
+    "aGridTiles": make_vector(Object({
+        # CBreakableTileGroupComponent::STileInfo
+        "eTileType": EBreakableTileType,
+        "vGridCoords": CVector2D,
+        "sHiddenSG": StrId,
+        "bIsHidingSecret": Flag,
+        "aVignettes": make_vector(CGameLink_CActor),
+    })),
+    "bFakeHusks": Flag,
+    "eCollisionMaterial": EColMat,
+}))
 
 #
+
+ActorComponents.add_option("CSonarTargetComponent", Object(CComponentFields))
+ActorComponents.add_option("CBreakableTileGroupSonarTargetComponent", Object(CComponentFields))
 
 ActorComponents.add_option("CDropComponent", Object(CComponentFields))
 
@@ -314,6 +356,14 @@ ActorComponents.add_option("CCameraRailComponent", Object({
     }),
 }))
 
+ActorComponents.add_option("CVideoManagerComponent", Object({
+    **CComponentFields,
+    "sVideo_1_Path": StrId,
+    "sVideo_2_Path": StrId,
+    "sVideoAux_1_Path": CFilePathStrId,
+    "sVideoAux_2_Path": CFilePathStrId,
+}))
+
 # Life Component
 
 ActorComponents.add_option("CLifeComponent", Object(CLifeComponentFields := {
@@ -340,7 +390,7 @@ ActorComponents.add_option("CDoorLifeComponent", Object({
     "bFrozenDuringColdown": Flag,
     "iAreaLeft": UInt,
     "iAreaRight": UInt,
-    "aVignettes": UInt,
+    "aVignettes": make_vector(CGameLink_CActor),
 }))
 
 ActorComponents.add_option("CPowerBombBlockLifeComponent", Object(CLifeComponentFields))
@@ -371,13 +421,13 @@ ActorComponents.add_option("CGrabComponent", Object({
 
 ActorComponents.add_option("CBreakableScenarioComponent", Object({
     **CComponentFields,
-    "aVignettes": UInt,
+    "aVignettes": make_vector(CGameLink_CActor),
 }))
 
 # CNavMeshItemComponent
 ActorComponents.add_option("CNavMeshItemComponent", Object(CNavMeshItemComponentFields := {
     **CComponentFields,
-    "tForbiddenEdgesSpawnPoints": CGameLink_CEntity,
+    "tForbiddenEdgesSpawnPoints": make_vector(make_vector(ErrorWithMessage("Not Implemented"))),
 }))
 
 ActorComponents.add_option("CAnimationNavMeshItemComponent", Object({
@@ -404,7 +454,7 @@ ActorComponents.add_option("CElevatorCommanderUsableComponent", Object({
 
 ActorComponents.add_option("CAccessPointComponent", Object(CAccessPointComponentFields := {
     **CUsableComponentFields,
-    "vDoorsToChange": CGameLink_CEntity,
+    "vDoorsToChange": make_vector(CGameLink_CEntity),
     "sInteractionLiteralID": StrId,
 
     # CRntDictionary<CStrId,CRntVector<CStrId>>
@@ -502,7 +552,10 @@ CScenario = Object({
     "vLayerFiles": make_vector(StrId),
     "rEntitiesLayer": Int32ul,
     "dctSublayers": make_dict(CActorSublayer),
-}, debug=True)
+
+    # "CRntDictionary<CStrId, CRntVector<CGameLink<CActor>>>"
+    "dctActorGroups": make_dict(make_vector(CGameLink_CActor)),
+})
 
 BRFLD = Struct(
     magic=Const('CScenario', PropertyEnum),
@@ -513,7 +566,7 @@ BRFLD = Struct(
     # gameeditor::CGameModelRoot
     root=Object({
         "pScenario": PointerSet.construct_pointer_for("CScenario", CScenario),
-    }),
+    }, debug=True),
     raw=GreedyBytes,
 )
 
