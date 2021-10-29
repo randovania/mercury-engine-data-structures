@@ -350,7 +350,6 @@ Actors.add_option("CEntity", create_struct({
 # Root stuff
 
 CActorSublayer = create_struct({
-    # Sublayer
     "sName": StrId,
     "dctActors": make_dict(Actors.create_construct()),
 })
@@ -364,13 +363,15 @@ CScenario = create_struct({
 }, debug=True)
 
 BRFLD = Struct(
-    intro_a=Const(0x42824DE0BB09EF20, Int64ul),
-    intro_b=Hex(Int64ul),
-    intro_c=Hex(Int64ul),
+    magic=Const('CScenario', PropertyEnum),
+    intro_a=Hex(Int32ul),
+    intro_b=Hex(Int32ul),
+    intro_c=Hex(Int32ul),
 
-    pScenario_t=PropertyEnum,
-    pScenario=PointerSet.construct_pointer_for("CScenario", CScenario),
-
+    # gameeditor::CGameModelRoot
+    root=create_struct({
+        "pScenario": PointerSet.construct_pointer_for("CScenario", CScenario),
+    }),
     raw=GreedyBytes,
 )
 
