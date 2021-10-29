@@ -1,11 +1,13 @@
 from typing import Dict, Union, Type
 
 from construct import (
-    Struct, Construct, Const, GreedyBytes, Int32ul, PrefixedArray, Hex,
-    Float32l, Flag, Int32sl,
-)
+    Struct, Construct, Const, GreedyBytes, Int32ul, Hex,
+    Flag, Int32sl, )
 
-from mercury_engine_data_structures.common_types import StrId, Float, CVector2D, CVector3D, make_dict, make_vector
+from mercury_engine_data_structures.common_types import (
+    StrId, Float, CVector2D, CVector3D, make_dict, make_vector,
+    make_enum, UInt,
+)
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
@@ -25,6 +27,9 @@ CLogicCamera = Object({
     "fDefaultInterp": Float,
 })
 
+# TODO: figure what's the other part. Maybe Pointer to CEntity?
+CGameLink_CEntity = make_vector(ErrorWithMessage("Not Implemented"))
+
 # CTriggerLogicAction
 TriggerLogicActions = PointerSet("CTriggerLogicAction")
 TriggerLogicActions.add_option("CCameraToRailLogicAction", Object({
@@ -40,6 +45,13 @@ TriggerLogicActions.add_option("CSetActorEnabledLogicAction", Object({
     "wpActor": StrId,
     "bEnabled": Flag,
 }))
+TriggerLogicActions.add_option("CSaveGameToSnapshotLogicAction", Object({
+    "sSnapshotId": StrId,
+}))
+TriggerLogicActions.add_option("CMarkMinimapLogicAction", Object({
+    "wpVisibleLogicShape": StrId,
+    "wpVisitedLogicShape": StrId,
+}))
 
 # Shapes
 Shapes = PointerSet("game::logic::collision::CShape")
@@ -49,13 +61,13 @@ Shapes.add_option("game::logic::collision::CPolygonCollectionShape", Object({
     "bIsSolid": Flag,
 
     # CPolygonCollectionShape
-    "oPolyCollection": PrefixedArray(Int32ul, Struct(
+    "oPolyCollection": make_vector(Struct(
         # "base::global::CRntVector<base::spatial::CPolygon2D>"
         vPolys_type=PropertyEnum,
-        vPolys=PrefixedArray(Int32ul, Object({
+        vPolys=make_vector(Object({
             "bClosed": Flag,
             # "base::global::CRntVector<base::spatial::SSegmentData>"
-            "oSegmentData": PrefixedArray(Int32ul, Object({
+            "oSegmentData": make_vector(Object({
                 "vPos": CVector3D,
             })),
             "bOutwardsNormal": Flag,
@@ -69,7 +81,7 @@ Shapes.add_option("game::logic::collision::COBoxShape2D", Object({
 
     # CPolygonCollectionShape
     "v2Extent": CVector2D,
-    "fDegrees": Float32l,
+    "fDegrees": Float,
     "bOutwardsNormal": Flag,
 }))
 
@@ -85,13 +97,11 @@ ActorComponents.add_option("CLogicCameraComponent", Object({
 }))
 
 ActorComponents.add_option("CAudioComponent", Object({
-    "bWantsEnabled": Flag,
-    "bUseDefaultValues": Flag,
+    **CComponentFields,
 }))
 
 ActorComponents.add_option("CStartPointComponent", Object({
-    "bWantsEnabled": Flag,
-    "bUseDefaultValues": Flag,
+    **CComponentFields,
 
     "sOnTeleport": StrId,
     "sOnTeleportLogicCamera": StrId,
@@ -104,20 +114,82 @@ ActorComponents.add_option("CStartPointComponent", Object({
 }))
 
 ActorComponents.add_option("CScriptComponent", Object({
-    "bWantsEnabled": Flag,
-    "bUseDefaultValues": Flag,
-}))
-
-ActorComponents.add_option("CWeightActivableMovablePlatformComponent", Object({
-    "bWantsEnabled": Flag,
-    "bUseDefaultValues": Flag,
-    "sOnActivatedLuaCallback": StrId,
+    **CComponentFields,
 }))
 
 ActorComponents.add_option("CRumbleComponent", Object({
-    "bWantsEnabled": Flag,
-    "bUseDefaultValues": Flag,
+    **CComponentFields,
 }))
+
+ActorComponents.add_option("CCutsceneComponent", Object({
+    "sCutsceneName": StrId,
+    "bDisableScenarioEntitiesOnPlay": Flag,
+    # "vOriginalPos": CVector3D,
+    "vctCutscenesOffsets": make_vector(CVector3D),
+    "vctExtraInvolvedSubareas": make_vector(StrId),
+    "vctExtraInvolvedActors": make_vector(Object({
+        # CCutsceneComponent::SActorInfo
+        "sId": StrId,
+        "lnkActor": StrId,
+        "bStartingVisibleState": Flag,
+        "bReceiveLogicUpdate": Flag,
+        "vctVisibilityPerTake": make_vector(Flag),
+    })),
+    "vctOnBeforeCutsceneStartsLA": make_vector(TriggerLogicActions.create_construct()),
+    "vctOnAfterCutsceneEndsLA": make_vector(TriggerLogicActions.create_construct()),
+    "bHasSamusAsExtraActor": Flag,
+}))
+
+# CSpawnGroupComponent
+
+ActorComponents.add_option("CSpawnGroupComponent", Object(CSpawnGroupComponentFields := {
+    **CComponentFields,
+    "bIsGenerator": Flag,
+    "bIsInfinite": Flag,
+    "iMaxToGenerate": UInt,
+    "iMaxSimultaneous": UInt,
+    "fGenerateEvery": Float,
+    "sOnBeforeGenerateEntity": StrId,
+    "sOnEntityGenerated": StrId,
+    "sOnEnable": StrId,
+    "sOnDisable": StrId,
+    "sOnMaxSimultaneous": StrId,
+    "sOnMaxGenerated": StrId,
+    "sOnEntityDead": StrId,
+    "sOnEntityDamaged": StrId,
+    "sOnAllEntitiesDead": StrId,
+    "bAutomanaged": Flag,
+    "bDisableOnAllDead": Flag,
+    "bAutoenabled": Flag,
+    "bSpawnPointsNotInFrustrum": Flag,
+    "bGenerateEntitiesByOrder": Flag,
+    "sLogicCollisionShapeID": StrId,
+    "wpAreaOfInterest": StrId,
+    "wpAreaOfInterestEnd": StrId,
+    "fDropAmmoProb": Float,
+    "iInitToGenerate": UInt,
+    "sArenaId": StrId,
+    "bCheckActiveDrops": Flag,
+    # "iNumDeaths": UInt,
+    "vectSpawnPoints": make_vector(StrId),
+}))
+ActorComponents.add_option("CBossSpawnGroupComponent", Object({
+    **CSpawnGroupComponentFields,
+    "sBossBattleLabel": StrId,
+}))
+
+# CSceneComponent
+
+ActorComponents.add_option("CMaterialFXComponent", Object(CComponentFields))
+ActorComponents.add_option("CModelInstanceComponent", Object({
+    **CComponentFields,
+    "sModelPath": StrId,
+    "vScale": CVector3D,
+}))
+
+#
+
+ActorComponents.add_option("CDropComponent", Object(CComponentFields))
 
 ActorComponents.add_option("CFXComponent", Object({
     **CComponentFields,
@@ -129,13 +201,6 @@ ActorComponents.add_option("CCollisionComponent", Object({
     **CComponentFields,
 }))
 
-ActorComponents.add_option("CAnimationNavMeshItemComponent", Object({
-    **CComponentFields,
-    "tForbiddenEdgesSpawnPoints": make_dict(Struct(
-        x=ErrorWithMessage("Not implemented"),
-    )),
-}))
-
 ActorComponents.add_option("CAnimationComponent", Object({
     **CComponentFields,
 }))
@@ -145,6 +210,7 @@ ActorComponents.add_option("CModelUpdaterComponent", Object({
     "sDefaultModelPath": StrId,
 }))
 
+EEvent = make_enum(["OnEnter", "OnExit", "OnAllExit", "OnStay", "OnEnable", "OnDisable", "TE_COUNT"])
 ActorComponents.add_option("CColliderTriggerComponent", Object({
     **CComponentFields,
     # CTriggerComponent
@@ -169,9 +235,7 @@ ActorComponents.add_option("CColliderTriggerComponent", Object({
             "bDone": Flag,
             "fExecutesEvery": Float,
             "fExecutesEveryRandomRange": Float,
-            "eEvent": make_vector(Struct(
-                # TODO empty?
-            )),
+            "eEvent": EEvent,
             "vLogicActions": make_vector(TriggerLogicActions.create_construct()),
         }),
     )),
@@ -180,9 +244,17 @@ ActorComponents.add_option("CColliderTriggerComponent", Object({
     "lnkShape": StrId,  # TODO: confirm
 }))
 
-ActorComponents.add_option("CLogicShapeComponent", Object({
+ActorComponents.add_option("CLogicShapeComponent", Object(CLogicShapeComponentFields := {
     "pLogicShape": Shapes.create_construct(),
     "bWantsToGenerateNavMeshEdges": Flag,
+}))
+
+ActorComponents.add_option("CBreakableVignetteComponent", Object({
+    **CLogicShapeComponentFields,
+    "sVignetteSG": StrId,
+    "bUnhideWhenPlayerInside": Flag,
+    "bPreventVisibilityOnly": Flag,
+    # "bForceNotVisible": Flag,
 }))
 
 ActorComponents.add_option("CCameraRailComponent", Object({
@@ -202,10 +274,21 @@ ActorComponents.add_option("CCameraRailComponent", Object({
     }),
 }))
 
-ActorComponents.add_option("CDoorLifeComponent", Object({
-    "bWantsEnabled": Flag,
-    "bUseDefaultValues": Flag,
+# Life Component
 
+ActorComponents.add_option("CLifeComponent", Object(CLifeComponentFields := {
+    **CComponentFields,
+    # Fields in Ghidra, but not yet in data
+    # "bWantsCameraFXPreset": Flag,
+    # "fMaxLife": Float,
+    # "fCurrentLife": Float,
+    # "bCurrentLifeLocked": Flag,
+}))
+
+ActorComponents.add_option("CItemLifeComponent", Object(CLifeComponentFields))
+
+ActorComponents.add_option("CDoorLifeComponent", Object({
+    **CLifeComponentFields,
     # door life
     "fMaxDistanceOpened": Float,
     "wpLeftDoorShieldEntity": StrId,
@@ -216,13 +299,143 @@ ActorComponents.add_option("CDoorLifeComponent", Object({
     "bOnBlackOutOpened": Flag,
     "bDoorIsWet": Flag,
     "bFrozenDuringColdown": Flag,
-    "iAreaLeft": Int32ul,
-    "iAreaRight": Int32ul,
-    "aVignettes": Int32ul,
+    "iAreaLeft": UInt,
+    "iAreaRight": UInt,
+    "aVignettes": UInt,
+}))
+
+ActorComponents.add_option("CPowerBombBlockLifeComponent", Object(CLifeComponentFields))
+
+ActorComponents.add_option("CElectricReactionComponent", Object({
+    **CComponentFields,
+}))
+
+ActorComponents.add_option("CTimelineComponent", Object({
+    **CComponentFields,
+}))
+
+ActorComponents.add_option("CThermalReactionComponent", Object({
+    **CComponentFields,
+}))
+
+ActorComponents.add_option("CLightingComponent", Object({
+    **CComponentFields,
+}))
+
+ELinkMode = make_enum({"None": 0, "RootToDC_Grab": 1, "FeetToRoot": 2})
+
+ActorComponents.add_option("CGrabComponent", Object({
+    **CComponentFields,
+    # "bIsInGrab": Flag, # found in Ghidra, but not in data so far. Implies the game indeed omits fields sometimes
+    "eLinkModeAsGrabber": ELinkMode,
+}))
+
+ActorComponents.add_option("CBreakableScenarioComponent", Object({
+    **CComponentFields,
+    "aVignettes": UInt,
+}))
+
+# CNavMeshItemComponent
+ActorComponents.add_option("CNavMeshItemComponent", Object(CNavMeshItemComponentFields := {
+    **CComponentFields,
+    "tForbiddenEdgesSpawnPoints": CGameLink_CEntity,
+}))
+
+ActorComponents.add_option("CAnimationNavMeshItemComponent", Object({
+    **CNavMeshItemComponentFields,
+}))
+
+# CUsableComponent
+ActorComponents.add_option("CUsableComponent", Object(CUsableComponentFields := {
+    **CComponentFields,
+    "bFadeInActived": Flag,
+}))
+
+ActorComponents.add_option("CSaveStationUsableComponent", Object(CUsableComponentFields))
+ActorComponents.add_option("CTotalRechargeComponent", Object({
+    **CUsableComponentFields,
+    "sRechargeFX": StrId,
+    "sEyeRFX": StrId,
+    "sEyeLFX": StrId,
+}))
+ActorComponents.add_option("CElevatorCommanderUsableComponent", Object({
+    **CUsableComponentFields,
+    "sTargetSpawnPoint": StrId,
+}))
+
+ActorComponents.add_option("CAccessPointComponent", Object(CAccessPointComponentFields := {
+    **CUsableComponentFields,
+    "vDoorsToChange": CGameLink_CEntity,
+    "sInteractionLiteralID": StrId,
+
+    # CRntDictionary<CStrId,CRntVector<CStrId>>
+    "tCaptionList": make_dict(make_vector(StrId)),
+    "wpThermalDevice": StrId,
+}))
+
+ActorComponents.add_option("CAccessPointCommanderComponent", Object({
+    **CAccessPointComponentFields,
+    "wpAfterFirstDialogueScenePlayer": StrId,
+}))
+
+# Elevator Stuff
+
+EElevatorDirection = make_enum(["UP", "DOWN"])
+ELoadingScreen = make_enum([
+    "E_LOADINGSCREEN_GUI_2D", "E_LOADINGSCREEN_VIDEO", "E_LOADINGSCREEN_ELEVATOR_UP", "E_LOADINGSCREEN_ELEVATOR_DOWN",
+    "E_LOADINGSCREEN_MAIN_ELEVATOR_UP", "E_LOADINGSCREEN_MAIN_ELEVATOR_DOWN", "E_LOADINGSCREEN_TELEPORTER",
+    "E_LOADINGSCREEN_TRAIN_LEFT", "E_LOADINGSCREEN_TRAIN_LEFT_AQUA", "E_LOADINGSCREEN_TRAIN_RIGHT",
+    "E_LOADINGSCREEN_TRAIN_RIGHT_AQUA",
+])
+
+ActorComponents.add_option("CElevatorUsableComponent", Object(CElevatorUsableComponentFields := {
+    **CUsableComponentFields,
+    "eDirection": EElevatorDirection,
+    "eLoadingScreen": ELoadingScreen,
+    "sLevelName": StrId,
+    "sScenarioName": StrId,
+    "sTargetSpawnPoint": StrId,
+    "sMapConnectionId": StrId,
+    "fMinTimeLoad": Float,
+}))
+ActorComponents.add_option("CCapsuleUsableComponent", Object({
+    **CElevatorUsableComponentFields,
+    # CCapsuleUsableComponent
+    "wpCapsule": StrId,
+    "wpSkybase": StrId,
+}))
+
+# CMovementComponent
+
+ActorComponents.add_option("CWeightActivableMovablePlatformComponent", Object({
+    **CComponentFields,
+    "sOnActivatedLuaCallback": StrId,
+}))
+
+# CSmartObjectComponent
+
+ActorComponents.add_option("CWeightActivatedPlatformSmartObjectComponent", Object({
+    **CComponentFields,
+    # CSmartObjectComponent
+    "sOnUseStart": StrId,
+    "sOnUseFailure": StrId,
+    "sOnUseSuccess": StrId,
+    "sUsableEntity": StrId,
+    "sDefaultUseAction": StrId,
+    "sDefaultAbortAction": StrId,
+    "bStartEnabled": Flag,
+    "fInterpolationTime": Float,
+
+    # Specific
+    "sDustFX": StrId,
+    "bDisableWhenEmmyNearby": Flag,
+    "bDisableWhenUsed": Flag,
 }))
 
 # Actors
-CActorFields = {
+
+Actors = PointerSet("CActor")
+Actors.add_option("CActor", Object(CActorFields := {
     "sName": StrId,
     "oActorDefLink": StrId,
     "vPos": CVector3D,
@@ -232,11 +445,6 @@ CActorFields = {
         make_dict(ActorComponents.create_construct())
     ),
     "bEnabled": Flag,
-}
-
-Actors = PointerSet("CActor")
-Actors.add_option("CActor", Object({
-    **CActorFields
 }))
 Actors.add_option("CEntity", Object({
     **CActorFields
@@ -252,7 +460,7 @@ CActorSublayer = Object({
 CScenario = Object({
     "sLevelID": StrId,
     "sScenarioID": StrId,
-    "vLayerFiles": PrefixedArray(Int32ul, StrId),
+    "vLayerFiles": make_vector(StrId),
     "rEntitiesLayer": Int32ul,
     "dctSublayers": make_dict(CActorSublayer),
 }, debug=True)

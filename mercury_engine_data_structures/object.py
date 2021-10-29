@@ -39,11 +39,15 @@ def Object(fields: Dict[str, Union[Construct, Type[Construct]]], *,
         r.extend([
             "next_enum" / PropertyEnum,
             "probe" / Probe(lookahead=0x8),
-            "check_field_count" / construct.If(
-                lambda ctx: ctx.field_count != len(fields),
-                ErrorWithMessage(lambda ctx: f"Expected {len(fields)} fields, got {ctx.field_count}"),
-            ),
-            "quit" / ForceQuit(),
         ])
+
+    # Right now, always adding the check_field_count to help development. So far, it has always matched the data.
+    r.append("check_field_count" / construct.If(
+        lambda ctx: ctx.field_count != len(fields),
+        ErrorWithMessage(lambda ctx: f"Expected {len(fields)} fields, got {ctx.field_count}"),
+    ))
+
+    if debug:
+        r.append(ForceQuit())
 
     return Struct(*r)
