@@ -3,7 +3,7 @@ from typing import Dict, Union, Type, Iterable
 import construct
 from construct import (
     Struct, Construct, Const, Bytes, CString, Array, GreedyBytes, Int32ul, PrefixedArray, Int16ul,
-    Switch, Int64ul, Hex, HexDisplayedInteger, Computed, Float32l, Flag, Probe, Int32sl, Pass, )
+    Switch, Int64ul, Hex, HexDisplayedInteger, Computed, Float32l, Flag, Probe, Int32sl, )
 
 from mercury_engine_data_structures import resource_names
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
@@ -75,6 +75,10 @@ def create_struct(fields: Dict[str, Union[Construct, Type[Construct]]],
         r.extend([
             "next_enum" / PropertyEnum,
             "probe" / Probe(lookahead=0x8),
+            "check_field_count" / construct.If(
+                lambda ctx: ctx.field_count != len(fields),
+                ErrorWithMessage(lambda ctx: f"Expected {len(fields)} fields, got {ctx.field_count}"),
+            ),
             "quit" / ErrorWithMessage(force_quit),
         ])
 
@@ -115,22 +119,6 @@ Component = Struct(
     )
 )
 
-CVector3D = Array(3, Float32l)
-
-Object = Struct(
-    name=StrId,
-    u7=Array(5, Int32ul),
-    # _=Probe(lookahead=0x20),
-    s7=StrId,
-    property_id=PropertyEnum,
-    actor_def=StrId,
-    u10=Array(14, Int32ul),
-
-    # num_components=Int32ul,
-    # component_0=Component,
-    components=PrefixedArray(Int32ul, Component),
-)
-
 
 def make_dict(value: Construct, single=True):
     if single:
@@ -149,6 +137,12 @@ def make_dict(value: Construct, single=True):
         )
     )
 
+
+def make_vector(value: Construct):
+    return PrefixedArray(Int32ul, value)
+
+
+CVector3D = Array(3, Float32l)
 
 add_prop("dctSublayers", make_dict(Struct(
     # Sublayer
@@ -259,6 +253,7 @@ add_prop("CColliderTriggerComponent", create_struct({
         Struct(
             "type" / PropertyEnum,
             "item" / create_struct({
+                "sID": StrId,
                 "sCharclasses": StrId,
                 "bEnabled": Flag,
                 "bAlways": Flag,
@@ -276,20 +271,18 @@ add_prop("CColliderTriggerComponent", create_struct({
                         })
                     )
                 ),
-            }, [
-                "f_type" / PropertyEnum,
-                "f" / Flag,
-            ]),
+            }),
         )
     ),
 
     # CColliderTriggerComponent
-    "lnkShape": StrId,
+    "lnkShape": StrId,  # TODO: confirm
 }))
 
 add_prop("CLogicShapeComponent", create_struct({
     "pLogicShape": PropertyElement,
-}, debug=True))
+    "bWantsToGenerateNavMeshEdges": Flag,
+}))
 
 add_prop("game::logic::collision::CPolygonCollectionShape", create_struct({
     # CShape
@@ -298,11 +291,35 @@ add_prop("game::logic::collision::CPolygonCollectionShape", create_struct({
 
     # CPolygonCollectionShape
     "oPolyCollection": PrefixedArray(Int32ul, Struct(
-        vPolys=PropertyEnum,
-        count=Int32ul,
-        # WIP
+        # "base::global::CRntVector<base::spatial::CPolygon2D>"
+        vPolys_type=PropertyEnum,
+        vPolys=PrefixedArray(Int32ul, create_struct({
+            "bClosed": Flag,
+            # "base::global::CRntVector<base::spatial::SSegmentData>"
+            "oSegmentData": PrefixedArray(Int32ul, create_struct({
+                "vPos": CVector3D,
+            })),
+            "bOutwardsNormal": Flag,
+        })),
     )),
-}, debug=True))
+}))
+
+add_prop("CCameraRailComponent", create_struct({
+    # base::global::CRntVector<SCameraSubRail>
+    "oCameraRail": create_struct({
+        # SCameraRail
+        "tSubRails": make_vector(create_struct({
+            # SCameraSubRail
+            "tNodes": make_vector(create_struct({
+                "vPos": CVector3D,
+                "wpLogicCamera": StrId,
+            })),
+        })),
+        "fMaxRailSpeed": Float32l,
+        "fMinRailSpeed": Float32l,
+        "fMaxRailDistance": Float32l,
+    }),
+}))
 
 # add_prop("____debug", create_struct({
 #     **CComponentFields,
