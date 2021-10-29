@@ -3,7 +3,7 @@ from typing import Dict, Union, Type, Iterable
 import construct
 from construct import (
     Struct, Construct, Const, Bytes, CString, Array, GreedyBytes, Int32ul, PrefixedArray, Int16ul,
-    Switch, Int64ul, Hex, HexDisplayedInteger, Computed, Float32l, Flag, Probe, Int32sl, Pass, )
+    Switch, Int64ul, Hex, HexDisplayedInteger, Computed, Float32l, Flag, Probe, Int32sl, )
 
 from mercury_engine_data_structures import resource_names
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
@@ -94,41 +94,9 @@ add_prop("sLevelID", StrId)
 add_prop("sScenarioID", StrId)
 add_prop("vLayerFiles", PrefixedArray(Int32ul, StrId))
 add_prop("rEntitiesLayer", PrefixedArray(Int32ul, PropertyElement))
-add_prop("sName", StrId)
-
-component_types = {
-    'AUDIO': Struct(
-        unk=Array(15, Int16ul),
-    ),
-    'STARTPOINT': Struct(
-        unk=Bytes(0x5d),
-    ),
-    'SCRIPT': Struct(
-        unk=Bytes(0x27),
-    ),
-    'LOGICCAMERA': Struct(
-        unk=Bytes(0x9a),
-    ),
-}
-
-Component = Struct(
-    type=StrId,
-    data=Switch(
-        construct.this.type,
-        component_types,
-    )
-)
 
 
-def make_dict(value: Construct, single=True):
-    if single:
-        return Struct(
-            count=Int32ul,
-            value=Struct(
-                key=StrId,
-                value=value,
-            )
-        )
+def make_dict(value: Construct):
     return PrefixedArray(
         Int32ul,
         Struct(
@@ -145,18 +113,6 @@ def make_vector(value: Construct):
 CVector2D = Array(2, Float32l)
 CVector3D = Array(3, Float32l)
 CVector4D = Array(4, Float32l)
-
-add_prop("dctSublayers", make_dict(Struct(
-    # Sublayer
-    field_count=Int32ul,
-    sName=PropertyElement,
-    dctActors=PropertyElement,
-)))
-
-add_prop("oActorDefLink", StrId)
-add_prop("vPos", CVector3D)
-add_prop("vAng", CVector3D)
-add_prop("bEnabled", Flag)
 
 add_prop("CLogicCamera", create_struct({
     "sControllerID": StrId,
@@ -224,7 +180,7 @@ add_prop("CAnimationNavMeshItemComponent", create_struct({
     **CComponentFields,
     "tForbiddenEdgesSpawnPoints": make_dict(Struct(
         x=ErrorWithMessage("Not implemented"),
-    ), single=False),
+    )),
 }))
 
 add_prop("CAnimationComponent", create_struct({
@@ -358,34 +314,28 @@ add_prop("CDoorLifeComponent", create_struct({
     "aVignettes": Int32ul,
 }))
 
-# add_prop("____debug", create_struct({
-#     **CComponentFields,
-# }, debug=True))
-
-# bEnabled_ = PropertyEnum,
-# bEnabled = Flag,
-#
-# sOnTeleport_ = PropertyEnum,
-#
-# x = Probe(),
-# z = ErrorWithMessage(force_quit),
-
-add_prop("pComponents", PropertyElement)
 add_prop("base::global::CRntSmallDictionary<base::global::CStrId, CActorComponent*>",
-         make_dict(PropertyElement, single=False))
+         make_dict(PropertyElement))
 
-add_prop("dctActors", make_dict(Struct(
+Actor = Struct(
     # Actor
-    field_count=Int32ul,
     f1=Int32ul,
     f2=Int32ul,
-    sName=PropertyElement,
-    oActorDefLink=PropertyElement,
-    vPos=PropertyElement,
-    vAng=PropertyElement,
-    pComponents=PropertyElement,
-    bEnabled=PropertyElement,
-), single=False))
+    item=create_struct({
+        "sName": StrId,
+        "oActorDefLink": StrId,
+        "vPos": CVector3D,
+        "vAng": CVector3D,
+        "pComponents": PropertyElement,
+        "bEnabled": Flag,
+    }),
+)
+
+add_prop("dctSublayers", make_dict(create_struct({
+    # Sublayer
+    "sName": StrId,
+    "dctActors": make_dict(Actor),
+})))
 
 BRFLD = Struct(
     intro_a=Const(0x42824DE0BB09EF20, Int64ul),
