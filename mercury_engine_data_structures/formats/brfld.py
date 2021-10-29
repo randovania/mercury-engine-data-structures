@@ -1,9 +1,11 @@
+import typing
 from typing import Dict, Union, Type, Iterable
 
 import construct
 from construct import (
-    Struct, Construct, Const, Bytes, CString, Array, GreedyBytes, Int32ul, PrefixedArray, Int16ul,
-    Switch, Int64ul, Hex, HexDisplayedInteger, Computed, Float32l, Flag, Probe, Int32sl, )
+    Struct, Construct, Const, CString, Array, GreedyBytes, Int32ul, PrefixedArray, Switch, Int64ul, Hex,
+    HexDisplayedInteger, Computed, Float32l, Flag, Probe, Int32sl,
+)
 
 from mercury_engine_data_structures import resource_names
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
@@ -15,33 +17,50 @@ def force_quit(ctx):
     raise SystemExit(1)
 
 
-properties = {}
-
-StrId = CString("utf-8")
-
-
-def add_prop(name: str, value: Construct):
-    prop_id = resource_names.all_name_to_property_id()[name]
-    if prop_id in properties:
-        raise ValueError(f"Attempting to add {name}, but already present.")
-    properties[prop_id] = value
-
-
 PropertyEnum = construct.Enum(Hex(Int64ul), **{
     name: HexDisplayedInteger.new(property_id, "0%sX" % (2 * 8))
     for property_id, name in resource_names.all_property_id_to_name().items()
 })
 
-PropertyElement = Struct(
-    type=Hex(Int64ul),
-    type_name=Computed(lambda ctx: resource_names.all_property_id_to_name().get(ctx.type)),
-    element=Switch(
-        construct.this.type,
-        properties,
-        ErrorWithMessage(lambda ctx: f"Property {ctx.type} ({resource_names.all_property_id_to_name().get(ctx.type)}) "
-                                     "without assigned type"),
-    )
-)
+
+class PointerSet:
+    types: Dict[int, Union[Construct, Type[Construct]]]
+
+    def __init__(self, category: str, *, allow_null: bool = False):
+        self.category = category
+        self.types = {}
+
+    @classmethod
+    def construct_pointer_for(cls, name: str, conn: Union[Construct, Type[Construct]]) -> Struct:
+        ret = cls(name, allow_null=True)
+        ret.add_option(name, conn)
+        return ret.create_construct()
+
+    def add_option(self, name: str, value: Union[Construct, Type[Construct]]) -> None:
+        prop_id = resource_names.all_name_to_property_id()[name]
+        if prop_id in self.types:
+            raise ValueError(f"Attempting to add {name} to {self.category}, but already present.")
+        self.types[prop_id] = value
+
+    def create_construct(self) -> Struct:
+        return Struct(
+            type=Hex(Int64ul),
+            type_name=Computed(lambda ctx: resource_names.all_property_id_to_name().get(ctx.type)),
+            element=Switch(
+                construct.this.type,
+                self.types,
+                ErrorWithMessage(
+                    lambda ctx: f"Property {ctx.type} ({resource_names.all_property_id_to_name().get(ctx.type)}) "
+                                "without assigned type"),
+            )
+        )
+
+
+StrId = CString("utf-8")
+Float: construct.FormatField = typing.cast(construct.FormatField, Float32l)
+CVector2D = Array(2, Float)
+CVector3D = Array(3, Float)
+CVector4D = Array(4, Float)
 
 
 def ConfirmType(name: str):
@@ -85,17 +104,6 @@ def create_struct(fields: Dict[str, Union[Construct, Type[Construct]]],
     return Struct(*r)
 
 
-CComponentFields: Dict[str, Union[Construct, Type[Construct]]] = {
-    "bWantsEnabled": Flag,
-    "bUseDefaultValues": Flag,
-}
-
-add_prop("sLevelID", StrId)
-add_prop("sScenarioID", StrId)
-add_prop("vLayerFiles", PrefixedArray(Int32ul, StrId))
-add_prop("rEntitiesLayer", PrefixedArray(Int32ul, PropertyElement))
-
-
 def make_dict(value: Construct):
     return PrefixedArray(
         Int32ul,
@@ -110,33 +118,83 @@ def make_vector(value: Construct):
     return PrefixedArray(Int32ul, value)
 
 
-CVector2D = Array(2, Float32l)
-CVector3D = Array(3, Float32l)
-CVector4D = Array(4, Float32l)
-
-add_prop("CLogicCamera", create_struct({
+# Other Types
+CLogicCamera = create_struct({
     "sControllerID": StrId,
     "bStatic": Flag,
     "v3Position": CVector3D,
     "v3Dir": CVector3D,
-    "fFovX": Float32l,
-    "fMinExtraZDist": Float32l,
-    "fMaxExtraZDist": Float32l,
-    "fDefaultInterp": Float32l,
+    "fFovX": Float,
+    "fMinExtraZDist": Float,
+    "fMaxExtraZDist": Float,
+    "fDefaultInterp": Float,
+})
+
+# CTriggerLogicAction
+TriggerLogicActions = PointerSet("CTriggerLogicAction")
+TriggerLogicActions.add_option("CCameraToRailLogicAction", create_struct({
+    "bCameraToRail": Flag,
+}))
+TriggerLogicActions.add_option("CLuaCallsLogicAction", create_struct({
+    "sCallbackEntityName": StrId,  # CRntString, but still a string
+    "sCallback": StrId,
+    "bCallbackEntity": Flag,
+    "bCallbackPersistent": Flag,
+}))
+TriggerLogicActions.add_option("CSetActorEnabledLogicAction", create_struct({
+    "wpActor": StrId,
+    "bEnabled": Flag,
 }))
 
-add_prop("CLogicCameraComponent", Struct(
-    count=Int32ul,
-    c2=PropertyEnum,
-    rLogicCamera=PropertyElement,
-))
+# Shapes
+Shapes = PointerSet("game::logic::collision::CShape")
+Shapes.add_option("game::logic::collision::CPolygonCollectionShape", create_struct({
+    # CShape
+    "vPos": CVector3D,
+    "bIsSolid": Flag,
 
-add_prop("CAudioComponent", create_struct({
+    # CPolygonCollectionShape
+    "oPolyCollection": PrefixedArray(Int32ul, Struct(
+        # "base::global::CRntVector<base::spatial::CPolygon2D>"
+        vPolys_type=PropertyEnum,
+        vPolys=PrefixedArray(Int32ul, create_struct({
+            "bClosed": Flag,
+            # "base::global::CRntVector<base::spatial::SSegmentData>"
+            "oSegmentData": PrefixedArray(Int32ul, create_struct({
+                "vPos": CVector3D,
+            })),
+            "bOutwardsNormal": Flag,
+        })),
+    )),
+}))
+Shapes.add_option("game::logic::collision::COBoxShape2D", create_struct({
+    # CShape
+    "vPos": CVector3D,
+    "bIsSolid": Flag,
+
+    # CPolygonCollectionShape
+    "v2Extent": CVector2D,
+    "fDegrees": Float32l,
+    "bOutwardsNormal": Flag,
+}))
+
+# CActorComponents
+CComponentFields: Dict[str, Union[Construct, Type[Construct]]] = {
+    "bWantsEnabled": Flag,
+    "bUseDefaultValues": Flag,
+}
+ActorComponents = PointerSet("CActorComponent")
+
+ActorComponents.add_option("CLogicCameraComponent", create_struct({
+    "rLogicCamera": PointerSet.construct_pointer_for("CLogicCamera", CLogicCamera),
+}))
+
+ActorComponents.add_option("CAudioComponent", create_struct({
     "bWantsEnabled": Flag,
     "bUseDefaultValues": Flag,
 }))
 
-add_prop("CStartPointComponent", create_struct({
+ActorComponents.add_option("CStartPointComponent", create_struct({
     "bWantsEnabled": Flag,
     "bUseDefaultValues": Flag,
 
@@ -150,64 +208,49 @@ add_prop("CStartPointComponent", create_struct({
     "bIsBossStartPoint": Flag,
 }))
 
-add_prop("CScriptComponent", create_struct({
+ActorComponents.add_option("CScriptComponent", create_struct({
     "bWantsEnabled": Flag,
     "bUseDefaultValues": Flag,
 }))
 
-add_prop("CWeightActivableMovablePlatformComponent", create_struct({
+ActorComponents.add_option("CWeightActivableMovablePlatformComponent", create_struct({
     "bWantsEnabled": Flag,
     "bUseDefaultValues": Flag,
     "sOnActivatedLuaCallback": StrId,
 }))
 
-add_prop("CRumbleComponent", create_struct({
+ActorComponents.add_option("CRumbleComponent", create_struct({
     "bWantsEnabled": Flag,
     "bUseDefaultValues": Flag,
 }))
 
-add_prop("CFXComponent", create_struct({
+ActorComponents.add_option("CFXComponent", create_struct({
     **CComponentFields,
-    "fSelectedHighRadius": Float32l,
-    "fSelectedLowRadius": Float32l,
+    "fSelectedHighRadius": Float,
+    "fSelectedLowRadius": Float,
 }))
 
-add_prop("CCollisionComponent", create_struct({
+ActorComponents.add_option("CCollisionComponent", create_struct({
     **CComponentFields,
 }))
 
-add_prop("CAnimationNavMeshItemComponent", create_struct({
+ActorComponents.add_option("CAnimationNavMeshItemComponent", create_struct({
     **CComponentFields,
     "tForbiddenEdgesSpawnPoints": make_dict(Struct(
         x=ErrorWithMessage("Not implemented"),
     )),
 }))
 
-add_prop("CAnimationComponent", create_struct({
+ActorComponents.add_option("CAnimationComponent", create_struct({
     **CComponentFields,
 }))
 
-add_prop("CModelUpdaterComponent", create_struct({
+ActorComponents.add_option("CModelUpdaterComponent", create_struct({
     **CComponentFields,
     "sDefaultModelPath": StrId,
 }))
 
-# CTriggerLogicAction
-add_prop("CCameraToRailLogicAction", create_struct({
-    "bCameraToRail": Flag,
-}))
-add_prop("CLuaCallsLogicAction", create_struct({
-    "sCallbackEntityName": StrId,  # CRntString, but still a string
-    "sCallback": StrId,
-    "bCallbackEntity": Flag,
-    "bCallbackPersistent": Flag,
-}))
-add_prop("CSetActorEnabledLogicAction", create_struct({
-    "wpActor": StrId,
-    "bEnabled": Flag,
-}))
-
-add_prop("CColliderTriggerComponent", create_struct({
+ActorComponents.add_option("CColliderTriggerComponent", create_struct({
     **CComponentFields,
     # CTriggerComponent
     "bCallEntityLuaCallback": Flag,
@@ -229,12 +272,12 @@ add_prop("CColliderTriggerComponent", create_struct({
             "bEnabled": Flag,
             "bAlways": Flag,
             "bDone": Flag,
-            "fExecutesEvery": Float32l,
-            "fExecutesEveryRandomRange": Float32l,
+            "fExecutesEvery": Float,
+            "fExecutesEveryRandomRange": Float,
             "eEvent": make_vector(Struct(
                 # TODO empty?
             )),
-            "vLogicActions": make_vector(PropertyElement),
+            "vLogicActions": make_vector(TriggerLogicActions.create_construct()),
         }),
     )),
 
@@ -242,43 +285,12 @@ add_prop("CColliderTriggerComponent", create_struct({
     "lnkShape": StrId,  # TODO: confirm
 }))
 
-add_prop("CLogicShapeComponent", create_struct({
-    "pLogicShape": PropertyElement,
+ActorComponents.add_option("CLogicShapeComponent", create_struct({
+    "pLogicShape": Shapes.create_construct(),
     "bWantsToGenerateNavMeshEdges": Flag,
 }))
 
-# Logic Shapes
-add_prop("game::logic::collision::CPolygonCollectionShape", create_struct({
-    # CShape
-    "vPos": CVector3D,
-    "bIsSolid": Flag,
-
-    # CPolygonCollectionShape
-    "oPolyCollection": PrefixedArray(Int32ul, Struct(
-        # "base::global::CRntVector<base::spatial::CPolygon2D>"
-        vPolys_type=PropertyEnum,
-        vPolys=PrefixedArray(Int32ul, create_struct({
-            "bClosed": Flag,
-            # "base::global::CRntVector<base::spatial::SSegmentData>"
-            "oSegmentData": PrefixedArray(Int32ul, create_struct({
-                "vPos": CVector3D,
-            })),
-            "bOutwardsNormal": Flag,
-        })),
-    )),
-}))
-add_prop("game::logic::collision::COBoxShape2D", create_struct({
-    # CShape
-    "vPos": CVector3D,
-    "bIsSolid": Flag,
-
-    # CPolygonCollectionShape
-    "v2Extent": CVector2D,
-    "fDegrees": Float32l,
-    "bOutwardsNormal": Flag,
-}))
-
-add_prop("CCameraRailComponent", create_struct({
+ActorComponents.add_option("CCameraRailComponent", create_struct({
     # base::global::CRntVector<SCameraSubRail>
     "oCameraRail": create_struct({
         # SCameraRail
@@ -289,21 +301,21 @@ add_prop("CCameraRailComponent", create_struct({
                 "wpLogicCamera": StrId,
             })),
         })),
-        "fMaxRailSpeed": Float32l,
-        "fMinRailSpeed": Float32l,
-        "fMaxRailDistance": Float32l,
+        "fMaxRailSpeed": Float,
+        "fMinRailSpeed": Float,
+        "fMaxRailDistance": Float,
     }),
 }))
 
-add_prop("CDoorLifeComponent", create_struct({
+ActorComponents.add_option("CDoorLifeComponent", create_struct({
     "bWantsEnabled": Flag,
     "bUseDefaultValues": Flag,
 
     # door life
-    "fMaxDistanceOpened": Float32l,
+    "fMaxDistanceOpened": Float,
     "wpLeftDoorShieldEntity": StrId,
     "wpRightDoorShieldEntity": StrId,
-    "fMinTimeOpened": Float32l,
+    "fMinTimeOpened": Float,
     "bStayOpen": Flag,
     "bStartOpened": Flag,
     "bOnBlackOutOpened": Flag,
@@ -314,49 +326,50 @@ add_prop("CDoorLifeComponent", create_struct({
     "aVignettes": Int32ul,
 }))
 
-add_prop("base::global::CRntSmallDictionary<base::global::CStrId, CActorComponent*>",
-         make_dict(PropertyElement))
+# Actors
+CActorFields = {
+    "sName": StrId,
+    "oActorDefLink": StrId,
+    "vPos": CVector3D,
+    "vAng": CVector3D,
+    "pComponents": PointerSet.construct_pointer_for(
+        "base::global::CRntSmallDictionary<base::global::CStrId, CActorComponent*>",
+        make_dict(ActorComponents.create_construct())
+    ),
+    "bEnabled": Flag,
+}
 
-Actor = Struct(
-    # Actor
-    f1=Int32ul,
-    f2=Int32ul,
-    item=create_struct({
-        "sName": StrId,
-        "oActorDefLink": StrId,
-        "vPos": CVector3D,
-        "vAng": CVector3D,
-        "pComponents": PropertyElement,
-        "bEnabled": Flag,
-    }),
-)
+Actors = PointerSet("CActor")
+Actors.add_option("CActor", create_struct({
+    **CActorFields
+}))
+Actors.add_option("CEntity", create_struct({
+    **CActorFields
+}))
 
-add_prop("dctSublayers", make_dict(create_struct({
+# Root stuff
+
+CActorSublayer = create_struct({
     # Sublayer
     "sName": StrId,
-    "dctActors": make_dict(Actor),
-})))
+    "dctActors": make_dict(Actors.create_construct()),
+})
+
+CScenario = create_struct({
+    "sLevelID": StrId,
+    "sScenarioID": StrId,
+    "vLayerFiles": PrefixedArray(Int32ul, StrId),
+    "rEntitiesLayer": Int32ul,
+    "dctSublayers": make_dict(CActorSublayer),
+}, debug=True)
 
 BRFLD = Struct(
     intro_a=Const(0x42824DE0BB09EF20, Int64ul),
     intro_b=Hex(Int64ul),
     intro_c=Hex(Int64ul),
 
-    intro_d=PropertyEnum,
-    intro_e=PropertyEnum,
-
-    count_for_stuff=Int32ul,
-
-    f1=PropertyElement,
-    f2=PropertyElement,
-    f3=PropertyElement,
-
-    # Should be PropertyElement!
-    f4_type=PropertyEnum,
-    f4=Int32ul,
-
-    # dctSublayers
-    dctSublayers=PropertyElement,
+    pScenario_t=PropertyEnum,
+    pScenario=PointerSet.construct_pointer_for("CScenario", CScenario),
 
     raw=GreedyBytes,
 )
