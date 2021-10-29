@@ -23,10 +23,6 @@ def ConfirmType(name: str):
 
 
 class ObjectAdapter(Adapter):
-    def __init__(self, subcon, fields: Dict[str, Union[Construct, Type[Construct]]]):
-        super().__init__(subcon)
-        self.fields = fields
-
     def _decode(self, obj: construct.ListContainer, context, path):
         result = construct.Container()
         for item in obj:
@@ -48,34 +44,31 @@ class ObjectAdapter(Adapter):
 def Object(fields: Dict[str, Union[Construct, Type[Construct]]], *,
            debug=False) -> Construct:
     all_types = list(fields)
+    fields = {
+        name: name / conn
+        for name, conn in fields.items()
+    }
 
-    r = [
-        "fields" / construct.PrefixedArray(
-            Int32ul,
-            Struct(
-                "type" / PropertyEnum,
-                "item" / construct.Switch(
-                    construct.this.type,
-                    fields,
-                    ErrorWithMessage(
-                        lambda ctx: f"Type {ctx.type} not known, valid types are {all_types}."
-                    )
+    r = construct.PrefixedArray(
+        Int32ul,
+        Struct(
+            "type" / PropertyEnum,
+            "item" / construct.Switch(
+                construct.this.type,
+                fields,
+                ErrorWithMessage(
+                    lambda ctx: f"Type {ctx.type} not known, valid types are {all_types}."
                 )
             )
         )
-    ]
+    )
     if debug:
-        r.extend([
+        r = construct.FocusedSeq(
+            "fields",
+            "fields" / r,
             "next_enum" / PropertyEnum,
             "probe" / Probe(lookahead=0x8),
-        ])
+            ForceQuit(),
+        )
 
-    r.append("_check_field_count" / construct.If(
-        lambda ctx: len(ctx.fields) > len(fields),
-        ErrorWithMessage(lambda ctx: f"Got {ctx.field_count} fields, but we have only {len(fields)} types."),
-    ))
-
-    if debug:
-        r.append(ForceQuit())
-
-    return ObjectAdapter(construct.FocusedSeq("fields", *r), fields)
+    return ObjectAdapter(r)
