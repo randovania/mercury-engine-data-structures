@@ -1,7 +1,7 @@
-from typing import Dict, Union, Type, Iterable
+from typing import Dict, Union, Type
 
 import construct
-from construct import Construct, Int32ul, Probe, Struct
+from construct import Construct, Int32ul, Probe, Struct, Adapter
 
 from mercury_engine_data_structures import hashed_names
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, ForceQuit
@@ -22,15 +22,36 @@ def ConfirmType(name: str):
     )
 
 
+class ObjectAdapter(Adapter):
+    def __init__(self, subcon, fields: Dict[str, Union[Construct, Type[Construct]]]):
+        super().__init__(subcon)
+        self.fields = fields
+
+    def _decode(self, obj: construct.ListContainer, context, path):
+        result = construct.Container()
+        for item in obj:
+            if item.type in result:
+                raise construct.ConstructError(f"Type {item.type} found twice in object", path)
+            result[item.type] = item.item
+        return result
+
+    def _encode(self, obj: construct.Container, context, path):
+        return construct.ListContainer(
+            construct.Container(
+                type=type_,
+                item=item
+            )
+            for type_, item in obj.items()
+        )
+
+
 def Object(fields: Dict[str, Union[Construct, Type[Construct]]], *,
-           extra_before_fields: Iterable[Construct] = (), debug=False) -> Construct:
+           debug=False) -> Construct:
     all_types = list(fields)
 
-    r = ["field_count" / Int32ul]
-    r.extend(extra_before_fields)
-    r.append(
-        "fields" / construct.Array(
-            construct.this.field_count,
+    r = [
+        "fields" / construct.PrefixedArray(
+            Int32ul,
             Struct(
                 "type" / PropertyEnum,
                 "item" / construct.Switch(
@@ -42,19 +63,19 @@ def Object(fields: Dict[str, Union[Construct, Type[Construct]]], *,
                 )
             )
         )
-    )
+    ]
     if debug:
         r.extend([
             "next_enum" / PropertyEnum,
             "probe" / Probe(lookahead=0x8),
         ])
 
-    r.append("check_field_count" / construct.If(
-        lambda ctx: ctx.field_count > len(fields),
+    r.append("_check_field_count" / construct.If(
+        lambda ctx: len(ctx.fields) > len(fields),
         ErrorWithMessage(lambda ctx: f"Got {ctx.field_count} fields, but we have only {len(fields)} types."),
     ))
 
     if debug:
         r.append(ForceQuit())
 
-    return Struct(*r)
+    return ObjectAdapter(construct.FocusedSeq("fields", *r), fields)
