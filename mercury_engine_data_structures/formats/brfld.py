@@ -61,6 +61,7 @@ Shapes.add_option("game::logic::collision::CPolygonCollectionShape", Object({
     "bIsSolid": Flag,
 
     # CPolygonCollectionShape
+    # base::spatial::CPolygonCollection2D
     "oPolyCollection": make_vector(Struct(
         # "base::global::CRntVector<base::spatial::CPolygon2D>"
         vPolys_type=PropertyEnum,
@@ -254,7 +255,7 @@ ActorComponents.add_option("CBreakableVignetteComponent", Object({
     "sVignetteSG": StrId,
     "bUnhideWhenPlayerInside": Flag,
     "bPreventVisibilityOnly": Flag,
-    # "bForceNotVisible": Flag,
+    "bForceNotVisible": Flag,
 }))
 
 ActorComponents.add_option("CCameraRailComponent", Object({
@@ -278,11 +279,10 @@ ActorComponents.add_option("CCameraRailComponent", Object({
 
 ActorComponents.add_option("CLifeComponent", Object(CLifeComponentFields := {
     **CComponentFields,
-    # Fields in Ghidra, but not yet in data
-    # "bWantsCameraFXPreset": Flag,
-    # "fMaxLife": Float,
-    # "fCurrentLife": Float,
-    # "bCurrentLifeLocked": Flag,
+    "bWantsCameraFXPreset": Flag,
+    "fMaxLife": Float,
+    "fCurrentLife": Float,
+    "bCurrentLifeLocked": Flag,
 }))
 
 ActorComponents.add_option("CItemLifeComponent", Object(CLifeComponentFields))
@@ -326,7 +326,7 @@ ELinkMode = make_enum({"None": 0, "RootToDC_Grab": 1, "FeetToRoot": 2})
 
 ActorComponents.add_option("CGrabComponent", Object({
     **CComponentFields,
-    # "bIsInGrab": Flag, # found in Ghidra, but not in data so far. Implies the game indeed omits fields sometimes
+    "bIsInGrab": Flag,
     "eLinkModeAsGrabber": ELinkMode,
 }))
 

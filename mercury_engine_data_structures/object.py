@@ -24,27 +24,34 @@ def ConfirmType(name: str):
 
 def Object(fields: Dict[str, Union[Construct, Type[Construct]]], *,
            extra_before_fields: Iterable[Construct] = (), debug=False) -> Construct:
-    r = [
-        "field_count" / Int32ul,
-    ]
-    r.extend(extra_before_fields)
-    for name, subcon in fields.items():
-        r.extend([
-            f"{name}_type" / PropertyEnum,
-            f"_{name}_check" / ConfirmType(name),
-            name / subcon,
-        ])
+    all_types = list(fields)
 
+    r = ["field_count" / Int32ul]
+    r.extend(extra_before_fields)
+    r.append(
+        "fields" / construct.Array(
+            construct.this.field_count,
+            Struct(
+                "type" / PropertyEnum,
+                "item" / construct.Switch(
+                    construct.this.type,
+                    fields,
+                    ErrorWithMessage(
+                        lambda ctx: f"Type {ctx.type} not known, valid types are {all_types}."
+                    )
+                )
+            )
+        )
+    )
     if debug:
         r.extend([
             "next_enum" / PropertyEnum,
             "probe" / Probe(lookahead=0x8),
         ])
 
-    # Right now, always adding the check_field_count to help development. So far, it has always matched the data.
     r.append("check_field_count" / construct.If(
-        lambda ctx: ctx.field_count != len(fields),
-        ErrorWithMessage(lambda ctx: f"Expected {len(fields)} fields, got {ctx.field_count}"),
+        lambda ctx: ctx.field_count > len(fields),
+        ErrorWithMessage(lambda ctx: f"Got {ctx.field_count} fields, but we have only {len(fields)} types."),
     ))
 
     if debug:
