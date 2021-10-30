@@ -501,6 +501,18 @@ ActorComponents.add_option("CSpotLightComponent", Object({
     "vProjectorUVScroll": CVector4D,
 }))
 
+ActorComponents.add_option("COmniLightComponent", Object({
+    **CBaseLightComponentFields,
+
+    "fAttMin": Float,
+    "fAttMax": Float,
+    "fAttConstantFactor": Float,
+    "fAttQuadraticFactor": Float,
+    "bCastShadows": Flag,
+    "bStaticShadows": Flag,
+    "fShadowScl": Float,
+}))
+
 # CNavMeshItemComponent
 ActorComponents.add_option("CNavMeshItemComponent", Object(CNavMeshItemComponentFields := {
     **CComponentFields,
@@ -705,7 +717,7 @@ BRFLD = Struct(
     # gameeditor::CGameModelRoot
     root=Object({
         "pScenario": PointerSet.construct_pointer_for("CScenario", CScenario),
-    }, debug=True),
+    }),
     raw=GreedyBytes,
 )
 
