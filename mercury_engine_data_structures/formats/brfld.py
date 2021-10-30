@@ -6,7 +6,7 @@ from construct import (
 
 from mercury_engine_data_structures.common_types import (
     StrId, Float, CVector2D, CVector3D, make_dict, make_vector,
-    make_enum, UInt,
+    make_enum, UInt, CVector4D,
 )
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource
@@ -424,6 +424,83 @@ ActorComponents.add_option("CBreakableScenarioComponent", Object({
     "aVignettes": make_vector(CGameLink_CActor),
 }))
 
+CFilePathStrIdPtr = PointerSet.construct_pointer_for("base::global::CFilePathStrId", CFilePathStrId)
+
+ActorComponents.add_option("CPositionalSoundComponent", Object({
+    **CComponentFields,
+    "fMinAtt": Float,
+    "fMaxAtt": Float,
+    "fVol": Float,
+    "fPitch": Float,
+    "fLaunchEvery": Float,
+    "fHorizontalMult": Float,
+    "fVerticalMult": Float,
+    "bLoop": Flag,
+    "fFadeInTime": Float,
+    "fFadeOutTime": Float,
+    "sSound1": CFilePathStrIdPtr,
+    "sSound2": CFilePathStrIdPtr,
+    "sSound3": CFilePathStrIdPtr,
+    "sSound4": CFilePathStrIdPtr,
+}))
+
+ActorComponents.add_option("CCubeMapComponent", Object({
+    **CComponentFields,
+    "vCubePos": CVector3D,
+    "fAttMin": Float,
+    "fAttMax": Float,
+    "vBoxBounds": CVector3D,
+    "fIntensity": Float,
+    "bEnableCulling": Flag,
+    "sTexturePathSpecular": CFilePathStrId,
+    "sTexturePathDiffuse": CFilePathStrId,
+}))
+
+# CBaseLightComponent
+
+ELightPreset = make_enum([
+    "E_LIGHT_PRESET_NONE", "E_LIGHT_PRESET_PULSE", "E_LIGHT_PRESET_BLINK", "E_LIGHT_PRESET_LIGHTNING",
+    "ELIGHT_PRESET_COUNT", "ELIGHT_PRESET_INVALID",
+])
+
+ActorComponents.add_option("CBaseLightComponent", Object(CBaseLightComponentFields := {
+    **CComponentFields,
+    "vLightPos": CVector3D,
+    "fIntensity": Float,
+    "fVIntensity": Float,
+    "fFIntensity": Float,
+    "vAmbient": CVector4D,
+    "vDiffuse": CVector4D,
+    "vSpecular0": CVector4D,
+    "vSpecular1": CVector4D,
+    "bVertexLight": Flag,
+    "eLightPreset": ELightPreset,
+    "vLightPresetParams": CVector4D,
+    "bSubstractive": Flag,
+    "bUseFaceCull": Flag,
+    "bUseSpecular": Flag,
+}))
+
+ActorComponents.add_option("CSpotLightComponent", Object({
+    **CBaseLightComponentFields,
+    "fAttMin": Float,
+    "fAttMax": Float,
+    "fAttIn": Float,
+    "fAttOut": Float,
+    "fAttConstantFactor": Float,
+    "fAttQuadraticFactor": Float,
+    "vDir": CVector3D,
+    "fAnimFrame": Float,
+    "bCastShadows": Flag,
+    "vShadowNearFar": CVector2D,
+    "fShadowBias": Float,
+    "bStaticShadows": Flag,
+    "fShadowScl": Float,
+    "bHasProjectorTexture": Flag,
+    "sTexturePath": CFilePathStrId,
+    "vProjectorUVScroll": CVector4D,
+}))
+
 # CNavMeshItemComponent
 ActorComponents.add_option("CNavMeshItemComponent", Object(CNavMeshItemComponentFields := {
     **CComponentFields,
@@ -521,6 +598,63 @@ ActorComponents.add_option("CWeightActivatedPlatformSmartObjectComponent", Objec
     "bDisableWhenUsed": Flag,
 }))
 
+# BaseTrigger
+
+CActivatableComponentFields = {**CComponentFields}
+CBaseTriggerComponentFields = {
+    **CComponentFields,
+    "bCheckAllEntities": Flag,
+}
+
+# SoundTrigger
+
+EReverbIntensity = make_enum([
+    "NONE", "SMALL_ROOM", "MEDIUM_ROOM", "BIG_ROOM", "CATHEDRAL",
+])
+ELowPassFilter = make_enum([
+    "LPF_DISABLED", "LPF_80HZ", "LPF_100HZ", "LPF_128HZ", "LPF_160HZ", "LPF_200HZ", "LPF_256HZ",
+    "LPF_320HZ", "LPF_400HZ", "LPF_500HZ", "LPF_640HZ", "LPF_800HZ", "LPF_1000HZ", "LPF_1280HZ",
+    "LPF_1600HZ", "LPF_2000HZ", "LPF_2560HZ", "LPF_3200HZ", "LPF_4000HZ", "LPF_5120HZ", "LPF_6400HZ",
+    "LPF_8000HZ", "LPF_10240HZ", "LPF_12800HZ", "LPF_16000HZ",
+])
+ESndType = make_enum([
+    "SFX", "MUSIC", "SPEECH", "GRUNT", "GUI", "ENVIRONMENT_STREAMS", "SFX_EMMY", "CUTSCENE",
+])
+EPositionalType = make_enum([
+    "POS_2D", "POS_3D",
+])
+
+CSoundTriggerFields = {
+    **CBaseTriggerComponentFields,
+    "eReverb": EReverbIntensity,
+    "iLowPassFilter": ELowPassFilter,
+}
+
+ActorComponents.add_option("CAreaSoundComponent", Object({
+    **CSoundTriggerFields,
+    "sOnEnterSound": CFilePathStrId,
+    "eOnEnterSoundType": ESndType,
+    "fEnterVol": Float,
+    "fEnterPitch": Float,
+    "fEnterFadeInTime": Float,
+    "fEnterFadeOutTime": Float,
+    "eOnEnterPositional": EPositionalType,
+    "sLoopSound": CFilePathStrId,
+    "eLoopSoundType": ESndType,
+    "fLoopVol": Float,
+    "fLoopPitch": Float,
+    "fLoopPan": Float,
+    "fLoopFadeInTime": Float,
+    "fLoopFadeOutTime": Float,
+    "sOnExitSound": CFilePathStrId,
+    "eOnExitSoundType": ESndType,
+    "fExitVol": Float,
+    "fExitPitch": Float,
+    "fExitFadeInTime": Float,
+    "fExitFadeOutTime": Float,
+    "eOnExitPositional": EPositionalType,
+}))
+
 # Actors
 
 Actors = PointerSet("CActor")
@@ -546,15 +680,20 @@ CActorSublayer = Object({
     "dctActors": make_dict(Actors.create_construct()),
 })
 
-CScenario = Object({
-    "sLevelID": StrId,
-    "sScenarioID": StrId,
-    "vLayerFiles": make_vector(StrId),
-    "rEntitiesLayer": Int32ul,
+CActorLayer = Object({
     "dctSublayers": make_dict(CActorSublayer),
-
     # "CRntDictionary<CStrId, CRntVector<CGameLink<CActor>>>"
     "dctActorGroups": make_dict(make_vector(CGameLink_CActor)),
+})
+
+CScenario = Object({
+    "awpScenarioColliders": StrId,
+    "sLevelID": StrId,
+    "sScenarioID": StrId,
+    "rEntitiesLayer": CActorLayer,
+    "rSoundsLayer": CActorLayer,
+    "rLightsLayer": CActorLayer,
+    "vLayerFiles": make_vector(StrId),
 })
 
 BRFLD = Struct(
