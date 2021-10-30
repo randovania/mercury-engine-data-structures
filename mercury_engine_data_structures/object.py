@@ -45,10 +45,14 @@ class ObjectAdapter(Adapter):
 def Object(fields: Dict[str, Union[Construct, Type[Construct]]], *,
            debug=False) -> Construct:
     all_types = list(fields)
+
     fields = {
         name: name / conn
         for name, conn in fields.items()
     }
+    for type_name in all_types:
+        if type_name not in hashed_names.all_name_to_property_id():
+            raise ValueError(f"Unknown type name: {type_name}, not in hashes database")
 
     switch = construct.Switch(
         construct.this.type,
