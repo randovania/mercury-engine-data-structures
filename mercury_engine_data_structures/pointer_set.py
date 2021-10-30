@@ -17,10 +17,10 @@ class PointerAdapter(Adapter):
         return ret
 
     def _encode(self, obj: construct.Container, context, path):
-        if len(obj) != 0:
+        if len(obj) != 1:
             raise construct.ConstructError(f"Invalid obj, expect only one field got {len(obj)}", path)
-        type_name = list(obj.keys())[0]
-        type_id = hashed_names.all_property_id_to_name()[type_name]
+        type_name: str = list(obj.keys())[0]
+        type_id = hashed_names.all_name_to_property_id()[type_name]
         return construct.Container(
             type=type_id,
             ptr=obj[type_name],

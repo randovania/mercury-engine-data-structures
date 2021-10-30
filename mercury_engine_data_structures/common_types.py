@@ -40,9 +40,12 @@ def make_vector(value: construct.Construct):
     )
     arr.name = "items"
 
+    def get_len(ctx):
+        return len(ctx['items'])
+
     return construct.FocusedSeq(
         "items",
-        "count" / construct.Rebuild(construct.Int32ul, lambda ctx: len(ctx[1])),
+        "count" / construct.Rebuild(construct.Int32ul, get_len),
         arr,
     )
 

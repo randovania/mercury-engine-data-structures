@@ -14,3 +14,16 @@ def test_make_dict_parse():
         "foo": 0.75,
         "banana": 1337,
     }
+
+
+def test_make_vector():
+    data = ["banana", "foobar", "alfafa"]
+    con = common_types.make_vector(common_types.StrId)
+
+    # Run
+    encoded = con.build(data)
+    decoded = con.parse(encoded)
+
+    # Assert
+    assert data == decoded
+
