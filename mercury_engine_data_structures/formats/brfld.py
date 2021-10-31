@@ -2,7 +2,8 @@ from typing import Dict, Union, Type
 
 from construct import (
     Struct, Construct, Const, GreedyBytes, Int32ul, Hex,
-    Flag, Int32sl, Prefixed, )
+    Flag, Int32sl, Prefixed,
+)
 
 from mercury_engine_data_structures.common_types import (
     StrId, Float, CVector2D, CVector3D, make_dict, make_vector,
@@ -33,6 +34,11 @@ TypedValues.add_option("base::global::CRntFile", Prefixed(Int32ul, GreedyBytes))
 
 CGameLink_CEntity = StrId
 CGameLink_CActor = StrId
+#
+# SFallBackPath = Object({
+#     "wpPath": CGameLink_CActor,
+#     "ePathType": Int32ul,  # enum
+# })
 
 # CTriggerLogicAction
 TriggerLogicActions = PointerSet("CTriggerLogicAction")
@@ -55,6 +61,10 @@ TriggerLogicActions.add_option("CSaveGameToSnapshotLogicAction", Object({
 TriggerLogicActions.add_option("CMarkMinimapLogicAction", Object({
     "wpVisibleLogicShape": StrId,
     "wpVisitedLogicShape": StrId,
+}))
+TriggerLogicActions.add_option("CForceMovementLogicAction", Object({
+    "bMovePlayer": Flag,
+    "v2Direction": CVector2D,
 }))
 
 # Shapes

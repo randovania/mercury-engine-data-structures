@@ -5,6 +5,7 @@ import construct
 from construct import Adapter
 
 StrId = construct.CString("utf-8")
+Int: construct.FormatField = typing.cast(construct.FormatField, construct.Int32sl)
 UInt: construct.FormatField = typing.cast(construct.FormatField, construct.Int32ul)
 Float: construct.FormatField = typing.cast(construct.FormatField, construct.Float32l)
 CVector2D = construct.Array(2, Float)
