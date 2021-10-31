@@ -86,7 +86,6 @@ def decompile_function(full_name: str, func_id: int) -> tuple[str, dict[str, str
     function_manager = flat_api.currentProgram.getFunctionManager()
     symbol_table = flat_api.currentProgram.getSymbolTable()
 
-    full_name = typing.cast(str, full_name)
     assert full_name.startswith("Reflection::")
     assert full_name.endswith("::fields")
     type_name = full_name[len("Reflection::"):-len("::fields")]
@@ -102,7 +101,9 @@ def decompile_function(full_name: str, func_id: int) -> tuple[str, dict[str, str
 
 
 def main():
+    print("Getting function list")
     all_fields_functions = get_function_list()
+    print(f"Got {len(all_fields_functions)} functions!")
 
     process_count = max(multiprocessing.cpu_count() - 2, 2)
 
@@ -138,7 +139,10 @@ def main():
         pool.join()
 
     with open("all_types.json", "w") as f:
-        json.dump(result, f, indent=4, sort_keys=True)
+        json.dump({
+            key: result[key]
+            for key in sorted(result.keys())
+        }, f, indent=4)
 
 
 if __name__ == '__main__':
