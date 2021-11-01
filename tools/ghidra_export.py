@@ -9,7 +9,7 @@ import typing
 
 import ghidra_bridge
 
-hash_str = "FUN_71000003d4"
+hash_str = "HashString"
 register_field = "RegisterField"
 
 
@@ -110,6 +110,9 @@ def main():
     process_count = max(multiprocessing.cpu_count() - 2, 2)
 
     finished_count = 0
+    fail_count = collections.defaultdict(int)
+    max_retries = 5
+
     total_count = len(all_fields_functions)
     num_digits = math.ceil(math.log10(total_count + 1))
     number_format = "[{0:" + str(num_digits) + "d}/{1}] "
@@ -126,20 +129,31 @@ def main():
         result[type_name] = fields
         report_update(f"Parsed {type_name}")
 
-    def error_callback(name, e):
-        msg = "".join(traceback.format_exception(type(e), e, e.__traceback__))
-        report_update(f"Failed {name}: {msg}")
-
     with multiprocessing.Pool(processes=process_count, initializer=initialize_worker) as pool:
+        def error_callback(entry, e):
+            name = entry[0]
+            fail_count[name] += 1
+            if fail_count[name] < max_retries:
+                pool.apply_async(
+                    func=decompile_function,
+                    args=entry,
+                    callback=callback,
+                    error_callback=functools.partial(error_callback, f),
+                )
+            else:
+                msg = "".join(traceback.format_exception(type(e), e, e.__traceback__))
+                report_update(f"Failed {name}: {msg}")
+
         for f in all_fields_functions:
             pool.apply_async(
                 func=decompile_function,
                 args=f,
                 callback=callback,
-                error_callback=functools.partial(error_callback, f[0]),
+                error_callback=functools.partial(error_callback, f),
             )
-        pool.close()
+
         pool.join()
+        pool.close()
 
     with open("all_types.json", "w") as f:
         json.dump({
