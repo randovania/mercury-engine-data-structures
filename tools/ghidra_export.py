@@ -1,13 +1,15 @@
 import collections
+import functools
 import json
 import math
 import multiprocessing
 import re
+import traceback
 import typing
 
 import ghidra_bridge
 
-hash_str = "HashStr_71000003d4"
+hash_str = "FUN_71000003d4"
 register_field = "RegisterField"
 
 
@@ -42,8 +44,8 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
             i = decompiled_code.rfind(type_var, offset, m.start())
             end = decompiled_code.find(';', i)
             type_name = decompiled_code[i + len(type_var) + len(" = "):end]
-            if type_name.endswith("::get()"):
-                type_name = type_name[:-len("::get()")]
+            if type_name.endswith("::init()"):
+                type_name = type_name[:-len("::init()")]
 
         fields[crc_string] = type_name
 
@@ -65,7 +67,7 @@ bridge: typing.Optional[ghidra_bridge.GhidraBridge] = None
 
 def initialize_worker():
     global bridge, monitor, ifc
-    bridge = ghidra_bridge.GhidraBridge()
+    bridge = ghidra_bridge.GhidraBridge(response_timeout=10)
 
     flat_api = bridge.get_flat_api()
     DecompileOptions = bridge.remote_import("ghidra.app.decompiler.DecompileOptions")
@@ -82,15 +84,15 @@ def decompile_function(full_name: str, func_id: int) -> tuple[str, dict[str, str
     if bridge is None:
         raise ValueError("Bridge not initialized")
 
-    flat_api = bridge.get_flat_api()
-    function_manager = flat_api.currentProgram.getFunctionManager()
-    symbol_table = flat_api.currentProgram.getSymbolTable()
-
     assert full_name.startswith("Reflection::")
     assert full_name.endswith("::fields")
     type_name = full_name[len("Reflection::"):-len("::fields")]
 
-    func = function_manager.getFunctionAt(symbol_table.getSymbol(func_id).getAddress())
+    func = bridge.remote_eval("""
+        currentProgram.getFunctionManager().getFunctionAt(
+            currentProgram.getSymbolTable().getSymbol(func_id).getAddress()
+        )
+    """, func_id=func_id)
 
     return type_name, get_field_registrations(
         bridge,
@@ -124,8 +126,9 @@ def main():
         result[type_name] = fields
         report_update(f"Parsed {type_name}")
 
-    def error_callback(e):
-        report_update(f"Failed {e}")
+    def error_callback(name, e):
+        msg = "".join(traceback.format_exception(type(e), e, e.__traceback__))
+        report_update(f"Failed {name}: {msg}")
 
     with multiprocessing.Pool(processes=process_count, initializer=initialize_worker) as pool:
         for f in all_fields_functions:
@@ -133,7 +136,7 @@ def main():
                 func=decompile_function,
                 args=f,
                 callback=callback,
-                error_callback=error_callback,
+                error_callback=functools.partial(error_callback, f[0]),
             )
         pool.close()
         pool.join()
@@ -143,6 +146,18 @@ def main():
             key: result[key]
             for key in sorted(result.keys())
         }, f, indent=4)
+
+
+def simple_decompile():
+    all_fields_functions = get_function_list()
+    initialize_worker()
+
+    for name, i in all_fields_functions:
+        if name == "Reflection::base::global::timeline::CEvent::CCharClassSetMaterialPropertyTransitionEvent::fields":
+            print(decompile_function(name, i))
+            return
+
+    # print(decompile_function(*all_fields_functions[4]))
 
 
 if __name__ == '__main__':
