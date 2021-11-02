@@ -11,6 +11,17 @@ import ghidra_bridge
 
 hash_str = "HashString"
 register_field = "RegisterField"
+prefixes_to_remove = [
+    "(ObjectField *)",
+    "&",
+]
+
+
+def clean_crc_var(crc_var: str) -> str:
+    for prefix in prefixes_to_remove:
+        if crc_var.startswith(prefix):
+            crc_var = crc_var[len(prefix):].strip()
+    return crc_var
 
 
 def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fields_function):
@@ -19,7 +30,7 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
     """, timeout_override=200, fields_function=fields_function, ifc=ifc, monitor=monitor)
 
     decompiled_code = str(res.getCCodeMarkup())
-    hash_call_re = re.compile(hash_str + r'\([^,]*?([a-zA-Z0-9]+),"([^"]+)",1\);')
+    hash_call_re = re.compile(hash_str + r'\(([^,]+?),"([^"]+)",1\);')
     register_call_re = re.compile(register_field + r'\([^,]+?,[^,]*?([a-zA-Z0-9]+),([^,]+?),([^;]+?)\);')
 
     crc_mapping = collections.defaultdict(list)
@@ -27,14 +38,14 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
 
     for m in hash_call_re.finditer(decompiled_code):
         crc_var, crc_string = m.group(1, 2)
-        crc_mapping[crc_var].append((m.start(), crc_string))
+        crc_mapping[clean_crc_var(crc_var)].append((m.start(), crc_string))
 
     for m in register_call_re.finditer(decompiled_code):
         crc_var, type_var = m.group(1, 2)
 
         offset = None
         crc_string = None
-        for offset, crc_string in reversed(crc_mapping[crc_var]):
+        for offset, crc_string in reversed(crc_mapping[clean_crc_var(crc_var)]):
             if offset < m.start():
                 break
 
@@ -110,7 +121,7 @@ def main():
     process_count = max(multiprocessing.cpu_count() - 2, 2)
 
     finished_count = 0
-    fail_count = collections.defaultdict(int)
+    failed = {}
     max_retries = 5
 
     total_count = len(all_fields_functions)
@@ -132,17 +143,9 @@ def main():
     with multiprocessing.Pool(processes=process_count, initializer=initialize_worker) as pool:
         def error_callback(entry, e):
             name = entry[0]
-            fail_count[name] += 1
-            if fail_count[name] < max_retries:
-                pool.apply_async(
-                    func=decompile_function,
-                    args=entry,
-                    callback=callback,
-                    error_callback=functools.partial(error_callback, f),
-                )
-            else:
-                msg = "".join(traceback.format_exception(type(e), e, e.__traceback__))
-                report_update(f"Failed {name}: {msg}")
+            failed[name] = entry[1]
+            msg = "".join(traceback.format_exception(type(e), e, e.__traceback__))
+            report_update(f"Failed {name}: {msg}")
 
         for f in all_fields_functions:
             pool.apply_async(
@@ -152,8 +155,19 @@ def main():
                 error_callback=functools.partial(error_callback, f),
             )
 
-        pool.join()
         pool.close()
+        pool.join()
+
+    if failed:
+        print(f"{len(failed)} function(s) failed, retrying on main thread.")
+        initialize_worker()
+    for n, func in failed.items():
+        try:
+            t, f = decompile_function(n, func)
+            result[t] = f
+            report_update(f"Parsed {t}")
+        except Exception as e:
+            report_update(f"Failed {n}: {e}")
 
     with open("all_types.json", "w") as f:
         json.dump({
