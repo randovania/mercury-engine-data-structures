@@ -6,6 +6,7 @@ import multiprocessing
 import re
 import traceback
 import typing
+from pprint import pprint
 
 import ghidra_bridge
 
@@ -30,8 +31,8 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
     """, timeout_override=200, fields_function=fields_function, ifc=ifc, monitor=monitor)
 
     decompiled_code = str(res.getCCodeMarkup())
-    hash_call_re = re.compile(hash_str + r'\(([^,]+?),"([^"]+)",1\);')
-    register_call_re = re.compile(register_field + r'\([^,]+?,[^,]*?([a-zA-Z0-9]+),([^,]+?),([^;]+?)\);')
+    hash_call_re = re.compile(hash_str + r'\(([^,]+?),"?([^,]+?)"?,1\);')
+    register_call_re = re.compile(register_field + r'\([^,]+?,([^,]+?),([^,]+?),([^;]+?)\);')
 
     crc_mapping = collections.defaultdict(list)
     fields = {}
@@ -49,7 +50,7 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
             if offset < m.start():
                 break
 
-        if type_var.startswith("&"):
+        if "&" in type_var:
             type_name = type_var
         else:
             i = decompiled_code.rfind(type_var, offset, m.start())
@@ -63,14 +64,30 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
     return fields
 
 
-def get_function_list() -> list[tuple[str, int]]:
+def get_function_list() -> dict[str, tuple[int, int]]:
     with ghidra_bridge.GhidraBridge() as init_bridge:
-        return init_bridge.remote_eval("""
+        result = init_bridge.remote_eval("""
         [
             (f.getName(True), f.getID()) for f in currentProgram.getSymbolTable().getDefinedSymbols()
-            if f.getName() == "fields"
+            if f.getName() == "fields" or f.getName() == "init"
         ]
         """)
+        init_funcs = {}
+        fields_funcs = {}
+        for name, func_id in result:
+            if not name.startswith("Reflection::"):
+                continue
+            name = name[len("Reflection::"):]
+
+            if name.endswith("::init"):
+                init_funcs[name[:-len("::init")]] = func_id
+            elif name.endswith("::fields"):
+                fields_funcs[name[:-len("::fields")]] = func_id
+
+        return {
+            name: (init_funcs[name], fields_funcs[name])
+            for name in set(fields_funcs.keys()) & set(init_funcs.keys())
+        }
 
 
 bridge: typing.Optional[ghidra_bridge.GhidraBridge] = None
@@ -91,26 +108,38 @@ def initialize_worker():
     ifc.openProgram(flat_api.currentProgram)
 
 
-def decompile_function(full_name: str, func_id: int) -> tuple[str, dict[str, str]]:
+def decompile_type(type_name: str, init_id: int, fields_id: int) -> tuple[str, typing.Optional[str], dict[str, str]]:
     if bridge is None:
         raise ValueError("Bridge not initialized")
 
-    assert full_name.startswith("Reflection::")
-    assert full_name.endswith("::fields")
-    type_name = full_name[len("Reflection::"):-len("::fields")]
+    bridge.remote_exec("""
+def find_parent(f):
+    super_namespace = f.getParentNamespace().getParentNamespace()
+    for other in f.getCalledFunctions(None):
+        if other.getName().startswith("init") and super_namespace != other.getParentNamespace():
+            return other.getName(True)
+    """)
+
+    parent_init: typing.Optional[str] = bridge.remote_eval("""find_parent(
+        currentProgram.getFunctionManager().getFunctionAt(
+            currentProgram.getSymbolTable().getSymbol(func_id).getAddress()
+        )
+    )""", func_id=init_id)
 
     func = bridge.remote_eval("""
         currentProgram.getFunctionManager().getFunctionAt(
             currentProgram.getSymbolTable().getSymbol(func_id).getAddress()
         )
-    """, func_id=func_id)
+    """, func_id=fields_id)
 
-    return type_name, get_field_registrations(
-        bridge,
-        ifc,
-        monitor,
-        func,
-    )
+    fields = get_field_registrations(bridge, ifc, monitor, func)
+
+    if parent_init is not None:
+        if parent_init.startswith("Reflection::"):
+            parent_init = parent_init[len("Reflection::"):]
+        parent_init = parent_init[:-len("::init")]
+
+    return type_name, parent_init, fields
 
 
 def main():
@@ -121,7 +150,7 @@ def main():
     process_count = max(multiprocessing.cpu_count() - 2, 2)
 
     finished_count = 0
-    failed = {}
+    failed = []
     max_retries = 5
 
     total_count = len(all_fields_functions)
@@ -136,23 +165,22 @@ def main():
     result = {}
 
     def callback(r):
-        type_name, fields = r
-        result[type_name] = fields
+        type_name, parent, fields = r
+        result[type_name] = {"parent": parent, "fields": fields}
         report_update(f"Parsed {type_name}")
 
     with multiprocessing.Pool(processes=process_count, initializer=initialize_worker) as pool:
-        def error_callback(entry, e):
-            name = entry[0]
-            failed[name] = entry[1]
+        def error_callback(name, e):
+            failed.append(name)
             msg = "".join(traceback.format_exception(type(e), e, e.__traceback__))
             report_update(f"Failed {name}: {msg}")
 
-        for f in all_fields_functions:
+        for n, f in all_fields_functions.items():
             pool.apply_async(
-                func=decompile_function,
-                args=f,
+                func=decompile_type,
+                args=(n, *f),
                 callback=callback,
-                error_callback=functools.partial(error_callback, f),
+                error_callback=functools.partial(error_callback, n),
             )
 
         pool.close()
@@ -161,11 +189,10 @@ def main():
     if failed:
         print(f"{len(failed)} function(s) failed, retrying on main thread.")
         initialize_worker()
-    for n, func in failed.items():
+
+    for n in failed:
         try:
-            t, f = decompile_function(n, func)
-            result[t] = f
-            report_update(f"Parsed {t}")
+            callback(decompile_type(n, *all_fields_functions[n]))
         except Exception as e:
             report_update(f"Failed {n}: {e}")
 
@@ -180,10 +207,8 @@ def simple_decompile():
     all_fields_functions = get_function_list()
     initialize_worker()
 
-    for name, i in all_fields_functions:
-        if name == "Reflection::base::global::timeline::CEvent::CCharClassSetMaterialPropertyTransitionEvent::fields":
-            print(decompile_function(name, i))
-            return
+    func_name = "CComponent"
+    print(decompile_type(func_name, *all_fields_functions[func_name]))
 
     # print(decompile_function(*all_fields_functions[4]))
 
