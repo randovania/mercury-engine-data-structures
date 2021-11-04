@@ -2,12 +2,7 @@ from construct import (
     Struct, Construct, Const, GreedyBytes, Int32ul, Hex,
 )
 
-from construct import (
-    Struct, Construct, Const, GreedyBytes, Int32ul, Hex,
-)
-
-from mercury_engine_data_structures.common_types import (
-    make_enum, )
+from mercury_engine_data_structures.common_types import make_enum
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.formats.dread_types import Pointer_CScenario
 from mercury_engine_data_structures.game_check import Game

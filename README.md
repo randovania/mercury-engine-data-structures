@@ -5,7 +5,8 @@ Construct type definitions for Mercury Engine
 | -------- | -------------------- | --------------------- | ------------ | ------------- |
 | PAK      | &cross;              | &cross;               | &check;      | &check;       |
 | BMSSD    | &cross;              | &cross;               | &check;      | &check;       |
-| Brfld    | &cross;              | &cross;               | &check;      | &check;       |
+| BRFLD    | &cross;              | &cross;               | &check;      | &check;       |
+| BMSCC    | &cross;              | &cross;               | &check;      | &check;       |
 
 
 ## Example Usage

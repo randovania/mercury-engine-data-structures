@@ -58,3 +58,11 @@ def LabeledOptional(label, subcon):
             "subcon" / subcon,
         )
     )
+
+
+def OptionalValue(subcon):
+    return construct.FocusedSeq(
+        "value",
+        present=construct.Rebuild(construct.Flag, construct.this.value != None),
+        value=construct.If(construct.this.present, subcon),
+    )
