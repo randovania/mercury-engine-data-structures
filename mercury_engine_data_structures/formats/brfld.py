@@ -60,11 +60,10 @@ EPositionalType = make_enum([
 
 BRFLD = Struct(
     magic=Const('CScenario', PropertyEnum),
-    intro_a=Hex(Int32ul),
-    intro_b=Hex(Int32ul),
-    intro_c=Hex(Int32ul),
+    magic_number=Const(0x02000031, Hex(Int32ul)),
 
     # gameeditor::CGameModelRoot
+    root_type=Const('Root', PropertyEnum),
     root=Object({
         "pScenario": Pointer_CScenario.create_construct(),
     }),

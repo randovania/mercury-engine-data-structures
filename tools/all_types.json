@@ -11703,6 +11703,12 @@
             "bIsFlying": "bool"
         }
     },
+    "CMultiLockOnBlockComponent": {
+        "parent": "CComponent",
+        "fields": {
+            "vMultiLockOnPoints": "base::global::CRntVector<CGameLink<CEntity>>"
+        }
+    },
     "CMultiLockOnBlockComponent::CTunableMultiLockOnBlockComponent": {
         "parent": "base::tunable::CTunable",
         "fields": {
@@ -13522,6 +13528,23 @@
             "fTimeToBreakValve": "float",
             "fTimeToFillAfterValveBreaks": "float",
             "fPlatformMovementDelaySinceUseStart": "float"
+        }
+    },
+    "CWaterPoolComponent": {
+        "parent": "CLiquidPoolBaseComponent",
+        "fields": {
+            "vWaterLevelChanges": "base::global::CRntVector<float32>",
+            "tFloatingEntities": "base::global::CRntVector<CWaterPoolComponent::FloatingEntitiesInfo>",
+            "sOnActivatedLuaCallback": "base::global::CStrId",
+            "bChangedLevelOnCooldownEvent": "bool",
+            "vFloatingEntities": "base::global::CRntVector<CGameLink<CEntity>>"
+        }
+    },
+    "CWaterPoolComponent::FloatingEntitiesInfo": {
+        "parent": null,
+        "fields": {
+            "wpFloatingEntity": "CGameLink<CEntity>",
+            "fLevelStopFloating": "float"
         }
     },
     "CWaterTriggerChangeComponent": {

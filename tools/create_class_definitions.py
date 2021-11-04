@@ -7,6 +7,7 @@ from typing import Optional
 known_types_to_construct = {
     "bool": "construct.Flag",
     "float": "common_types.Float",
+    "float32": "common_types.Float",
     "int": "common_types.Int",
     "unsigned": "common_types.UInt",
     "unsigned_int": "common_types.UInt",

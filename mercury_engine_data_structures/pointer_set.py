@@ -30,9 +30,11 @@ class PointerAdapter(Adapter):
 class PointerSet:
     types: Dict[int, Union[Construct, Type[Construct]]]
 
-    def __init__(self, category: str, *, allow_null: bool = False):
+    def __init__(self, category: str, *, allow_null: bool = True):
         self.category = category
         self.types = {}
+        if allow_null:
+            self.add_option("void", construct.Pass)
 
     @classmethod
     def construct_pointer_for(cls, name: str, conn: Union[Construct, Type[Construct]]) -> Construct:
