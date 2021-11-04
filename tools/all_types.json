@@ -13175,6 +13175,13 @@
             "bKillPlayerOutsideScenario": "bool"
         }
     },
+    "CSubareaCharclassGroup": {
+        "parent": null,
+        "fields": {
+            "sId": "base::global::CStrId",
+            "vsCharClassesIds": "base::global::CRntVector<base::global::CStrId>"
+        }
+    },
     "CSubareaInfo": {
         "parent": null,
         "fields": {

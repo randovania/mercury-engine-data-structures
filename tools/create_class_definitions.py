@@ -22,6 +22,11 @@ known_types_to_construct = {
     "CGameLink<CSpawnPointComponent>": "common_types.StrId",
     "base::global::CRntFile": "construct.Prefixed(construct.Int32ul, construct.GreedyBytes)",
 
+    # ESubAreaItem::Count = 9
+    "base::global::CArray<base::global::CStrId, EnumClass<ESubAreaItem>::Count, ESubAreaItem>": (
+        "common_types.make_vector(common_types.StrId)"
+    ),
+
     # TODO: test if works
     "base::global::CName": "common_types.StrId",
     "base::core::CAssetLink": "common_types.StrId",
@@ -43,7 +48,7 @@ all_container_re = {
 
 unique_ptr_re = re.compile(r"std::unique_ptr<(.*)>$")
 weak_ptr_re = re.compile(r"base::global::CWeakPtr<(.*)>$")
-raw_ptr_re = re.compile(r"(.*?)(?: const)?\*$")
+raw_ptr_re = re.compile(r"(.*?)(?:[ ]?const)?\*$")
 ref_re = re.compile(r"CGameObjectRef<(.*)>$")
 typed_var_re = re.compile(r"(base::reflection::CTypedValue)$")
 all_ptr_re = [unique_ptr_re, weak_ptr_re, raw_ptr_re, ref_re, typed_var_re]
@@ -230,6 +235,7 @@ def main():
 
     type_exporter = TypeExporter(all_types)
     type_exporter.pointer_to_type("CScenario")
+    type_exporter.pointer_to_type("CSubAreaManager")
 
     # needs_exporting = {"CActor"}
     # while needs_exporting:

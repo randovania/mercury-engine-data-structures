@@ -7,6 +7,7 @@ Construct type definitions for Mercury Engine
 | BMSSD    | &cross;              | &cross;               | &check;      | &check;       |
 | BRFLD    | &cross;              | &cross;               | &check;      | &check;       |
 | BMSCC    | &cross;              | &cross;               | &check;      | &check;       |
+| BRSA     | &cross;              | &cross;               | &check;      | &check;       |
 
 
 ## Example Usage
