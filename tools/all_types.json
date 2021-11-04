@@ -505,7 +505,7 @@
         "fields": {}
     },
     "CAreaFXComponent": {
-        "parent": null,
+        "parent": "CSceneComponent",
         "fields": {
             "sModelResPath": "base::global::CFilePathStrId"
         }
@@ -835,7 +835,7 @@
         }
     },
     "CBoneToConstantComponent": {
-        "parent": null,
+        "parent": "CSceneComponent",
         "fields": {}
     },
     "CBossAIComponent": {
@@ -881,12 +881,18 @@
         "parent": "CLogicShapeComponent",
         "fields": {}
     },
+    "CBreakableScenarioComponent": {
+        "parent": "CComponent",
+        "fields": {
+            "aVignettes": "base::global::CRntVector<CGameLink<CActor>>"
+        }
+    },
     "CBreakableTileGroup": {
         "parent": null,
         "fields": {}
     },
     "CBreakableTileGroupComponent": {
-        "parent": null,
+        "parent": "CSceneComponent",
         "fields": {
             "uGroupId": "unsigned",
             "aGridTiles": "base::global::CRntVector<CBreakableTileGroupComponent::STileInfo>",
@@ -9369,7 +9375,7 @@
         "fields": {}
     },
     "CChozombieFXComponent": {
-        "parent": null,
+        "parent": "CSceneComponent",
         "fields": {}
     },
     "CColliderTriggerComponent": {
@@ -10789,7 +10795,7 @@
         "fields": {}
     },
     "CHecathonPlanktonFXComponent": {
-        "parent": null,
+        "parent": "CSceneComponent",
         "fields": {
             "sModelResPath": "base::global::CFilePathStrId"
         }
@@ -11396,7 +11402,7 @@
         }
     },
     "CMaterialFXComponent": {
-        "parent": null,
+        "parent": "CSceneComponent",
         "fields": {}
     },
     "CMeleeCameraCtrl": {
@@ -11588,7 +11594,7 @@
         }
     },
     "CModelInstanceComponent": {
-        "parent": null,
+        "parent": "CSceneComponent",
         "fields": {
             "sModelPath": "base::global::CFilePathStrId",
             "vScale": "base::math::CVector3D"
@@ -12652,7 +12658,7 @@
         "fields": {}
     },
     "CScorpiusFXComponent": {
-        "parent": null,
+        "parent": "CSceneComponent",
         "fields": {}
     },
     "CScorpiusMovingPoisonousGasAttack": {
@@ -13061,7 +13067,7 @@
         }
     },
     "CStandaloneFXComponent": {
-        "parent": null,
+        "parent": "CSceneComponent",
         "fields": {
             "vctFXInstances": "&DAT_71726c9640",
             "uPoolSize": "unsigned",
