@@ -10264,6 +10264,12 @@
         "parent": "CComponent",
         "fields": {}
     },
+    "CEvacuationCountDown": {
+        "parent": "CEventPropComponent",
+        "fields": {
+            "vEntitiesToPowerOff": "base::global::CRntVector<CGameLink<CEntity>>"
+        }
+    },
     "CEvacuationCountDown::CTunableEvacuationCountDown": {
         "parent": "base::tunable::CTunable",
         "fields": {
