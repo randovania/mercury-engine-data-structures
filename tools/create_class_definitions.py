@@ -45,46 +45,6 @@ known_types_to_construct = {
     "base::global::CName": "common_types.StrId",
 }
 
-_aliases = {
-    # weirdness
-    "(undefined **)base::global::CFilePathStrId": "base::global::CFilePathStrId",
-
-    # custom names
-    "&DAT_7172642b18": "CGameLink<CActor>",
-    "&DAT_717275c0d8": "CGameLink<CEntity>",
-    "&DAT_7172642ed8": "base::global::CRntVector<CGameLink<CActor>>",
-    "&DAT_717275c498": "base::global::CRntVector<CGameLink<CEntity>>",
-
-    "&CGameLink_CActor_DAT_7172642b18": "CGameLink<CActor>",
-    "&CGameLink<CEntity>::Serializer": "CGameLink<CEntity>",
-    "&Vector_GameLink_CActor_7172642ed8": "base::global::CRntVector<CGameLink<CActor>>",
-    "&Vector_CGameLink_CEntity_DAT_717275c498": "base::global::CRntVector<CGameLink<CEntity>>",
-
-    "&Vector_PtrCTriggerLogicAction_DAT_71726f3930": "base::global::CRntVector<std::unique_ptr<CTriggerLogicAction>>",
-
-    "&Vector_CXParasiteBehavior_71726c3030": "base::global::CRntVector<std::unique_ptr<CXParasiteBehavior>>",
-    "&base::snd::ELowPassFilter_DAT_7108b13de8": "unsigned",
-
-    "&DAT_71726bb4c0": "base::global::CRntVector<CCentralUnitComponent::SStartPointInfo>",
-    "&DAT_71726baee8": "base::global::CRntVector<std::unique_ptr<CCentralUnitWeightedEdges>>",
-    "&DAT_71729a98a8": "base::global::CRntVector<SFallBackPath>",
-    "&DAT_7172686f58": "base::global::CRntVector<std::unique_ptr<CEmmyOverrideDeathPositionDef>>",
-    "&DAT_7172687378": "base::global::CRntVector<std::unique_ptr<CEmmyAutoForbiddenEdgesDef>>",
-    "&DAT_7172687798": "base::global::CRntVector<std::unique_ptr<CEmmyAutoGlobalSmartLinkDef>>",
-    "&DAT_71726ecbf0": "CFreezeRoomConfig",
-    "&DAT_71726ecd30": "CFreezeRoomCoolConfig",
-    "&DAT_71726ed380": "CHeatRoomConfig",
-    "&DAT_71726ed4c0": "CHeatRoomCoolConfig",
-    "&DAT_71726d53e0": "base::global::CRntVector<SBeamBoxActivatable>",
-    "&vectSpawnPoints_DAT_71729aaf30": "base::global::CRntVector<CGameLink<CSpawnPointComponent>>",
-    "&Vector_CSpawnerActorBlueprint_DAT_71729aa9d0": "base::global::CRntVector<CSpawnerActorBlueprint>",
-    "&Trigger_DAT_71726f4968": "base::global::CRntVector<std::unique_ptr<CTriggerComponent::SActivationCondition>>",
-    "&DictStr_ListStr_DAT_71726f5da0": "base::global::CRntDictionary<base::global::CStrId, base::global::CRntVector<base::global::CStrId>>",
-    "&VectorStrId_DAT_7101d03998": "base::global::CRntVector<base::global::CStrId>",
-    "&DAT_71726f8e78": "base::global::CRntVector<SDoorInfo>",
-    "&DAT_71726fd0c0": "base::global::CRntVector<SWorldGraphNode>",
-}
-
 vector_re = re.compile(r"base::global::CRntVector<(.*)>$")
 dict_re = re.compile(r"base::global::CRntDictionary<base::global::CStrId, (.*)>$")
 all_container_re = {
@@ -99,8 +59,6 @@ all_ptr_re = [unique_ptr_re, raw_ptr_re, ref_re]
 
 
 def convert_type_to_construct(field_name: str, field_type: str, all_types: dict[str, Any]):
-    field_type = _aliases.get(field_type, field_type)
-
     if field_type in known_types_to_construct:
         return known_types_to_construct[field_type]
 
@@ -136,7 +94,7 @@ def convert_type_to_construct(field_name: str, field_type: str, all_types: dict[
 
 
 def main():
-    p = Path(r"C:\Users\henri\programming\mercury-engine-data-structures\tools\all_types.json")
+    p = Path("all_types.json")
 
     with p.open() as f:
         all_types: dict[str, dict[str, str]] = json.load(f)
@@ -168,7 +126,7 @@ def main():
                 if (converted_type := convert_type_to_construct(field_name, field_type, all_types)) is not None:
                     field_lines.append(f'    "{field_name}": {converted_type},')
                 else:
-                    field_lines.append(f'    # "{field_name}": {_aliases.get(field_type, field_type)},')
+                    field_lines.append(f'    # "{field_name}": {field_type},')
 
             fields_def = "{{\n    **{}Fields,\n{}\n}}".format(
                 parent_name,

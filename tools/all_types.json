@@ -27,8 +27,8 @@
             "fPathRightCut": "float",
             "fCutDistanceClockwise": "float",
             "fCutDistanceCounterClockwise": "float",
-            "wpPathToFollow": "&CGameLink_CActor_DAT_7172642b18",
-            "tFallbackPaths": "&DAT_71729a98a8",
+            "wpPathToFollow": "CGameLink<CActor>",
+            "tFallbackPaths": "base::global::CRntVector<SFallBackPath>",
             "ePathType": "&DAT_7172761720",
             "bIndividualRequiresActivationPerception": "bool",
             "bIgnoreAttack": "bool",
@@ -307,16 +307,16 @@
     "CAccessPointCommanderComponent": {
         "parent": "CAccessPointComponent",
         "fields": {
-            "wpAfterFirstDialogueScenePlayer": "&CGameLink<CEntity>::Serializer"
+            "wpAfterFirstDialogueScenePlayer": "CGameLink<CEntity>"
         }
     },
     "CAccessPointComponent": {
         "parent": "CUsableComponent",
         "fields": {
-            "vDoorsToChange": "&Vector_CGameLink_CEntity_DAT_717275c498",
+            "vDoorsToChange": "base::global::CRntVector<CGameLink<CEntity>>",
             "sInteractionLiteralID": "base::global::CStrId",
-            "tCaptionList": "&DictStr_ListStr_DAT_71726f5da0",
-            "wpThermalDevice": "&CGameLink<CEntity>::Serializer"
+            "tCaptionList": "base::global::CRntDictionary<base::global::CStrId, base::global::CRntVector<base::global::CStrId>>",
+            "wpThermalDevice": "CGameLink<CEntity>"
         }
     },
     "CAccessPointComponent::CTunableAccessPointComponent": {
@@ -630,7 +630,7 @@
     "CAutoolAIComponent": {
         "parent": "CRobotAIComponent",
         "fields": {
-            "vAISmartObjects": "&Vector_GameLink_CActor_7172642ed8"
+            "vAISmartObjects": "base::global::CRntVector<CGameLink<CActor>>"
         }
     },
     "CAutsharpAIComponent": {
@@ -645,7 +645,7 @@
         "parent": "CSpawnPointComponent",
         "fields": {
             "eSpawnDir": "&DAT_71726eb140",
-            "wpSpawnShape": "&CGameLink_CActor_DAT_7172642b18"
+            "wpSpawnShape": "CGameLink<CActor>"
         }
     },
     "CAutsniperAIComponent": {
@@ -732,7 +732,7 @@
         "parent": "CItemLifeComponent",
         "fields": {
             "fDisplaceDist": "float",
-            "vActivatables": "&DAT_71726d53e0",
+            "vActivatables": "base::global::CRntVector<SBeamBoxActivatable>",
             "sAnimationId": "base::global::CStrId"
         }
     },
@@ -830,13 +830,13 @@
             "sArenaLeftLandmark": "base::global::CStrId",
             "sArenaRightLandmark": "base::global::CStrId",
             "fArenaLimitDist": "float",
-            "tDoors": "&Vector_CGameLink_CEntity_DAT_717275c498",
-            "wpBossCamera": "&CGameLink_CActor_DAT_7172642b18",
-            "wpBossCameraFloorLandmark": "&CGameLink_CActor_DAT_7172642b18",
-            "wpBossCameraCeilingLandmark": "&CGameLink_CActor_DAT_7172642b18",
-            "wpStartCombatCheckpointStartPoint": "&CGameLink_CActor_DAT_7172642b18",
+            "tDoors": "base::global::CRntVector<CGameLink<CEntity>>",
+            "wpBossCamera": "CGameLink<CActor>",
+            "wpBossCameraFloorLandmark": "CGameLink<CActor>",
+            "wpBossCameraCeilingLandmark": "CGameLink<CActor>",
+            "wpStartCombatCheckpointStartPoint": "CGameLink<CActor>",
             "sStartCombatCheckpointSnapshotId": "base::global::CStrId",
-            "wpDeadCheckpointStartPoint": "&CGameLink_CActor_DAT_7172642b18",
+            "wpDeadCheckpointStartPoint": "CGameLink<CActor>",
             "bSaveGameOnAfterDead": "bool"
         }
     },
@@ -1018,8 +1018,8 @@
     "CCapsuleUsableComponent": {
         "parent": "CElevatorUsableComponent",
         "fields": {
-            "wpCapsule": "&CGameLink<CEntity>::Serializer",
-            "wpSkybase": "&CGameLink<CEntity>::Serializer"
+            "wpCapsule": "CGameLink<CEntity>",
+            "wpSkybase": "CGameLink<CEntity>"
         }
     },
     "CCaterzillaAIComponent": {
@@ -1033,16 +1033,16 @@
             "eSpawnOrder": "&DAT_71726eb828",
             "NumCaterzillas": "unsigned",
             "fTimeToGenerateNextWave": "float",
-            "wpSpawnPointLinked": "&CGameLink_CActor_DAT_7172642b18",
+            "wpSpawnPointLinked": "CGameLink<CActor>",
             "fTimeToRespawnAllCaterzillas": "float",
-            "aHomeLandmarks": "&Vector_GameLink_CActor_7172642ed8",
+            "aHomeLandmarks": "base::global::CRntVector<CGameLink<CActor>>",
             "bInOutSpawnPoint": "bool"
         }
     },
     "CCaveCentralUnitComponent": {
         "parent": "CCentralUnitComponent",
         "fields": {
-            "wpGate": "&CGameLink<CEntity>::Serializer"
+            "wpGate": "CGameLink<CEntity>"
         }
     },
     "CCaveCentralUnitComponentDef": {
@@ -1052,10 +1052,10 @@
     "CCentralUnitAIComponent": {
         "parent": "CBehaviorTreeAIComponent",
         "fields": {
-            "vSpawnPointActors": "&Vector_GameLink_CActor_7172642ed8",
+            "vSpawnPointActors": "base::global::CRntVector<CGameLink<CActor>>",
             "eType": "&DAT_71726a3e20",
-            "wpDoorCentralUnit": "&CGameLink<CEntity>::Serializer",
-            "wpDeadCutScenePlayer": "&CGameLink<CEntity>::Serializer"
+            "wpDoorCentralUnit": "CGameLink<CEntity>",
+            "wpDeadCutScenePlayer": "CGameLink<CEntity>"
         }
     },
     "CCentralUnitCannonAIComponent": {
@@ -1071,24 +1071,24 @@
         "fields": {
             "eMode": "&DAT_71726bb0d8",
             "bStartEnabled": "bool",
-            "wpBossSpawnPoint": "&CGameLink<CEntity>::Serializer",
-            "wpCentralUnitAI": "&CGameLink<CEntity>::Serializer",
-            "wpBossAlive": "&CGameLink<CEntity>::Serializer",
-            "wpBossDestroyed": "&CGameLink<CEntity>::Serializer",
-            "wpBossDoor": "&CGameLink<CEntity>::Serializer",
+            "wpBossSpawnPoint": "CGameLink<CEntity>",
+            "wpCentralUnitAI": "CGameLink<CEntity>",
+            "wpBossAlive": "CGameLink<CEntity>",
+            "wpBossDestroyed": "CGameLink<CEntity>",
+            "wpBossDoor": "CGameLink<CEntity>",
             "sBossCollisionCameraID": "base::global::CStrId",
-            "wpEmmySpawnPoint": "&CGameLink<CEntity>::Serializer",
-            "tEmmyStartPointsInfo": "&DAT_71726bb4c0",
-            "wpEmmyZoneShape": "&CGameLink_CActor_DAT_7172642b18",
-            "wpDestroySearchLandmark": "&CGameLink_CActor_DAT_7172642b18",
-            "tEmmyForbiddenShapes": "&Vector_GameLink_CActor_7172642ed8",
-            "tEmmyWeightedShapes": "&DAT_71726baee8",
+            "wpEmmySpawnPoint": "CGameLink<CEntity>",
+            "tEmmyStartPointsInfo": "base::global::CRntVector<CCentralUnitComponent::SStartPointInfo>",
+            "wpEmmyZoneShape": "CGameLink<CActor>",
+            "wpDestroySearchLandmark": "CGameLink<CActor>",
+            "tEmmyForbiddenShapes": "base::global::CRntVector<CGameLink<CActor>>",
+            "tEmmyWeightedShapes": "base::global::CRntVector<std::unique_ptr<CCentralUnitWeightedEdges>>",
             "bUnlockDoorsOnEmmyDead": "bool",
-            "tEmmyLockedDoors": "&Vector_CGameLink_CEntity_DAT_717275c498",
-            "tEmmyPhase2DeactivatedActors": "&Vector_GameLink_CActor_7172642ed8",
-            "wpStartCombatCheckpointStartPoint": "&CGameLink_CActor_DAT_7172642b18",
+            "tEmmyLockedDoors": "base::global::CRntVector<CGameLink<CEntity>>",
+            "tEmmyPhase2DeactivatedActors": "base::global::CRntVector<CGameLink<CActor>>",
+            "wpStartCombatCheckpointStartPoint": "CGameLink<CActor>",
             "sStartCombatCheckpointSnapshotId": "base::global::CStrId",
-            "wpDeadCheckpointStartPoint": "&CGameLink_CActor_DAT_7172642b18"
+            "wpDeadCheckpointStartPoint": "CGameLink<CActor>"
         }
     },
     "CCentralUnitComponentDef": {
@@ -1099,7 +1099,7 @@
         "parent": null,
         "fields": {
             "sId": "base::global::CStrId",
-            "pLogicShape": "&CGameLink_CActor_DAT_7172642b18",
+            "pLogicShape": "CGameLink<CActor>",
             "fFactorToAdd": "float",
             "fFactorToMultiply": "float"
         }
@@ -2068,7 +2068,7 @@
     "CCharClassBreakableScenarioComponent": {
         "parent": "CCharClassComponent",
         "fields": {
-            "vColliderIds": "&VectorStrId_DAT_7101d03998"
+            "vColliderIds": "base::global::CRntVector<base::global::CStrId>"
         }
     },
     "CCharClassBumpedTrack": {
@@ -3311,7 +3311,7 @@
     "CCharClassDoorGrapplePointComponent": {
         "parent": "CCharClassPullableGrapplePointComponent",
         "fields": {
-            "sGrappleColliderNames": "&VectorStrId_DAT_7101d03998"
+            "sGrappleColliderNames": "base::global::CRntVector<base::global::CStrId>"
         }
     },
     "CCharClassDoorLifeComponent": {
@@ -9111,12 +9111,12 @@
         "parent": "CBossAIComponent",
         "fields": {
             "bUltimateGrabTestMode": "bool",
-            "wpUltimateGrabLandmark": "&CGameLink_CActor_DAT_7172642b18",
-            "wpDeadCutScenePlayer": "&CGameLink<CEntity>::Serializer",
-            "wpPhase2CutscenePlayer": "&CGameLink<CEntity>::Serializer",
-            "wpPhase3CutscenePlayer": "&CGameLink<CEntity>::Serializer",
-            "wpPhase3EndLeftCutscenePlayer": "&CGameLink<CEntity>::Serializer",
-            "wpPhase3EndRightCutscenePlayer": "&CGameLink<CEntity>::Serializer"
+            "wpUltimateGrabLandmark": "CGameLink<CActor>",
+            "wpDeadCutScenePlayer": "CGameLink<CEntity>",
+            "wpPhase2CutscenePlayer": "CGameLink<CEntity>",
+            "wpPhase3CutscenePlayer": "CGameLink<CEntity>",
+            "wpPhase3EndLeftCutscenePlayer": "CGameLink<CEntity>",
+            "wpPhase3EndRightCutscenePlayer": "CGameLink<CEntity>"
         }
     },
     "CChozoCommanderAirAttack": {
@@ -9210,8 +9210,8 @@
     "CChozoCommanderXLifeComponent": {
         "parent": "CLifeComponent",
         "fields": {
-            "wpIntroductionCutScenePlayer": "&CGameLink<CEntity>::Serializer",
-            "wpDeathCutScenePlayer": "&CGameLink<CEntity>::Serializer"
+            "wpIntroductionCutScenePlayer": "CGameLink<CEntity>",
+            "wpDeathCutScenePlayer": "CGameLink<CEntity>"
         }
     },
     "CChozoCommanderZeroLaserAttack": {
@@ -9230,8 +9230,8 @@
         "parent": "CBossAIComponent",
         "fields": {
             "bAlternativeSkin": "bool",
-            "wpPatrolPath": "&CGameLink_CActor_DAT_7172642b18",
-            "tShootingPositions": "&Vector_GameLink_CActor_7172642ed8"
+            "wpPatrolPath": "CGameLink<CActor>",
+            "tShootingPositions": "base::global::CRntVector<CGameLink<CActor>>"
         }
     },
     "CChozoRobotSoldierBeamMovementComponent": {
@@ -9265,7 +9265,7 @@
     "CChozoWarriorAIComponent": {
         "parent": "CBossAIComponent",
         "fields": {
-            "wpChozoWarrioXSpawnPoint": "&CGameLink_CActor_DAT_7172642b18",
+            "wpChozoWarrioXSpawnPoint": "CGameLink<CActor>",
             "eTransformationType": "&DAT_7172677f78"
         }
     },
@@ -9344,7 +9344,7 @@
     "CColliderTriggerComponent": {
         "parent": "CTriggerComponent",
         "fields": {
-            "lnkShape": "&CGameLink_CActor_DAT_7172642b18"
+            "lnkShape": "CGameLink<CActor>"
         }
     },
     "CCollisionComponent": {
@@ -9374,11 +9374,11 @@
     "CCooldownXBossAIComponent": {
         "parent": "CBossAIComponent",
         "fields": {
-            "wpWindTunnelDamageTrigger": "&CGameLink<CEntity>::Serializer",
-            "wpLavaCarpetFloorFX": "&CGameLink<CEntity>::Serializer",
-            "wpCoolShinesparkTrigger": "&CGameLink<CEntity>::Serializer",
-            "wpDeathCutscenePlayer": "&CGameLink<CEntity>::Serializer",
-            "wpDeathFromGrabCutscenePlayer": "&CGameLink<CEntity>::Serializer"
+            "wpWindTunnelDamageTrigger": "CGameLink<CEntity>",
+            "wpLavaCarpetFloorFX": "CGameLink<CEntity>",
+            "wpCoolShinesparkTrigger": "CGameLink<CEntity>",
+            "wpDeathCutscenePlayer": "CGameLink<CEntity>",
+            "wpDeathFromGrabCutscenePlayer": "CGameLink<CEntity>"
         }
     },
     "CCooldownXBossAttack": {
@@ -9548,7 +9548,7 @@
         "parent": null,
         "fields": {
             "sId": "base::global::CStrId",
-            "lnkActor": "&CGameLink_CActor_DAT_7172642b18",
+            "lnkActor": "CGameLink<CActor>",
             "bStartingVisibleState": "bool",
             "bReceiveLogicUpdate": "bool",
             "vctVisibilityPerTake": "&VectorBool_7101d07e78"
@@ -9561,16 +9561,16 @@
     "CCutsceneTriggerComponent": {
         "parent": "CBaseTriggerComponent",
         "fields": {
-            "lnkTargetCutsceneActor": "&CGameLink_CActor_DAT_7172642b18",
+            "lnkTargetCutsceneActor": "CGameLink<CActor>",
             "bOneShot": "bool"
         }
     },
     "CDaivoAIComponent": {
         "parent": "CSluggerAIComponent",
         "fields": {
-            "wpSwarmActor": "&CGameLink_CActor_DAT_7172642b18",
-            "wpSwarmAOIBegin": "&CGameLink_CActor_DAT_7172642b18",
-            "wpSwarmAOIEnd": "&CGameLink_CActor_DAT_7172642b18",
+            "wpSwarmActor": "CGameLink<CActor>",
+            "wpSwarmAOIBegin": "CGameLink<CActor>",
+            "wpSwarmAOIEnd": "CGameLink<CActor>",
             "fChaseForcedDistanceToWall": "float"
         }
     },
@@ -9633,20 +9633,20 @@
     "CDemolitionBlockActivatableActorLifeComponent": {
         "parent": "CDemolitionBlockLifeComponent",
         "fields": {
-            "oActivatableObjController": "&CGameLink<CEntity>::Serializer"
+            "oActivatableObjController": "CGameLink<CEntity>"
         }
     },
     "CDemolitionBlockComponent": {
         "parent": "CActivatableComponent",
         "fields": {
-            "vObjsToEnable": "&Vector_CGameLink_CEntity_DAT_717275c498",
-            "vObjsToDisable": "&Vector_CGameLink_CEntity_DAT_717275c498"
+            "vObjsToEnable": "base::global::CRntVector<CGameLink<CEntity>>",
+            "vObjsToDisable": "base::global::CRntVector<CGameLink<CEntity>>"
         }
     },
     "CDemolitionBlockLifeComponent": {
         "parent": "CLifeComponent",
         "fields": {
-            "wpOtherBlock": "&CGameLink_CActor_DAT_7172642b18"
+            "wpOtherBlock": "CGameLink<CActor>"
         }
     },
     "CDemolitionBlockSonarTargetComponent": {
@@ -9683,8 +9683,8 @@
         "parent": "CItemLifeComponent",
         "fields": {
             "fMaxDistanceOpened": "float",
-            "wpLeftDoorShieldEntity": "&CGameLink<CEntity>::Serializer",
-            "wpRightDoorShieldEntity": "&CGameLink<CEntity>::Serializer",
+            "wpLeftDoorShieldEntity": "CGameLink<CEntity>",
+            "wpRightDoorShieldEntity": "CGameLink<CEntity>",
             "fMinTimeOpened": "float",
             "bStayOpen": "bool",
             "bStartOpened": "bool",
@@ -9693,7 +9693,7 @@
             "bFrozenDuringColdown": "bool",
             "iAreaLeft": "int",
             "iAreaRight": "int",
-            "aVignettes": "&Vector_GameLink_CActor_7172642ed8",
+            "aVignettes": "base::global::CRntVector<CGameLink<CActor>>",
             "sShieldEntity": "base::global::CStrId"
         }
     },
@@ -9816,7 +9816,7 @@
         "fields": {
             "eBlackOutZone": "&DAT_71726f6ec8",
             "sOnEnterUseLuaCallback": "base::global::CStrId",
-            "vAffectedSubAreas": "&VectorStrId_DAT_7101d03998"
+            "vAffectedSubAreas": "base::global::CRntVector<base::global::CStrId>"
         }
     },
     "CElectricReactionComponent": {
@@ -9865,11 +9865,11 @@
             "fGrabZoomTime": "float",
             "bTargetDetectionEnabled": "bool",
             "bTargetInsideEmmyZone": "bool",
-            "tOverrideGrabPosition": "&DAT_7172686f58",
-            "tOverrideDeathPosition": "&DAT_7172686f58",
-            "tAutoForbiddenEdges": "&DAT_7172687378",
-            "tAutoGlobalSmartLinks": "&DAT_7172687798",
-            "tLogicShapesToAvoidCornerReposition": "&Vector_GameLink_CActor_7172642ed8"
+            "tOverrideGrabPosition": "base::global::CRntVector<std::unique_ptr<CEmmyOverrideDeathPositionDef>>",
+            "tOverrideDeathPosition": "base::global::CRntVector<std::unique_ptr<CEmmyOverrideDeathPositionDef>>",
+            "tAutoForbiddenEdges": "base::global::CRntVector<std::unique_ptr<CEmmyAutoForbiddenEdgesDef>>",
+            "tAutoGlobalSmartLinks": "base::global::CRntVector<std::unique_ptr<CEmmyAutoGlobalSmartLinkDef>>",
+            "tLogicShapesToAvoidCornerReposition": "base::global::CRntVector<CGameLink<CActor>>"
         }
     },
     "CEmmyAttackComponent": {
@@ -9879,10 +9879,10 @@
     "CEmmyAutoForbiddenEdgesDef": {
         "parent": null,
         "fields": {
-            "wpCheckSamusLogicShape": "&CGameLink_CActor_DAT_7172642b18",
-            "wpCheckEmmyLogicShape": "&CGameLink_CActor_DAT_7172642b18",
-            "tForbiddenLogicShapes": "&Vector_GameLink_CActor_7172642ed8",
-            "tWeightedLogicShapeIDs": "&VectorStrId_DAT_7101d03998"
+            "wpCheckSamusLogicShape": "CGameLink<CActor>",
+            "wpCheckEmmyLogicShape": "CGameLink<CActor>",
+            "tForbiddenLogicShapes": "base::global::CRntVector<CGameLink<CActor>>",
+            "tWeightedLogicShapeIDs": "base::global::CRntVector<base::global::CStrId>"
         }
     },
     "CEmmyCaveAIComponent": {
@@ -9920,8 +9920,8 @@
     "CEmmyOverrideDeathPositionDef": {
         "parent": null,
         "fields": {
-            "wpLandmark": "&CGameLink_CActor_DAT_7172642b18",
-            "wpLogicShape": "&CGameLink_CActor_DAT_7172642b18"
+            "wpLandmark": "CGameLink<CActor>",
+            "wpLogicShape": "CGameLink<CActor>"
         }
     },
     "CEmmyProtoAIComponent": {
@@ -9933,10 +9933,10 @@
     "CEmmySancAIComponent": {
         "parent": "CEmmyAIComponent",
         "fields": {
-            "tFast4LegTransformationMagnet": "&Vector_GameLink_CActor_7172642ed8",
-            "wpForceEmmyPerceptionVisionConeOffShape": "&CGameLink_CActor_DAT_7172642b18",
+            "tFast4LegTransformationMagnet": "base::global::CRntVector<CGameLink<CActor>>",
+            "wpForceEmmyPerceptionVisionConeOffShape": "CGameLink<CActor>",
             "bZipLine004Behavior": "bool",
-            "wpPhase2HeatEnabledLogicShape": "&CGameLink_CActor_DAT_7172642b18"
+            "wpPhase2HeatEnabledLogicShape": "CGameLink<CActor>"
         }
     },
     "CEmmyShipyardAIComponent": {
@@ -9960,7 +9960,7 @@
     "CEmmyWakeUpComponent": {
         "parent": "CEventPropComponent",
         "fields": {
-            "wpCentralUnit": "&CGameLink_CActor_DAT_7172642b18"
+            "wpCentralUnit": "CGameLink<CActor>"
         }
     },
     "CEmmyWaveMovementComponent": {
@@ -10155,7 +10155,7 @@
     "CEventScenarioComponent": {
         "parent": "CComponent",
         "fields": {
-            "vEventActors": "&Vector_GameLink_CActor_7172642ed8",
+            "vEventActors": "base::global::CRntVector<CGameLink<CActor>>",
             "sIdleAction": "base::global::CStrId",
             "sReactionAction": "base::global::CStrId",
             "sFinishedAction": "base::global::CStrId",
@@ -10283,8 +10283,8 @@
     "CFootstepPlatformComponent": {
         "parent": "CComponent",
         "fields": {
-            "wpActivableEntity": "&CGameLink<CEntity>::Serializer",
-            "wpPartnerFootStepPlatformEntity": "&CGameLink<CEntity>::Serializer",
+            "wpActivableEntity": "CGameLink<CEntity>",
+            "wpPartnerFootStepPlatformEntity": "CGameLink<CEntity>",
             "sCallbackOnOpened": "base::global::CStrId",
             "sCallbackOnClosed": "base::global::CStrId"
         }
@@ -10293,8 +10293,8 @@
         "parent": "CTriggerLogicAction",
         "fields": {
             "eNavMeshGroup": "&DAT_71726f2728",
-            "wpSpawnPoint": "&CGameLink<CEntity>::Serializer",
-            "wpLogicShape": "&CGameLink_CActor_DAT_7172642b18",
+            "wpSpawnPoint": "CGameLink<CEntity>",
+            "wpLogicShape": "CGameLink<CActor>",
             "eState": "&DAT_71726f2888"
         }
     },
@@ -10315,7 +10315,7 @@
     "CFreeAimTutoLogicAction": {
         "parent": "CTriggerLogicAction",
         "fields": {
-            "wpItemToDestroy": "&CGameLink<CEntity>::Serializer"
+            "wpItemToDestroy": "CGameLink<CEntity>"
         }
     },
     "CFreeCameraCtrl": {
@@ -10325,9 +10325,9 @@
     "CFreezeRoomComponent": {
         "parent": "CBaseDamageTriggerComponent",
         "fields": {
-            "oFreezeConfig": "&DAT_71726ecbf0",
-            "oCoolConfig": "&DAT_71726ecd30",
-            "sEnterZoneSound": "(undefined **)base::global::CFilePathStrId",
+            "oFreezeConfig": "CFreezeRoomConfig",
+            "oCoolConfig": "CFreezeRoomCoolConfig",
+            "sEnterZoneSound": "base::global::CFilePathStrId",
             "sVisualPresetOverride": "base::global::CStrId"
         }
     },
@@ -10362,7 +10362,7 @@
     "CFrozenPlatformComponent": {
         "parent": "CComponent",
         "fields": {
-            "wpWeightPlatform": "&CGameLink<CEntity>::Serializer"
+            "wpWeightPlatform": "CGameLink<CEntity>"
         }
     },
     "CFulmiteBellyMineAIComponent": {
@@ -10418,8 +10418,8 @@
     "CGobblerSpawnPointComponent": {
         "parent": "CSpawnPointComponent",
         "fields": {
-            "wpDoor": "&CGameLink<CEntity>::Serializer",
-            "wpWeb": "&CGameLink<CEntity>::Serializer"
+            "wpDoor": "CGameLink<CEntity>",
+            "wpWeb": "CGameLink<CEntity>"
         }
     },
     "CGoliathAIComponent": {
@@ -10433,7 +10433,7 @@
     "CGoliathXAIComponent": {
         "parent": "CGoliathAIComponent",
         "fields": {
-            "wpCoreXSpawnPoint": "&CGameLink_CActor_DAT_7172642b18"
+            "wpCoreXSpawnPoint": "CGameLink<CActor>"
         }
     },
     "CGoliathXBurstProjectionBombMovement": {
@@ -10568,12 +10568,12 @@
     "CHeatRoomComponent": {
         "parent": "CBaseDamageTriggerComponent",
         "fields": {
-            "oHeatConfig": "&DAT_71726ed380",
-            "oCoolConfig": "&DAT_71726ed4c0",
-            "sEnterZoneSound": "(undefined **)base::global::CFilePathStrId",
+            "oHeatConfig": "CHeatRoomConfig",
+            "oCoolConfig": "CHeatRoomCoolConfig",
+            "sEnterZoneSound": "base::global::CFilePathStrId",
             "sVisualPresetOverride": "base::global::CStrId",
-            "pEnvironmentFXActor": "&CGameLink_CActor_DAT_7172642b18",
-            "vEnvironmentFXActors": "&Vector_GameLink_CActor_7172642ed8"
+            "pEnvironmentFXActor": "CGameLink<CActor>",
+            "vEnvironmentFXActors": "base::global::CRntVector<CGameLink<CActor>>"
         }
     },
     "CHeatableShieldComponent": {
@@ -10599,9 +10599,9 @@
     "CHecathonAIComponent": {
         "parent": "CBehaviorTreeAIComponent",
         "fields": {
-            "wpPatrolPath": "&CGameLink_CActor_DAT_7172642b18",
+            "wpPatrolPath": "CGameLink<CActor>",
             "ePatrolPathType": "&DAT_7172761720",
-            "wpHarassPath": "&CGameLink_CActor_DAT_7172642b18",
+            "wpHarassPath": "CGameLink<CActor>",
             "eHarassPathType": "&DAT_7172761720",
             "fTimeToGoPatrol": "float",
             "fSpeed": "float",
@@ -10635,8 +10635,8 @@
     "CHydrogigaAIComponent": {
         "parent": "CBossAIComponent",
         "fields": {
-            "wpPresentationCutscenePlayer": "&CGameLink<CEntity>::Serializer",
-            "wpDeadCutScenePlayer": "&CGameLink<CEntity>::Serializer"
+            "wpPresentationCutscenePlayer": "CGameLink<CEntity>",
+            "wpDeadCutScenePlayer": "CGameLink<CEntity>"
         }
     },
     "CHydrogigaAttack": {
@@ -10670,13 +10670,13 @@
     "CHydrogigaZiplineComponent": {
         "parent": "CMagnetSlidingBlockComponent",
         "fields": {
-            "lstLinkedMagnetSlidingBlocks": "&Vector_CGameLink_CEntity_DAT_717275c498"
+            "lstLinkedMagnetSlidingBlocks": "base::global::CRntVector<CGameLink<CEntity>>"
         }
     },
     "CHydrogigaZiplineRailComponent": {
         "parent": "CComponent",
         "fields": {
-            "lstAttachedZiplines": "&Vector_CGameLink_CEntity_DAT_717275c498"
+            "lstAttachedZiplines": "base::global::CRntVector<CGameLink<CEntity>>"
         }
     },
     "CHyperBeamBlockLifeComponent": {
@@ -10787,8 +10787,8 @@
     "CItemDestructionLogicAction": {
         "parent": "CTriggerLogicAction",
         "fields": {
-            "wpItemToDestroy": "&CGameLink<CEntity>::Serializer",
-            "wpObserver": "&CGameLink_CActor_DAT_7172642b18"
+            "wpItemToDestroy": "CGameLink<CEntity>",
+            "wpObserver": "CGameLink<CActor>"
         }
     },
     "CItemLifeComponent": {
@@ -10798,11 +10798,11 @@
     "CKraidAIComponent": {
         "parent": "CBossAIComponent",
         "fields": {
-            "wpStage1ArenaShape": "&CGameLink_CActor_DAT_7172642b18",
-            "wpStage2ArenaShape": "&CGameLink_CActor_DAT_7172642b18",
-            "wpPhase2CutScenePlayer": "&CGameLink<CEntity>::Serializer",
-            "wpDeadCutScenePlayer": "&CGameLink<CEntity>::Serializer",
-            "wpDeadFromZiplineOrMBCutscenePlayer": "&CGameLink<CEntity>::Serializer"
+            "wpStage1ArenaShape": "CGameLink<CActor>",
+            "wpStage2ArenaShape": "CGameLink<CActor>",
+            "wpPhase2CutScenePlayer": "CGameLink<CEntity>",
+            "wpDeadCutScenePlayer": "CGameLink<CEntity>",
+            "wpDeadFromZiplineOrMBCutscenePlayer": "CGameLink<CEntity>"
         }
     },
     "CKraidAcidBlobsAttack": {
@@ -10964,7 +10964,7 @@
         "parent": "CBaseDamageTriggerComponent",
         "fields": {
             "sModelPath": "base::global::CFilePathStrId",
-            "eLowPassFilter": "&base::snd::ELowPassFilter_DAT_7108b13de8",
+            "eLowPassFilter": "unsigned",
             "eReverb": "&base::snd::EReverbIntensity_DAT_7108b13c88"
         }
     },
@@ -11014,7 +11014,7 @@
     "CLockRoomLogicAction": {
         "parent": "CTriggerLogicAction",
         "fields": {
-            "wpAccessPoint": "&CGameLink<CEntity>::Serializer",
+            "wpAccessPoint": "CGameLink<CEntity>",
             "sDoorsLockedLiteralID": "base::global::CStrId",
             "bInstantLock": "bool"
         }
@@ -11022,7 +11022,7 @@
     "CLogicActionTriggerComponent": {
         "parent": "CComponent",
         "fields": {
-            "vLogicActions": "&Vector_PtrCTriggerLogicAction_DAT_71726f3930"
+            "vLogicActions": "base::global::CRntVector<std::unique_ptr<CTriggerLogicAction>>"
         }
     },
     "CLogicCamera": {
@@ -11130,7 +11130,7 @@
     "CMagmaCentralUnitComponent": {
         "parent": "CCentralUnitComponent",
         "fields": {
-            "wpGate": "&CGameLink<CEntity>::Serializer"
+            "wpGate": "CGameLink<CEntity>"
         }
     },
     "CMagmaCentralUnitComponentDef": {
@@ -11144,8 +11144,8 @@
     "CMagmaKraidScenarioControllerComponent": {
         "parent": "CComponent",
         "fields": {
-            "wpBackGorundPipesEntity": "&CGameLink<CEntity>::Serializer",
-            "wpPistonEntity": "&CGameLink<CEntity>::Serializer"
+            "wpBackGorundPipesEntity": "CGameLink<CEntity>",
+            "wpPistonEntity": "CGameLink<CEntity>"
         }
     },
     "CMagmaKraidSpikeComponent": {
@@ -11163,8 +11163,8 @@
             "fTimeToCompleteMovementTowardsEnd": "float",
             "fTimeToCompleteMovementTowardsStart": "float",
             "bContinueMovingOnStopHang": "bool",
-            "wpRail": "&CGameLink<CEntity>::Serializer",
-            "wpDoorOpeningOnAnimatedCamera": "&CGameLink<CEntity>::Serializer",
+            "wpRail": "CGameLink<CEntity>",
+            "wpDoorOpeningOnAnimatedCamera": "CGameLink<CEntity>",
             "fTotalMetersToMoveY": "float",
             "fTimeToOpen": "float",
             "bAutoOpenAfterPreparing": "bool"
@@ -11173,7 +11173,7 @@
     "CMagnetSlidingBlockCounterWeightMovablePlatformComponent": {
         "parent": "CMagnetMovablePlatformComponent",
         "fields": {
-            "wpReferenceEntity": "&CGameLink<CEntity>::Serializer"
+            "wpReferenceEntity": "CGameLink<CEntity>"
         }
     },
     "CMagnetSlidingBlockRailComponent": {
@@ -11201,8 +11201,8 @@
     "CMarkMinimapLogicAction": {
         "parent": "CTriggerLogicAction",
         "fields": {
-            "wpVisibleLogicShape": "&CGameLink_CActor_DAT_7172642b18",
-            "wpVisitedLogicShape": "&CGameLink_CActor_DAT_7172642b18"
+            "wpVisibleLogicShape": "CGameLink<CActor>",
+            "wpVisitedLogicShape": "CGameLink<CActor>"
         }
     },
     "CMassiveCaterzillaSpawnGroupComponent": {
@@ -11421,7 +11421,7 @@
     "CMorphBallLauncherComponent": {
         "parent": "CComponent",
         "fields": {
-            "wpLauncherExit": "&CGameLink<CEntity>::Serializer",
+            "wpLauncherExit": "CGameLink<CEntity>",
             "sTravellingAction": "base::global::CStrId",
             "bManualActivation": "bool"
         }
@@ -11510,7 +11510,7 @@
     "CMultiLockOnPointComponent": {
         "parent": "CActivatableByProjectileComponent",
         "fields": {
-            "wpMultiLockOnBlock": "&CGameLink<CEntity>::Serializer"
+            "wpMultiLockOnBlock": "CGameLink<CEntity>"
         }
     },
     "CMultiModelUpdaterComponent": {
@@ -11529,7 +11529,7 @@
     "CNailongAIComponent": {
         "parent": "CBehaviorTreeAIComponent",
         "fields": {
-            "wpPatrolPath": "&CGameLink_CActor_DAT_7172642b18",
+            "wpPatrolPath": "CGameLink<CActor>",
             "ePatrolPathType": "&DAT_7172761720"
         }
     },
@@ -11552,7 +11552,7 @@
     "CNavMeshItemComponent": {
         "parent": "CComponent",
         "fields": {
-            "tForbiddenEdgesSpawnPoints": "&Vector_CGameLink_CEntity_DAT_717275c498"
+            "tForbiddenEdgesSpawnPoints": "base::global::CRntVector<CGameLink<CEntity>>"
         }
     },
     "CNavMeshItemStage": {
@@ -11608,7 +11608,7 @@
         "parent": "CTriggerLogicAction",
         "fields": {
             "eMode": "&DAT_71726f2e28",
-            "wpPerceivedPosition": "&CGameLink_CActor_DAT_7172642b18",
+            "wpPerceivedPosition": "CGameLink<CActor>",
             "eGroup": "&DAT_71727620c8"
         }
     },
@@ -11868,14 +11868,14 @@
     "CPowerGeneratorComponent": {
         "parent": "CActivatableComponent",
         "fields": {
-            "wpPowerGeneratorUsable": "&CGameLink<CEntity>::Serializer",
-            "wpPowerGeneratorUsablePlatform": "&CGameLink<CEntity>::Serializer"
+            "wpPowerGeneratorUsable": "CGameLink<CEntity>",
+            "wpPowerGeneratorUsablePlatform": "CGameLink<CEntity>"
         }
     },
     "CPowerUpLifeComponent": {
         "parent": "CItemLifeComponent",
         "fields": {
-            "wpCheckPointEntity": "&CGameLink<CEntity>::Serializer",
+            "wpCheckPointEntity": "CGameLink<CEntity>",
             "sPowerupNameLabelID": "base::global::CStrId"
         }
     },
@@ -11902,7 +11902,7 @@
     "CProtoCentralUnitComponent": {
         "parent": "CCentralUnitComponent",
         "fields": {
-            "wpGate": "&CGameLink<CEntity>::Serializer"
+            "wpGate": "CGameLink<CEntity>"
         }
     },
     "CProtoCentralUnitComponentDef": {
@@ -11916,7 +11916,7 @@
     "CPullOffGrapplePointComponent": {
         "parent": "CPullableGrapplePointComponent",
         "fields": {
-            "oActivatableObj": "&CGameLink<CEntity>::Serializer"
+            "oActivatableObj": "CGameLink<CEntity>"
         }
     },
     "CPullableGrapplePointComponent": {
@@ -11934,9 +11934,9 @@
     "CQuetzoaAIComponent": {
         "parent": "CBossAIComponent",
         "fields": {
-            "wpShortRangePath": "&CGameLink_CActor_DAT_7172642b18",
+            "wpShortRangePath": "CGameLink<CActor>",
             "eShortRangePathType": "&DAT_7172761720",
-            "wpLongRangePath": "&CGameLink_CActor_DAT_7172642b18",
+            "wpLongRangePath": "CGameLink<CActor>",
             "eLongRangePathType": "&DAT_7172761720"
         }
     },
@@ -11959,7 +11959,7 @@
     "CQuetzoaXAIComponent": {
         "parent": "CQuetzoaAIComponent",
         "fields": {
-            "wpCoreXSpawnPoint": "&CGameLink_CActor_DAT_7172642b18"
+            "wpCoreXSpawnPoint": "CGameLink<CActor>"
         }
     },
     "CQuetzoaXMultiTargetAttack": {
@@ -12037,7 +12037,7 @@
     "CRotationalPlatformComponent": {
         "parent": "CComponent",
         "fields": {
-            "wpDestructibleBlock": "&CGameLink<CEntity>::Serializer",
+            "wpDestructibleBlock": "CGameLink<CEntity>",
             "eRotationDirection": "&DAT_71726e7618"
         }
     },
@@ -12061,17 +12061,17 @@
     "CSPBTutoLogicAction": {
         "parent": "CTriggerLogicAction",
         "fields": {
-            "wpCentralUnitDoor": "&CGameLink_CActor_DAT_7172642b18",
-            "wpCentralUnit": "&CGameLink_CActor_DAT_7172642b18",
-            "oSPRTuto.m_vAfterTutoLogicActions": "&Vector_PtrCTriggerLogicAction_DAT_71726f3930"
+            "wpCentralUnitDoor": "CGameLink<CActor>",
+            "wpCentralUnit": "CGameLink<CActor>",
+            "oSPRTuto.m_vAfterTutoLogicActions": "base::global::CRntVector<std::unique_ptr<CTriggerLogicAction>>"
         }
     },
     "CSPRTutoLogicAction": {
         "parent": "CTriggerLogicAction",
         "fields": {
-            "wpCentralUnitDoor": "&CGameLink_CActor_DAT_7172642b18",
-            "wpCentralUnit": "&CGameLink_CActor_DAT_7172642b18",
-            "vAfterTutoLogicActions": "&Vector_PtrCTriggerLogicAction_DAT_71726f3930"
+            "wpCentralUnitDoor": "CGameLink<CActor>",
+            "wpCentralUnit": "CGameLink<CActor>",
+            "vAfterTutoLogicActions": "base::global::CRntVector<std::unique_ptr<CTriggerLogicAction>>"
         }
     },
     "CSabotoruAIComponent": {
@@ -12090,8 +12090,8 @@
     "CSabotoruSpawnPointComponent": {
         "parent": "CSpawnPointComponent",
         "fields": {
-            "wpDoor": "&CGameLink<CEntity>::Serializer",
-            "wpHomeLandmark": "&CGameLink_CActor_DAT_7172642b18",
+            "wpDoor": "CGameLink<CEntity>",
+            "wpHomeLandmark": "CGameLink<CActor>",
             "bRightSideDoor": "bool"
         }
     },
@@ -12367,7 +12367,7 @@
     "CSaveGameFromEmmyDoorLogicAction": {
         "parent": "CTriggerLogicAction",
         "fields": {
-            "wpEmmyDoorActor": "&CGameLink_CActor_DAT_7172642b18",
+            "wpEmmyDoorActor": "CGameLink<CActor>",
             "bForce": "bool",
             "bRestoreOriginalValue": "bool"
         }
@@ -12377,7 +12377,7 @@
         "fields": {
             "eDestination": "&DAT_71726f0f20",
             "sCheckpointKey": "base::global::CStrId",
-            "wpStartPoint": "&CGameLink_CActor_DAT_7172642b18",
+            "wpStartPoint": "CGameLink<CActor>",
             "bForce": "bool"
         }
     },
@@ -12392,7 +12392,7 @@
         "fields": {
             "sSnapshotId": "base::global::CStrId",
             "sCheckpointKey": "base::global::CStrId",
-            "wpStartPoint": "&CGameLink_CActor_DAT_7172642b18",
+            "wpStartPoint": "CGameLink<CActor>",
             "bForce": "bool"
         }
     },
@@ -12415,7 +12415,7 @@
             "rEntitiesLayer": "&CActorLayer_DAT_7172647740",
             "rSoundsLayer": "&CActorLayer_DAT_7172647740",
             "rLightsLayer": "&CActorLayer_DAT_7172647740",
-            "vLayerFiles": "&VectorStrId_DAT_7101d03998"
+            "vLayerFiles": "base::global::CRntVector<base::global::CStrId>"
         }
     },
     "CScenario::CTunableScenario": {
@@ -12444,9 +12444,9 @@
     "CScorpiusAIComponent": {
         "parent": "CBossAIComponent",
         "fields": {
-            "wpPhase2CutScenePlayer": "&CGameLink<CEntity>::Serializer",
-            "wpPhase3CutScenePlayer": "&CGameLink<CEntity>::Serializer",
-            "wpDeadCutScenePlayer": "&CGameLink<CEntity>::Serializer"
+            "wpPhase2CutScenePlayer": "CGameLink<CEntity>",
+            "wpPhase3CutScenePlayer": "CGameLink<CEntity>",
+            "wpDeadCutScenePlayer": "CGameLink<CEntity>"
         }
     },
     "CScorpiusAttack": {
@@ -12535,7 +12535,7 @@
     "CSetActorEnabledLogicAction": {
         "parent": "CTriggerLogicAction",
         "fields": {
-            "wpActor": "&CGameLink_CActor_DAT_7172642b18",
+            "wpActor": "CGameLink<CActor>",
             "bEnabled": "bool"
         }
     },
@@ -12583,10 +12583,10 @@
             "fInitialAccumulatedTime": "float",
             "fActivationTime": "float",
             "fTimePerShot": "float",
-            "vTargetsToActivate": "&Vector_GameLink_CActor_7172642ed8",
-            "vTargetsToDeactivate": "&Vector_GameLink_CActor_7172642ed8",
+            "vTargetsToActivate": "base::global::CRntVector<CGameLink<CActor>>",
+            "vTargetsToDeactivate": "base::global::CRntVector<CGameLink<CActor>>",
             "sOnUseEntityTimeline": "base::global::CStrId",
-            "wpAtmosphereEntity": "&CGameLink<CEntity>::Serializer",
+            "wpAtmosphereEntity": "CGameLink<CEntity>",
             "vEntitiesActivatabledOnEvent": "&DAT_71726d36d8",
             "vEntitiesDeactivatabledOnEvent": "&DAT_71726d36d8"
         }
@@ -12602,15 +12602,15 @@
     "CShootActivatorHidrogigaComponent": {
         "parent": "CShootActivatorComponent",
         "fields": {
-            "wpOtherActivator": "&CGameLink<CEntity>::Serializer",
-            "wpWaterNozzle": "&CGameLink<CEntity>::Serializer"
+            "wpOtherActivator": "CGameLink<CEntity>",
+            "wpWaterNozzle": "CGameLink<CEntity>"
         }
     },
     "CShootDCBones": {
         "parent": null,
         "fields": {
             "sName": "base::global::CStrId",
-            "tBoneNames": "&VectorStrId_DAT_7101d03998"
+            "tBoneNames": "base::global::CRntVector<base::global::CStrId>"
         }
     },
     "CShotComponent": {
@@ -12670,7 +12670,7 @@
     "CShowPopUpCompositionLogicAction": {
         "parent": "CTriggerLogicAction",
         "fields": {
-            "vtexts": "&VectorStrId_DAT_7101d03998"
+            "vtexts": "base::global::CRntVector<base::global::CStrId>"
         }
     },
     "CSideEnemyMovement": {
@@ -12727,19 +12727,19 @@
     "CSoundProofTriggerComponent": {
         "parent": "CBaseTriggerComponent",
         "fields": {
-            "eLowPassFilterToApply": "&base::snd::ELowPassFilter_DAT_7108b13de8",
+            "eLowPassFilterToApply": "unsigned",
             "fFadeInTime": "float",
             "fFadeOutTime": "float",
             "bMuteActors": "bool",
             "bFilterSpecificActors": "bool",
-            "vActorsToIgnore": "&Vector_GameLink_CActor_7172642ed8"
+            "vActorsToIgnore": "base::global::CRntVector<CGameLink<CActor>>"
         }
     },
     "CSoundTrigger": {
         "parent": "CBaseTriggerComponent",
         "fields": {
             "eReverb": "&base::snd::EReverbIntensity_DAT_7108b13c88",
-            "iLowPassFilter": "&base::snd::ELowPassFilter_DAT_7108b13de8"
+            "iLowPassFilter": "unsigned"
         }
     },
     "CSpawnGroupComponent": {
@@ -12765,14 +12765,14 @@
             "bSpawnPointsNotInFrustrum": "bool",
             "bGenerateEntitiesByOrder": "bool",
             "sLogicCollisionShapeID": "base::global::CStrId",
-            "wpAreaOfInterest": "&CGameLink_CActor_DAT_7172642b18",
-            "wpAreaOfInterestEnd": "&CGameLink_CActor_DAT_7172642b18",
+            "wpAreaOfInterest": "CGameLink<CActor>",
+            "wpAreaOfInterestEnd": "CGameLink<CActor>",
             "fDropAmmoProb": "float",
             "iInitToGenerate": "int",
             "sArenaId": "base::global::CStrId",
             "bCheckActiveDrops": "bool",
             "iNumDeaths": "int",
-            "vectSpawnPoints": "&vectSpawnPoints_DAT_71729aaf30"
+            "vectSpawnPoints": "base::global::CRntVector<CGameLink<CSpawnPointComponent>>"
         }
     },
     "CSpawnPointComponent": {
@@ -12789,31 +12789,31 @@
             "bAllowSpawnInFrustum": "bool",
             "bStartEnabled": "bool",
             "bAutomanaged": "bool",
-            "wpSceneShapeId": "&CGameLink_CActor_DAT_7172642b18",
-            "wpCollisionSceneShapeId": "&CGameLink_CActor_DAT_7172642b18",
-            "wpNavigableShape": "&CGameLink_CActor_DAT_7172642b18",
-            "wpAreaOfInterest": "&CGameLink_CActor_DAT_7172642b18",
-            "wpAreaOfInterestEnd": "&CGameLink_CActor_DAT_7172642b18",
+            "wpSceneShapeId": "CGameLink<CActor>",
+            "wpCollisionSceneShapeId": "CGameLink<CActor>",
+            "wpNavigableShape": "CGameLink<CActor>",
+            "wpAreaOfInterest": "CGameLink<CActor>",
+            "wpAreaOfInterestEnd": "CGameLink<CActor>",
             "fTimeOnAOIEndToUseAsMainAOI": "float",
             "fSpawnFromXCellProbability": "float",
             "fSpawnFromXCellProbabilityAfterFirst": "float",
             "eXCellSpawnPositionMode": "&eXCellSpawnPositionMode_71729ab208",
             "bUseDynamicSpawnPosition": "bool",
             "eDynamicSpawnPositionMode": "&eDynamicSpawnPositionMod_DAT_71729ab0a8",
-            "tDynamicSpawnPositions": "&Vector_GameLink_CActor_7172642ed8",
-            "tXCellTransformTargets": "&Vector_GameLink_CActor_7172642ed8",
-            "wpXCellActivationAreaShape": "&CGameLink_CActor_DAT_7172642b18",
+            "tDynamicSpawnPositions": "base::global::CRntVector<CGameLink<CActor>>",
+            "tXCellTransformTargets": "base::global::CRntVector<CGameLink<CActor>>",
+            "wpXCellActivationAreaShape": "CGameLink<CActor>",
             "sCharClass": "base::global::CStrId",
-            "voActorBlueprint": "&Vector_CSpawnerActorBlueprint_DAT_71729aa9d0"
+            "voActorBlueprint": "base::global::CRntVector<CSpawnerActorBlueprint>"
         }
     },
     "CSpbSprActivator": {
         "parent": "CActivatableByProjectileComponent",
         "fields": {
-            "wpSpbSprpPlatform": "&CGameLink<CEntity>::Serializer",
-            "vTargetsToActivate": "&Vector_GameLink_CActor_7172642ed8",
-            "vTargetsToDeactivate": "&Vector_GameLink_CActor_7172642ed8",
-            "wpPoolPlatform": "&CGameLink<CEntity>::Serializer"
+            "wpSpbSprpPlatform": "CGameLink<CEntity>",
+            "vTargetsToActivate": "base::global::CRntVector<CGameLink<CActor>>",
+            "vTargetsToDeactivate": "base::global::CRntVector<CGameLink<CActor>>",
+            "wpPoolPlatform": "CGameLink<CEntity>"
         }
     },
     "CSpecialEnergyComponent": {
@@ -12876,7 +12876,7 @@
     "CStartCentralUnitCombatLogicAction": {
         "parent": "CTriggerLogicAction",
         "fields": {
-            "wpCentralUnit": "&CGameLink_CActor_DAT_7172642b18"
+            "wpCentralUnit": "CGameLink<CActor>"
         }
     },
     "CStartDetectionPerceptionRuleSet": {
@@ -12905,7 +12905,7 @@
             "bCrossingAllowed": "bool",
             "bForceReactionDirection": "bool",
             "vReactionDirection": "base::math::CVector2D",
-            "wpNextSteamJet": "&CGameLink_CActor_DAT_7172642b18"
+            "wpNextSteamJet": "CGameLink<CActor>"
         }
     },
     "CSteeringMovement": {
@@ -12960,7 +12960,7 @@
     "CSwarmControllerComponent": {
         "parent": "CComponent",
         "fields": {
-            "wpPathToFollow": "&CGameLink_CActor_DAT_7172642b18",
+            "wpPathToFollow": "CGameLink<CActor>",
             "ePathType": "&DAT_7172761720",
             "fGroupVelocity": "float"
         }
@@ -13022,7 +13022,7 @@
             "sScenarioName": "base::global::CStrId",
             "sTargetSpawnPoint": "base::global::CStrId",
             "eTeleporterColorSphere": "&DAT_71726f86d0",
-            "wpFrozenPlatform": "&CGameLink<CEntity>::Serializer"
+            "wpFrozenPlatform": "CGameLink<CEntity>"
         }
     },
     "CTentacle": {
@@ -13030,14 +13030,14 @@
         "fields": {
             "sName": "base::global::CStrId",
             "fExtraNodeLengthFactor": "float",
-            "tTentacleNodes": "&VectorStrId_DAT_7101d03998",
+            "tTentacleNodes": "base::global::CRntVector<base::global::CStrId>",
             "bAllowTrail": "bool"
         }
     },
     "CThermalDeviceComponent": {
         "parent": "CUsableComponent",
         "fields": {
-            "vThermalDoors": "&DAT_71726f8e78",
+            "vThermalDoors": "base::global::CRntVector<SDoorInfo>",
             "sOnEnterUseLuaCallback": "base::global::CStrId",
             "sOnSetupInitialStateLuaCallback": "base::global::CStrId",
             "sOnSetupUseStateLuaCallback": "base::global::CStrId",
@@ -13054,8 +13054,8 @@
     "CThermalRoomConnectionFX": {
         "parent": "CActivatableComponent",
         "fields": {
-            "vTargetToLink": "&CGameLink_CActor_DAT_7172642b18",
-            "vHidderLink": "&CGameLink_CActor_DAT_7172642b18"
+            "vTargetToLink": "CGameLink<CActor>",
+            "vHidderLink": "CGameLink<CActor>"
         }
     },
     "CThermalRoomFX": {
@@ -13098,13 +13098,13 @@
     "CTrainUsableComponentCutScene": {
         "parent": "CTrainUsableComponent",
         "fields": {
-            "wpCutScenePlayer": "&CGameLink<CEntity>::Serializer"
+            "wpCutScenePlayer": "CGameLink<CEntity>"
         }
     },
     "CTrainWithPortalUsableComponent": {
         "parent": "CTrainUsableComponent",
         "fields": {
-            "wpPortal": "&CGameLink<CEntity>::Serializer"
+            "wpPortal": "CGameLink<CEntity>"
         }
     },
     "CTriggerComponent": {
@@ -13121,7 +13121,7 @@
             "bCheckAllEntities": "bool",
             "bPersistentState": "bool",
             "sSfxType": "base::global::CStrId",
-            "lstActivationConditions": "&Trigger_DAT_71726f4968"
+            "lstActivationConditions": "base::global::CRntVector<std::unique_ptr<CTriggerComponent::SActivationCondition>>"
         }
     },
     "CTriggerComponent::CTunableTriggerComponent": {
@@ -13148,7 +13148,7 @@
     "CTunnelTrapMorphballComponent": {
         "parent": "CComponent",
         "fields": {
-            "aVignettes": "&Vector_GameLink_CActor_7172642ed8",
+            "aVignettes": "base::global::CRntVector<CGameLink<CActor>>",
             "bDisableCloseTrapSensor": "bool"
         }
     },
@@ -13158,7 +13158,7 @@
             "sLiteralID": "base::global::CStrId",
             "bShowMessage": "bool",
             "bWaitForInput": "bool",
-            "wpObserver": "&CGameLink_CActor_DAT_7172642b18",
+            "wpObserver": "CGameLink<CActor>",
             "sLuaCallbackOnMessageClosed": "base::global::CStrId",
             "sMissionLogTutoId": "base::global::CStrId"
         }
@@ -13167,7 +13167,7 @@
         "parent": "CTriggerLogicAction",
         "fields": {
             "sMissionLogTutoId": "base::global::CStrId",
-            "wpTriggerToDisable": "&CGameLink<CEntity>::Serializer"
+            "wpTriggerToDisable": "CGameLink<CEntity>"
         }
     },
     "CUnlockAreaSmartObjectComponent": {
@@ -13232,7 +13232,7 @@
     "CWaterNozzleComponent": {
         "parent": "CComponent",
         "fields": {
-            "wpWaterPool": "&CGameLink<CEntity>::Serializer"
+            "wpWaterPool": "CGameLink<CEntity>"
         }
     },
     "CWaterNozzleComponent::CTunableWaterNozzle": {
@@ -13255,12 +13255,12 @@
     "CWaterTriggerChangeComponent": {
         "parent": "CComponent",
         "fields": {
-            "wpOriginWaterTrigger": "&CGameLink<CEntity>::Serializer",
-            "wpTargetWaterTrigger": "&CGameLink<CEntity>::Serializer",
+            "wpOriginWaterTrigger": "CGameLink<CEntity>",
+            "wpTargetWaterTrigger": "CGameLink<CEntity>",
             "fChangeTime": "float",
             "fDelay": "float",
             "bDeactivateOnFinished": "bool",
-            "wpOtherWaterTriggerChange": "&CGameLink<CEntity>::Serializer",
+            "wpOtherWaterTriggerChange": "CGameLink<CEntity>",
             "fOriginChange": "float",
             "fTargetChange": "float",
             "sOnActivatedLuaCallback": "base::global::CStrId"
@@ -13319,7 +13319,7 @@
     "CWorldGraph": {
         "parent": "CActorComponent",
         "fields": {
-            "tNodes": "&DAT_71726fd0c0"
+            "tNodes": "base::global::CRntVector<SWorldGraphNode>"
         }
     },
     "CXParasiteAIComponent": {
@@ -13340,26 +13340,26 @@
     "CXParasiteDropComponent": {
         "parent": "CComponent",
         "fields": {
-            "vectBehaviors": "&Vector_CXParasiteBehavior_71726c3030"
+            "vectBehaviors": "base::global::CRntVector<std::unique_ptr<CXParasiteBehavior>>"
         }
     },
     "CXParasiteGoSpawnBehavior": {
         "parent": "CXParasiteBehavior",
         "fields": {
-            "tSpawnPoints": "&Vector_GameLink_CActor_7172642ed8"
+            "tSpawnPoints": "base::global::CRntVector<CGameLink<CActor>>"
         }
     },
     "CXParasiteGoTransformBehavior": {
         "parent": "CXParasiteBehavior",
         "fields": {
-            "wpFromSpawnPoint": "&CGameLink_CActor_DAT_7172642b18",
-            "tToSpawnPoints": "&Vector_GameLink_CActor_7172642ed8"
+            "wpFromSpawnPoint": "CGameLink<CActor>",
+            "tToSpawnPoints": "base::global::CRntVector<CGameLink<CActor>>"
         }
     },
     "CXParasiteStayOnPlaceBehavior": {
         "parent": "CXParasiteBehavior",
         "fields": {
-            "wpStayPosLandmark": "&CGameLink_CActor_DAT_7172642b18"
+            "wpStayPosLandmark": "CGameLink<CActor>"
         }
     },
     "CXParasiteWanderThenFleeBehavior": {
@@ -13934,7 +13934,7 @@
         "parent": "IPathNode",
         "fields": {
             "vPos": "base::math::CVector3D",
-            "wpLogicCamera": "&CGameLink_CActor_DAT_7172642b18"
+            "wpLogicCamera": "CGameLink<CActor>"
         }
     },
     "SDeathImpactDisplacement": {
@@ -14057,8 +14057,8 @@
             "fEventsWeightThreshold": "float",
             "bLaunchEvents": "bool",
             "bAllowRootMotion": "bool",
-            "vBones": "&VectorStrId_DAT_7101d03998",
-            "vBoneHierarchies": "&VectorStrId_DAT_7101d03998"
+            "vBones": "base::global::CRntVector<base::global::CStrId>",
+            "vBoneHierarchies": "base::global::CRntVector<base::global::CStrId>"
         }
     },
     "animtree::CBlendNode": {
@@ -14091,8 +14091,8 @@
     "animtree::CBoneFilterNodeDef": {
         "parent": "animtree::CAnimTreeElementDef",
         "fields": {
-            "vBones": "&VectorStrId_DAT_7101d03998",
-            "vBoneHierarchies": "&VectorStrId_DAT_7101d03998"
+            "vBones": "base::global::CRntVector<base::global::CStrId>",
+            "vBoneHierarchies": "base::global::CRntVector<base::global::CStrId>"
         }
     },
     "animtree::CCallbackBoneControl": {

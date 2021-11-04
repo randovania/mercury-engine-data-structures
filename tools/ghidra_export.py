@@ -16,6 +16,46 @@ prefixes_to_remove = [
     "&",
 ]
 
+_aliases = {
+    # weirdness
+    "(undefined **)base::global::CFilePathStrId": "base::global::CFilePathStrId",
+
+    # custom names
+    "&DAT_7172642b18": "CGameLink<CActor>",
+    "&DAT_717275c0d8": "CGameLink<CEntity>",
+    "&DAT_7172642ed8": "base::global::CRntVector<CGameLink<CActor>>",
+    "&DAT_717275c498": "base::global::CRntVector<CGameLink<CEntity>>",
+
+    "&CGameLink_CActor_DAT_7172642b18": "CGameLink<CActor>",
+    "&CGameLink<CEntity>::Serializer": "CGameLink<CEntity>",
+    "&Vector_GameLink_CActor_7172642ed8": "base::global::CRntVector<CGameLink<CActor>>",
+    "&Vector_CGameLink_CEntity_DAT_717275c498": "base::global::CRntVector<CGameLink<CEntity>>",
+
+    "&Vector_PtrCTriggerLogicAction_DAT_71726f3930": "base::global::CRntVector<std::unique_ptr<CTriggerLogicAction>>",
+
+    "&Vector_CXParasiteBehavior_71726c3030": "base::global::CRntVector<std::unique_ptr<CXParasiteBehavior>>",
+    "&base::snd::ELowPassFilter_DAT_7108b13de8": "unsigned",
+
+    "&DAT_71726bb4c0": "base::global::CRntVector<CCentralUnitComponent::SStartPointInfo>",
+    "&DAT_71726baee8": "base::global::CRntVector<std::unique_ptr<CCentralUnitWeightedEdges>>",
+    "&DAT_71729a98a8": "base::global::CRntVector<SFallBackPath>",
+    "&DAT_7172686f58": "base::global::CRntVector<std::unique_ptr<CEmmyOverrideDeathPositionDef>>",
+    "&DAT_7172687378": "base::global::CRntVector<std::unique_ptr<CEmmyAutoForbiddenEdgesDef>>",
+    "&DAT_7172687798": "base::global::CRntVector<std::unique_ptr<CEmmyAutoGlobalSmartLinkDef>>",
+    "&DAT_71726ecbf0": "CFreezeRoomConfig",
+    "&DAT_71726ecd30": "CFreezeRoomCoolConfig",
+    "&DAT_71726ed380": "CHeatRoomConfig",
+    "&DAT_71726ed4c0": "CHeatRoomCoolConfig",
+    "&DAT_71726d53e0": "base::global::CRntVector<SBeamBoxActivatable>",
+    "&vectSpawnPoints_DAT_71729aaf30": "base::global::CRntVector<CGameLink<CSpawnPointComponent>>",
+    "&Vector_CSpawnerActorBlueprint_DAT_71729aa9d0": "base::global::CRntVector<CSpawnerActorBlueprint>",
+    "&Trigger_DAT_71726f4968": "base::global::CRntVector<std::unique_ptr<CTriggerComponent::SActivationCondition>>",
+    "&DictStr_ListStr_DAT_71726f5da0": "base::global::CRntDictionary<base::global::CStrId, base::global::CRntVector<base::global::CStrId>>",
+    "&VectorStrId_DAT_7101d03998": "base::global::CRntVector<base::global::CStrId>",
+    "&DAT_71726f8e78": "base::global::CRntVector<SDoorInfo>",
+    "&DAT_71726fd0c0": "base::global::CRntVector<SWorldGraphNode>",
+}
+
 
 def clean_crc_var(crc_var: str) -> str:
     for prefix in prefixes_to_remove:
@@ -58,7 +98,7 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
             if type_name.endswith("::init()"):
                 type_name = type_name[:-len("::init()")]
 
-        fields[crc_string] = type_name
+        fields[crc_string] = _aliases.get(type_name, type_name)
 
     return fields
 
@@ -218,6 +258,12 @@ def main(only_missing: bool = True):
     process_results = decompile_in_background(all_fields_functions)
     for key in sorted(process_results.keys()):
         final_results[key] = process_results[key]
+
+    for data in final_results.values():
+        for field in data["fields"].keys():
+            value = data["fields"][field]
+            if value in _aliases:
+                data["fields"][field] = _aliases[value]
 
     with open("all_types.json", "w") as f:
         json.dump({
