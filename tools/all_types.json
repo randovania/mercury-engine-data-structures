@@ -407,15 +407,15 @@
     "CActorLayer": {
         "parent": null,
         "fields": {
-            "dctSublayers": "&DAT_71726475c8",
-            "dctActorGroups": "&Dict_Str_VecGameLinkActor_DAT_71726432d0"
+            "dctSublayers": "base::global::CRntSmallDictionary<base::global::CStrId, CActorSublayer>",
+            "dctActorGroups": "base::global::CRntDictionary<base::global::CStrId, base::global::CRntVector<CGameLink<CActor>>>"
         }
     },
     "CActorSublayer": {
         "parent": null,
         "fields": {
             "sName": "base::global::CStrId",
-            "dctActors": "&dctActors_DAT_7172642188"
+            "dctActors": "base::global::CRntDictionary<base::global::CStrId, CActor*>"
         }
     },
     "CAimCameraEnabledVisibleOnlyComponent": {
@@ -9581,6 +9581,20 @@
             "fDistanceListenerToTarget": "float"
         }
     },
+    "CCutsceneComponent": {
+        "parent": "CActorComponent",
+        "fields": {
+            "sCutsceneName": "base::global::CStrId",
+            "bDisableScenarioEntitiesOnPlay": "bool",
+            "vOriginalPos": "base::math::CVector3D",
+            "vctCutscenesOffsets": "base::global::CRntVector<base::math::CVector3D>",
+            "vctExtraInvolvedSubareas": "base::global::CRntVector<base::global::CStrId>",
+            "vctExtraInvolvedActors": "base::global::CRntVector<CCutsceneComponent::SActorInfo>",
+            "vctOnBeforeCutsceneStartsLA": "base::global::CRntVector<std::unique_ptr<CTriggerLogicAction>>",
+            "vctOnAfterCutsceneEndsLA": "base::global::CRntVector<std::unique_ptr<CTriggerLogicAction>>",
+            "bHasSamusAsExtraActor": "bool"
+        }
+    },
     "CCutsceneComponent::SActorInfo": {
         "parent": null,
         "fields": {
@@ -9588,7 +9602,7 @@
             "lnkActor": "CGameLink<CActor>",
             "bStartingVisibleState": "bool",
             "bReceiveLogicUpdate": "bool",
-            "vctVisibilityPerTake": "&VectorBool_7101d07e78"
+            "vctVisibilityPerTake": "base::global::CRntVector<bool>"
         }
     },
     "CCutsceneComponent::SSamusActorInfo": {
@@ -12601,12 +12615,12 @@
     "CScenario": {
         "parent": "CGameObject",
         "fields": {
-            "awpScenarioColliders": "&DAT_7172756550",
+            "awpScenarioColliders": "base::global::CRntVector<base::global::CWeakPtr<game::logic::collision::CCollider>>",
             "sLevelID": "base::global::CStrId",
             "sScenarioID": "base::global::CStrId",
-            "rEntitiesLayer": "&CActorLayer_DAT_7172647740",
-            "rSoundsLayer": "&CActorLayer_DAT_7172647740",
-            "rLightsLayer": "&CActorLayer_DAT_7172647740",
+            "rEntitiesLayer": "CActorLayer",
+            "rSoundsLayer": "CActorLayer",
+            "rLightsLayer": "CActorLayer",
             "vLayerFiles": "base::global::CRntVector<base::global::CStrId>"
         }
     },
@@ -13069,7 +13083,7 @@
     "CStandaloneFXComponent": {
         "parent": "CSceneComponent",
         "fields": {
-            "vctFXInstances": "&DAT_71726c9640",
+            "vctFXInstances": "base::global::CRntVector<SFXInstanceData, false>",
             "uPoolSize": "unsigned",
             "vScale": "base::math::CVector3D",
             "sFXPath": "base::global::CFilePathStrId"
@@ -13134,12 +13148,41 @@
             "fMaxTTL": "float"
         }
     },
+    "CSubAreaManager": {
+        "parent": null,
+        "fields": {
+            "vSubareaSetups": "base::global::CRntVector<std::unique_ptr<CSubareaSetup>>const*",
+            "vCharclassGroups": "base::global::CRntVector<std::unique_ptr<CSubareaCharclassGroup>>const*"
+        }
+    },
     "CSubAreaManager::CTunableSubAreaManager": {
         "parent": "base::tunable::CTunable",
         "fields": {
             "fMaxFadeOutTimeLights": "float",
             "fMaxFadeInTimeLights": "float",
             "bKillPlayerOutsideScenario": "bool"
+        }
+    },
+    "CSubareaInfo": {
+        "parent": null,
+        "fields": {
+            "sId": "base::global::CStrId",
+            "sSetupId": "base::global::CStrId",
+            "sPackSetId": "base::global::CFilePathStrId",
+            "bDisableSubArea": "bool",
+            "fCameraZDistance": "float",
+            "bIgnoreMetroidCameraOffsets": "bool",
+            "sCharclassGroupId": "base::global::CStrId",
+            "asItemsIds": "base::global::CArray<base::global::CStrId, EnumClass<ESubAreaItem>::Count, ESubAreaItem>",
+            "vsCameraCollisionsIds": "base::global::CRntVector<base::global::CStrId>",
+            "vsCutscenesIds": "base::global::CRntVector<base::global::CFilePathStrId>"
+        }
+    },
+    "CSubareaSetup": {
+        "parent": null,
+        "fields": {
+            "sId": "base::global::CStrId",
+            "vSubareaConfigs": "base::global::CRntVector<std::unique_ptr<CSubareaInfo>>"
         }
     },
     "CSubareaTransitionTypeLogicAction": {
@@ -14252,6 +14295,15 @@
             "bAutomaticGrab": "bool",
             "iXCellsToDrop": "int",
             "iNumOfItemsToDropWithXCells": "int"
+        }
+    },
+    "SFXInstanceData": {
+        "parent": null,
+        "fields": {
+            "sFXPath": "base::global::CFilePathStrId",
+            "v3Position": "base::math::CVector3D",
+            "v3Rotation": "base::math::CVector3D",
+            "v3Scale": "base::math::CVector3D"
         }
     },
     "SFallBackPath": {
@@ -15725,7 +15777,7 @@
     "game::logic::collision::CBroadphaseObject": {
         "parent": "CGameObject",
         "fields": {
-            "sId": "unsigned::long",
+            "sId": "unsigned_int",
             "sStrId": "base::global::CStrId"
         }
     },
@@ -15747,7 +15799,7 @@
     "game::logic::collision::CCollider": {
         "parent": "game::logic::collision::CBroadphaseObject",
         "fields": {
-            "pShape": "CShape*"
+            "pShape": "game::logic::collision::CShape*"
         }
     },
     "game::logic::collision::CColliderGroup": {

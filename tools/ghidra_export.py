@@ -87,7 +87,7 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
 
     decompiled_code = str(res.getCCodeMarkup())
     hash_call_re = re.compile(hash_str + r'\(([^,]+?),"?([^,]+?)"?,1\);')
-    register_call_re = re.compile(register_field + r'\([^,]+?,([^,]+?),([^,]+?),([^;]+?)\);')
+    register_call_re = re.compile(register_field + r'\([^,]+?,([^,]+?),(.+?),([^,]+?),([^,]+?),([^,]+?)\);')
 
     crc_mapping = collections.defaultdict(list)
     fields = {}
@@ -116,9 +116,6 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
             type_name = decompiled_code[i + len(type_var) + len(" = "):end]
             if type_name.endswith("::init()"):
                 type_name = type_name[:-len("::init()")]
-            if type_name.endswith("Ptr"):
-                type_name = type_name[:-len("Ptr")] + "*"
-            type_name = type_name.replace("_", " ")
 
         fields[crc_string] = _aliases.get(type_name, type_name)
 

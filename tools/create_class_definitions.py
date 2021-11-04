@@ -9,6 +9,7 @@ known_types_to_construct = {
     "float": "common_types.Float",
     "int": "common_types.Int",
     "unsigned": "common_types.UInt",
+    "unsigned_int": "common_types.UInt",
     "base::global::CStrId": "common_types.StrId",
     "base::global::CFilePathStrId": "common_types.StrId",
     "base::global::CRntString": "common_types.StrId",
@@ -32,7 +33,7 @@ known_types_to_construct = {
     "ECoolShinesparkSituation": "common_types.UInt",
 }
 
-vector_re = re.compile(r"(?:base::)?global::CRntVector<(.*)>$")
+vector_re = re.compile(r"(?:base::)?global::CRntVector<(.*?)(?:, false)?>$")
 dict_re = re.compile(r"base::global::CRnt(?:Small)?Dictionary<base::global::CStrId,[\s_](.*)>$")
 all_container_re = {
     "common_types.make_vector": vector_re,
@@ -40,10 +41,11 @@ all_container_re = {
 }
 
 unique_ptr_re = re.compile(r"std::unique_ptr<(.*)>$")
+weak_ptr_re = re.compile(r"base::global::CWeakPtr<(.*)>$")
 raw_ptr_re = re.compile(r"(.*?)(?: const)?\*$")
 ref_re = re.compile(r"CGameObjectRef<(.*)>$")
 typed_var_re = re.compile(r"(base::reflection::CTypedValue)$")
-all_ptr_re = [unique_ptr_re, raw_ptr_re, ref_re, typed_var_re]
+all_ptr_re = [unique_ptr_re, weak_ptr_re, raw_ptr_re, ref_re, typed_var_re]
 
 
 def _type_name_to_python_identifier(type_name: str):
@@ -226,7 +228,7 @@ def main():
     all_types.pop("CGameBlackboard")
 
     type_exporter = TypeExporter(all_types)
-    type_exporter.pointer_to_type("CActor")
+    type_exporter.pointer_to_type("CScenario")
 
     # needs_exporting = {"CActor"}
     # while needs_exporting:
