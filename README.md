@@ -5,10 +5,8 @@ Construct type definitions for Mercury Engine
 | -------- | -------------------- | --------------------- | ------------ | ------------- |
 | PAK      | &cross;              | &cross;               | &check;      | &check;       |
 | BMSSD    | &cross;              | &cross;               | &check;      | &check;       |
-| Brfld    | &cross;              | &cross;               | &check;[1]   | &check;[1]    |
+| Brfld    | &cross;              | &cross;               | &check;      | &check;       |
 
-
-[1] - Only s090_skybase.brfld works.
 
 ## Example Usage
 

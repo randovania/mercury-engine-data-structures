@@ -6,6 +6,7 @@ import multiprocessing
 import re
 import traceback
 import typing
+from pathlib import Path
 
 import ghidra_bridge
 
@@ -264,8 +265,10 @@ def main(only_missing: bool = True):
     all_fields_functions = get_function_list()
     print(f"Got {len(all_fields_functions)} functions!")
 
+    path = Path(__file__).parent.joinpath("all_types.json")
+
     try:
-        with open("all_types.json") as f:
+        with path.open() as f:
             final_results = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         final_results = {}
@@ -293,7 +296,7 @@ def main(only_missing: bool = True):
 
             data["fields"][field] = value
 
-    with open("all_types.json", "w") as f:
+    with path.open("w") as f:
         json.dump({
             key: final_results[key]
             for key in sorted(final_results.keys())
