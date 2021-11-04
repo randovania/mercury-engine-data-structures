@@ -1,6 +1,7 @@
 """
 Helper class to handle objects that contain a pointer to objects of varied types, usually all with the same base type.
 """
+import copy
 from typing import Dict, Union, Type
 
 import construct
@@ -11,19 +12,48 @@ from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMe
 
 
 class PointerAdapter(Adapter):
+    types: Dict[int, Union[Construct, Type[Construct]]]
+
+    def __init__(self, subcon, types):
+        super().__init__(subcon)
+        self.types = types
+
+    @property
+    def _allow_null(self):
+        return hashed_names.all_name_to_property_id()["void"] in self.types
+
+    @property
+    def _single_type(self):
+        return len(self.types) == (2 if self._allow_null else 1)
+
     def _decode(self, obj: construct.Container, context, path):
+        if obj.ptr is None:
+            return None
+
+        if self._single_type:
+            return obj.ptr
+
         ret = construct.Container()
-        ret[hashed_names.all_property_id_to_name()[obj.type]] = obj.ptr
+        ret["@type"] = hashed_names.all_property_id_to_name()[obj.type]
+        for key, value in obj.ptr.items():
+            ret[key] = value
         return ret
 
     def _encode(self, obj: construct.Container, context, path):
-        if len(obj) != 1:
-            raise construct.ConstructError(f"Invalid obj, expect only one field got {len(obj)}", path)
-        type_name: str = list(obj.keys())[0]
-        type_id = hashed_names.all_name_to_property_id()[type_name]
+        if obj is None:
+            type_id = hashed_names.all_name_to_property_id()["void"]
+
+        elif self._single_type:
+            type_id = list(self.types.keys())[1]
+
+        else:
+            obj = copy.copy(obj)
+            type_name: str = obj.pop("@type")
+            type_id = hashed_names.all_name_to_property_id()[type_name]
+
         return construct.Container(
             type=type_id,
-            ptr=obj[type_name],
+            ptr=obj,
         )
 
 
@@ -58,4 +88,4 @@ class PointerSet:
                     lambda ctx: f"Property {ctx.type} ({hashed_names.all_property_id_to_name().get(ctx.type)}) "
                                 "without assigned type"),
             )
-        ))
+        ), self.types)
