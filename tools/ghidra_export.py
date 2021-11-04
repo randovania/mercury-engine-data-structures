@@ -19,6 +19,9 @@ prefixes_to_remove = [
 _aliases = {
     # weirdness
     "(undefined **)base::global::CFilePathStrId": "base::global::CFilePathStrId",
+    "global::CStrId": "base::global::CStrId",
+    "global::CFilePathStrId": "base::global::CFilePathStrId",
+    "math::CVector3D": "base::math::CVector3D",
 
     # custom names
     "&DAT_7172642b18": "CGameLink<CActor>",
@@ -34,7 +37,7 @@ _aliases = {
     "&Vector_PtrCTriggerLogicAction_DAT_71726f3930": "base::global::CRntVector<std::unique_ptr<CTriggerLogicAction>>",
 
     "&Vector_CXParasiteBehavior_71726c3030": "base::global::CRntVector<std::unique_ptr<CXParasiteBehavior>>",
-    "&base::snd::ELowPassFilter_DAT_7108b13de8": "unsigned",
+    "&base::snd::ELowPassFilter_DAT_7108b13de8": "base::snd::ELowPassFilter",
 
     "&DAT_71726bb4c0": "base::global::CRntVector<CCentralUnitComponent::SStartPointInfo>",
     "&DAT_71726baee8": "base::global::CRntVector<std::unique_ptr<CCentralUnitWeightedEdges>>",
@@ -54,6 +57,19 @@ _aliases = {
     "&VectorStrId_DAT_7101d03998": "base::global::CRntVector<base::global::CStrId>",
     "&DAT_71726f8e78": "base::global::CRntVector<SDoorInfo>",
     "&DAT_71726fd0c0": "base::global::CRntVector<SWorldGraphNode>",
+    "&DAT_71726d8090": "CDoorLifeComponent::SState",
+    "&DAT_7101cf5c20": "base::core::CAssetLink",
+    "&DAT_7101cf4aa8": "base::core::AssetID",
+    "&SCameraSubRail_DAT_7172721790": "base::global::CRntVector<SCameraSubRail>",
+    "&DAT_71726ee5e8": "base::global::CRntVector<EShinesparkTravellingDirection>",
+    "&DAT_71726ee9e0": "base::global::CRntVector<ECoolShinesparkSituation>",
+    "&Vector_STileInfo_71726b8960": "base::global::CRntVector<CBreakableTileGroupComponent::STileInfo>",
+    "&DAT_7172721398": "CEditorRailSegment",
+    "&DAT_71726efbb0": "base::global::CRntVector<DoorStateInfo>",
+    "&DAT_7101d062b0": "base::global::CRntSmallDictionary<base::global::CStrId, base::global::CStrId>",
+    "&DAT_7108b143d0": "base::spatial::CAABox",
+    "&DAT_71729a2688": "base::global::CRntVector<SLogicSubPath>",
+    "&DAT_71729a2290": "base::global::CRntVector<SLogicPathNode>",
 }
 
 
@@ -90,13 +106,19 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
                 break
 
         if "&" in type_var:
-            type_name = type_var
+            if "::_" in type_var:
+                type_name = type_var[1:type_var.find("::_")]
+            else:
+                type_name = type_var
         else:
             i = decompiled_code.rfind(type_var, offset, m.start())
             end = decompiled_code.find(';', i)
             type_name = decompiled_code[i + len(type_var) + len(" = "):end]
             if type_name.endswith("::init()"):
                 type_name = type_name[:-len("::init()")]
+            if type_name.endswith("Ptr"):
+                type_name = type_name[:-len("Ptr")] + "*"
+            type_name = type_name.replace("_", " ")
 
         fields[crc_string] = _aliases.get(type_name, type_name)
 
@@ -263,7 +285,13 @@ def main(only_missing: bool = True):
         for field in data["fields"].keys():
             value = data["fields"][field]
             if value in _aliases:
-                data["fields"][field] = _aliases[value]
+                value = _aliases[value]
+
+            if value.endswith("Ptr"):
+                value = value[:-len("Ptr")] + "*"
+            value = value.replace("_", " ")
+
+            data["fields"][field] = value
 
     with open("all_types.json", "w") as f:
         json.dump({

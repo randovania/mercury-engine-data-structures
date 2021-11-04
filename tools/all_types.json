@@ -379,7 +379,7 @@
         "parent": "CGameObject",
         "fields": {
             "sName": "base::global::CStrId",
-            "oActorDefLink": "&DAT_7101cf5c20",
+            "oActorDefLink": "base::core::CAssetLink",
             "sActorDefName": "base::global::CStrId",
             "vPos": "base::math::CVector3D",
             "vAng": "base::math::CVector3D",
@@ -403,6 +403,20 @@
     "CActorDef": {
         "parent": "base::core::CDefinition",
         "fields": {}
+    },
+    "CActorLayer": {
+        "parent": null,
+        "fields": {
+            "dctSublayers": "&DAT_71726475c8",
+            "dctActorGroups": "&Dict_Str_VecGameLinkActor_DAT_71726432d0"
+        }
+    },
+    "CActorSublayer": {
+        "parent": null,
+        "fields": {
+            "sName": "base::global::CStrId",
+            "dctActors": "&dctActors_DAT_7172642188"
+        }
     },
     "CAimCameraEnabledVisibleOnlyComponent": {
         "parent": "CComponent",
@@ -451,8 +465,8 @@
     "CAllowCoolShinesparkLogicAction": {
         "parent": "CTriggerLogicAction",
         "fields": {
-            "lstAllowedDirections": "&DAT_71726ee5e8",
-            "lstAllowedSituations": "&DAT_71726ee9e0",
+            "lstAllowedDirections": "base::global::CRntVector<EShinesparkTravellingDirection>",
+            "lstAllowedSituations": "base::global::CRntVector<ECoolShinesparkSituation>",
             "sCoolShinesparkId": "base::global::CStrId",
             "bAllow": "bool",
             "bForce": "bool"
@@ -875,9 +889,19 @@
         "parent": null,
         "fields": {
             "uGroupId": "unsigned",
-            "aGridTiles": "&Vector_STileInfo_71726b8960",
+            "aGridTiles": "base::global::CRntVector<CBreakableTileGroupComponent::STileInfo>",
             "bFakeHusks": "bool",
             "eCollisionMaterial": "&game::logic::collision::EColMat_DAT_7172737b18"
+        }
+    },
+    "CBreakableTileGroupComponent::STileInfo": {
+        "parent": null,
+        "fields": {
+            "eTileType": "&EBreakableTileType_DAT_717273bb10",
+            "vGridCoords": "base::math::CVector2D",
+            "sHiddenSG": "base::global::CStrId",
+            "bIsHidingSecret": "bool",
+            "aVignettes": "base::global::CRntVector<CGameLink<CActor>>"
         }
     },
     "CBreakableTileGroupSonarTargetComponent": {
@@ -1091,6 +1115,13 @@
             "wpDeadCheckpointStartPoint": "CGameLink<CActor>"
         }
     },
+    "CCentralUnitComponent::SStartPointInfo": {
+        "parent": null,
+        "fields": {
+            "wpStartPoint": "CGameLink<CActor>",
+            "wpEmmyLandmark": "CGameLink<CActor>"
+        }
+    },
     "CCentralUnitComponentDef": {
         "parent": "CActorComponentDef",
         "fields": {}
@@ -1124,7 +1155,7 @@
     "CChangeStateDoorsLogicAction": {
         "parent": "CTriggerLogicAction",
         "fields": {
-            "vDoorStateInfo": "&DAT_71726efbb0",
+            "vDoorStateInfo": "base::global::CRntVector<DoorStateInfo>",
             "bEnabled": "bool"
         }
     },
@@ -1585,7 +1616,7 @@
             "bForceReaction": "bool",
             "eDamageStrengthOnForcedReaction": "&DAT_71726d76e8",
             "bIgnoreInmune": "bool",
-            "dictDamageIDOverrides": "&DAT_7101d062b0",
+            "dictDamageIDOverrides": "base::global::CRntSmallDictionary<base::global::CStrId, base::global::CStrId>",
             "sIgnoreBumpColliders": "base::global::CStrId"
         }
     },
@@ -9619,7 +9650,17 @@
     "CDamageTriggerComponent": {
         "parent": "CBaseDamageTriggerComponent",
         "fields": {
-            "oConfig": "&DAT_71726f1d88"
+            "oConfig": "CDamageTriggerConfig"
+        }
+    },
+    "CDamageTriggerConfig": {
+        "parent": null,
+        "fields": {
+            "fDamagePerTime": "float",
+            "fInBetweenDamageTime": "float",
+            "fInitTimeDamageIncrease": "float",
+            "fDamageIncreaseAmount": "float",
+            "fMaxDamage": "float"
         }
     },
     "CDeathCameraCtrl": {
@@ -9811,6 +9852,12 @@
         "parent": "CPullableGrapplePointComponent",
         "fields": {}
     },
+    "CEditorRailSegment": {
+        "parent": null,
+        "fields": {
+            "vPos": "base::math::CVector3D"
+        }
+    },
     "CElectricGeneratorComponent": {
         "parent": "CUsableComponent",
         "fields": {
@@ -9872,6 +9919,77 @@
             "tLogicShapesToAvoidCornerReposition": "base::global::CRntVector<CGameLink<CActor>>"
         }
     },
+    "CEmmyAIComponent::CTunableEmmyAIComponent": {
+        "parent": "base::tunable::CTunable",
+        "fields": {
+            "eEmmyOutsideRoomLPF": "base::snd::ELowPassFilter",
+            "eMinimapMode": "&DAT_71726869d0",
+            "eIceMode": "&DAT_7172686870",
+            "fChaseUnspawnEnemyDistance": "float",
+            "bCloseEmmyDoorsDuringChase": "bool",
+            "fEmmyAutoFocusStartTime": "float",
+            "fEmmyAutoFocusEndTime": "float",
+            "fEmmyAutoFocusMaxZoomDistance": "float",
+            "fFocusModeActivationRadius": "float",
+            "fEmmyZoneChasePulseWaitTime": "float",
+            "fEmmyZoneChasePulseSpeed": "float",
+            "fEmmyZoneChasePhase2PulseWaitTime": "float",
+            "fEmmyZoneChasePhase2PulseSpeed": "float",
+            "fEmmyZoneSearch2PulseWaitTime": "float",
+            "fEmmyZoneSearch2PulseSpeed": "float",
+            "eEmmyOutsideRoomLowPassFilter": "int",
+            "bEmmyOutsideRoomLowPassActive": "bool",
+            "bAfterGrabGotoSearch": "bool",
+            "fGrab2Probability": "float",
+            "fTimeTargetOutOfEmmyZoneToEndSearch": "float",
+            "bWantsChaseRedLight": "bool",
+            "fTunnelWalkTransitionSpeedChasePhase1": "float",
+            "fTunnelWalkTransitionSpeedChasePhase2ProtectorOn": "float",
+            "fTunnelWalkTransitionSpeedChasePhase2ProtectorDestroyed": "float",
+            "bDarknessEnabled": "bool",
+            "iMinimapMode": "int",
+            "fMinimapPatrol2SearchTime": "float",
+            "bWaveInSearch": "bool",
+            "bWaveInChase": "bool",
+            "bWaveInWater": "bool",
+            "bWaveInPhase2ProtectorOn": "bool",
+            "bWaveInfiniteDetectionRadius": "bool",
+            "fWaveTimeBetweenFire": "float",
+            "fWaveChargeTime": "float",
+            "bWaveMaxRadiusToFireDebug": "bool",
+            "fWaveMaxRadiusToFire": "float",
+            "fWaveTimeSinceWaveReactionToFire": "float",
+            "bWaveShowFireFeedback": "bool",
+            "fWaveProjectileInitialRadius": "float",
+            "fWaveProjectileRadius": "float",
+            "fWaveIgnoreInputTime": "float",
+            "fWaveProjectileSpeed": "float",
+            "fWaveProjectileWaterSpeed": "float",
+            "fWaveMinAtt": "float",
+            "fWaveMaxAtt": "float",
+            "fWaveMinTimeInSpaceJumpToFire": "float",
+            "fWaveMaxTimeInSpaceJumpToFire": "float",
+            "fWaveInSpaceJumpFireProjectileMaxSpeed": "float",
+            "bIceUseInPatrol": "bool",
+            "bIceUseInWater": "bool",
+            "bIceInfiniteDetectionRadius": "bool",
+            "fIceIceConeRadius": "float",
+            "fIceIceConeAperture": "float",
+            "fIceIceConeChargeTime": "float",
+            "fIceTimeBetweenFire": "float",
+            "fIceIgnoreInputTimeMax": "float",
+            "fIceIgnoreInputTimeMin": "float",
+            "fTimeSearchForcedToGoAway": "float",
+            "fTimeSearchForcedToGoAwayInSearch": "float",
+            "fStaggerTimeGrab": "float",
+            "fStaggerTimeHeadProtectorDestroyed": "float",
+            "fStaggerTimeGrabTuto": "float",
+            "bUseTurnsWithoutStopAndLook": "bool",
+            "bAlwaysWinQTE1": "bool",
+            "fCentralUnitAlarmVolumeOnGrab": "float",
+            "fTimeInFrustumToMarkEmmySeen": "float"
+        }
+    },
     "CEmmyAttackComponent": {
         "parent": "CAIAttackComponent",
         "fields": {}
@@ -9883,6 +10001,14 @@
             "wpCheckEmmyLogicShape": "CGameLink<CActor>",
             "tForbiddenLogicShapes": "base::global::CRntVector<CGameLink<CActor>>",
             "tWeightedLogicShapeIDs": "base::global::CRntVector<base::global::CStrId>"
+        }
+    },
+    "CEmmyAutoGlobalSmartLinkDef": {
+        "parent": null,
+        "fields": {
+            "wpStartLandmark": "CGameLink<CActor>",
+            "tEndLandmarks": "base::global::CRntVector<CGameLink<CActor>>",
+            "wpActivateLogicShape": "CGameLink<CActor>"
         }
     },
     "CEmmyCaveAIComponent": {
@@ -10015,7 +10141,7 @@
     "CEntity": {
         "parent": "CActor",
         "fields": {
-            "oBBox": "&DAT_7108b143d0",
+            "oBBox": "base::spatial::CAABox",
             "bIsInFrustum": "bool"
         }
     },
@@ -10331,6 +10457,28 @@
             "sVisualPresetOverride": "base::global::CStrId"
         }
     },
+    "CFreezeRoomConfig": {
+        "parent": null,
+        "fields": {
+            "fActivationDelayTime": "float",
+            "fDamagePerTime": "float",
+            "fInBetweenDamageTime": "float",
+            "fInitTimeDamageIncrease": "float",
+            "fDamageIncreaseAmount": "float",
+            "fMaxDamage": "float"
+        }
+    },
+    "CFreezeRoomCoolConfig": {
+        "parent": null,
+        "fields": {
+            "fActivationDelayTime": "float",
+            "fDamagePerTime": "float",
+            "fInBetweenDamageTime": "float",
+            "fInitTimeDamageIncrease": "float",
+            "fDamageIncreaseAmount": "float",
+            "fMaxDamage": "float"
+        }
+    },
     "CFrozenAsFrostbiteComponent": {
         "parent": "CFrozenComponent",
         "fields": {}
@@ -10574,6 +10722,30 @@
             "sVisualPresetOverride": "base::global::CStrId",
             "pEnvironmentFXActor": "CGameLink<CActor>",
             "vEnvironmentFXActors": "base::global::CRntVector<CGameLink<CActor>>"
+        }
+    },
+    "CHeatRoomConfig": {
+        "parent": null,
+        "fields": {
+            "fActivationDelayTime": "float",
+            "fDamagePerTime": "float",
+            "fInBetweenDamageTime": "float",
+            "fInitTimeDamageIncrease": "float",
+            "fDamageIncreaseAmount": "float",
+            "fMaxDamage": "float",
+            "bActivationDelayTimeOnlyForFirstTime": "bool"
+        }
+    },
+    "CHeatRoomCoolConfig": {
+        "parent": null,
+        "fields": {
+            "fActivationDelayTime": "float",
+            "fDamagePerTime": "float",
+            "fInBetweenDamageTime": "float",
+            "fInitTimeDamageIncrease": "float",
+            "fDamageIncreaseAmount": "float",
+            "fMaxDamage": "float",
+            "bActivationDelayTimeOnlyForFirstTime": "bool"
         }
     },
     "CHeatableShieldComponent": {
@@ -10878,8 +11050,18 @@
     "CLavaPoolComponent": {
         "parent": "CLiquidPoolBaseComponent",
         "fields": {
-            "oConfig": "&DAT_71726da238",
+            "oConfig": "CLavaPoolConfig",
             "fChangeTime": "float"
+        }
+    },
+    "CLavaPoolConfig": {
+        "parent": null,
+        "fields": {
+            "fDamagePerTime": "float",
+            "fInBetweenDamageTime": "float",
+            "fInitTimeDamageIncrease": "float",
+            "fDamageIncreaseAmount": "float",
+            "fMaxDamage": "float"
         }
     },
     "CLavaPumpComponent": {
@@ -11026,7 +11208,7 @@
         }
     },
     "CLogicCamera": {
-        "parent": "CLogicCamera",
+        "parent": "CGameObject",
         "fields": {
             "sID": "base::global::CStrId",
             "sControllerID": "base::global::CStrId",
@@ -11289,17 +11471,17 @@
             "mapProps": "&DAT_7172767788",
             "mapCentralUnits": "&DAT_7172767788",
             "mapBosses": "&DAT_7172767788",
-            "mapBossBattleLabels": "&DAT_7101d062b0",
-            "mapAbilityLabels": "&DAT_7101d062b0",
+            "mapBossBattleLabels": "base::global::CRntSmallDictionary<base::global::CStrId, base::global::CStrId>",
+            "mapAbilityLabels": "base::global::CRntSmallDictionary<base::global::CStrId, base::global::CStrId>",
             "mapVignetteOccludedIcons": "&DAT_7172767b80"
         }
     },
     "CMinimapDef": {
         "parent": "base::core::CDefinition",
         "fields": {
-            "oMinimapIconsMatLink": "&DAT_7101cf5c20",
-            "oIconsNoMipsMatLink": "&DAT_7101cf5c20",
-            "oOverlayMatLink": "&DAT_7101cf5c20",
+            "oMinimapIconsMatLink": "base::core::CAssetLink",
+            "oIconsNoMipsMatLink": "base::core::CAssetLink",
+            "oOverlayMatLink": "base::core::CAssetLink",
             "mapIconDefs": "&DAT_717276bcc8",
             "mapLabelDefs": "&DAT_717276c0c0"
         }
@@ -11762,7 +11944,7 @@
         "parent": "base::core::CAsset",
         "fields": {
             "sPlaythroughName": "base::global::CStrId",
-            "oPlayDefLink": "&DAT_7101cf5c20",
+            "oPlayDefLink": "base::core::CAssetLink",
             "dctCheckpointDatas": "&DAT_7172653cb8"
         }
     },
@@ -11999,6 +12181,10 @@
         "fields": {
             "eRinkaType": "&DAT_71726a3cc0"
         }
+    },
+    "CRntFile": {
+        "parent": null,
+        "fields": {}
     },
     "CRobotAIComponent": {
         "parent": "CBehaviorTreeAIComponent",
@@ -12587,8 +12773,8 @@
             "vTargetsToDeactivate": "base::global::CRntVector<CGameLink<CActor>>",
             "sOnUseEntityTimeline": "base::global::CStrId",
             "wpAtmosphereEntity": "CGameLink<CEntity>",
-            "vEntitiesActivatabledOnEvent": "&DAT_71726d36d8",
-            "vEntitiesDeactivatabledOnEvent": "&DAT_71726d36d8"
+            "vEntitiesActivatabledOnEvent": "base::global::CRntVector<SActivatabledOnEventInfo>",
+            "vEntitiesDeactivatabledOnEvent": "base::global::CRntVector<SActivatabledOnEventInfo>"
         }
     },
     "CShootActivatorComponent::CTunableShootActivatorComponent": {
@@ -12805,6 +12991,12 @@
             "wpXCellActivationAreaShape": "CGameLink<CActor>",
             "sCharClass": "base::global::CStrId",
             "voActorBlueprint": "base::global::CRntVector<CSpawnerActorBlueprint>"
+        }
+    },
+    "CSpawnerActorBlueprint": {
+        "parent": null,
+        "fields": {
+            "InnerValue": "base::reflection::CTypedValue"
         }
     },
     "CSpbSprActivator": {
@@ -13133,6 +13325,21 @@
             "iLavaLowPassFilter": "int"
         }
     },
+    "CTriggerComponent::SActivationCondition": {
+        "parent": null,
+        "fields": {
+            "sID": "base::global::CStrId",
+            "sCharclasses": "base::global::CStrId",
+            "bEnabled": "bool",
+            "bAlways": "bool",
+            "bDone": "bool",
+            "fExecutesEvery": "float",
+            "fExecutesEveryRandomRange": "float",
+            "fLastExecution": "float",
+            "eEvent": "&EEvent_DAT_71726f4b00",
+            "vLogicActions": "base::global::CRntVector<std::unique_ptr<CTriggerLogicAction>>"
+        }
+    },
     "CTriggerLogicAction": {
         "parent": null,
         "fields": {}
@@ -13398,6 +13605,13 @@
         "parent": "base::global::timeline::CEvent",
         "fields": {
             "eAction": "&DAT_7172718a58"
+        }
+    },
+    "DoorStateInfo": {
+        "parent": null,
+        "fields": {
+            "pDoor": "CGameLink<CEntity>",
+            "eDoorState": "&DAT_71726ef690"
         }
     },
     "GUI::CAmiiboButton": {
@@ -13930,11 +14144,40 @@
         "parent": null,
         "fields": {}
     },
+    "SActivatabledOnEventInfo": {
+        "parent": null,
+        "fields": {
+            "pActivatable": "CGameLink<CEntity>",
+            "sIdActivation": "base::global::CStrId"
+        }
+    },
+    "SBeamBoxActivatable": {
+        "parent": null,
+        "fields": {
+            "oActivatableObj": "CGameLink<CEntity>",
+            "sState": "base::global::CStrId"
+        }
+    },
+    "SCameraRail": {
+        "parent": "IPath",
+        "fields": {
+            "tSubRails": "base::global::CRntVector<SCameraSubRail>",
+            "fMaxRailSpeed": "float",
+            "fMinRailSpeed": "float",
+            "fMaxRailDistance": "float"
+        }
+    },
     "SCameraRailNode": {
         "parent": "IPathNode",
         "fields": {
             "vPos": "base::math::CVector3D",
             "wpLogicCamera": "CGameLink<CActor>"
+        }
+    },
+    "SCameraSubRail": {
+        "parent": "ISubPath",
+        "fields": {
+            "tNodes": "CEditorRailSegment"
         }
     },
     "SDeathImpactDisplacement": {
@@ -13944,6 +14187,13 @@
             "fMidSpeed": "float",
             "fTimeToMidSpeed": "float",
             "fEndSpeed": "float"
+        }
+    },
+    "SDoorInfo": {
+        "parent": null,
+        "fields": {
+            "wpThermalDoor": "CGameLink<CEntity>",
+            "sDoorState": "CDoorLifeComponent::SState"
         }
     },
     "SDropProbabilities": {
@@ -13982,10 +14232,17 @@
             "iNumOfItemsToDropWithXCells": "int"
         }
     },
+    "SFallBackPath": {
+        "parent": null,
+        "fields": {
+            "wpPath": "CGameLink<CActor>",
+            "ePathType": "&DAT_7172761720"
+        }
+    },
     "SLogicPath": {
         "parent": "IPath",
         "fields": {
-            "tSubPaths": "&DAT_71729a2688"
+            "tSubPaths": "base::global::CRntVector<SLogicSubPath>"
         }
     },
     "SLogicPathNode": {
@@ -13999,12 +14256,21 @@
     "SLogicSubPath": {
         "parent": "ISubPath",
         "fields": {
-            "tNodes": "&DAT_71729a2290"
+            "tNodes": "base::global::CRntVector<SLogicPathNode>"
         }
     },
     "STransition": {
         "parent": null,
         "fields": {}
+    },
+    "SWorldGraphNode": {
+        "parent": null,
+        "fields": {
+            "vPos": "base::math::CVector3D",
+            "sID": "base::global::CStrId",
+            "bDeadEnd": "bool",
+            "tNeighboursIds": "base::global::CRntVector<base::global::CStrId>"
+        }
     },
     "animtree::CAnimTreeControl": {
         "parent": "animtree::CAnimTreeElement",
@@ -14179,7 +14445,7 @@
     "base::animation::CBlendSpaceResource": {
         "parent": "base::core::CAsset",
         "fields": {
-            "sVarName": "global::CStrId",
+            "sVarName": "base::global::CStrId",
             "vTargets": "&DAT_7101cf2fc0"
         }
     },
@@ -14188,16 +14454,29 @@
         "fields": {
             "fSample": "float",
             "fPlayRate": "float",
-            "sAnimationResource": "global::CFilePathStrId"
+            "sAnimationResource": "base::global::CFilePathStrId"
         }
     },
     "base::animation::CSkeletalAnimation": {
         "parent": null,
         "fields": {}
     },
+    "base::core::AssetID": {
+        "parent": null,
+        "fields": {
+            "sType": "base::global::CStrId",
+            "sPath": "base::global::CFilePathStrId"
+        }
+    },
     "base::core::CAsset": {
         "parent": "base::core::CBaseObject",
         "fields": {}
+    },
+    "base::core::CAssetLink": {
+        "parent": null,
+        "fields": {
+            "assetID": "base::core::AssetID"
+        }
     },
     "base::core::CBaseObject": {
         "parent": null,
@@ -14206,7 +14485,7 @@
     "base::core::CDefinition": {
         "parent": "base::core::CAsset",
         "fields": {
-            "sLabel": "global::CStrId"
+            "sLabel": "base::global::CStrId"
         }
     },
     "base::curves::CCurveResource": {
@@ -14258,8 +14537,8 @@
     "base::reflection::CType": {
         "parent": null,
         "fields": {
-            "sName": "global::CStrId",
-            "sBaseTypeName": "global::CStrId"
+            "sName": "base::global::CStrId",
+            "sBaseTypeName": "base::global::CStrId"
         }
     },
     "base::res::CRes": {
@@ -14294,10 +14573,37 @@
             "fEnvironmentStreamsVolume": "float"
         }
     },
-    "base::tunable::CTunable": {
-        "parent": "base::tunable::CTunable",
+    "base::spatial::CAABox": {
+        "parent": null,
         "fields": {
-            "sName": "global::CStrId"
+            "Min": "base::math::CVector3D",
+            "Max": "base::math::CVector3D"
+        }
+    },
+    "base::spatial::CPolygon2D": {
+        "parent": null,
+        "fields": {
+            "bClosed": "bool",
+            "oSegmentData": "global::CRntVector<base::spatial::SSegmentData>",
+            "bOutwardsNormal": "bool"
+        }
+    },
+    "base::spatial::CPolygonCollection2D": {
+        "parent": null,
+        "fields": {
+            "vPolys": "global::CRntVector<base::spatial::CPolygon2D>"
+        }
+    },
+    "base::spatial::SSegmentData": {
+        "parent": null,
+        "fields": {
+            "vPos": "base::math::CVector3D"
+        }
+    },
+    "base::tunable::CTunable": {
+        "parent": "base::core::CBaseObject",
+        "fields": {
+            "sName": "base::global::CStrId"
         }
     },
     "behaviortree::CAgitateInNervousnessAction": {
@@ -15437,7 +15743,7 @@
     "game::logic::collision::CPolygonCollectionShape": {
         "parent": "game::logic::collision::CShape",
         "fields": {
-            "oPolyCollection": "&CPolygonCollection2D_DAT_7108b16d78"
+            "oPolyCollection": "base::spatial::CPolygonCollection2D"
         }
     },
     "game::logic::collision::CShape": {
@@ -15450,6 +15756,18 @@
     "game::logic::collision::CTrigger": {
         "parent": "CGameObject",
         "fields": {}
+    },
+    "gameeditor::CGameModelRoot": {
+        "parent": null,
+        "fields": {
+            "pScenario": "CScenarioPtr",
+            "pSubareaManager": "CSubAreaManagerPtr",
+            "pEnvironmentManager": "CEnvironmentManagerPtr",
+            "pSoundManager": "sound::CSoundManagerPtr",
+            "pShotManager": "CShotManagerPtr",
+            "pLightManager": "CLightManagerPtr",
+            "pMusicManager": "sound::CMusicManagerPtr"
+        }
     },
     "media::CAtkSoundStream": {
         "parent": "media::CMediaStream",

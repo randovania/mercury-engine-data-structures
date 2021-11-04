@@ -44,18 +44,14 @@ class PointerSet:
         prop_id = hashed_names.all_name_to_property_id()[name]
         if prop_id in self.types:
             raise ValueError(f"Attempting to add {name} to {self.category}, but already present.")
-        self.types[prop_id] = value
+        self.types[prop_id] = name / value
 
     def create_construct(self) -> Construct:
-        fields = {
-            prop_id: hashed_names.all_property_id_to_name()[prop_id] / conn
-            for prop_id, conn in self.types.items()
-        }
         return PointerAdapter(Struct(
             type=Hex(Int64ul),
             ptr=Switch(
                 construct.this.type,
-                fields,
+                self.types,
                 ErrorWithMessage(
                     lambda ctx: f"Property {ctx.type} ({hashed_names.all_property_id_to_name().get(ctx.type)}) "
                                 "without assigned type"),
