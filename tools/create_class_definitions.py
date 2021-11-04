@@ -2,30 +2,7 @@ import collections
 import json
 import re
 from pathlib import Path
-from typing import Any, Optional
-
-
-def parse_all_types(all_types: dict[str, Any]):
-    type_objects = {
-        name: {
-            "fields": data["fields"],
-            "children": {},
-        }
-        for name, data in all_types.items()
-    }
-    type_objects[None] = {
-        "children": {},
-    }
-
-    for name, data in all_types.items():
-        try:
-            type_objects[data["parent"]]["children"][name] = type_objects[name]
-        except KeyError as e:
-            print(f"Missing type: {e}")
-            continue
-
-    return type_objects[None]["children"]
-
+from typing import Optional
 
 known_types_to_construct = {
     "bool": "construct.Flag",
@@ -41,11 +18,11 @@ known_types_to_construct = {
     "CGameLink<CActor>": "common_types.StrId",
     "CGameLink<CEntity>": "common_types.StrId",
     "CGameLink<CSpawnPointComponent>": "common_types.StrId",
-
-    "base::reflection::CTypedValue": "ErrorWithMessage('nope')",
+    "base::global::CRntFile": "construct.Prefixed(construct.Int32ul, construct.GreedyBytes)",
 
     # TODO: test if works
     "base::global::CName": "common_types.StrId",
+    "base::core::CAssetLink": "common_types.StrId",
 
     # Hacky
     # Enums that don't use enum-like names in fields
@@ -63,48 +40,15 @@ all_container_re = {
 }
 
 unique_ptr_re = re.compile(r"std::unique_ptr<(.*)>$")
-raw_ptr_re = re.compile(r"(.*?)(?:_const)?Ptr$")
+raw_ptr_re = re.compile(r"(.*?)(?: const)?\*$")
 ref_re = re.compile(r"CGameObjectRef<(.*)>$")
-all_ptr_re = [unique_ptr_re, raw_ptr_re, ref_re]
-
-
-def convert_type_to_construct(field_name: str, field_type: str, all_types: dict[str, Any]):
-    if field_type in known_types_to_construct:
-        return known_types_to_construct[field_type]
-
-    if field_name.startswith("e"):
-        return "common_types.UInt"
-
-    # Vector
-    if (m := vector_re.match(field_type)) is not None:
-        if (inner_field := convert_type_to_construct(field_name, m.group(1), all_types)) is not None:
-            return f"common_types.make_vector({inner_field})"
-        return None
-
-    # Containers
-    try:
-        make, m = next((make, x) for make, r in all_container_re.items() if (x := r.match(field_type)))
-        if (inner_field := convert_type_to_construct(field_name, m.group(1), all_types)) is not None:
-            return f"{make}({inner_field})"
-        return None
-    except StopIteration:
-        pass
-
-    # Pointers
-    try:
-        m = next(x for r in all_ptr_re if (x := r.match(field_type)))
-        return f'make_pointer_to("{m.group(1)}")'
-    except StopIteration:
-        pass
-
-    if field_type in all_types:
-        return f'make_object_for("{field_type}")'
-
-    return None
+typed_var_re = re.compile(r"(base::reflection::CTypedValue)$")
+all_ptr_re = [unique_ptr_re, raw_ptr_re, ref_re, typed_var_re]
 
 
 def _type_name_to_python_identifier(type_name: str):
-    return type_name.replace("::", "_").replace(" ", "_").replace("<", "_").replace(">", "_").replace(",", "_")
+    return type_name.replace("::", "_").replace(" ", "_").replace("<", "_").replace(
+        ">", "_").replace(",", "_").replace("*", "Ptr")
 
 
 class TypeExporter:
@@ -115,6 +59,11 @@ class TypeExporter:
         self._types_being_exported = set()
         self._children_for = collections.defaultdict(set)
         self._type_definition_code = ""
+
+        self._exported_types["base::reflection::CTypedValue"] = _type_name_to_python_identifier(
+            "base::reflection::CTypedValue"
+        )
+        self._children_for["base::reflection::CTypedValue"].add("base::global::CRntFile")
 
         for type_name, data in all_types.items():
             if data["parent"] is not None:
@@ -253,11 +202,12 @@ from mercury_engine_data_structures.pointer_set import PointerSet
         code += "\n\n"
 
         for type_name in sorted(self._types_with_pointer):
-            code += '{}.add_option("{}", {})\n'.format(
-                self.pointer_to_type(type_name),
-                type_name,
-                self.ensure_exported_type(type_name),
-            )
+            if type_name != "base::reflection::CTypedValue":
+                code += '{}.add_option("{}", {})\n'.format(
+                    self.pointer_to_type(type_name),
+                    type_name,
+                    self.ensure_exported_type(type_name),
+                )
             for child in sorted(self.children_for(type_name)):
                 code += f'{self.pointer_to_type(type_name)}.add_option("{child}", {self.ensure_exported_type(child)})\n'
             code += "\n"
@@ -267,6 +217,7 @@ from mercury_engine_data_structures.pointer_set import PointerSet
 
 def main():
     p = Path("all_types.json")
+    output_path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "formats", "dread_types.py")
 
     with p.open() as f:
         all_types: dict[str, dict[str, str]] = json.load(f)
@@ -274,68 +225,17 @@ def main():
     all_types.pop("CBlackboard")
     all_types.pop("CGameBlackboard")
 
-    type_hierarchy = parse_all_types(all_types)
     type_exporter = TypeExporter(all_types)
+    type_exporter.pointer_to_type("CActor")
 
-    needs_exporting = {"CActor"}
-    while needs_exporting:
-        next_type = needs_exporting.pop()
-        if next_type not in type_exporter._exported_types:
-            type_exporter.ensure_exported_type(next_type)
-            needs_exporting.update(type_exporter._children_for[next_type])
+    # needs_exporting = {"CActor"}
+    # while needs_exporting:
+    #     next_type = needs_exporting.pop()
+    #     if next_type not in type_exporter._exported_types:
+    #         type_exporter.ensure_exported_type(next_type)
+    #         needs_exporting.update(type_exporter._children_for[next_type])
 
-
-#     root = type_hierarchy
-#     for it in ["base::core::CBaseObject", "CGameObject", "CActorComponent"]:
-#         root = root[it]["children"]
-#
-#     def process_type(obj, self_name: str, parent_name: str, pointer_set: str):
-#         if obj["fields"]:
-#             field_lines = []
-#             for field_name, field_type in obj["fields"].items():
-#                 if (converted_type := convert_type_to_construct(field_name, field_type, all_types)) is not None:
-#                     field_lines.append(f'    "{field_name}": {converted_type},')
-#                 else:
-#                     field_lines.append(f'    # "{field_name}": {field_type},')
-#
-#             fields_def = "{{\n    **{}Fields,\n{}\n}}".format(
-#                 parent_name,
-#                 "\n".join(field_lines)
-#             )
-#         else:
-#             # No fields, just use the parent dict
-#             fields_def = f"{parent_name}Fields"
-#
-#         field_var = ""
-#         if obj["children"]:
-#             # We have children, create a field vars
-#             field_var = f"{self_name}Fields := "
-#
-#         result = f'\n\n{pointer_set}.add_option("{self_name}", Object({field_var}{fields_def}))'
-#
-#         for child_name, child_details in obj["children"].items():
-#             result += process_type(child_details, child_name, self_name, pointer_set)
-#
-#         return result
-#
-#     code = """# This file was generated!
-# import construct
-#
-# from mercury_engine_data_structures import common_types
-# from mercury_engine_data_structures.object import Object
-# from mercury_engine_data_structures.pointer_set import PointerSet
-#
-# ActorComponents = PointerSet("CActorComponent")
-# CActorComponentFields = {}
-# """
-#
-#     for name, details in root.items():
-#         code += process_type(details, name, "CActorComponent", "ActorComponents")
-
-    Path("custom_types.py").write_text(type_exporter.export_code())
-
-    with open("type_tree.json", "w") as f:
-        json.dump(type_hierarchy, f, indent=4)
+    output_path.write_text(type_exporter.export_code())
 
 
 if __name__ == '__main__':

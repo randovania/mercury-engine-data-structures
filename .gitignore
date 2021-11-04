@@ -133,3 +133,4 @@ dmypy.json
 
 # Version
 mercury_engine_data_structures/version.py
+mercury_engine_data_structures/formats/dread_types.py

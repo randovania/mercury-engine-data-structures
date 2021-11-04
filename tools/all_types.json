@@ -383,7 +383,7 @@
             "sActorDefName": "base::global::CStrId",
             "vPos": "base::math::CVector3D",
             "vAng": "base::math::CVector3D",
-            "pComponents": "base::global::CRntSmallDictionary<base::global::CStrId,_CActorComponentPtr>Ptr",
+            "pComponents": "base::global::CRntSmallDictionary<base::global::CStrId, CActorComponent*>*",
             "bEnabled": "bool"
         }
     },
@@ -10333,7 +10333,7 @@
         }
     },
     "CFXComponent": {
-        "parent": null,
+        "parent": "CSceneComponent",
         "fields": {
             "fSelectedHighRadius": "float",
             "fSelectedLowRadius": "float"
@@ -11595,7 +11595,7 @@
         }
     },
     "CModelUpdaterComponent": {
-        "parent": null,
+        "parent": "CSceneComponent",
         "fields": {
             "sDefaultModelPath": "base::global::CFilePathStrId"
         }
@@ -11995,10 +11995,10 @@
             "bLoop": "bool",
             "fFadeInTime": "float",
             "fFadeOutTime": "float",
-            "sSound1": "base::global::CFilePathStrId_constPtr",
-            "sSound2": "base::global::CFilePathStrId_constPtr",
-            "sSound3": "base::global::CFilePathStrId_constPtr",
-            "sSound4": "base::global::CFilePathStrId_constPtr"
+            "sSound1": "base::global::CFilePathStrId const*",
+            "sSound2": "base::global::CFilePathStrId const*",
+            "sSound3": "base::global::CFilePathStrId const*",
+            "sSound4": "base::global::CFilePathStrId const*"
         }
     },
     "CPowerBeamGun": {
@@ -12613,6 +12613,10 @@
             "fAreaTextSpriteY": "float"
         }
     },
+    "CSceneComponent": {
+        "parent": "CComponent",
+        "fields": {}
+    },
     "CSceneModelAnimationComponent": {
         "parent": "CComponent",
         "fields": {
@@ -13077,6 +13081,18 @@
             "eOverridedInFrustumMode": "&DAT_717273b110",
             "fInstantDetectionFrontDistance": "float",
             "fInstantDetectionBackDistance": "float"
+        }
+    },
+    "CStartPointComponent": {
+        "parent": "CComponent",
+        "fields": {
+            "sOnTeleport": "base::global::CRntString",
+            "sOnTeleportLogicCamera": "base::global::CStrId",
+            "bOnTeleportLogicCameraRaw": "bool",
+            "bProjectOnFloor": "bool",
+            "bMorphballMode": "bool",
+            "bSaveGameToCheckpoint": "bool",
+            "bIsBossStartPoint": "bool"
         }
     },
     "CStateParams": {
@@ -14177,7 +14193,7 @@
     "SCameraSubRail": {
         "parent": "ISubPath",
         "fields": {
-            "tNodes": "CEditorRailSegment"
+            "tNodes": "base::global::CRntVector<SCameraRailNode>"
         }
     },
     "SDeathImpactDisplacement": {
@@ -15725,7 +15741,7 @@
     "game::logic::collision::CCollider": {
         "parent": "game::logic::collision::CBroadphaseObject",
         "fields": {
-            "pShape": "CShapePtr"
+            "pShape": "CShape*"
         }
     },
     "game::logic::collision::CColliderGroup": {
@@ -15760,13 +15776,13 @@
     "gameeditor::CGameModelRoot": {
         "parent": null,
         "fields": {
-            "pScenario": "CScenarioPtr",
-            "pSubareaManager": "CSubAreaManagerPtr",
-            "pEnvironmentManager": "CEnvironmentManagerPtr",
-            "pSoundManager": "sound::CSoundManagerPtr",
-            "pShotManager": "CShotManagerPtr",
-            "pLightManager": "CLightManagerPtr",
-            "pMusicManager": "sound::CMusicManagerPtr"
+            "pScenario": "CScenario*",
+            "pSubareaManager": "CSubAreaManager*",
+            "pEnvironmentManager": "CEnvironmentManager*",
+            "pSoundManager": "sound::CSoundManager*",
+            "pShotManager": "CShotManager*",
+            "pLightManager": "CLightManager*",
+            "pMusicManager": "sound::CMusicManager*"
         }
     },
     "media::CAtkSoundStream": {
@@ -16108,7 +16124,7 @@
     "sound::CSoundManager": {
         "parent": null,
         "fields": {
-            "pAudioPresets": "CAudioPresetsPtr"
+            "pAudioPresets": "CAudioPresets*"
         }
     },
     "sound::SGUISoundEventsSelector": {

@@ -287,9 +287,12 @@ def main(only_missing: bool = True):
             if value in _aliases:
                 value = _aliases[value]
 
-            if value.endswith("Ptr"):
-                value = value[:-len("Ptr")] + "*"
-            value = value.replace("_", " ")
+            if not value.startswith("&"):
+                if value.endswith("Ptr"):
+                    value = value[:-len("Ptr")] + "*"
+                value = value.replace("_const", " const")
+                value = value.replace(",_", ", ")
+                value = value.replace("Ptr>", "*>")
 
             data["fields"][field] = value
 
