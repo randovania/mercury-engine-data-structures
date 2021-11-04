@@ -6,7 +6,6 @@ import multiprocessing
 import re
 import traceback
 import typing
-from pprint import pprint
 
 import ghidra_bridge
 
@@ -85,8 +84,8 @@ def get_function_list() -> dict[str, tuple[int, int]]:
                 fields_funcs[name[:-len("::fields")]] = func_id
 
         return {
-            name: (init_funcs[name], fields_funcs[name])
-            for name in set(fields_funcs.keys()) & set(init_funcs.keys())
+            name: (init_funcs.get(name), fields_funcs[name])
+            for name in fields_funcs
         }
 
 
@@ -108,7 +107,8 @@ def initialize_worker():
     ifc.openProgram(flat_api.currentProgram)
 
 
-def decompile_type(type_name: str, init_id: int, fields_id: int) -> tuple[str, typing.Optional[str], dict[str, str]]:
+def decompile_type(type_name: str, init_id: typing.Optional[int], fields_id: int,
+                   ) -> tuple[str, typing.Optional[str], dict[str, str]]:
     if bridge is None:
         raise ValueError("Bridge not initialized")
 
@@ -120,11 +120,13 @@ def find_parent(f):
             return other.getName(True)
     """)
 
-    parent_init: typing.Optional[str] = bridge.remote_eval("""find_parent(
-        currentProgram.getFunctionManager().getFunctionAt(
-            currentProgram.getSymbolTable().getSymbol(func_id).getAddress()
-        )
-    )""", func_id=init_id)
+    parent_init: typing.Optional[str] = None
+    if init_id is not None:
+        parent_init = bridge.remote_eval("""find_parent(
+            currentProgram.getFunctionManager().getFunctionAt(
+                currentProgram.getSymbolTable().getSymbol(func_id).getAddress()
+            )
+        )""", func_id=init_id)
 
     func = bridge.remote_eval("""
         currentProgram.getFunctionManager().getFunctionAt(
@@ -142,16 +144,11 @@ def find_parent(f):
     return type_name, parent_init, fields
 
 
-def main():
-    print("Getting function list")
-    all_fields_functions = get_function_list()
-    print(f"Got {len(all_fields_functions)} functions!")
-
+def decompile_in_background(all_fields_functions: dict[str, tuple[int, int]]):
     process_count = max(multiprocessing.cpu_count() - 2, 2)
 
     finished_count = 0
     failed = []
-    max_retries = 5
 
     total_count = len(all_fields_functions)
     num_digits = math.ceil(math.log10(total_count + 1))
@@ -169,22 +166,26 @@ def main():
         result[type_name] = {"parent": parent, "fields": fields}
         report_update(f"Parsed {type_name}")
 
-    with multiprocessing.Pool(processes=process_count, initializer=initialize_worker) as pool:
-        def error_callback(name, e):
-            failed.append(name)
-            msg = "".join(traceback.format_exception(type(e), e, e.__traceback__))
-            report_update(f"Failed {name}: {msg}")
+    if total_count > process_count:
+        with multiprocessing.Pool(processes=process_count, initializer=initialize_worker) as pool:
+            def error_callback(name, e):
+                failed.append(name)
+                msg = "".join(traceback.format_exception(type(e), e, e.__traceback__))
+                report_update(f"Failed {name}: {msg}")
 
-        for n, f in all_fields_functions.items():
-            pool.apply_async(
-                func=decompile_type,
-                args=(n, *f),
-                callback=callback,
-                error_callback=functools.partial(error_callback, n),
-            )
+            for n, f in all_fields_functions.items():
+                pool.apply_async(
+                    func=decompile_type,
+                    args=(n, *f),
+                    callback=callback,
+                    error_callback=functools.partial(error_callback, n),
+                )
 
-        pool.close()
-        pool.join()
+            pool.close()
+            pool.join()
+    else:
+        print("Less tasks than CPUs, just do it single-threaded.")
+        failed.extend(all_fields_functions.keys())
 
     if failed:
         print(f"{len(failed)} function(s) failed, retrying on main thread.")
@@ -196,10 +197,32 @@ def main():
         except Exception as e:
             report_update(f"Failed {n}: {e}")
 
+    return result
+
+
+def main(only_missing: bool = True):
+    print("Getting function list")
+    all_fields_functions = get_function_list()
+    print(f"Got {len(all_fields_functions)} functions!")
+
+    try:
+        with open("all_types.json") as f:
+            final_results = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        final_results = {}
+
+    if only_missing:
+        for key in final_results.keys():
+            all_fields_functions.pop(key, None)
+
+    process_results = decompile_in_background(all_fields_functions)
+    for key in sorted(process_results.keys()):
+        final_results[key] = process_results[key]
+
     with open("all_types.json", "w") as f:
         json.dump({
-            key: result[key]
-            for key in sorted(result.keys())
+            key: final_results[key]
+            for key in sorted(final_results.keys())
         }, f, indent=4)
 
 
