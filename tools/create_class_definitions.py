@@ -236,6 +236,7 @@ def main():
     type_exporter = TypeExporter(all_types)
     type_exporter.pointer_to_type("CScenario")
     type_exporter.pointer_to_type("CSubAreaManager")
+    type_exporter.pointer_to_type("CEnvironmentManager")
 
     # needs_exporting = {"CActor"}
     # while needs_exporting:

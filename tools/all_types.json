@@ -10165,11 +10165,55 @@
             "bIsInFrustum": "bool"
         }
     },
+    "CEnvironmentData": {
+        "parent": null,
+        "fields": {
+            "sID": "base::global::CStrId",
+            "tFog": "CEnvironmentData::SFog*",
+            "tVerticalFog": "CEnvironmentData::SVerticalFog*",
+            "tFogTransitions": "base::global::CRntVector<CEnvironmentData::SFogTransition>*",
+            "tAmbient": "CEnvironmentData::SAmbient*",
+            "tAmbientTransitions": "base::global::CRntVector<CEnvironmentData::SAmbientTransition>*",
+            "tDepthTint": "CEnvironmentData::SDepthTint*",
+            "tDepthTintTransitions": "base::global::CRntVector<CEnvironmentData::SDepthTintTransition>*",
+            "tMaterialTint": "CEnvironmentData::SMaterialTint*",
+            "tMaterialTintTransitions": "base::global::CRntVector<CEnvironmentData::SMaterialTintTransition>*",
+            "tPlayerLight": "CEnvironmentData::SPlayerLight*",
+            "tPlayerLightTransitions": "base::global::CRntVector<CEnvironmentData::SPlayerLightTransition>*",
+            "tHemisphericalLight": "CEnvironmentData::SHemisphericalLight*",
+            "tHemisphericalLightTransitions": "base::global::CRntVector<CEnvironmentData::SHemisphericalLightTransition>*",
+            "tBloom": "CEnvironmentData::SBloom*",
+            "tBloomTransitions": "base::global::CRntVector<CEnvironmentData::SBloomTransition>*",
+            "tVerticalFogTransitions": "base::global::CRntVector<CEnvironmentData::SVerticalFogTransition>*",
+            "tCubeMap": "CEnvironmentData::SCubeMap*",
+            "tCubeMapTransitions": "base::global::CRntVector<CEnvironmentData::SCubeMapTransition>*",
+            "tSSAO": "CEnvironmentData::SSSAO*",
+            "tSSAOTransitions": "base::global::CRntVector<CEnvironmentData::SSSAOTransition>*",
+            "tToneMapping": "CEnvironmentData::SToneMapping*",
+            "tToneMappingTransitions": "base::global::CRntVector<CEnvironmentData::SToneMappingTransition>*",
+            "tIBLAttenuation": "CEnvironmentData::SIBLAttenuation*",
+            "tIBLAttenuationTransitions": "base::global::CRntVector<CEnvironmentData::SIBLAttenuationTransition>*"
+        }
+    },
+    "CEnvironmentData::SAmbient": {
+        "parent": null,
+        "fields": {
+            "tColor": "base::math::CVector4D",
+            "fColorInterp": "float"
+        }
+    },
     "CEnvironmentData::SAmbientTransition": {
         "parent": "STransition",
         "fields": {
             "sPreset": "base::global::CStrId",
             "fColorInterp": "float"
+        }
+    },
+    "CEnvironmentData::SBloom": {
+        "parent": null,
+        "fields": {
+            "tBloom": "base::math::CVector3D",
+            "fBloomInterp": "float"
         }
     },
     "CEnvironmentData::SBloomTransition": {
@@ -10179,6 +10223,14 @@
             "fBloomInterp": "float"
         }
     },
+    "CEnvironmentData::SCubeMap": {
+        "parent": null,
+        "fields": {
+            "fInterp": "float",
+            "bEnabled": "bool",
+            "sTexturePath": "base::global::CFilePathStrId"
+        }
+    },
     "CEnvironmentData::SCubeMapTransition": {
         "parent": "STransition",
         "fields": {
@@ -10186,11 +10238,40 @@
             "fCubeMapInterp": "float"
         }
     },
+    "CEnvironmentData::SDepthTint": {
+        "parent": null,
+        "fields": {
+            "fTintInterp": "float",
+            "fLight": "float",
+            "fCube": "float",
+            "fDepth": "float",
+            "fSaturation": "float",
+            "fLightNear": "float",
+            "fCubeNear": "float",
+            "fDepthNear": "float",
+            "fSaturationNear": "float"
+        }
+    },
     "CEnvironmentData::SDepthTintTransition": {
         "parent": "STransition",
         "fields": {
             "sPreset": "base::global::CStrId",
             "fTintInterp": "float"
+        }
+    },
+    "CEnvironmentData::SFog": {
+        "parent": null,
+        "fields": {
+            "tColor": "base::math::CVector4D",
+            "fColorInterp": "float",
+            "fScale": "float",
+            "fScaleInterp": "float",
+            "tRange": "base::math::CVector2D",
+            "fRangeInterp": "float",
+            "fWaveFreq": "float",
+            "fWaveAmp": "float",
+            "fWaveVelocity": "float",
+            "fWaveInterp": "float"
         }
     },
     "CEnvironmentData::SFogTransition": {
@@ -10203,6 +10284,15 @@
             "fWaveInterp": "float"
         }
     },
+    "CEnvironmentData::SHemisphericalLight": {
+        "parent": null,
+        "fields": {
+            "tColorUp": "base::math::CVector3D",
+            "fColorUpInterp": "float",
+            "tColorDown": "base::math::CVector3D",
+            "fColorDownInterp": "float"
+        }
+    },
     "CEnvironmentData::SHemisphericalLightTransition": {
         "parent": "STransition",
         "fields": {
@@ -10211,11 +10301,29 @@
             "fColorDownInterp": "float"
         }
     },
+    "CEnvironmentData::SIBLAttenuation": {
+        "parent": null,
+        "fields": {
+            "fInterp": "float",
+            "fCubeAttFactor": "float",
+            "fZDistance": "float",
+            "fGradientSize": "float"
+        }
+    },
     "CEnvironmentData::SIBLAttenuationTransition": {
         "parent": "STransition",
         "fields": {
             "sPreset": "base::global::CStrId",
             "fInterp": "float"
+        }
+    },
+    "CEnvironmentData::SMaterialTint": {
+        "parent": null,
+        "fields": {
+            "tColor": "base::math::CVector4D",
+            "fColorInterp": "float",
+            "fBlend": "float",
+            "fBlendInterp": "float"
         }
     },
     "CEnvironmentData::SMaterialTintTransition": {
@@ -10226,12 +10334,37 @@
             "fBlendInterp": "float"
         }
     },
+    "CEnvironmentData::SPlayerLight": {
+        "parent": null,
+        "fields": {
+            "tDiffuse": "base::math::CVector4D",
+            "tSpecular0": "base::math::CVector4D",
+            "tSpecular1": "base::math::CVector4D",
+            "fColorInterp": "float",
+            "tAttenuation": "base::math::CVector2D",
+            "fAttenuationInterp": "float"
+        }
+    },
     "CEnvironmentData::SPlayerLightTransition": {
         "parent": "STransition",
         "fields": {
             "sPreset": "base::global::CStrId",
             "fColorInterp": "float",
             "fAttenuationInterp": "float"
+        }
+    },
+    "CEnvironmentData::SSSAO": {
+        "parent": null,
+        "fields": {
+            "fFallOff": "float",
+            "fIntensity": "float",
+            "fBias": "float",
+            "fRadius": "float",
+            "fDepthFct": "float",
+            "bEnabled": "bool",
+            "fInterp": "float",
+            "fIntensityFactor": "float",
+            "fFogFactor": "float"
         }
     },
     "CEnvironmentData::SSSAOTransition": {
@@ -10241,11 +10374,45 @@
             "fInterp": "float"
         }
     },
+    "CEnvironmentData::SToneMapping": {
+        "parent": null,
+        "fields": {
+            "fInterp": "float",
+            "fExposure": "float",
+            "fGamma": "float",
+            "fSaturationColor": "float",
+            "fContrast": "float",
+            "fBrightness": "float",
+            "vColorTint": "base::math::CVector4D",
+            "fColorVibrance": "float",
+            "bEnabled": "bool"
+        }
+    },
     "CEnvironmentData::SToneMappingTransition": {
         "parent": "STransition",
         "fields": {
             "sPreset": "base::global::CStrId",
             "fInterp": "float"
+        }
+    },
+    "CEnvironmentData::SVerticalFog": {
+        "parent": null,
+        "fields": {
+            "bEnabled": "bool",
+            "tColor": "base::math::CVector4D",
+            "fColorInterp": "float",
+            "fBase": "float",
+            "fBaseInterp": "float",
+            "tAttenuation": "base::math::CVector2D",
+            "fAttInterp": "float",
+            "fNear": "float",
+            "fNearInterp": "float",
+            "fFar": "float",
+            "fFarInterp": "float",
+            "fWaveFreq": "float",
+            "fWaveAmp": "float",
+            "fWaveVelocity": "float",
+            "fWaveInterp": "float"
         }
     },
     "CEnvironmentData::SVerticalFogTransition": {
@@ -10258,6 +10425,72 @@
             "fFarInterp": "float",
             "fAttInterp": "float",
             "fWaveInterp": "float"
+        }
+    },
+    "CEnvironmentManager": {
+        "parent": null,
+        "fields": {
+            "pVisualPresets": "CEnvironmentVisualPresets*",
+            "pSoundPresets": "CEnvironmentSoundPresets*",
+            "pMusicPresets": "CEnvironmentMusicPresets*"
+        }
+    },
+    "CEnvironmentMusicData": {
+        "parent": null,
+        "fields": {
+            "sID": "base::global::CStrId",
+            "tPreset": "sound::TScenarioMusicPreset",
+            "ePlayFlag": "&DAT_7172994880",
+            "tMusicTransitions": "base::global::CRntVector<CEnvironmentMusicData::SMusicTransition>"
+        }
+    },
+    "CEnvironmentMusicData::SMusicTransition": {
+        "parent": null,
+        "fields": {
+            "sPreset": "base::global::CStrId",
+            "fFadeIn": "float",
+            "fFadeOut": "float",
+            "eFadeType": "&DAT_7172994e00",
+            "ePlayFlag": "&DAT_7172994880"
+        }
+    },
+    "CEnvironmentMusicPresets": {
+        "parent": null,
+        "fields": {
+            "dicPresets": "base::global::CRntDictionary<base::global::CStrId, CEnvironmentMusicData>",
+            "dicBossPresets": "base::global::CRntDictionary<base::global::CStrId, sound::TBossMusicPreset>"
+        }
+    },
+    "CEnvironmentSoundData": {
+        "parent": null,
+        "fields": {
+            "sID": "base::global::CStrId",
+            "sSoundID": "base::global::CFilePathStrId",
+            "tSound": "CEnvironmentSoundData::SSound",
+            "dctTransitions": "base::global::CRntDictionary<base::global::CStrId, CEnvironmentSoundData::SSound>"
+        }
+    },
+    "CEnvironmentSoundData::SSound": {
+        "parent": null,
+        "fields": {
+            "sToPreset": "base::global::CStrId",
+            "fVolume": "float",
+            "fFadeIn": "float",
+            "fFadeOut": "float",
+            "fFadeInDelay": "float",
+            "eReverb": "&base::snd::EReverbIntensity_DAT_7108b13c88"
+        }
+    },
+    "CEnvironmentSoundPresets": {
+        "parent": null,
+        "fields": {
+            "dicPresets": "base::global::CRntDictionary<base::global::CStrId, CEnvironmentSoundData>"
+        }
+    },
+    "CEnvironmentVisualPresets": {
+        "parent": null,
+        "fields": {
+            "dicPresets": "base::global::CRntDictionary<base::global::CStrId, CEnvironmentData>"
         }
     },
     "CEscapeSequenceExplosionComponent": {
@@ -16225,6 +16458,72 @@
         "parent": "sound::CSoundEventsDef::SSoundEventsSelector",
         "fields": {
             "strTargetFilter": "base::global::TRntString256"
+        }
+    },
+    "sound::SStateFadeOut": {
+        "parent": null,
+        "fields": {
+            "eState": "&DAT_7172994f60",
+            "fFadeOut": "float"
+        }
+    },
+    "sound::TBossMusicPreset": {
+        "parent": null,
+        "fields": {
+            "sBoss": "base::global::CStrId",
+            "dicSpawnGroupConfigs": "base::global::CRntDictionary<base::global::CStrId, sound::TBossMusicSpawnGroupConfig>"
+        }
+    },
+    "sound::TBossMusicSpawnGroupConfig": {
+        "parent": null,
+        "fields": {
+            "sSpawnGroup": "base::global::CStrId",
+            "dicSubStatePresets": "base::global::CRntDictionary<base::global::CStrId, sound::TBossMusicSubStateConfig>"
+        }
+    },
+    "sound::TBossMusicSubStateConfig": {
+        "parent": null,
+        "fields": {
+            "eState": "base::global::CStrId",
+            "vTracks": "base::global::CRntVector<sound::TBossMusicTrack>"
+        }
+    },
+    "sound::TBossMusicTrack": {
+        "parent": null,
+        "fields": {
+            "oTrack": "sound::TMusicTrack",
+            "vFadeOuts": "base::global::CRntVector<sound::SStateFadeOut>"
+        }
+    },
+    "sound::TMusicFile": {
+        "parent": null,
+        "fields": {
+            "sWav": "base::global::CFilePathStrId",
+            "iLoops": "int",
+            "iLoopStart": "int",
+            "iLoopEnd": "int"
+        }
+    },
+    "sound::TMusicTrack": {
+        "parent": null,
+        "fields": {
+            "iTrack": "int",
+            "vFiles": "base::global::CRntVector<sound::TMusicFile>",
+            "fFadeIn": "float",
+            "fFadeOut": "float",
+            "fDelay": "float",
+            "fVol": "float",
+            "iStartPos": "int",
+            "eCrossFade": "&DAT_7172994e00",
+            "bPauseOnPop": "bool",
+            "fEnvFactor": "float"
+        }
+    },
+    "sound::TScenarioMusicPreset": {
+        "parent": null,
+        "fields": {
+            "sAlias": "base::global::CStrId",
+            "vTracks": "base::global::CRntVector<sound::TMusicTrack>"
         }
     }
 }
