@@ -1,5 +1,7 @@
-from construct import Struct, Construct, Const, Int32ul, PrefixedArray, CString, Byte, Array, Float32l, PaddedString, \
+from construct import (
+    Struct, Construct, Const, Int32ul, PrefixedArray, CString, Byte, Array, Float32l, PaddedString,
     Int64ul
+)
 
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game

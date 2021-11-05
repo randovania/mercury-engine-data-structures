@@ -232,11 +232,13 @@ def main():
 
     all_types.pop("CBlackboard")
     all_types.pop("CGameBlackboard")
+    all_types["gameeditor::CGameModelRoot"]["fields"].pop("pSoundManager")
+    all_types["gameeditor::CGameModelRoot"]["fields"].pop("pShotManager")
+    all_types["gameeditor::CGameModelRoot"]["fields"].pop("pLightManager")
+    all_types["gameeditor::CGameModelRoot"]["fields"].pop("pMusicManager")
 
     type_exporter = TypeExporter(all_types)
-    type_exporter.pointer_to_type("CScenario")
-    type_exporter.pointer_to_type("CSubAreaManager")
-    type_exporter.pointer_to_type("CEnvironmentManager")
+    type_exporter.ensure_exported_type("gameeditor::CGameModelRoot")
 
     # needs_exporting = {"CActor"}
     # while needs_exporting:
