@@ -24,6 +24,56 @@ area_names = {
 }
 pickup_index = 0
 
+_polygon_override = {
+    ("s010_cave", "collision_camera_010"): [
+        [-1200.0, 2200.0],
+        [-5200.0, 2200.0],
+        [-5200.0, -5600.0],
+        [-4800.0, -5600.0],
+        [-3300.0, -6200.0],
+        [-1200.0, -6200.0]
+    ],
+    ("s010_cave", "collision_camera_023"): [
+        [24900.0, 5100.0], [17800.0, 5100.0], [17800.0, 3500.0], [24900.0, 3500.0]
+    ],
+    ("s010_cave", "collision_camera_048"): [
+        [800.0, 3900.0],
+        [-1200.0, 3900.0],
+        [-1200.0, 5200.0],
+        [-5200.0, 5200.0],
+        [-5200.0, 2100.0],
+        [-1000.0, 2100.0],
+        [-1000.0, 1500.0],
+        [500.0, 1500.0],
+        [800.0, 1500.0]
+    ],
+    ("s040_aqua", "collision_camera_023_B"): [
+        [4100.0, -9800.0],
+        [2000.0, -9800.0],
+        [2000.0, -12150.0],
+        [3500.0, -12150.0],
+        [3500.0, -12500.0],
+        [4100.0, -12500.0],
+    ],
+    ("s070_basesanc", "collision_camera_003"): [
+        [-4400.0, -2100.0],
+        [-10500.0, -2100.0],
+        [-10500.0, -4900.0],
+        [-8400.0, -4900.0],
+        [-8400.0, -3800.0],
+        [-6400.0, -3800.0],
+        [-4400.0, -4100.0],
+    ],
+}
+_camera_skip = {
+    ("s010_cave", "collision_camera_999"),
+    ("s040_aqua", "collision_camera_001_B"),
+    ("s050_forest", "collision_camera_024_B"),
+    ("s050_forest", "collision_camera_025"),
+    ("s050_forest", "collision_camera_025_C"),
+    ("s080_shipyard", "collision_camera_009_C"),
+}
+
 
 def decode_world(root: Path, target_level: str):
     global pickup_index
@@ -84,7 +134,7 @@ def decode_world(root: Path, target_level: str):
         "areas": []
     }
 
-    area_by_name = {}
+    area_by_name: dict[str, dict] = {}
     plt.figure(1, figsize=(20, 10))
     plt.title(target_level)
 
@@ -95,6 +145,9 @@ def decode_world(root: Path, target_level: str):
         if abs(x1) > 59999 or abs(y1) > 59999 or abs(x2) > 59999 or abs(y2) > 59999:
             continue
 
+        if (target_level, entry.name) in _camera_skip:
+            continue
+
         if entry.name not in cams:
             continue
 
@@ -102,6 +155,8 @@ def decode_world(root: Path, target_level: str):
         raw_vertices = []
         for v in entry.data.polys[0].points:
             raw_vertices.append((v.x, v.y))
+
+        raw_vertices = _polygon_override.get((target_level, entry.name), raw_vertices)
         vertices = numpy.array(raw_vertices)
         c = [0.2, 0.7, 0.6]
 
@@ -157,6 +212,12 @@ def decode_world(root: Path, target_level: str):
             va = "bottom" if is_door else "top"
             plt.annotate(actor.sName, actor.vPos[:2], fontsize='xx-small', ha='center', va=va)
             if is_door:
+                extra = {
+                    "actor_def": actor.oActorDefLink,
+                    "left_shield": actor.pComponents.LIFE.wpLeftDoorShieldEntity,
+                    "right_shield": actor.pComponents.LIFE.wpLeftDoorShieldEntity,
+                }
+
                 if len(rooms_for_actor) == 2:
                     for i, room_name in enumerate(rooms_for_actor):
                         area_by_name[room_name]["nodes"].append({
@@ -167,12 +228,29 @@ def decode_world(root: Path, target_level: str):
                                 "y": actor.vPos[1],
                                 "z": actor.vPos[2],
                             },
+                            "extra": extra,
                             "node_type": "dock",
                             "dock_index": count_docks(room_name),
                             "connected_area_asset_id": rooms_for_actor[(i + 1) % 2],
                             "connected_dock_index": count_docks(rooms_for_actor[(i + 1) % 2]),
-                            "dock_type": 0,
-                            "dock_weakness_index": 0
+                            "dock_type": 2,
+                            "dock_weakness_index": 1,
+                            "connections": {}
+                        })
+                elif len(rooms_for_actor) > 2:
+                    print("multiple rooms for door!", actor.sName, rooms_for_actor)
+                    for i, room_name in enumerate(rooms_for_actor):
+                        area_by_name[room_name]["nodes"].append({
+                            "name": f"Door ({actor.sName})",
+                            "heal": False,
+                            "coordinates": {
+                                "x": actor.vPos[0],
+                                "y": actor.vPos[1],
+                                "z": actor.vPos[2],
+                            },
+                            "extra": extra,
+                            "node_type": "generic",
+                            "connections": {}
                         })
             else:
                 for room_name in rooms_for_actor:
@@ -184,17 +262,21 @@ def decode_world(root: Path, target_level: str):
                             "y": actor.vPos[1],
                             "z": actor.vPos[2],
                         },
+                        "extra": {
+                            "actor_def": actor.oActorDefLink,
+                        },
                         "node_type": "pickup",
                         "pickup_index": pickup_index,
                         "major_location": "tank" not in actor_def,
-                        "extra": {
-                            "actor_def": actor_def,
-                        },
                         "connections": {}
                     })
                 if len(rooms_for_actor) != 1:
                     print("wrong item!", actor.sName, rooms_for_actor)
                 pickup_index += 1
+
+        # else:
+        #     plt.annotate(actor.sName, actor.vPos[:2], fontsize='xx-small', ha='center')
+        #     plt.plot(actor.vPos[0], actor.vPos[1], "o", color=item_color)
 
     handles_by_label = {
         key: value
@@ -202,10 +284,11 @@ def decode_world(root: Path, target_level: str):
     }
 
     plt.legend(handles_by_label.values(), handles_by_label.keys())
-    plt.savefig(f"{target_level}.png", dpi=200, bbox_inches='tight')
+    # plt.show()
+    # plt.savefig(f"{target_level}.png", dpi=200, bbox_inches='tight')
     plt.close()
 
-    with open(f"{target_level}.json", "w") as f:
+    with open(f"{world['name']}.json", "w") as f:
         json.dump(world, f, indent=4)
 
 
@@ -217,4 +300,4 @@ def decode_all_worlds(root: Path):
 
 if __name__ == '__main__':
     decode_all_worlds(Path("E:/DreadExtract"))
-    # decode_world(Path("E:/DreadExtract"), "s010_cave")
+    # decode_world(Path("E:/DreadExtract"), "s080_shipyard")
