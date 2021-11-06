@@ -10,3 +10,6 @@ class Brfld(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> construct.Construct:
         return BRFLD
+
+    def actors_for_layer(self, name: str) -> dict:
+        return self.raw.Root.pScenario.rEntitiesLayer.dctSublayers[name].dctActors
