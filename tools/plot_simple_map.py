@@ -1,3 +1,4 @@
+import copy
 import hashlib
 import json
 import os
@@ -73,6 +74,34 @@ _camera_skip = {
     ("s050_forest", "collision_camera_025_C"),
     ("s080_shipyard", "collision_camera_009_C"),
 }
+dock_weakness = {
+    "frame": 0,
+    "closed": 1,
+    "power": 2,
+    "charge": 3,
+    "presence": 9,
+    "grapple": 10,
+    "phase_shift": 11,
+}
+_weakness_table_for_def = {
+    'doorframe': (dock_weakness["frame"], dock_weakness["frame"]),
+    'doorchargecharge': (dock_weakness["charge"], dock_weakness["charge"]),
+    'doorclosedcharge': (dock_weakness["closed"], dock_weakness["charge"]),
+    'doorpowerpower': (dock_weakness["power"], dock_weakness["power"]),
+    'doorclosedpower': (dock_weakness["closed"], dock_weakness["power"]),
+    'doorpowerclosed': (dock_weakness["power"], dock_weakness["closed"]),
+    'doorchargeclosed': (dock_weakness["charge"], dock_weakness["closed"]),
+    'doorpresencepresence': (dock_weakness["presence"], dock_weakness["presence"]),
+    'doorpresenceframe': (dock_weakness["presence"], dock_weakness["frame"]),
+    'doorframepresence': (dock_weakness["frame"], dock_weakness["presence"]),
+    'doorgrapplegrapple': (dock_weakness["grapple"], dock_weakness["grapple"]),
+    'doorclosedgrapple': (dock_weakness["closed"], dock_weakness["grapple"]),
+    'doorgrappleclosed': (dock_weakness["grapple"], dock_weakness["closed"]),
+    'doorshutter': (dock_weakness["phase_shift"], dock_weakness["phase_shift"]),
+
+    # These doors are going to be event or whatever it is
+    'doorheat': (None, None),
+}
 
 
 def decode_world(root: Path, target_level: str):
@@ -127,7 +156,7 @@ def decode_world(root: Path, target_level: str):
 
     handles = []
     rooms = {}
-    world = {
+    world: dict[str, typing.Any] = {
         "name": area_names[brfld_path],
         "dark_name": None,
         "asset_id": brfld_path,
@@ -166,7 +195,7 @@ def decode_world(root: Path, target_level: str):
         handles.append(patch)
         rooms[entry.name] = Polygon(vertices)
         world["areas"].append({
-            "name": entry.name,
+            "name": f"{entry.name} ({area_names[brfld_path][0]})",
             "in_dark_aether": False,
             "asset_id": entry.name,
             "default_node_index": None,
@@ -189,11 +218,28 @@ def decode_world(root: Path, target_level: str):
     item_color = [0.2, 0.2, 0.8]
     actor_positions = {}
 
+    def _find_room_orientation(room_a: str, room_b: str):
+        a_bounds = area_by_name[room_a]["extra"]["total_boundings"]
+        b_bounds = area_by_name[room_b]["extra"]["total_boundings"]
+        a_cx = (a_bounds["x1"] + a_bounds["x2"]) / 2
+        b_cx = (b_bounds["x1"] + b_bounds["x2"]) / 2
+        if a_cx < b_cx:
+            return 0, 1
+        elif a_cx > b_cx:
+            return 1, 0
+        else:
+            raise ValueError(f"{room_a} and {room_b} are aligned")
+
     def count_docks(rm: str) -> int:
         return sum(
             1 for node in area_by_name[rm]["nodes"]
             if node["node_type"] == "dock"
         )
+
+    def get_def_link_for_entity(actor_ref: str) -> typing.Optional[str]:
+        a = brfld.follow_link(actor_ref)
+        if a is not None:
+            return a.oActorDefLink
 
     for actor in brfld.actors_for_layer("default").values():
         actor_def = os.path.splitext(os.path.split(actor.oActorDefLink)[1])[0]
@@ -207,51 +253,67 @@ def decode_world(root: Path, target_level: str):
             if others := [name for name, other in actor_positions.items() if p.distance(other) < 3]:
                 print(f"{actor.sName} is very close to {[other for other in others]}")
             actor_positions[actor.sName] = p
-            rooms_for_actor = [name for name, pol in rooms.items() if pol.contains(p)]
+            rooms_for_actor: list[str] = [name for name, pol in rooms.items() if pol.contains(p)]
 
             va = "bottom" if is_door else "top"
             plt.annotate(actor.sName, actor.vPos[:2], fontsize='xx-small', ha='center', va=va)
             if is_door:
                 extra = {
                     "actor_def": actor.oActorDefLink,
-                    "left_shield": actor.pComponents.LIFE.wpLeftDoorShieldEntity,
-                    "right_shield": actor.pComponents.LIFE.wpLeftDoorShieldEntity,
+                    "left_shield_entity": actor.pComponents.LIFE.wpLeftDoorShieldEntity,
+                    "left_shield_def": get_def_link_for_entity(actor.pComponents.LIFE.wpLeftDoorShieldEntity),
+                    "right_shield_entity": actor.pComponents.LIFE.wpRightDoorShieldEntity,
+                    "right_shield_def": get_def_link_for_entity(actor.pComponents.LIFE.wpRightDoorShieldEntity),
                 }
 
                 if len(rooms_for_actor) == 2:
+                    simple = {"def": actor_def,
+                              "left": extra["left_shield_def"],
+                              "right": extra["right_shield_def"]}
+
+                    left_room, right_room = _find_room_orientation(*rooms_for_actor)
+                    custom_weakness = [None, None]
+
+                    if simple["left"] == simple["right"] and simple["left"] is None:
+                        if actor_def in _weakness_table_for_def:
+                            custom_weakness[left_room], custom_weakness[right_room] = _weakness_table_for_def[actor_def]
+                        else:
+                            print(f"no weakness for {actor_def} without shields")
+
+                    door_template = {
+                        "name": f"Door ({actor.sName})",
+                        "heal": False,
+                        "coordinates": {
+                            "x": actor.vPos[0],
+                            "y": actor.vPos[1],
+                            "z": actor.vPos[2],
+                        },
+                        "extra": extra,
+                        "node_type": "dock",
+                        "dock_index": None,
+                        "connected_area_asset_id": None,
+                        "connected_dock_index": None,
+                        "dock_type": 2,
+                        "dock_weakness_index": 1,
+                        "connections": {}
+                    }
+
+                    doors = []
                     for i, room_name in enumerate(rooms_for_actor):
-                        area_by_name[room_name]["nodes"].append({
-                            "name": f"Door ({actor.sName})",
-                            "heal": False,
-                            "coordinates": {
-                                "x": actor.vPos[0],
-                                "y": actor.vPos[1],
-                                "z": actor.vPos[2],
-                            },
-                            "extra": extra,
-                            "node_type": "dock",
-                            "dock_index": count_docks(room_name),
-                            "connected_area_asset_id": rooms_for_actor[(i + 1) % 2],
-                            "connected_dock_index": count_docks(rooms_for_actor[(i + 1) % 2]),
-                            "dock_type": 2,
-                            "dock_weakness_index": 1,
-                            "connections": {}
-                        })
+                        door = copy.copy(door_template)
+                        door["dock_index"] = count_docks(room_name)
+                        door["connected_area_asset_id"] = rooms_for_actor[(i + 1) % 2]
+                        door["connected_dock_index"] = count_docks(rooms_for_actor[(i + 1) % 2])
+                        if custom_weakness[i] is not None:
+                            door["dock_type"] = 0
+                            door["dock_weakness_index"] = custom_weakness[i]
+                        doors.append(door)
+
+                    for i, room_name in enumerate(rooms_for_actor):
+                        area_by_name[room_name]["nodes"].append(doors[i])
+
                 elif len(rooms_for_actor) > 2:
                     print("multiple rooms for door!", actor.sName, rooms_for_actor)
-                    for i, room_name in enumerate(rooms_for_actor):
-                        area_by_name[room_name]["nodes"].append({
-                            "name": f"Door ({actor.sName})",
-                            "heal": False,
-                            "coordinates": {
-                                "x": actor.vPos[0],
-                                "y": actor.vPos[1],
-                                "z": actor.vPos[2],
-                            },
-                            "extra": extra,
-                            "node_type": "generic",
-                            "connections": {}
-                        })
             else:
                 for room_name in rooms_for_actor:
                     area_by_name[room_name]["nodes"].append({
@@ -283,6 +345,17 @@ def decode_world(root: Path, target_level: str):
         for key, value in sorted(handles_by_label.items(), key=lambda it: it[0])
     }
 
+    for area in world["areas"]:
+        if not area["nodes"]:
+            area["nodes"].append({
+                "name": "Placeholder",
+                "heal": False,
+                "coordinates": None,
+                "extra": {},
+                "node_type": "generic",
+                "connections": {},
+            })
+
     plt.legend(handles_by_label.values(), handles_by_label.keys())
     # plt.show()
     # plt.savefig(f"{target_level}.png", dpi=200, bbox_inches='tight')
@@ -300,4 +373,4 @@ def decode_all_worlds(root: Path):
 
 if __name__ == '__main__':
     decode_all_worlds(Path("E:/DreadExtract"))
-    # decode_world(Path("E:/DreadExtract"), "s080_shipyard")
+    # decode_world(Path("E:/DreadExtract"), "s010_cave")

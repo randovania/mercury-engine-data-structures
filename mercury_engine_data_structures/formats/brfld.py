@@ -13,3 +13,14 @@ class Brfld(BaseResource):
 
     def actors_for_layer(self, name: str) -> dict:
         return self.raw.Root.pScenario.rEntitiesLayer.dctSublayers[name].dctActors
+
+    def all_actors(self):
+        for sublayer in self.raw.Root.pScenario.rEntitiesLayer.dctSublayers.values():
+            yield from sublayer.dctActors.values()
+
+    def follow_link(self, link: str):
+        if link != '{EMPTY}':
+            result = self.raw
+            for part in link.split(":"):
+                result = result[part]
+            return result
