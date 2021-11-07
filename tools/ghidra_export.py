@@ -123,6 +123,9 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
             if offset < m.start():
                 break
 
+        if crc_string is None:
+            raise ValueError(f"Could not find the correct string for {crc_var}")
+
         if "&" in type_var:
             if "::_" in type_var:
                 type_name = type_var[type_var.find("&") + 1:type_var.find("::_")]
@@ -139,6 +142,7 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
                 type_name = type_name[:-len("()")]
             if type_name.endswith("::init"):
                 type_name = type_name[:-len("::init")]
+
         fields[crc_string] = _aliases.get(type_name, type_name)
 
     return fields
@@ -171,6 +175,9 @@ def get_value_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, va
         for offset, crc_string in reversed(crc_mapping[clean_crc_var(crc_var)]):
             if offset < m.start():
                 break
+
+        if crc_string is None:
+            raise ValueError(f"Could not find the correct string for {crc_var}")
 
         values[crc_string] = int(value_var, 0)
 
@@ -366,6 +373,7 @@ def is_container_or_ptr(name: str):
         "base::global::CRntDictionary",
         "base::global::CRntVector",
         "base::global::CWeakPtr",
+        "base::global::CSmartPtr",
         "std::unique_ptr",
     ]
     suffixes = [
@@ -406,7 +414,7 @@ def main(only_missing: bool = True, ignore_without_hash: bool = True,
             invalid = is_invalid_data(key, final_results[key])
             container = ignore_container_or_ptr and is_container_or_ptr(key)
             unknown_hash = False
-            # unknown_hash = key not in dread_data.all_name_to_property_id()
+            # unknown_hash = ignore_without_hash and key not in dread_data.all_name_to_property_id()
 
             if invalid or container or unknown_hash:
                 print(f"Removing existing type: {key}")
