@@ -265,7 +265,7 @@ def main(only_missing: bool = True):
     all_fields_functions = get_function_list()
     print(f"Got {len(all_fields_functions)} functions!")
 
-    path = Path(__file__).parent.joinpath("all_types.json")
+    path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "dread_types.json")
 
     try:
         with path.open() as f:

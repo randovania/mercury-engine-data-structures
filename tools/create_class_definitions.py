@@ -224,7 +224,7 @@ from mercury_engine_data_structures.pointer_set import PointerSet
 
 
 def main():
-    p = Path(__file__).parent.joinpath("all_types.json")
+    p = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "dread_types.json")
     output_path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "formats", "dread_types.py")
 
     with p.open() as f:
