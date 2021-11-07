@@ -1,9 +1,4 @@
 {
-    "<EXTERNAL>::std::__1::ios_base": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CAIAction": {
         "parent": "CActionInstance",
         "fields": {},
@@ -46,11 +41,16 @@
         "values": null
     },
     "CAIGotoPointNavigationState::SEntityTarget": {
-        "parent": null,
+        "parent": "CAIGotoPointNavigationState::SPointTarget",
         "fields": {},
         "values": null
     },
     "CAIGotoPointNavigationState::SPointTarget": {
+        "parent": "CAIGotoPointNavigationState::STarget",
+        "fields": {},
+        "values": null
+    },
+    "CAIGotoPointNavigationState::STarget": {
         "parent": null,
         "fields": {},
         "values": null
@@ -438,7 +438,7 @@
         "values": null
     },
     "CActivationPerceptionRuleSet": {
-        "parent": null,
+        "parent": "CPerceptionRuleSet",
         "fields": {
             "eOverridedInFrustumMode": "EInFrustumMode",
             "fInstantDetectionFrontDistance": "float",
@@ -461,11 +461,6 @@
     },
     "CActorComponent": {
         "parent": "CGameObject",
-        "fields": {},
-        "values": null
-    },
-    "CActorComponent::CCutsceneComponent::SSamusActorInfo": {
-        "parent": "CCutsceneComponent::SActorInfo",
         "fields": {},
         "values": null
     },
@@ -1400,7 +1395,7 @@
         "values": null
     },
     "CCentralUnitComponent::SStartPointInfo": {
-        "parent": "std::unique_ptr<CCentralUnitWeightedEdges>",
+        "parent": null,
         "fields": {
             "wpStartPoint": "CGameLink<CActor>",
             "wpEmmyLandmark": "CGameLink<CActor>"
@@ -4381,7 +4376,64 @@
     },
     "CCharClassEmmyMovement": {
         "parent": "CCharClassEnemyMovement",
-        "fields": {},
+        "fields": {
+            "sWalkingWallUpRelaxAnim": "base::global::CStrId",
+            "sWalkingWallUpFrontAnim": "base::global::CStrId",
+            "sWalkingWallUpBackAnim": "base::global::CStrId",
+            "sWalkingWallUpFrontInitAnim": "base::global::CStrId",
+            "sWalkingWallUpBackInitAnim": "base::global::CStrId",
+            "sWalkingWallUpFrontEndAnim": "base::global::CStrId",
+            "sWalkingWallUpBackEndAnim": "base::global::CStrId",
+            "sWalkingWallDownRelaxAnim": "base::global::CStrId",
+            "sWalkingWallDownFrontAnim": "base::global::CStrId",
+            "sWalkingWallDownBackAnim": "base::global::CStrId",
+            "sWalkingWallDownFrontInitAnim": "base::global::CStrId",
+            "sWalkingWallDownBackInitAnim": "base::global::CStrId",
+            "sWalkingWallDownFrontEndAnim": "base::global::CStrId",
+            "sWalkingWallDownBackEndAnim": "base::global::CStrId",
+            "sWalkingCeilRelaxAnim": "base::global::CStrId",
+            "sWalkingCeilFrontAnim": "base::global::CStrId",
+            "sWalkingCeilBackAnim": "base::global::CStrId",
+            "sWalkingCeilFrontInitAnim": "base::global::CStrId",
+            "sWalkingCeilBackInitAnim": "base::global::CStrId",
+            "sWalkingCeilFrontEndAnim": "base::global::CStrId",
+            "sWalkingCeilBackEndAnim": "base::global::CStrId",
+            "sWalkingPatrolRelaxAnim": "base::global::CStrId",
+            "sWalkingPatrolFrontAnim": "base::global::CStrId",
+            "sWalkingPatrolBackAnim": "base::global::CStrId",
+            "sWalkingPatrolFrontInitAnim": "base::global::CStrId",
+            "sWalkingPatrolBackInitAnim": "base::global::CStrId",
+            "sWalkingPatrolFrontEndAnim": "base::global::CStrId",
+            "sWalkingPatrolBackEndAnim": "base::global::CStrId",
+            "sWalkingWallUpPatrolRelaxAnim": "base::global::CStrId",
+            "sWalkingWallUpPatrolFrontAnim": "base::global::CStrId",
+            "sWalkingWallUpPatrolBackAnim": "base::global::CStrId",
+            "sWalkingWallUpPatrolFrontInitAnim": "base::global::CStrId",
+            "sWalkingWallUpPatrolBackInitAnim": "base::global::CStrId",
+            "sWalkingWallUpPatrolFrontEndAnim": "base::global::CStrId",
+            "sWalkingWallUpPatrolBackEndAnim": "base::global::CStrId",
+            "sWalkingWallDownPatrolRelaxAnim": "base::global::CStrId",
+            "sWalkingWallDownPatrolFrontAnim": "base::global::CStrId",
+            "sWalkingWallDownPatrolBackAnim": "base::global::CStrId",
+            "sWalkingWallDownPatrolFrontInitAnim": "base::global::CStrId",
+            "sWalkingWallDownPatrolBackInitAnim": "base::global::CStrId",
+            "sWalkingWallDownPatrolFrontEndAnim": "base::global::CStrId",
+            "sWalkingWallDownPatrolBackEndAnim": "base::global::CStrId",
+            "sWalkingCeilPatrolRelaxAnim": "base::global::CStrId",
+            "sWalkingCeilPatrolFrontAnim": "base::global::CStrId",
+            "sWalkingCeilPatrolBackAnim": "base::global::CStrId",
+            "sWalkingCeilPatrolFrontInitAnim": "base::global::CStrId",
+            "sWalkingCeilPatrolBackInitAnim": "base::global::CStrId",
+            "sWalkingCeilPatrolFrontEndAnim": "base::global::CStrId",
+            "sWalkingCeilPatrolBackEndAnim": "base::global::CStrId",
+            "sWalkingTunnelRelaxAnim": "base::global::CStrId",
+            "sWalkingTunnelFrontAnim": "base::global::CStrId",
+            "sWalkingTunnelBackAnim": "base::global::CStrId",
+            "sWalkingTunnelFrontInitAnim": "base::global::CStrId",
+            "sWalkingTunnelBackInitAnim": "base::global::CStrId",
+            "sWalkingTunnelFrontEndAnim": "base::global::CStrId",
+            "sWalkingTunnelBackEndAnim": "base::global::CStrId"
+        },
         "values": null
     },
     "CCharClassEmmyProtoAIComponent": {
@@ -7973,7 +8025,7 @@
         "parent": "base::global::timeline::CTrack",
         "fields": {
             "bX": "bool",
-            "s_m_bY_71015a98a9 + 2": "bool"
+            "bY": "bool"
         },
         "values": null
     },
@@ -11327,6 +11379,11 @@
         },
         "values": null
     },
+    "CCutsceneComponent::SSamusActorInfo": {
+        "parent": "CCutsceneComponent::SActorInfo",
+        "fields": {},
+        "values": null
+    },
     "CCutsceneTriggerComponent": {
         "parent": "CBaseTriggerComponent",
         "fields": {
@@ -12281,7 +12338,7 @@
         "values": null
     },
     "CEnvironmentManager": {
-        "parent": "base::global::CStrId",
+        "parent": null,
         "fields": {
             "pVisualPresets": "CEnvironmentVisualPresets*",
             "pSoundPresets": "CEnvironmentSoundPresets*",
@@ -12464,6 +12521,15 @@
             "null": 2147483647
         }
     },
+    "CExtendDetectionPerceptionRuleSet": {
+        "parent": "CPerceptionRuleSet",
+        "fields": {
+            "eOverridedInFrustumMode": "EInFrustumMode",
+            "fInstantDetectionFrontDistance": "float",
+            "fInstantDetectionBackDistance": "float"
+        },
+        "values": null
+    },
     "CFXComponent": {
         "parent": "CSceneComponent",
         "fields": {
@@ -12637,7 +12703,7 @@
         "values": null
     },
     "CFreezeRoomCoolConfig": {
-        "parent": "int",
+        "parent": null,
         "fields": {
             "fActivationDelayTime": "float",
             "fDamagePerTime": "float",
@@ -13024,7 +13090,7 @@
         "values": null
     },
     "CHeatRoomCoolConfig": {
-        "parent": "int",
+        "parent": null,
         "fields": {
             "fActivationDelayTime": "float",
             "fDamagePerTime": "float",
@@ -13419,7 +13485,7 @@
         "values": null
     },
     "CLavaPoolConfig": {
-        "parent": "CCharClassLavaPoolComponent",
+        "parent": null,
         "fields": {
             "fDamagePerTime": "float",
             "fInBetweenDamageTime": "float",
@@ -14045,7 +14111,70 @@
     },
     "CMinimapManager::CTunableMinimapManager": {
         "parent": "base::tunable::CTunable",
-        "fields": {},
+        "fields": {
+            "vOccluderColor": "base::math::CVector3D",
+            "vDefaultBorderColor": "base::math::CVector3D",
+            "vUnexploredBorderColor": "base::math::CVector3D",
+            "vNormalRoomColor": "base::math::CVector3D",
+            "vSpecialRoomColor": "base::math::CVector3D",
+            "vTransportRoomColor": "base::math::CVector3D",
+            "vDefaultColor": "base::math::CVector3D",
+            "vCooldownColor": "base::math::CVector3D",
+            "vCameraLimitsColor": "base::math::CVector3D",
+            "vHighlightColor": "base::math::CVector3D",
+            "vHighlightUnlockedColor": "base::math::CVector3D",
+            "vEmmyColor": "base::math::CVector3D",
+            "vEmmyDeadColor": "base::math::CVector3D",
+            "vEmmyZoneClosedColor": "base::math::CVector3D",
+            "vHeatColor": "base::math::CVector3D",
+            "vCooldownHeatColor": "base::math::CVector3D",
+            "vWaterColor": "base::math::CVector3D",
+            "vColdColor": "base::math::CVector3D",
+            "vLavaColor": "base::math::CVector3D",
+            "vDoorColor": "base::math::CVector3D",
+            "vBossColor": "base::math::CVector3D",
+            "vMagnetSurfaceColor": "base::math::CVector3D",
+            "vTileColorPowerbeam": "base::math::CVector3D",
+            "vTileColorBomb": "base::math::CVector3D",
+            "vTileColorMissile": "base::math::CVector3D",
+            "vTileColorSupermissile": "base::math::CVector3D",
+            "vTileColorPowerbomb": "base::math::CVector3D",
+            "vTileColorScrewattack": "base::math::CVector3D",
+            "vTileColorWeight": "base::math::CVector3D",
+            "vTileColorSpeedboost": "base::math::CVector3D",
+            "vMarkerColorA": "base::math::CVector3D",
+            "vMarkerColorB": "base::math::CVector3D",
+            "vMarkerColorC": "base::math::CVector3D",
+            "vMarkerColorD": "base::math::CVector3D",
+            "vMarkerColorE": "base::math::CVector3D",
+            "vColorRED": "base::math::CVector3D",
+            "vColorPURPLE": "base::math::CVector3D",
+            "vColorYELLOW": "base::math::CVector3D",
+            "vColorGREEN": "base::math::CVector3D",
+            "vColorDARKBLUE": "base::math::CVector3D",
+            "vColorBLUE": "base::math::CVector3D",
+            "vColorORANGE": "base::math::CVector3D",
+            "vColorPINK": "base::math::CVector3D",
+            "vCaveColor": "base::math::CVector3D",
+            "vMagmaColor": "base::math::CVector3D",
+            "vLabColor": "base::math::CVector3D",
+            "vAquaColor": "base::math::CVector3D",
+            "vForestColor": "base::math::CVector3D",
+            "vQuarantineColor": "base::math::CVector3D",
+            "vSanctuaryColor": "base::math::CVector3D",
+            "vShipyardColor": "base::math::CVector3D",
+            "vSkyColor": "base::math::CVector3D",
+            "fMinimapViewAlpha": "float",
+            "fMinimapViewZoom": "float",
+            "fAreaMapSnapVelMult": "float",
+            "fAreaMapMoveVel": "float",
+            "fAreaMapFastMoveVel": "float",
+            "fAreaMapZoomMin": "float",
+            "fAreaMapZoomMax": "float",
+            "fAreaMapZoomDefault": "float",
+            "fAreaMapZoomVel": "float",
+            "bAutoFadeEnabled": "bool"
+        },
         "values": null
     },
     "CMinimapManager::SAreaIconInfo": {
@@ -14424,24 +14553,6 @@
         },
         "values": null
     },
-    "CPerceptionRuleSet::CExtendDetectionPerceptionRuleSet": {
-        "parent": null,
-        "fields": {
-            "eOverridedInFrustumMode": "EInFrustumMode",
-            "fInstantDetectionFrontDistance": "float",
-            "fInstantDetectionBackDistance": "float"
-        },
-        "values": null
-    },
-    "CPerceptionRuleSet::CStartDetectionPerceptionRuleSet": {
-        "parent": null,
-        "fields": {
-            "eOverridedInFrustumMode": "EInFrustumMode",
-            "fInstantDetectionFrontDistance": "float",
-            "fInstantDetectionBackDistance": "float"
-        },
-        "values": null
-    },
     "CPersistenceComponent": {
         "parent": "CComponent",
         "fields": {},
@@ -14621,7 +14732,7 @@
         "fields": {
             "sName": "base::global::CStrId",
             "sLevelID": "base::global::CStrId",
-            "aCheckpointDefs": "base::global::CRntVector<_std::unique_ptr<CPlaythroughDef::SCheckpointDef>_>"
+            "aCheckpointDefs": "base::global::CRntVector< std::unique_ptr<CPlaythroughDef::SCheckpointDef> >"
         },
         "values": null
     },
@@ -16018,6 +16129,15 @@
         },
         "values": null
     },
+    "CStartDetectionPerceptionRuleSet": {
+        "parent": "CPerceptionRuleSet",
+        "fields": {
+            "eOverridedInFrustumMode": "EInFrustumMode",
+            "fInstantDetectionFrontDistance": "float",
+            "fInstantDetectionBackDistance": "float"
+        },
+        "values": null
+    },
     "CStartPointComponent": {
         "parent": "CComponent",
         "fields": {
@@ -16070,7 +16190,10 @@
     },
     "CSubAreaManager": {
         "parent": null,
-        "fields": {},
+        "fields": {
+            "vSubareaSetups": "base::global::CRntVector<std::unique_ptr<CSubareaSetup>>const*",
+            "vCharclassGroups": "base::global::CRntVector<std::unique_ptr<CSubareaCharclassGroup>>const*"
+        },
         "values": null
     },
     "CSubAreaManager::CTunableSubAreaManager": {
@@ -17189,7 +17312,7 @@
         "values": null
     },
     "GUI::CDisplayObjectTrackBool": {
-        "parent": null,
+        "parent": "GUI::IDisplayObjectTrack",
         "fields": {
             "aKeys": "base::global::CRntVector<GUI::CDisplayObjectTrack<bool>::SKey>",
             "sPropertyID": "base::global::CRntString",
@@ -17206,7 +17329,7 @@
         "values": null
     },
     "GUI::CDisplayObjectTrackFloat": {
-        "parent": null,
+        "parent": "GUI::IDisplayObjectTrack",
         "fields": {
             "aKeys": "base::global::CRntVector<GUI::CDisplayObjectTrack<float>::SKey>",
             "sPropertyID": "base::global::CRntString",
@@ -17223,7 +17346,7 @@
         "values": null
     },
     "GUI::CDisplayObjectTrackString": {
-        "parent": null,
+        "parent": "GUI::IDisplayObjectTrack",
         "fields": {
             "aKeys": "base::global::CRntVector<GUI::CDisplayObjectTrack<base::global::CRntString>::SKey>",
             "sPropertyID": "base::global::CRntString",
@@ -17871,7 +17994,7 @@
         }
     },
     "SFXInstanceData": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<SFXInstanceData,_false>>::TElementConstIterator",
+        "parent": null,
         "fields": {
             "sFXPath": "base::global::CFilePathStrId",
             "v3Position": "base::math::CVector3D",
@@ -17881,7 +18004,7 @@
         "values": null
     },
     "SFallBackPath": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<SFallBackPath>>::TKeyElementConstIterator",
+        "parent": null,
         "fields": {
             "wpPath": "CGameLink<CActor>",
             "ePathType": "IPath::EType"
@@ -18287,7 +18410,22 @@
         "fields": {},
         "values": null
     },
+    "base::color::CColor3F": {
+        "parent": null,
+        "fields": {},
+        "values": null
+    },
+    "base::color::CColor4B": {
+        "parent": null,
+        "fields": {},
+        "values": null
+    },
     "base::color::CColor4B_SRGB": {
+        "parent": null,
+        "fields": {},
+        "values": null
+    },
+    "base::color::CColor4F": {
         "parent": null,
         "fields": {},
         "values": null
@@ -18314,9 +18452,9 @@
         "values": null
     },
     "base::core::CAssetLink": {
-        "parent": "base::global::CStrId",
+        "parent": null,
         "fields": {
-            "assetID": "AssetID"
+            "assetID": "base::core::AssetID"
         },
         "values": null
     },
@@ -18528,8 +18666,28 @@
         "fields": {},
         "values": null
     },
+    "base::reflection::CEnumConstRef": {
+        "parent": null,
+        "fields": {},
+        "values": null
+    },
+    "base::reflection::CEnumRef": {
+        "parent": null,
+        "fields": {},
+        "values": null
+    },
     "base::reflection::CEnumType": {
         "parent": "base::reflection::CType",
+        "fields": {},
+        "values": null
+    },
+    "base::reflection::CFlagsetConstRef": {
+        "parent": null,
+        "fields": {},
+        "values": null
+    },
+    "base::reflection::CFlagsetRef": {
+        "parent": null,
         "fields": {},
         "values": null
     },
@@ -18660,7 +18818,7 @@
         }
     },
     "base::spatial::CAABox": {
-        "parent": "base::global::CStrId",
+        "parent": null,
         "fields": {
             "Min": "base::math::CVector3D",
             "Max": "base::math::CVector3D"
@@ -20029,6 +20187,11 @@
             "null": 2
         }
     },
+    "double": {
+        "parent": null,
+        "fields": {},
+        "values": null
+    },
     "engine::render::anim::CSkeletalAnimTree": {
         "parent": "base::animation::ISkeletonTransformer",
         "fields": {},
@@ -20086,7 +20249,7 @@
     "game::logic::collision::CBroadphaseObject": {
         "parent": "CGameObject",
         "fields": {
-            "sId": "unsigned_long",
+            "sId": "unsigned_int",
             "sStrId": "base::global::CStrId"
         },
         "values": null
@@ -20203,6 +20366,21 @@
         "values": null
     },
     "int": {
+        "parent": null,
+        "fields": {},
+        "values": null
+    },
+    "long": {
+        "parent": null,
+        "fields": {},
+        "values": null
+    },
+    "luaDisplayObject": {
+        "parent": null,
+        "fields": {},
+        "values": null
+    },
+    "luaGameObject": {
         "parent": null,
         "fields": {},
         "values": null
@@ -20801,21 +20979,6 @@
             "sAlias": "base::global::CStrId",
             "vTracks": "base::global::CRntVector<sound::TMusicTrack>"
         },
-        "values": null
-    },
-    "std::__1::ios_base": {
-        "parent": "<EXTERNAL>::std::__1::ios_base",
-        "fields": {},
-        "values": null
-    },
-    "unsigned": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "unsigned::short": {
-        "parent": null,
-        "fields": {},
         "values": null
     }
 }
