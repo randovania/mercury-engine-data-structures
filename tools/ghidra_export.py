@@ -368,6 +368,11 @@ def is_container_or_ptr(name: str):
     ]
     suffixes = [
         "Ptr",
+        "::value_type",
+        "::TKeyElementIterator",
+        "::TKeyElementConstIterator",
+        "::TElementIterator",
+        "::TElementConstIterator",
     ]
 
     return any(name.endswith(suffix) for suffix in suffixes) or any(name.startswith(prefix) for prefix in prefixes)
@@ -400,6 +405,7 @@ def main(only_missing: bool = True, ignore_without_hash: bool = True,
             # unknown_hash = key not in dread_data.all_name_to_property_id()
 
             if invalid or container or unknown_hash:
+                print(f"Removing existing type: {key}")
                 final_results.pop(key)
 
     if only_missing:
