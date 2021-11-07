@@ -10,6 +10,8 @@ from pathlib import Path
 
 import ghidra_bridge
 
+from mercury_engine_data_structures import dread_data
+
 hash_str = "HashString"
 register_field = "RegisterField"
 add_enum_value = "(?:FUN_71000148b8|AddEnumValue)"
@@ -84,6 +86,15 @@ def clean_crc_var(crc_var: str) -> str:
     return crc_var
 
 
+def fix_alternative_ghidra_name(name: str) -> str:
+    if name.endswith("Ptr"):
+        name = name[:-len("Ptr")] + "*"
+    name = name.replace("_const", " const")
+    name = name.replace(",_", ", ")
+    name = name.replace("Ptr>", "*>")
+    return name
+
+
 def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fields_function):
     if fields_function is None:
         return {}
@@ -114,7 +125,7 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
 
         if "&" in type_var:
             if "::_" in type_var:
-                type_name = type_var[type_var.find("&")+1:type_var.find("::_")]
+                type_name = type_var[type_var.find("&") + 1:type_var.find("::_")]
             else:
                 type_name = type_var
         else:
@@ -131,6 +142,7 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
         fields[crc_string] = _aliases.get(type_name, type_name)
 
     return fields
+
 
 def get_value_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, values_function):
     if values_function is None:
@@ -159,10 +171,11 @@ def get_value_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, va
         for offset, crc_string in reversed(crc_mapping[clean_crc_var(crc_var)]):
             if offset < m.start():
                 break
-        
+
         values[crc_string] = int(value_var, 0)
 
     return values
+
 
 def get_function_list() -> dict[str, tuple[int, int, int]]:
     with ghidra_bridge.GhidraBridge() as init_bridge:
@@ -181,12 +194,22 @@ def get_function_list() -> dict[str, tuple[int, int, int]]:
             (f.getName(True), f.getID()) for f in currentProgram.getSymbolTable().getSymbols("values")
         ]
         """)
+
+        print("Found {} init, {} fields and {} values".format(
+            len(result_init),
+            len(result_fields),
+            len(result_values),
+        ))
+
         init_funcs = {}
         fields_funcs = {}
         values_funcs = {}
-        for name, func_id in result_fields+result_init+result_values:
+        for name, func_id in result_fields + result_init + result_values:
             if name.startswith("Reflection::"):
                 name = name[len("Reflection::"):]
+
+            if name.startswith("base::reflection::CollectionTypeMapper"):
+                continue
 
             if name.endswith("::init"):
                 init_funcs[name[:-len("::init")]] = func_id
@@ -197,7 +220,7 @@ def get_function_list() -> dict[str, tuple[int, int, int]]:
 
         return {
             name: (init_funcs.get(name), fields_funcs.get(name), values_funcs.get(name))
-            for name in fields_funcs.keys() | init_funcs.keys()
+            for name in fields_funcs.keys() | init_funcs.keys() | values_funcs.keys()
         }
 
 
@@ -222,7 +245,8 @@ def initialize_worker():
     ifc.openProgram(flat_api.currentProgram)
 
 
-def decompile_type(type_name: str, init_id: typing.Optional[int], fields_id: typing.Optional[int], values_id: typing.Optional[int]
+def decompile_type(type_name: str, init_id: typing.Optional[int], fields_id: typing.Optional[int],
+                   values_id: typing.Optional[int]
                    ) -> tuple[str, typing.Optional[str], dict[str, str], dict[str, int]]:
     if bridge is None:
         raise ValueError("Bridge not initialized")
@@ -266,7 +290,6 @@ def find_parent(f):
         if parent_init.startswith("Reflection::"):
             parent_init = parent_init[len("Reflection::"):]
         parent_init = parent_init[:-len("::init")]
-    
 
     return type_name, parent_init, fields, values
 
@@ -327,7 +350,31 @@ def decompile_in_background(all_fields_functions: dict[str, tuple[int, int]]):
     return result
 
 
-def main(only_missing: bool = True):
+def is_invalid_data(name: str, data: dict[str, typing.Any]):
+    # if "null" in data["fields"]:
+    #     return True
+    #
+    # if data["values"] is not None and "null" in data["values"]:
+    #     return True
+
+    return False
+
+
+def is_container_or_ptr(name: str):
+    prefixes = [
+        "base::global::CRntSmallDictionary",
+        "base::global::CRntDictionary",
+        "base::global::CRntVector",
+    ]
+    suffixes = [
+        "Ptr",
+    ]
+
+    return any(name.endswith(suffix) for suffix in suffixes) or any(name.startswith(prefix) for prefix in prefixes)
+
+
+def main(only_missing: bool = True, ignore_without_hash: bool = True,
+         ignore_existing_invalid_fields: bool = True, ignore_container_or_ptr: bool = True):
     print("Getting function list")
     all_fields_functions = get_function_list()
     print(f"Got {len(all_fields_functions)} functions!")
@@ -340,9 +387,37 @@ def main(only_missing: bool = True):
     except (FileNotFoundError, json.JSONDecodeError):
         final_results = {}
 
+    if ignore_container_or_ptr:
+        for key in list(all_fields_functions.keys()):
+            if is_container_or_ptr(key):
+                all_fields_functions.pop(key)
+
+    if ignore_existing_invalid_fields:
+        for key in list(final_results.keys()):
+            invalid = is_invalid_data(key, final_results[key])
+            container = ignore_container_or_ptr and is_container_or_ptr(key)
+            unknown_hash = False
+            # unknown_hash = key not in dread_data.all_name_to_property_id()
+
+            if invalid or container or unknown_hash:
+                final_results.pop(key)
+
     if only_missing:
         for key in final_results.keys():
             all_fields_functions.pop(key, None)
+
+    if ignore_without_hash:
+        # for key in list(final_results.keys()):
+        #     if key not in dread_data.all_name_to_property_id():
+        #         print(f"Removing {key}: no known hash")
+        #         final_results.pop(key)
+
+        for key in list(all_fields_functions.keys()):
+            if key not in dread_data.all_name_to_property_id():
+                # print(f"Skipping {key}: no known hash - {all_fields_functions[key]}")
+                all_fields_functions.pop(key)
+
+    all_fields_functions = {}
 
     process_results = decompile_in_background(all_fields_functions)
     for key in sorted(process_results.keys()):
@@ -355,13 +430,15 @@ def main(only_missing: bool = True):
                 value = _aliases[value]
 
             if not value.startswith("&"):
-                if value.endswith("Ptr"):
-                    value = value[:-len("Ptr")] + "*"
-                value = value.replace("_const", " const")
-                value = value.replace(",_", ", ")
-                value = value.replace("Ptr>", "*>")
+                value = fix_alternative_ghidra_name(value)
 
             data["fields"][field] = value
+
+    for key in list(final_results.keys()):
+        # Something causes a type to inherit from a pointer to itself, that's wrong
+        if final_results[key]["parent"] in (f"{key}Ptr", key):
+            print(f'Removing parent for {key}: {final_results[key]["parent"]}')
+            final_results[key]["parent"] = None
 
     with path.open("w") as f:
         json.dump({
@@ -374,7 +451,7 @@ def simple_decompile():
     all_fields_functions = get_function_list()
     initialize_worker()
 
-    func_name = "CComponent"
+    func_name = "EBreakableTileType"
     print(decompile_type(func_name, *all_fields_functions[func_name]))
 
     # print(decompile_function(*all_fields_functions[4]))

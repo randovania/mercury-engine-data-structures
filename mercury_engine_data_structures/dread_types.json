@@ -30,7 +30,7 @@
         "values": null
     },
     "CAIGotoPointNavigationState::SEntityTarget": {
-        "parent": "CAIGotoPointNavigationState::SEntityTarget",
+        "parent": null,
         "fields": {},
         "values": null
     },
@@ -283,11 +283,6 @@
             "fTime": "float",
             "bBreakable": "bool"
         },
-        "values": null
-    },
-    "CAcidBlobsLaunchPatternPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CAction": {
@@ -965,11 +960,6 @@
         },
         "values": null
     },
-    "CActorComponentPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CActorDef": {
         "parent": "base::core::CDefinition",
         "fields": {},
@@ -983,37 +973,12 @@
         },
         "values": null
     },
-    "CActorLayerPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CActorLayer_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CActorPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CActorSublayer": {
         "parent": null,
         "fields": {
             "sName": "base::global::CStrId",
             "dctActors": "base::global::CRntDictionary<base::global::CStrId, CActor*>"
         },
-        "values": null
-    },
-    "CActorSublayerPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CActorSublayer_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CAfterElementDeserializationWrapper": {
@@ -1176,11 +1141,6 @@
         },
         "values": null
     },
-    "CAttackPresetPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CAudioComponent": {
         "parent": "CComponent",
         "fields": {},
@@ -1291,11 +1251,6 @@
         },
         "values": null
     },
-    "CBarelyFrozenIceInfoPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CBaseBigFistAIComponent": {
         "parent": "CBossAIComponent",
         "fields": {},
@@ -1311,11 +1266,6 @@
         "fields": {
             "oLinkIndex": "gameeditor::CGameModelIndex"
         },
-        "values": null
-    },
-    "CBaseGameLinkPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CBaseGroundShockerAIComponent": {
@@ -1752,18 +1702,8 @@
         },
         "values": null
     },
-    "CBlackboard::CSectionPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CBlackboard::TSectionContainer": {
         "parent": "CBlackboard::CSectionPtr",
-        "fields": {},
-        "values": null
-    },
-    "CBlackboard::TSectionContainerPtr": {
-        "parent": null,
         "fields": {},
         "values": null
     },
@@ -1944,11 +1884,6 @@
         },
         "values": null
     },
-    "CBouncingCreaturesLaunchPatternPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CBreakableHintComponent": {
         "parent": "CLogicShapeComponent",
         "fields": {},
@@ -2030,16 +1965,6 @@
         },
         "values": null
     },
-    "CBreakableTileManager::STileGroupGroupPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CBreakableTileManagerPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CBreakableVignetteComponent": {
         "parent": "CLogicShapeComponent",
         "fields": {},
@@ -2062,16 +1987,6 @@
             "fDefaultFar": "float",
             "bIgnoreSlomo": "bool"
         },
-        "values": null
-    },
-    "CCameraComponentPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CCameraComponent_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CCameraCtrl": {
@@ -2133,11 +2048,6 @@
             "fEmmyDistanceZoomWalkDisableAutoFocusEmmyExtraDistance": "float",
             "fEmmyDistanceZoomWalkAutoFocusDistCamZ": "float"
         },
-        "values": null
-    },
-    "CCameraCtrlPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CCameraFX": {
@@ -2328,11 +2238,6 @@
             "fFactorToAdd": "float",
             "fFactorToMultiply": "float"
         },
-        "values": null
-    },
-    "CCentralUnitWeightedEdgesPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CChainReactionActionSwitcherComponent": {
@@ -12461,11 +12366,6 @@
         },
         "values": null
     },
-    "CChozoRobotSoldierCannonShotPatternPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CChozoRobotSoldierDashSlashAttack": {
         "parent": "CAttack",
         "fields": {},
@@ -12622,11 +12522,6 @@
         "fields": {},
         "values": null
     },
-    "CComponentPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CConstantMovement": {
         "parent": "CCharacterMovement",
         "fields": {},
@@ -12673,11 +12568,6 @@
         },
         "values": null
     },
-    "CCooldownXBossFireWallDefPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CCooldownXBossLaserBiteAttack": {
         "parent": "CCooldownXBossAttack",
         "fields": {},
@@ -12699,11 +12589,6 @@
         },
         "values": null
     },
-    "CCooldownXBossLavaCarpetDefPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CCooldownXBossLavaDropsAttack": {
         "parent": "CCooldownXBossAttack",
         "fields": {},
@@ -12718,11 +12603,6 @@
             "eRightDownArmPos": "ELavaDropArmPos",
             "tActions": "base::global::CRntVector<CCooldownXBossLavaDropsMovementDef>"
         },
-        "values": null
-    },
-    "CCooldownXBossLavaDropsDefPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CCooldownXBossLavaDropsMovementDef": {
@@ -12870,16 +12750,6 @@
         "values": null
     },
     "CCutsceneComponent::SActorInfo": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CCutsceneComponent::SActorInfoPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CCutscenePtr": {
         "parent": null,
         "fields": {},
         "values": null
@@ -13270,11 +13140,6 @@
         },
         "values": null
     },
-    "CEmmyAutoForbiddenEdgesDefPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEmmyAutoGlobalSmartLinkDef": {
         "parent": null,
         "fields": {
@@ -13284,22 +13149,12 @@
         },
         "values": null
     },
-    "CEmmyAutoGlobalSmartLinkDefPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEmmyCaveAIComponent": {
         "parent": "CEmmyAIComponent",
         "fields": {},
         "values": null
     },
     "CEmmyConfiguration": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CEmmyConfigurationPtr": {
         "parent": null,
         "fields": {},
         "values": null
@@ -13340,11 +13195,6 @@
             "wpLandmark": "CGameLink<CActor>",
             "wpLogicShape": "CGameLink<CActor>"
         },
-        "values": null
-    },
-    "CEmmyOverrideDeathPositionDefPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CEmmyProtoAIComponent": {
@@ -13449,11 +13299,6 @@
         },
         "values": null
     },
-    "CEnemyPresetPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnhanceWeakSpotComponent": {
         "parent": "CComponent",
         "fields": {},
@@ -13461,11 +13306,6 @@
     },
     "CEntity": {
         "parent": "CActor",
-        "fields": {},
-        "values": null
-    },
-    "CEntityPtr": {
-        "parent": null,
         "fields": {},
         "values": null
     },
@@ -13508,22 +13348,12 @@
         },
         "values": null
     },
-    "CEnvironmentData::SAmbientPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentData::SAmbientTransition": {
         "parent": "STransition",
         "fields": {
             "sPreset": "base::global::CStrId",
             "fColorInterp": "float"
         },
-        "values": null
-    },
-    "CEnvironmentData::SAmbient_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CEnvironmentData::SBloom": {
@@ -13534,22 +13364,12 @@
         },
         "values": null
     },
-    "CEnvironmentData::SBloomPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentData::SBloomTransition": {
         "parent": "STransition",
         "fields": {
             "sPreset": "base::global::CStrId",
             "fBloomInterp": "float"
         },
-        "values": null
-    },
-    "CEnvironmentData::SBloom_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CEnvironmentData::SCubeMap": {
@@ -13561,22 +13381,12 @@
         },
         "values": null
     },
-    "CEnvironmentData::SCubeMapPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentData::SCubeMapTransition": {
         "parent": "STransition",
         "fields": {
             "sPreset": "base::global::CStrId",
             "fCubeMapInterp": "float"
         },
-        "values": null
-    },
-    "CEnvironmentData::SCubeMap_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CEnvironmentData::SDepthTint": {
@@ -13594,22 +13404,12 @@
         },
         "values": null
     },
-    "CEnvironmentData::SDepthTintPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentData::SDepthTintTransition": {
         "parent": "STransition",
         "fields": {
             "sPreset": "base::global::CStrId",
             "fTintInterp": "float"
         },
-        "values": null
-    },
-    "CEnvironmentData::SDepthTint_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CEnvironmentData::SFog": {
@@ -13628,11 +13428,6 @@
         },
         "values": null
     },
-    "CEnvironmentData::SFogPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentData::SFogTransition": {
         "parent": "STransition",
         "fields": {
@@ -13642,11 +13437,6 @@
             "fRangeInterp": "float",
             "fWaveInterp": "float"
         },
-        "values": null
-    },
-    "CEnvironmentData::SFog_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CEnvironmentData::SHemisphericalLight": {
@@ -13659,11 +13449,6 @@
         },
         "values": null
     },
-    "CEnvironmentData::SHemisphericalLightPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentData::SHemisphericalLightTransition": {
         "parent": "STransition",
         "fields": {
@@ -13671,11 +13456,6 @@
             "fColorUpInterp": "float",
             "fColorDownInterp": "float"
         },
-        "values": null
-    },
-    "CEnvironmentData::SHemisphericalLight_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CEnvironmentData::SIBLAttenuation": {
@@ -13688,22 +13468,12 @@
         },
         "values": null
     },
-    "CEnvironmentData::SIBLAttenuationPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentData::SIBLAttenuationTransition": {
         "parent": "STransition",
         "fields": {
             "sPreset": "base::global::CStrId",
             "fInterp": "float"
         },
-        "values": null
-    },
-    "CEnvironmentData::SIBLAttenuation_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CEnvironmentData::SMaterialTint": {
@@ -13716,11 +13486,6 @@
         },
         "values": null
     },
-    "CEnvironmentData::SMaterialTintPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentData::SMaterialTintTransition": {
         "parent": "STransition",
         "fields": {
@@ -13728,11 +13493,6 @@
             "fColorInterp": "float",
             "fBlendInterp": "float"
         },
-        "values": null
-    },
-    "CEnvironmentData::SMaterialTint_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CEnvironmentData::SPlayerLight": {
@@ -13747,11 +13507,6 @@
         },
         "values": null
     },
-    "CEnvironmentData::SPlayerLightPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentData::SPlayerLightTransition": {
         "parent": "STransition",
         "fields": {
@@ -13759,11 +13514,6 @@
             "fColorInterp": "float",
             "fAttenuationInterp": "float"
         },
-        "values": null
-    },
-    "CEnvironmentData::SPlayerLight_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CEnvironmentData::SSSAO": {
@@ -13781,22 +13531,12 @@
         },
         "values": null
     },
-    "CEnvironmentData::SSSAOPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentData::SSSAOTransition": {
         "parent": "STransition",
         "fields": {
             "sPreset": "base::global::CStrId",
             "fInterp": "float"
         },
-        "values": null
-    },
-    "CEnvironmentData::SSSAO_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CEnvironmentData::SToneMapping": {
@@ -13814,22 +13554,12 @@
         },
         "values": null
     },
-    "CEnvironmentData::SToneMappingPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentData::SToneMappingTransition": {
         "parent": "STransition",
         "fields": {
             "sPreset": "base::global::CStrId",
             "fInterp": "float"
         },
-        "values": null
-    },
-    "CEnvironmentData::SToneMapping_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CEnvironmentData::SVerticalFog": {
@@ -13853,11 +13583,6 @@
         },
         "values": null
     },
-    "CEnvironmentData::SVerticalFogPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentData::SVerticalFogTransition": {
         "parent": "STransition",
         "fields": {
@@ -13871,21 +13596,6 @@
         },
         "values": null
     },
-    "CEnvironmentData::SVerticalFog_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CEnvironmentDataPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CEnvironmentData_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentManager": {
         "parent": "base::global::CStrId",
         "fields": {
@@ -13893,11 +13603,6 @@
             "pSoundPresets": "CEnvironmentSoundPresets*",
             "pMusicPresets": "CEnvironmentMusicPresets*"
         },
-        "values": null
-    },
-    "CEnvironmentManagerPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CEnvironmentMusicData": {
@@ -13921,42 +13626,12 @@
         },
         "values": null
     },
-    "CEnvironmentMusicData::SMusicTransitionPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CEnvironmentMusicData::SMusicTransition_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CEnvironmentMusicDataPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CEnvironmentMusicData_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentMusicPresets": {
-        "parent": "CEnvironmentMusicPresetsPtr",
+        "parent": null,
         "fields": {
             "dicPresets": "base::global::CRntDictionary<base::global::CStrId, CEnvironmentMusicData>",
             "dicBossPresets": "base::global::CRntDictionary<base::global::CStrId, sound::TBossMusicPreset>"
         },
-        "values": null
-    },
-    "CEnvironmentMusicPresetsPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CEnvironmentMusicPresets_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CEnvironmentSoundData": {
@@ -13981,21 +13656,6 @@
         },
         "values": null
     },
-    "CEnvironmentSoundData::SSoundPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CEnvironmentSoundData::SSound_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CEnvironmentSoundDataPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentSoundPresets": {
         "parent": null,
         "fields": {
@@ -14003,31 +13663,11 @@
         },
         "values": null
     },
-    "CEnvironmentSoundPresetsPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CEnvironmentSoundPresets_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CEnvironmentVisualPresets": {
-        "parent": "CEnvironmentVisualPresetsPtr",
+        "parent": null,
         "fields": {
             "dicPresets": "base::global::CRntDictionary<base::global::CStrId, CEnvironmentData>"
         },
-        "values": null
-    },
-    "CEnvironmentVisualPresetsPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CEnvironmentVisualPresets_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CEscapeSequenceExplosionComponent": {
@@ -14156,11 +13796,6 @@
         "values": {
             "null": 2147483647
         }
-    },
-    "CExplosionGfxPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
     },
     "CFXComponent": {
         "parent": "CSceneComponent",
@@ -14416,11 +14051,6 @@
         "fields": {},
         "values": null
     },
-    "CGameLink<CSpawnPointComponent>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CGameManager::CTunableEnemies": {
         "parent": "base::tunable::CTunable",
         "fields": {},
@@ -14563,11 +14193,6 @@
             "iHazardousCount": "int",
             "iHeatZoneCount": "int"
         },
-        "values": null
-    },
-    "CGameObjectPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CGameObjectRef<CLogicCamera>": {
@@ -15199,11 +14824,6 @@
         },
         "values": null
     },
-    "CKraidSpinningNailsDefPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CKraidTripleFlyingSpikesAttack": {
         "parent": "CKraidAttack",
         "fields": {},
@@ -15313,31 +14933,11 @@
         },
         "values": null
     },
-    "CLightInfoPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CLightInfo_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CLightManager": {
         "parent": null,
         "fields": {
             "dicLightDefs": "base::global::CRntDictionary<base::global::CFilePathStrId, CLightsDef>"
         },
-        "values": null
-    },
-    "CLightManagerPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CLightManager_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CLightingComponent": {
@@ -15351,16 +14951,6 @@
             "sPath": "base::global::CFilePathStrId",
             "vLights": "base::global::CRntVector<CLightInfo>"
         },
-        "values": null
-    },
-    "CLightsDefPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "CLightsDef_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CLineBombGun": {
@@ -15496,11 +15086,6 @@
     },
     "CLogicCameraComponent": {
         "parent": "CActorComponent",
-        "fields": {},
-        "values": null
-    },
-    "CLogicCameraPtr": {
-        "parent": null,
         "fields": {},
         "values": null
     },
@@ -16247,11 +15832,6 @@
         },
         "values": null
     },
-    "COffsetPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "COmniLightComponent": {
         "parent": "CBaseLightComponent",
         "fields": {},
@@ -16263,11 +15843,6 @@
             "sPatternName": "base::global::CStrId",
             "tOffsets": "TPatterns"
         },
-        "values": null
-    },
-    "CPatternPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CPerceptionComponent": {
@@ -16540,11 +16115,6 @@
             "fMiddleSpeed": "float",
             "CloseSpeed": "float"
         },
-        "values": null
-    },
-    "CPolypFallPatternPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CPositionalSoundComponent": {
@@ -17282,11 +16852,6 @@
         "fields": {},
         "values": null
     },
-    "CScenarioPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CSceneComponent": {
         "parent": "CComponent",
         "fields": {},
@@ -17585,11 +17150,6 @@
         },
         "values": null
     },
-    "CShootDCBonesPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CShotAudioWeaponPresets": {
         "parent": null,
         "fields": {
@@ -17597,21 +17157,11 @@
         },
         "values": null
     },
-    "CShotAudioWeaponPresetsPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CShotAudioWeaponStates": {
         "parent": null,
         "fields": {
             "arrWeaponStateAssets": "base::global::CArray<base::global::CFilePathStrId, EnumClass<EWeaponState>::Count, EWeaponState>"
         },
-        "values": null
-    },
-    "CShotAudioWeaponStatesPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CShotComponent": {
@@ -17626,11 +17176,6 @@
             "fMaxHitVerticalSpeed": "float",
             "fTrajectorySampleTimeInterval": "float"
         },
-        "values": null
-    },
-    "CShotLaunchConfigPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CShotManager": {
@@ -17659,11 +17204,6 @@
             "rHeatedExplosion": "CExplosionGfx",
             "fShotSpeed": "float"
         },
-        "values": null
-    },
-    "CShotManagerPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CShotVariableAngleLaunchConfig": {
@@ -17887,21 +17427,11 @@
             "null": 2147483647
         }
     },
-    "CSpawnPointComponentPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CSpawnerActorBlueprint": {
         "parent": null,
         "fields": {
             "InnerValue": "base::reflection::CTypedValue"
         },
-        "values": null
-    },
-    "CSpawnerActorBlueprintPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CSpbSprActivator": {
@@ -18003,7 +17533,7 @@
         "values": null
     },
     "CSubAreaManager": {
-        "parent": "CSubAreaManagerPtr",
+        "parent": null,
         "fields": {},
         "values": null
     },
@@ -18016,22 +17546,12 @@
         },
         "values": null
     },
-    "CSubAreaManagerPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CSubareaCharclassGroup": {
         "parent": null,
         "fields": {
             "sId": "base::global::CStrId",
             "vsCharClassesIds": "base::global::CRntVector<base::global::CStrId>"
         },
-        "values": null
-    },
-    "CSubareaCharclassGroupPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CSubareaInfo": {
@@ -18050,22 +17570,12 @@
         },
         "values": null
     },
-    "CSubareaInfoPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CSubareaSetup": {
         "parent": null,
         "fields": {
             "sId": "base::global::CStrId",
             "vSubareaConfigs": "base::global::CRntVector<std::unique_ptr<CSubareaInfo>>"
         },
-        "values": null
-    },
-    "CSubareaSetupPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CSubareaTransitionTypeLogicAction": {
@@ -18184,11 +17694,6 @@
             "tTentacleNodes": "base::global::CRntVector<base::global::CStrId>",
             "bAllowTrail": "bool"
         },
-        "values": null
-    },
-    "CTentaclePtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CThermalDeviceComponent": {
@@ -18320,11 +17825,6 @@
         },
         "values": null
     },
-    "CTriggerComponent::SActivationConditionPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "CTriggerLogicAction": {
         "parent": null,
         "fields": {},
@@ -18391,11 +17891,6 @@
             "sMissionLogTutoId": "base::global::CStrId",
             "wpTriggerToDisable": "CGameLink<CEntity>"
         },
-        "values": null
-    },
-    "CTriggerLogicActionPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CTriggerNavMeshItemComponent": {
@@ -18756,11 +18251,6 @@
             "fOverrideOrangeTypeProbability": "float",
             "fOverrideRedTypeProbability": "float"
         },
-        "values": null
-    },
-    "CXParasiteBehaviorPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "CXParasiteDropComponent": {
@@ -19276,11 +18766,6 @@
         },
         "values": null
     },
-    "GUI::CDisplayObjectContainerPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "GUI::CDisplayObjectDef": {
         "parent": "base::core::CBaseObject",
         "fields": {
@@ -19290,27 +18775,12 @@
         },
         "values": null
     },
-    "GUI::CDisplayObjectDefPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "GUI::CDisplayObjectPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "GUI::CDisplayObjectStateDef": {
         "parent": null,
         "fields": {
             "sID": "base::global::CRntString",
             "pDOAnimationDef": "std::unique_ptr<GUI::CDisplayObjectAnimationDef>::unique_ptr<GUI::CDisplayObjectAnimationDef>((unique_ptr<GUI::CDisplayObjectAnimationDef> *)this_00)"
         },
-        "values": null
-    },
-    "GUI::CDisplayObjectStateDefPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "GUI::CDisplayObjectTrackBool": {
@@ -19462,11 +18932,6 @@
         }
     },
     "GUI::CHUD::SResourceAnimation": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "GUI::CHUD::SResourceAnimationPtr": {
         "parent": null,
         "fields": {},
         "values": null
@@ -19674,11 +19139,6 @@
         },
         "values": null
     },
-    "GUI::CSkinPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "GUI::CSlotInfoComposition": {
         "parent": "GUI::CDisplayObjectContainer",
         "fields": {},
@@ -19749,16 +19209,6 @@
         },
         "values": null
     },
-    "GUI::CSpriteSheetItemPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "GUI::CSpriteSheetPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "GUI::CSubtitleComposition": {
         "parent": "GUI::CDisplayObjectContainer",
         "fields": {},
@@ -19792,11 +19242,6 @@
         "values": null
     },
     "GUI::IDisplayObjectTrack": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "GUI::IDisplayObjectTrackPtr": {
         "parent": null,
         "fields": {},
         "values": null
@@ -20151,18 +19596,8 @@
         },
         "values": null
     },
-    "SWorldGraphNodePtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "TActionInsertFlagset": {
         "parent": "int",
-        "fields": {},
-        "values": null
-    },
-    "TActorUniquePtr": {
-        "parent": null,
         "fields": {},
         "values": null
     },
@@ -20238,11 +19673,6 @@
         "fields": {
             "sName": "base::global::CStrId"
         },
-        "values": null
-    },
-    "animtree::CAnimTreeElementDefPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "animtree::CAnimTreeNode": {
@@ -20554,38 +19984,8 @@
         "fields": {},
         "values": null
     },
-    "base::global::CArray<CShotAudioWeaponStates,_EnumClass<EWeaponType>::Count,_EWeaponType>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CArray<CShotAudioWeaponStates,_EnumClass<EWeaponType>::Count,_EWeaponType>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CArray<base::global::CFilePathStrId,_EnumClass<EWeaponState>::Count,_EWeaponState>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CArray<base::global::CFilePathStrId,_EnumClass<EWeaponState>::Count,_EWeaponState>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "base::global::CArray<base::global::CStrId,_EnumClass<ESubAreaItem>::Count,_ESubAreaItem>": {
         "parent": "base::reflection::CollectionTypeMapper<base::global::CArray<base::global::CStrId,_EnumClass<ESubAreaItem>::Count,_ESubAreaItem>>::TElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CArray<base::global::CStrId,_EnumClass<ESubAreaItem>::Count,_ESubAreaItem>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CArray<base::global::CStrId,_EnumClass<ESubAreaItem>::Count,_ESubAreaItem>constPtr": {
-        "parent": null,
         "fields": {},
         "values": null
     },
@@ -20594,27 +19994,7 @@
         "fields": {},
         "values": null
     },
-    "base::global::CArray<sound::CAudioMaterial,_EnumClass<base::snd::EMaterial>::Count,_base::snd::EMaterial>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CArray<sound::CAudioMaterial,_EnumClass<base::snd::EMaterial>::Count,_base::snd::EMaterial>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "base::global::CFilePathStrId": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CFilePathStrIdPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CFilePathStrId_constPtr": {
         "parent": null,
         "fields": {},
         "values": null
@@ -20629,196 +20009,6 @@
         "fields": {},
         "values": null
     },
-    "base::global::CNamePtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CName_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CFilePathStrId,_CLightsDef>": {
-        "parent": "CLightManagerPtr",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CFilePathStrId,_CLightsDef>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CFilePathStrId,_CLightsDef>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CName,_engine::scene::sceneItems::CSceneGroupPtr>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntDictionary<base::global::CName,_engine::scene::sceneItems::CSceneGroupPtr>>::TElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CName,_engine::scene::sceneItems::CSceneGroupPtr>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_CActorPtr>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_CEnvironmentData>": {
-        "parent": "CEnvironmentData::SIBLAttenuationPtr",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_CEnvironmentData>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_CEnvironmentData>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_CEnvironmentMusicData>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<CEnvironmentMusicData::SMusicTransition>>::TKeyElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_CEnvironmentSoundData::SSound>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntDictionary<base::global::CStrId,_CEnvironmentSoundData::SSound>>::TElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_CEnvironmentSoundData::SSound>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_CEnvironmentSoundData::SSound>_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_CEnvironmentSoundData>": {
-        "parent": "CEnvironmentSoundPresets_constPtr",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_CEnvironmentSoundData>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_CEnvironmentSoundData>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_GUI::CSpriteSheetPtr>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntDictionary<base::global::CStrId,_GUI::CSpriteSheetPtr>>::TKeyElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_base::global::CRntVector<CGameLink<CActor>>>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CPooledList<CActorPtr>>::TKeyElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_base::global::CRntVector<CGameLink<CActor>_>>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_base::global::CRntVector<CGameLink<CActor>_>>_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_base::global::CRntVector<CGameLink<CEntity>>>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntSmallDictionary<base::global::CStrId,_CEntityPtr>>::TKeyElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_base::global::CRntVector<base::global::CStrId>>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntDictionary<base::global::CStrId,_base::global::CRntVector<base::global::CStrId>>>::TKeyElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_base::global::CWeakPtr<game::logic::collision::CCollider>>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_base::global::CWeakPtr<game::logic::collision::CCollider>>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_sound::CAudioPreset>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntDictionary<base::global::CStrId,_sound::CAudioPreset>>::TElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_sound::CAudioPreset>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_sound::CAudioPreset>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_sound::TBossMusicPreset>": {
-        "parent": "base::global::CRntVector<sound::SStateFadeOut>Ptr",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_sound::TBossMusicPreset>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_sound::TBossMusicPreset>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_sound::TBossMusicSpawnGroupConfig>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_sound::TBossMusicSpawnGroupConfig>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_sound::TBossMusicSubStateConfig>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_sound::TBossMusicSubStateConfig>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_sound::TScenarioMusicPreset>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntDictionary<base::global::CStrId,_sound::TScenarioMusicPreset>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "base::global::CRntFile": {
         "parent": null,
         "fields": {},
@@ -20829,517 +20019,7 @@
         "fields": {},
         "values": null
     },
-    "base::global::CRntSmallDictionary<_base::global::CStrId,_CGameBlackboard::TPropDeltaValues_>": {
-        "parent": "CGameBlackboard",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntSmallDictionary<base::global::CRntString,_base::tunable::CTunablePtr>": {
-        "parent": "base::global::CRntSmallDictionary<base::global::CRntString,_base::tunable::CTunablePtr>Ptr",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntSmallDictionary<base::global::CRntString,_base::tunable::CTunablePtr>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntSmallDictionary<base::global::CStrId,_CActorComponentPtr>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntSmallDictionary<base::global::CStrId,_CActorComponentPtr>>::TElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntSmallDictionary<base::global::CStrId,_CActorComponentPtr>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntSmallDictionary<base::global::CStrId,_CActorSublayer>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntSmallDictionary<base::global::CStrId,_CActorSublayer>_const_Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntSmallDictionary<base::global::CStrId,_CComponentPtr>": {
-        "parent": "CComponentPtr",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntSmallDictionary<base::global::CStrId,_CComponentPtr>_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntSmallDictionary<base::global::CStrId,_bool>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntSmallDictionary<base::global::CStrId,_bool>>::TKeyElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntSmallDictionary<base::global::CStrId,_game::logic::collision::EColMat>": {
-        "parent": "CCharClassCollisionComponent",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntSmallDictionary<base::global::CStrId,_game::logic::collision::EColMat>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "base::global::CRntString": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntString_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CActorPtr>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CActorPtr>_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CBreakableTileGroupComponent::STileInfo>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CCooldownXBossFireBallDef>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<std::unique_ptr<CCooldownXBossFireWallDef>>>::TKeyElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CCooldownXBossLavaDropsMovementDef>": {
-        "parent": "CCharClassCooldownXBossLavaDropsAttack",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CCutSceneDef::CTakeDef>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<CCutSceneDef::CActorDef>>::TKeyElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEditorPathSegment>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<CEditorPathSegment>>::TKeyElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEditorRailSegment>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<CEditorRailSegment>>::TElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SAmbientTransition>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SAmbientTransition>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SBloomTransition>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SBloomTransition>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SCubeMapTransition>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SCubeMapTransition>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SDepthTintTransition>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SDepthTintTransition>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SFogTransition>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SFogTransition>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SHemisphericalLightTransition>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SHemisphericalLightTransition>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SIBLAttenuationTransition>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SIBLAttenuationTransition>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SMaterialTintTransition>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SMaterialTintTransition>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SPlayerLightTransition>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SPlayerLightTransition>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SSSAOTransition>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SSSAOTransition>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SToneMappingTransition>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SToneMappingTransition>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SVerticalFogTransition>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentData::SVerticalFogTransition>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentMusicData::SMusicTransition>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CEnvironmentMusicData::SMusicTransition>_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CFXPool::CDefinition>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<CFXPool::CDefinition>>::TKeyElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CLightInfo>": {
-        "parent": "base::global::CRntVector<CLightInfo>Ptr",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CLightInfo>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CLightInfo>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CMinimapData::SMovingMagnetSurfaceData>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntSmallDictionary<base::global::CStrId,_CMinimapData::STransportSignData>>::TKeyElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<CWaterPoolComponent::FloatingEntitiesInfo>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<CWaterPoolComponent::FloatingEntitiesInfo>>::TElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<DoorStateInfo>": {
-        "parent": "int",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<ECoolShinesparkSituation>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<EShinesparkTravellingDirection>>::TKeyElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<EMapTutoType>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<EMapTutoType>>::TKeyElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<GUI::CDisplayObjectContainerPtr>": {
-        "parent": "base::global::CWeakPtr<GUI::CDisplayObjectContainer>",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<GUI::CDisplayObjectDefPtr>": {
-        "parent": "GUI::CDisplayObjectDef",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<GUI::CDisplayObjectStateDefPtr>": {
-        "parent": "GUI::CDisplayObjectStateDefPtr",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<GUI::CDisplayObjectTrack<base::global::CRntString>::SKey>": {
-        "parent": "",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<GUI::CSkinPtr>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<GUI::CSkinPtr>>::TElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<GUI::CSpriteSheetItemPtr>": {
-        "parent": "GUI::CSpriteSheetItemPtr",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<SActivatabledOnEventInfo>": {
-        "parent": "CShootActivatorComponent",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<SBeamBoxActivatable>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<SBeamBoxActivatable>>::TElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<SWorldGraphNode>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<SWorldGraphNode>>::TKeyElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<_std::unique_ptr<CPlaythroughDef::SCheckpointDef>_>": {
-        "parent": "std::unique_ptr<CPlaythroughDef::SCheckpointDef>",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<animtree::CAnimTreeDef::TAnimTreeLinkDef>": {
-        "parent": "animtree::CAnimTreeDef",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<base::animation::CBlendSpaceResource::SBlendTarget>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<base::animation::CBlendSpaceResource::SBlendTarget>>::TKeyElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<base::core::AssetName>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<base::core::AssetName>>::TElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<base::global::CFilePathStrId>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<base::global::CFilePathStrId>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<base::global::CRntVector<game::logic::collision::CColliderPtr>>": {
-        "parent": "game::logic::collision::CColliderPtr",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<base::global::CRntVector<std::unique_ptr<CAcidBlobsLaunchPattern>>>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<std::unique_ptr<CAcidBlobsLaunchPattern>>>::TKeyElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<base::global::CRntVector<std::unique_ptr<CBouncingCreaturesLaunchPattern>>>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<base::global::CRntVector<std::unique_ptr<CBouncingCreaturesLaunchPattern>>>>::TKeyElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<base::global::CRntVector<std::unique_ptr<CCooldownXBossLavaCarpetDef>>>": {
-        "parent": "CCharClassCooldownXBossLavaCarpetAttack",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<base::global::CRntVector<std::unique_ptr<CKraidSpinningNailsDef>>>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<std::unique_ptr<CKraidSpinningNailsDef>>>::TKeyElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<base::global::CStrId>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<base::global::CStrId>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<base::spatial::CEditorSegment>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<base::spatial::CPolygon2D>>::TElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<base::tunable::CTunableManagerPtr>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<base::tunable::CTunableManagerPtr>>::TElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<engine::scene::CSceneSlotPtr>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<engine::scene::CSceneSlotPtr>>::TKeyElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<engine::scene::CSceneSlotPtr>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<gameeditor::EPersistenceTarget>": {
-        "parent": "unsigned",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<navmesh::CDynamicSmartLinkGroup::SDynamicSmartLinkRulesSet>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<navmesh::CDynamicSmartLinkGroup::SDynamicSmartLinkRulesSet>>::TKeyElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<navmesh::CDynamicSmartLinkRulePtr>": {
-        "parent": "navmesh::CDynamicSmartLinkRulePtr",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<navmesh::CFixedDynamicSmartLinkRule::SMask>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<navmesh::CFixedDynamicSmartLinkRule::SMask>>::TElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<sound::SStateFadeOut>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<sound::SStateFadeOut>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<sound::TBossMusicTrack>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<sound::TBossMusicTrack>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<sound::TMusicFile>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<sound::TMusicFile>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<sound::TMusicTrack>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<sound::TMusicTrack>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<std::unique_ptr<CChozoRobotSoldierCannonShotPattern>>": {
-        "parent": "CChozoRobotSoldierCannonShotPattern",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<std::unique_ptr<CEmmyAutoGlobalSmartLinkDef>>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<std::unique_ptr<CEmmyOverrideDeathPositionDef>>>::TElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<std::unique_ptr<CPattern>>": {
-        "parent": "base::reflection::CollectionTypeMapper<TPatterns>::TKeyElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<std::unique_ptr<CSubareaCharclassGroup>>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<std::unique_ptr<CSubareaCharclassGroup>>constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<std::unique_ptr<CSubareaInfo>>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<std::unique_ptr<CSubareaSetup>>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CRntVector<std::unique_ptr<CSubareaSetup>>constPtr": {
         "parent": null,
         "fields": {},
         "values": null
@@ -21360,16 +20040,6 @@
         "values": null
     },
     "base::global::CStrId": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CStrIdPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CStrId_constPtr": {
         "parent": null,
         "fields": {},
         "values": null
@@ -21513,11 +20183,6 @@
         "fields": {},
         "values": null
     },
-    "base::reflection::CFunction_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "base::reflection::CPointerType": {
         "parent": "base::reflection::CType",
         "fields": {},
@@ -21532,11 +20197,6 @@
         "values": null
     },
     "base::reflection::CTypedValue": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::reflection::CTypedValuePtr": {
         "parent": null,
         "fields": {},
         "values": null
@@ -28574,11 +27234,6 @@
         },
         "values": null
     },
-    "base::spatial::CPolygon2DPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "base::spatial::CPolygonCollection2D": {
         "parent": null,
         "fields": {
@@ -28605,16 +27260,6 @@
         "fields": {
             "hashTunables": "global::CRntSmallDictionary<base::global::CRntString, base::tunable::CTunable*>"
         },
-        "values": null
-    },
-    "base::tunable::CTunableManagerPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::tunable::CTunablePtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "behaviortree::CAgitateInNervousnessAction": {
@@ -28689,11 +27334,6 @@
     },
     "behaviortree::CBehavior": {
         "parent": "CGameObject",
-        "fields": {},
-        "values": null
-    },
-    "behaviortree::CBehaviorPtr": {
-        "parent": null,
         "fields": {},
         "values": null
     },
@@ -29909,51 +28549,6 @@
         "fields": {},
         "values": null
     },
-    "char_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "const::CCutSceneDefPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "const::CEmmyConfigurationPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "const::CExplosionGfxPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "const::CPlaythroughDef::SCheckpointDefPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "const::CPlaythroughDefPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "const::CShotLaunchConfigPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "const::base::global::CRntDictionary<base::global::CName,_engine::scene::sceneItems::CSceneGroupPtr>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "const::base::global::CRntSmallDictionary<base::global::CStrId,_CActorComponentPtr>Ptr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "cutscene::EDevelopmentState": {
         "parent": "int",
         "fields": {},
@@ -29974,20 +28569,10 @@
         "values": null
     },
     "engine::scene::CSceneManager": {
-        "parent": "engine::scene::CSceneManagerPtr",
+        "parent": null,
         "fields": {
             "vSlots": "base::global::CRntVector<engine::scene::CSceneSlot*>"
         },
-        "values": null
-    },
-    "engine::scene::CSceneManagerPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "engine::scene::CScenePtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "engine::scene::CSceneSlot": {
@@ -29997,26 +28582,11 @@
         },
         "values": null
     },
-    "engine::scene::CSceneSlotPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "engine::scene::sceneItems::CSceneGroup": {
         "parent": null,
         "fields": {
             "oName": "base::global::CStrId"
         },
-        "values": null
-    },
-    "engine::scene::sceneItems::CSceneGroupPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "engine::scene::sceneItems::CSceneGroup_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "engine::utils::ELightPreset": {
@@ -30047,16 +28617,6 @@
         },
         "values": null
     },
-    "game::logic::collision::CAABoxShape2DPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "game::logic::collision::CAABoxShape2D_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "game::logic::collision::CBroadphaseObject": {
         "parent": "CGameObject",
         "fields": {
@@ -30072,16 +28632,6 @@
             "fHalfHeight": "float",
             "bOutwardsNormal": "bool"
         },
-        "values": null
-    },
-    "game::logic::collision::CCapsuleShape2DPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "game::logic::collision::CCapsuleShape2D_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "game::logic::collision::CCircleShape2D": {
@@ -30104,11 +28654,6 @@
         "fields": {},
         "values": null
     },
-    "game::logic::collision::CColliderPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "game::logic::collision::CCollisionImporter": {
         "parent": null,
         "fields": {},
@@ -30123,31 +28668,11 @@
         },
         "values": null
     },
-    "game::logic::collision::COBoxShape2DPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "game::logic::collision::COBoxShape2D_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "game::logic::collision::CPolygonCollectionShape": {
         "parent": "game::logic::collision::CShape",
         "fields": {
             "oPolyCollection": "base::spatial::CPolygonCollection2D"
         },
-        "values": null
-    },
-    "game::logic::collision::CPolygonCollectionShapePtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "game::logic::collision::CPolygonCollectionShape_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "game::logic::collision::CShape": {
@@ -30156,16 +28681,6 @@
             "vPos": "base::math::CVector3D",
             "bIsSolid": "bool"
         },
-        "values": null
-    },
-    "game::logic::collision::CShapePtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "game::logic::collision::CShape_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "game::logic::collision::CTrigger": {
@@ -30196,11 +28711,6 @@
         },
         "values": null
     },
-    "gameeditor::CGameModelQueryBoardPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "gameeditor::CGameModelRoot": {
         "parent": null,
         "fields": {
@@ -30212,11 +28722,6 @@
             "pLightManager": "CLightManager*",
             "pMusicManager": "sound::CMusicManager*"
         },
-        "values": null
-    },
-    "gameeditor::CGameModelRootPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "gameeditor::EEditorModeDataFlow": {
@@ -30231,27 +28736,7 @@
         "fields": {},
         "values": null
     },
-    "gameeditor::TPropertyIdPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "gameeditor::TPropertyId_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "int": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "luaDisplayObjectPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "luaGameObjectPtr": {
         "parent": null,
         "fields": {},
         "values": null
@@ -30494,11 +28979,6 @@
         "fields": {},
         "values": null
     },
-    "navmesh::CDynamicSmartLinkRulePtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "navmesh::CDynamicSmartLinkRules": {
         "parent": "base::core::CAsset",
         "fields": {},
@@ -30583,21 +29063,11 @@
         },
         "values": null
     },
-    "querysystem::CEvaluatorPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "querysystem::CFilter": {
         "parent": null,
         "fields": {
             "bNegate": "bool"
         },
-        "values": null
-    },
-    "querysystem::CFilterPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "querysystem::CFilterToEvaluator": {
@@ -30684,16 +29154,6 @@
         },
         "values": null
     },
-    "sound::CAudioMaterialPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "sound::CAudioMaterial_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "sound::CAudioPreset": {
         "parent": "base::core::CAsset",
         "fields": {
@@ -30740,26 +29200,6 @@
         },
         "values": null
     },
-    "sound::CAudioPresetModifierPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "sound::CAudioPresetModifier_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "sound::CAudioPresetPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "sound::CAudioPreset_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "sound::CAudioPresets": {
         "parent": null,
         "fields": {
@@ -30767,18 +29207,8 @@
         },
         "values": null
     },
-    "sound::CAudioPresetsPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "sound::CAudioPresets_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "sound::CMusicManager": {
-        "parent": "sound::CMusicManagerPtr",
+        "parent": null,
         "fields": {
             "dicGlobalMusicPresets": "base::global::CRntDictionary<base::global::CStrId, CEnvironmentMusicData>",
             "dicGlobalBossMusicPresets": "base::global::CRntDictionary<base::global::CStrId, sound::TBossMusicPreset>"
@@ -30790,11 +29220,6 @@
         "fields": {
             "bNCLCurrentMusicDebugEnable": "bool"
         },
-        "values": null
-    },
-    "sound::CMusicManagerPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "sound::CMusicVolumeOverride::CTunableMusicVolumeOverride": {
@@ -30831,16 +29256,6 @@
         },
         "values": null
     },
-    "sound::CSoundManagerPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "sound::CSoundManager_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "sound::SGUISoundEventsSelector": {
         "parent": "sound::CSoundEventsDef::SSoundEventsSelector",
         "fields": {
@@ -30856,32 +29271,12 @@
         },
         "values": null
     },
-    "sound::SStateFadeOutPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "sound::SStateFadeOut_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "sound::TBossMusicPreset": {
         "parent": null,
         "fields": {
             "sBoss": "base::global::CStrId",
             "dicSpawnGroupConfigs": "base::global::CRntDictionary<base::global::CStrId, sound::TBossMusicSpawnGroupConfig>"
         },
-        "values": null
-    },
-    "sound::TBossMusicPresetPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "sound::TBossMusicPreset_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "sound::TBossMusicSpawnGroupConfig": {
@@ -30892,32 +29287,12 @@
         },
         "values": null
     },
-    "sound::TBossMusicSpawnGroupConfigPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "sound::TBossMusicSpawnGroupConfig_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "sound::TBossMusicSubStateConfig": {
         "parent": null,
         "fields": {
             "eState": "base::global::CStrId",
             "vTracks": "base::global::CRntVector<sound::TBossMusicTrack>"
         },
-        "values": null
-    },
-    "sound::TBossMusicSubStateConfigPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "sound::TBossMusicSubStateConfig_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "sound::TBossMusicTrack": {
@@ -30928,16 +29303,6 @@
         },
         "values": null
     },
-    "sound::TBossMusicTrackPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "sound::TBossMusicTrack_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "sound::TMusicFile": {
         "parent": null,
         "fields": {
@@ -30946,16 +29311,6 @@
             "iLoopStart": "int",
             "iLoopEnd": "int"
         },
-        "values": null
-    },
-    "sound::TMusicFilePtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "sound::TMusicFile_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "sound::TMusicTrack": {
@@ -30974,32 +29329,12 @@
         },
         "values": null
     },
-    "sound::TMusicTrackPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "sound::TMusicTrack_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "sound::TScenarioMusicPreset": {
         "parent": null,
         "fields": {
             "sAlias": "base::global::CStrId",
             "vTracks": "base::global::CRntVector<sound::TMusicTrack>"
         },
-        "values": null
-    },
-    "sound::TScenarioMusicPresetPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "sound::TScenarioMusicPreset_constPtr": {
-        "parent": null,
-        "fields": {},
         "values": null
     },
     "std::__1::ios_base": {
@@ -31193,21 +29528,6 @@
         "values": null
     },
     "unsigned::short": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "unsignedPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "unsigned_constPtr": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "voidPtr": {
         "parent": null,
         "fields": {},
         "values": null
