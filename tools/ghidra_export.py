@@ -448,11 +448,52 @@ def main(only_missing: bool = True, ignore_without_hash: bool = True,
             print(f'Removing parent for {key}: {final_results[key]["parent"]}')
             final_results[key]["parent"] = None
 
+    _merge_split_types(final_results)
+
     with path.open("w") as f:
         json.dump({
             key: final_results[key]
             for key in sorted(final_results.keys())
         }, f, indent=4)
+
+
+def _merge_split_types(final_results: dict[str, typing.Any]):
+    hashes = dread_data.all_name_to_property_id()
+    wrong_to_correct = {}
+
+    for key in list(final_results.keys()):
+        if len(key.split("::")) == 1:
+            continue
+
+        last_part = key.split("::")[-1]
+        if last_part.startswith("E") or last_part in {"SKey", "CParams", "SState", "CDefinition", "SSubState",
+                                                      "CActorDef"}:
+            continue
+
+        similar = [other for other in final_results.keys() if other.endswith(last_part) and other != key]
+        if similar:
+            if len(similar) != 1:
+                raise ValueError(f"OH NO too many similar {similar}")
+
+            both_hash = key in hashes and similar[0] in hashes
+            if both_hash:
+                print("{} (Hash: {}) is similar to {} (Hash: {})".format(
+                    key, key in dread_data.all_name_to_property_id(),
+                    similar[0], similar[0] in dread_data.all_name_to_property_id(),
+                ))
+            elif key in hashes:
+                wrong_to_correct[similar[0]] = key
+            elif similar[0] in hashes:
+                wrong_to_correct[key] = similar[0]
+            else:
+                print(f"BOTH ARE WRONG! {key} - {similar[0]}")
+
+    for wrong, correct in wrong_to_correct.items():
+        final_results[correct]["fields"] = final_results.pop(wrong)["fields"]
+
+    for key in list(final_results.keys()):
+        if final_results[key]["parent"] in wrong_to_correct:
+            final_results[key]["parent"] = wrong_to_correct[final_results[key]["parent"]]
 
 
 def simple_decompile():
