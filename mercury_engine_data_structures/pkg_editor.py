@@ -52,6 +52,9 @@ class PkgEditor:
                     return self.files[name].read(entry.end_offset - entry.start_offset)
         raise ValueError(f"Unknown asset_id: {asset_id:0x}")
 
+    def get_asset_with_name(self, name: str, in_pkg: Optional[str] = None) -> bytes:
+        return self.get_asset_with_asset_id(crc.crc64(name.encode("utf-8")), in_pkg)
+
     def all_asset_ids(self):
         return {
             entry.asset_id
