@@ -18547,11 +18547,6 @@
         "fields": {},
         "values": null
     },
-    "base::global::CRntFile": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "base::global::CRntPooledDictionary<base::global::CStrId,_CBreakableTileManager::STileGroupGroup>": {
         "parent": "CBreakableTileManager::CTunableBreakableTileManager",
         "fields": {},

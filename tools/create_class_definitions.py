@@ -231,6 +231,11 @@ def main():
     with p.open() as f:
         all_types: dict[str, dict[str, str]] = json.load(f)
 
+    all_types.pop("base::global::CStrId")
+    all_types.pop("base::global::CRntString")
+    all_types.pop("base::global::CFilePathStrId")
+    all_types.pop("base::global::CRntFile")
+
     all_types.pop("CBlackboard")
     all_types.pop("CGameBlackboard")
     all_types["gameeditor::CGameModelRoot"]["fields"].pop("pSoundManager")
