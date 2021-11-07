@@ -18562,21 +18562,6 @@
         "fields": {},
         "values": null
     },
-    "base::global::CSmartPtr<const_CPlaythrough>": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CSmartPtr<const_CPlaythroughDef>": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
-    "base::global::CSmartPtr<media::CMoviePlayer>": {
-        "parent": null,
-        "fields": {},
-        "values": null
-    },
     "base::global::CStrId": {
         "parent": null,
         "fields": {},
