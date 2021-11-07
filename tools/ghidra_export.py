@@ -318,11 +318,11 @@ def decompile_in_background(all_fields_functions: dict[str, tuple[int, int]]):
         print(f"{len(failed)} function(s) failed, retrying on main thread.")
         initialize_worker()
 
-    # for n in failed:
-    #     try:
-    #         callback(decompile_type(n, *all_fields_functions[n]))
-    #     except Exception as e:
-    #         report_update(f"Failed {n}: {e}")
+    for n in failed:
+        try:
+            callback(decompile_type(n, *all_fields_functions[n]))
+        except Exception as e:
+            report_update(f"Failed {n}: {e}")
 
     return result
 
