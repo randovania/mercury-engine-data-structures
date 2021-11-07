@@ -16,6 +16,8 @@ add_enum_value = "(?:FUN_71000148b8|AddEnumValue)"
 prefixes_to_remove = [
     "(ObjectField *)",
     "&",
+    "(CClass *)",
+    "Reflection::"
 ]
 
 _aliases = {
@@ -119,8 +121,9 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
             i = decompiled_code.rfind(type_var, offset, m.start())
             end = decompiled_code.find(';', i)
             type_name = decompiled_code[i + len(type_var) + len(" = "):end]
-            if type_name.startswith("Reflection::"):
-                type_name = type_name[len("Reflection::"):]
+            for prefix in prefixes_to_remove:
+                if type_name.startswith(prefix):
+                    type_name = type_name[len(prefix):].strip()
             if type_name.endswith("()"):
                 type_name = type_name[:-len("()")]
             if type_name.endswith("::init"):
@@ -212,7 +215,10 @@ def initialize_worker():
 
     monitor = ConsoleTaskMonitor()
     ifc = DecompInterface()
-    ifc.setOptions(DecompileOptions())
+    options = DecompileOptions()
+    # make sure you have namespaces set to Always, and casting disabled
+    options.grabFromProgram(flat_api.currentProgram)
+    ifc.setOptions(options)
     ifc.openProgram(flat_api.currentProgram)
 
 
