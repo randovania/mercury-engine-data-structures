@@ -1,3 +1,5 @@
+from typing import Iterator
+
 import construct
 
 from mercury_engine_data_structures.formats import BaseResource, game_model_root
@@ -13,6 +15,9 @@ class Brfld(BaseResource):
 
     def actors_for_layer(self, name: str) -> dict:
         return self.raw.Root.pScenario.rEntitiesLayer.dctSublayers[name].dctActors
+
+    def all_layers(self) -> Iterator[str]:
+        yield from self.raw.Root.pScenario.rEntitiesLayer.dctSublayers.keys()
 
     def all_actors(self):
         for sublayer in self.raw.Root.pScenario.rEntitiesLayer.dctSublayers.values():
