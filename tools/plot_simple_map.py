@@ -7,7 +7,7 @@ from pathlib import Path
 
 import numpy
 
-from mercury_engine_data_structures import hashed_names
+from mercury_engine_data_structures import dread_data
 from mercury_engine_data_structures.formats import Bmscc, Brfld, Brsa
 from mercury_engine_data_structures.game_check import Game
 from mercury_engine_data_structures.pkg_editor import PkgEditor
@@ -106,7 +106,7 @@ _weakness_table_for_def = {
 
 def decode_world(root: Path, target_level: str):
     global pickup_index
-    all_names = hashed_names.all_asset_id_to_name()
+    all_names = dread_data.all_asset_id_to_name()
     game = Game.DREAD
 
     with PkgEditor.open_pkgs_at(root) as pkg_editor:

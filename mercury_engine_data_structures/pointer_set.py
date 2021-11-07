@@ -5,9 +5,9 @@ import copy
 from typing import Dict, Union, Type
 
 import construct
-from construct import Construct, Struct, Hex, Int64ul, Computed, Switch, Adapter
+from construct import Construct, Struct, Hex, Int64ul, Switch, Adapter
 
-from mercury_engine_data_structures import hashed_names
+import mercury_engine_data_structures.dread_data
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 
 
@@ -20,7 +20,7 @@ class PointerAdapter(Adapter):
 
     @property
     def _allow_null(self):
-        return hashed_names.all_name_to_property_id()["void"] in self.types
+        return mercury_engine_data_structures.dread_data.all_name_to_property_id()["void"] in self.types
 
     @property
     def _single_type(self):
@@ -34,14 +34,14 @@ class PointerAdapter(Adapter):
             return obj.ptr
 
         ret = construct.Container()
-        ret["@type"] = hashed_names.all_property_id_to_name()[obj.type]
+        ret["@type"] = mercury_engine_data_structures.dread_data.all_property_id_to_name()[obj.type]
         for key, value in obj.ptr.items():
             ret[key] = value
         return ret
 
     def _encode(self, obj: construct.Container, context, path):
         if obj is None:
-            type_id = hashed_names.all_name_to_property_id()["void"]
+            type_id = mercury_engine_data_structures.dread_data.all_name_to_property_id()["void"]
 
         elif self._single_type:
             type_id = list(self.types.keys())[1]
@@ -49,7 +49,7 @@ class PointerAdapter(Adapter):
         else:
             obj = copy.copy(obj)
             type_name: str = obj.pop("@type")
-            type_id = hashed_names.all_name_to_property_id()[type_name]
+            type_id = mercury_engine_data_structures.dread_data.all_name_to_property_id()[type_name]
 
         return construct.Container(
             type=type_id,
@@ -73,7 +73,7 @@ class PointerSet:
         return ret.create_construct()
 
     def add_option(self, name: str, value: Union[Construct, Type[Construct]]) -> None:
-        prop_id = hashed_names.all_name_to_property_id()[name]
+        prop_id = mercury_engine_data_structures.dread_data.all_name_to_property_id()[name]
         if prop_id in self.types:
             raise ValueError(f"Attempting to add {name} to {self.category}, but already present.")
         self.types[prop_id] = name / value
@@ -85,7 +85,7 @@ class PointerSet:
                 construct.this.type,
                 self.types,
                 ErrorWithMessage(
-                    lambda ctx: f"Property {ctx.type} ({hashed_names.all_property_id_to_name().get(ctx.type)}) "
+                    lambda ctx: f"Property {ctx.type} ({mercury_engine_data_structures.dread_data.all_property_id_to_name().get(ctx.type)}) "
                                 "without assigned type"),
             )
         ), self.types)

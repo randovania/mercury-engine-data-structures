@@ -3,9 +3,12 @@ import json
 from pathlib import Path
 from typing import Dict, Optional
 
-import construct
-from construct import Hex, Int64ul
-from construct.lib import HexDisplayedInteger
+
+@functools.lru_cache()
+def get_raw_types() -> Dict[str, str]:
+    path = Path(__file__).parent.joinpath("dread_types.json")
+    with path.open() as f:
+        return json.load(f)
 
 
 @functools.lru_cache()
@@ -39,9 +42,3 @@ def all_property_id_to_name() -> Dict[int, str]:
         asset_id: name
         for name, asset_id in names.items()
     }
-
-
-PropertyEnum = construct.Enum(Hex(Int64ul), **{
-    name: HexDisplayedInteger.new(property_id, "0%sX" % (2 * 8))
-    for property_id, name in all_property_id_to_name().items()
-})

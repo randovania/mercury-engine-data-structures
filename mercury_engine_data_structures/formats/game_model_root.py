@@ -1,7 +1,7 @@
 import construct
 
 from mercury_engine_data_structures.formats.dread_types import gameeditor_CGameModelRoot
-from mercury_engine_data_structures.hashed_names import PropertyEnum
+from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 
 
 def create(name: str, magic_number: int):

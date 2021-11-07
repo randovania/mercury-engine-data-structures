@@ -1,12 +1,12 @@
 from typing import Dict, Union, Type
 
 import construct
-from construct import Construct, Int32ul, Probe, Struct, Adapter
+from construct import Construct, Probe, Struct, Adapter
 
-from mercury_engine_data_structures import hashed_names
+import mercury_engine_data_structures.dread_data
 from mercury_engine_data_structures.common_types import make_vector
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, ForceQuit
-from mercury_engine_data_structures.hashed_names import PropertyEnum
+from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 
 
 def ConfirmType(name: str):
@@ -17,7 +17,7 @@ def ConfirmType(name: str):
         check,
         ErrorWithMessage(
             lambda ctx: f"Expected {name}, got {ctx[f'{name}_type']} ("
-                        f"{hashed_names.all_property_id_to_name().get(ctx[f'{name}_type'])}) "
+                        f"{mercury_engine_data_structures.dread_data.all_property_id_to_name().get(ctx[f'{name}_type'])}) "
                         "without assigned type"
         ),
     )
@@ -51,7 +51,7 @@ def Object(fields: Dict[str, Union[Construct, Type[Construct]]], *,
         for name, conn in fields.items()
     }
     for type_name in all_types:
-        if type_name not in hashed_names.all_name_to_property_id():
+        if type_name not in mercury_engine_data_structures.dread_data.all_name_to_property_id():
             raise ValueError(f"Unknown type name: {type_name}, not in hashes database")
 
     switch = construct.Switch(
