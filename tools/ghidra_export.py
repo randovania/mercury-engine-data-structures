@@ -82,12 +82,15 @@ def clean_crc_var(crc_var: str) -> str:
 
 
 def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fields_function):
+    if fields_function is None:
+        return {}
+
     res = bridge.remote_eval("""
         ifc.decompileFunction(fields_function, 180, monitor)
     """, timeout_override=200, fields_function=fields_function, ifc=ifc, monitor=monitor)
 
     decompiled_code = str(res.getCCodeMarkup())
-    hash_call_re = re.compile(hash_str + r'\(([^,]+?),"?([^,]+?)"?,1\);')
+    hash_call_re = re.compile(hash_str + r'\(([^,]+?),"?([^,]+?)"?,(?:1|true)\);')
     register_call_re = re.compile(register_field + r'\([^,]+?,([^,]+?),(.+?),([^,]+?),([^,]+?),([^,]+?)\);')
 
     crc_mapping = collections.defaultdict(list)
@@ -108,16 +111,19 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
 
         if "&" in type_var:
             if "::_" in type_var:
-                type_name = type_var[1:type_var.find("::_")]
+                type_name = type_var[type_var.find("&")+1:type_var.find("::_")]
             else:
                 type_name = type_var
         else:
             i = decompiled_code.rfind(type_var, offset, m.start())
             end = decompiled_code.find(';', i)
             type_name = decompiled_code[i + len(type_var) + len(" = "):end]
-            if type_name.endswith("::init()"):
-                type_name = type_name[:-len("::init()")]
-
+            if type_name.startswith("Reflection::"):
+                type_name = type_name[len("Reflection::"):]
+            if type_name.endswith("()"):
+                type_name = type_name[:-len("()")]
+            if type_name.endswith("::init"):
+                type_name = type_name[:-len("::init")]
         fields[crc_string] = _aliases.get(type_name, type_name)
 
     return fields
@@ -125,18 +131,21 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
 
 def get_function_list() -> dict[str, tuple[int, int]]:
     with ghidra_bridge.GhidraBridge() as init_bridge:
-        result = init_bridge.remote_eval("""
+        result_fields = init_bridge.remote_eval("""
         [
-            (f.getName(True), f.getID()) for f in currentProgram.getSymbolTable().getDefinedSymbols()
-            if f.getName() == "fields" or f.getName() == "init"
+            (f.getName(True), f.getID()) for f in currentProgram.getSymbolTable().getSymbols("fields")
+        ]
+        """)
+        result_init = init_bridge.remote_eval("""
+        [
+            (f.getName(True), f.getID()) for f in currentProgram.getSymbolTable().getSymbols("init")
         ]
         """)
         init_funcs = {}
         fields_funcs = {}
-        for name, func_id in result:
-            if not name.startswith("Reflection::"):
-                continue
-            name = name[len("Reflection::"):]
+        for name, func_id in result_fields+result_init:
+            if name.startswith("Reflection::"):
+                name = name[len("Reflection::"):]
 
             if name.endswith("::init"):
                 init_funcs[name[:-len("::init")]] = func_id
@@ -144,8 +153,8 @@ def get_function_list() -> dict[str, tuple[int, int]]:
                 fields_funcs[name[:-len("::fields")]] = func_id
 
         return {
-            name: (init_funcs.get(name), fields_funcs[name])
-            for name in fields_funcs
+            name: (init_funcs.get(name), fields_funcs.get(name))
+            for name in fields_funcs.keys() | init_funcs.keys()
         }
 
 
@@ -188,11 +197,13 @@ def find_parent(f):
             )
         )""", func_id=init_id)
 
-    func = bridge.remote_eval("""
-        currentProgram.getFunctionManager().getFunctionAt(
-            currentProgram.getSymbolTable().getSymbol(func_id).getAddress()
-        )
-    """, func_id=fields_id)
+    func = None
+    if fields_id is not None:
+        func = bridge.remote_eval("""
+            currentProgram.getFunctionManager().getFunctionAt(
+                currentProgram.getSymbolTable().getSymbol(func_id).getAddress()
+            )
+        """, func_id=fields_id)
 
     fields = get_field_registrations(bridge, ifc, monitor, func)
 
@@ -251,11 +262,11 @@ def decompile_in_background(all_fields_functions: dict[str, tuple[int, int]]):
         print(f"{len(failed)} function(s) failed, retrying on main thread.")
         initialize_worker()
 
-    for n in failed:
-        try:
-            callback(decompile_type(n, *all_fields_functions[n]))
-        except Exception as e:
-            report_update(f"Failed {n}: {e}")
+    # for n in failed:
+    #     try:
+    #         callback(decompile_type(n, *all_fields_functions[n]))
+    #     except Exception as e:
+    #         report_update(f"Failed {n}: {e}")
 
     return result
 
