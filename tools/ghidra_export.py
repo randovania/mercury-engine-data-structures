@@ -12,6 +12,7 @@ import ghidra_bridge
 
 hash_str = "HashString"
 register_field = "RegisterField"
+add_enum_value = "(?:FUN_71000148b8|AddEnumValue)"
 prefixes_to_remove = [
     "(ObjectField *)",
     "&",
@@ -128,8 +129,39 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
 
     return fields
 
+def get_value_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, values_function):
+    if values_function is None:
+        return None
 
-def get_function_list() -> dict[str, tuple[int, int]]:
+    res = bridge.remote_eval("""
+        ifc.decompileFunction(values_function, 180, monitor)
+    """, timeout_override=200, values_function=values_function, ifc=ifc, monitor=monitor)
+
+    decompiled_code = str(res.getCCodeMarkup())
+    hash_call_re = re.compile(hash_str + r'\(([^,]+?),"?([^,]+?)"?,(?:1|true)\);')
+    enum_call_re = re.compile(add_enum_value + r'\([^,]+?,([^,]+?),(.+?)\);')
+
+    crc_mapping = collections.defaultdict(list)
+    values = {}
+
+    for m in hash_call_re.finditer(decompiled_code):
+        crc_var, crc_string = m.group(1, 2)
+        crc_mapping[clean_crc_var(crc_var)].append((m.start(), crc_string))
+
+    for m in enum_call_re.finditer(decompiled_code):
+        crc_var, value_var = m.group(1, 2)
+
+        offset = None
+        crc_string = None
+        for offset, crc_string in reversed(crc_mapping[clean_crc_var(crc_var)]):
+            if offset < m.start():
+                break
+        
+        values[crc_string] = int(value_var, 0)
+
+    return values
+
+def get_function_list() -> dict[str, tuple[int, int, int]]:
     with ghidra_bridge.GhidraBridge() as init_bridge:
         result_fields = init_bridge.remote_eval("""
         [
@@ -141,9 +173,15 @@ def get_function_list() -> dict[str, tuple[int, int]]:
             (f.getName(True), f.getID()) for f in currentProgram.getSymbolTable().getSymbols("init")
         ]
         """)
+        result_values = init_bridge.remote_eval("""
+        [
+            (f.getName(True), f.getID()) for f in currentProgram.getSymbolTable().getSymbols("values")
+        ]
+        """)
         init_funcs = {}
         fields_funcs = {}
-        for name, func_id in result_fields+result_init:
+        values_funcs = {}
+        for name, func_id in result_fields+result_init+result_values:
             if name.startswith("Reflection::"):
                 name = name[len("Reflection::"):]
 
@@ -151,9 +189,11 @@ def get_function_list() -> dict[str, tuple[int, int]]:
                 init_funcs[name[:-len("::init")]] = func_id
             elif name.endswith("::fields"):
                 fields_funcs[name[:-len("::fields")]] = func_id
+            elif name.endswith("::values"):
+                values_funcs[name[:-len("::values")]] = func_id
 
         return {
-            name: (init_funcs.get(name), fields_funcs.get(name))
+            name: (init_funcs.get(name), fields_funcs.get(name), values_funcs.get(name))
             for name in fields_funcs.keys() | init_funcs.keys()
         }
 
@@ -176,8 +216,8 @@ def initialize_worker():
     ifc.openProgram(flat_api.currentProgram)
 
 
-def decompile_type(type_name: str, init_id: typing.Optional[int], fields_id: int,
-                   ) -> tuple[str, typing.Optional[str], dict[str, str]]:
+def decompile_type(type_name: str, init_id: typing.Optional[int], fields_id: typing.Optional[int], values_id: typing.Optional[int]
+                   ) -> tuple[str, typing.Optional[str], dict[str, str], dict[str, int]]:
     if bridge is None:
         raise ValueError("Bridge not initialized")
 
@@ -207,12 +247,22 @@ def find_parent(f):
 
     fields = get_field_registrations(bridge, ifc, monitor, func)
 
+    func = None
+    if values_id is not None:
+        func = bridge.remote_eval("""
+            currentProgram.getFunctionManager().getFunctionAt(
+                currentProgram.getSymbolTable().getSymbol(func_id).getAddress()
+            )
+        """, func_id=values_id)
+    values = get_value_registrations(bridge, ifc, monitor, func)
+
     if parent_init is not None:
         if parent_init.startswith("Reflection::"):
             parent_init = parent_init[len("Reflection::"):]
         parent_init = parent_init[:-len("::init")]
+    
 
-    return type_name, parent_init, fields
+    return type_name, parent_init, fields, values
 
 
 def decompile_in_background(all_fields_functions: dict[str, tuple[int, int]]):
@@ -233,8 +283,8 @@ def decompile_in_background(all_fields_functions: dict[str, tuple[int, int]]):
     result = {}
 
     def callback(r):
-        type_name, parent, fields = r
-        result[type_name] = {"parent": parent, "fields": fields}
+        type_name, parent, fields, values = r
+        result[type_name] = {"parent": parent, "fields": fields, "values": values}
         report_update(f"Parsed {type_name}")
 
     if total_count > process_count:
