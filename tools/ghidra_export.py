@@ -294,7 +294,7 @@ def find_parent(f):
     return type_name, parent_init, fields, values
 
 
-def decompile_in_background(all_fields_functions: dict[str, tuple[int, int]]):
+def decompile_in_background(all_fields_functions: dict[str, tuple[int, int, int]]):
     process_count = max(multiprocessing.cpu_count() - 2, 2)
 
     finished_count = 0
@@ -353,7 +353,7 @@ def decompile_in_background(all_fields_functions: dict[str, tuple[int, int]]):
 def is_invalid_data(name: str, data: dict[str, typing.Any]):
     # if "null" in data["fields"]:
     #     return True
-    #
+
     # if data["values"] is not None and "null" in data["values"]:
     #     return True
 
@@ -365,6 +365,8 @@ def is_container_or_ptr(name: str):
         "base::global::CRntSmallDictionary",
         "base::global::CRntDictionary",
         "base::global::CRntVector",
+        "base::global::CWeakPtr",
+        "std::unique_ptr",
     ]
     suffixes = [
         "Ptr",
@@ -391,6 +393,8 @@ def main(only_missing: bool = True, ignore_without_hash: bool = True,
             final_results = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         final_results = {}
+
+    final_results = typing.cast(dict[str, typing.Any], final_results)
 
     if ignore_container_or_ptr:
         for key in list(all_fields_functions.keys()):
@@ -422,8 +426,6 @@ def main(only_missing: bool = True, ignore_without_hash: bool = True,
             if key not in dread_data.all_name_to_property_id():
                 # print(f"Skipping {key}: no known hash - {all_fields_functions[key]}")
                 all_fields_functions.pop(key)
-
-    all_fields_functions = {}
 
     process_results = decompile_in_background(all_fields_functions)
     for key in sorted(process_results.keys()):
