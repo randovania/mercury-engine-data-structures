@@ -11,6 +11,7 @@ known_types_to_construct = {
     "int": "common_types.Int",
     "unsigned": "common_types.UInt",
     "unsigned_int": "common_types.UInt",
+    "unsigned_long": "construct.Int64ul",
     "base::global::CStrId": "common_types.StrId",
     "base::global::CFilePathStrId": "common_types.StrId",
     "base::global::CRntString": "common_types.StrId",
@@ -238,14 +239,13 @@ def main():
     all_types["gameeditor::CGameModelRoot"]["fields"].pop("pMusicManager")
 
     type_exporter = TypeExporter(all_types)
-    type_exporter.ensure_exported_type("gameeditor::CGameModelRoot")
 
-    # needs_exporting = {"CActor"}
-    # while needs_exporting:
-    #     next_type = needs_exporting.pop()
-    #     if next_type not in type_exporter._exported_types:
-    #         type_exporter.ensure_exported_type(next_type)
-    #         needs_exporting.update(type_exporter._children_for[next_type])
+    needs_exporting = {"gameeditor::CGameModelRoot", "CActor", "CCharClass"}
+    while needs_exporting:
+        next_type = needs_exporting.pop()
+        if next_type not in type_exporter._exported_types:
+            type_exporter.ensure_exported_type(next_type)
+            needs_exporting.update(type_exporter._children_for[next_type])
 
     output_path.write_text(type_exporter.export_code())
 

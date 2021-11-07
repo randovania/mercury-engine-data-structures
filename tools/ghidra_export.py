@@ -12,9 +12,12 @@ import ghidra_bridge
 
 hash_str = "HashString"
 register_field = "RegisterField"
+add_enum_value = "(?:FUN_71000148b8|AddEnumValue)"
 prefixes_to_remove = [
     "(ObjectField *)",
     "&",
+    "(CClass *)",
+    "Reflection::"
 ]
 
 _aliases = {
@@ -82,12 +85,15 @@ def clean_crc_var(crc_var: str) -> str:
 
 
 def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fields_function):
+    if fields_function is None:
+        return {}
+
     res = bridge.remote_eval("""
         ifc.decompileFunction(fields_function, 180, monitor)
     """, timeout_override=200, fields_function=fields_function, ifc=ifc, monitor=monitor)
 
     decompiled_code = str(res.getCCodeMarkup())
-    hash_call_re = re.compile(hash_str + r'\(([^,]+?),"?([^,]+?)"?,1\);')
+    hash_call_re = re.compile(hash_str + r'\(([^,]+?),"?([^,]+?)"?,(?:1|true)\);')
     register_call_re = re.compile(register_field + r'\([^,]+?,([^,]+?),(.+?),([^,]+?),([^,]+?),([^,]+?)\);')
 
     crc_mapping = collections.defaultdict(list)
@@ -108,44 +114,90 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
 
         if "&" in type_var:
             if "::_" in type_var:
-                type_name = type_var[1:type_var.find("::_")]
+                type_name = type_var[type_var.find("&")+1:type_var.find("::_")]
             else:
                 type_name = type_var
         else:
             i = decompiled_code.rfind(type_var, offset, m.start())
             end = decompiled_code.find(';', i)
             type_name = decompiled_code[i + len(type_var) + len(" = "):end]
-            if type_name.endswith("::init()"):
-                type_name = type_name[:-len("::init()")]
-
+            for prefix in prefixes_to_remove:
+                if type_name.startswith(prefix):
+                    type_name = type_name[len(prefix):].strip()
+            if type_name.endswith("()"):
+                type_name = type_name[:-len("()")]
+            if type_name.endswith("::init"):
+                type_name = type_name[:-len("::init")]
         fields[crc_string] = _aliases.get(type_name, type_name)
 
     return fields
 
+def get_value_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, values_function):
+    if values_function is None:
+        return None
 
-def get_function_list() -> dict[str, tuple[int, int]]:
+    res = bridge.remote_eval("""
+        ifc.decompileFunction(values_function, 180, monitor)
+    """, timeout_override=200, values_function=values_function, ifc=ifc, monitor=monitor)
+
+    decompiled_code = str(res.getCCodeMarkup())
+    hash_call_re = re.compile(hash_str + r'\(([^,]+?),"?([^,]+?)"?,(?:1|true)\);')
+    enum_call_re = re.compile(add_enum_value + r'\([^,]+?,([^,]+?),(.+?)\);')
+
+    crc_mapping = collections.defaultdict(list)
+    values = {}
+
+    for m in hash_call_re.finditer(decompiled_code):
+        crc_var, crc_string = m.group(1, 2)
+        crc_mapping[clean_crc_var(crc_var)].append((m.start(), crc_string))
+
+    for m in enum_call_re.finditer(decompiled_code):
+        crc_var, value_var = m.group(1, 2)
+
+        offset = None
+        crc_string = None
+        for offset, crc_string in reversed(crc_mapping[clean_crc_var(crc_var)]):
+            if offset < m.start():
+                break
+        
+        values[crc_string] = int(value_var, 0)
+
+    return values
+
+def get_function_list() -> dict[str, tuple[int, int, int]]:
     with ghidra_bridge.GhidraBridge() as init_bridge:
-        result = init_bridge.remote_eval("""
+        result_fields = init_bridge.remote_eval("""
         [
-            (f.getName(True), f.getID()) for f in currentProgram.getSymbolTable().getDefinedSymbols()
-            if f.getName() == "fields" or f.getName() == "init"
+            (f.getName(True), f.getID()) for f in currentProgram.getSymbolTable().getSymbols("fields")
+        ]
+        """)
+        result_init = init_bridge.remote_eval("""
+        [
+            (f.getName(True), f.getID()) for f in currentProgram.getSymbolTable().getSymbols("init")
+        ]
+        """)
+        result_values = init_bridge.remote_eval("""
+        [
+            (f.getName(True), f.getID()) for f in currentProgram.getSymbolTable().getSymbols("values")
         ]
         """)
         init_funcs = {}
         fields_funcs = {}
-        for name, func_id in result:
-            if not name.startswith("Reflection::"):
-                continue
-            name = name[len("Reflection::"):]
+        values_funcs = {}
+        for name, func_id in result_fields+result_init+result_values:
+            if name.startswith("Reflection::"):
+                name = name[len("Reflection::"):]
 
             if name.endswith("::init"):
                 init_funcs[name[:-len("::init")]] = func_id
             elif name.endswith("::fields"):
                 fields_funcs[name[:-len("::fields")]] = func_id
+            elif name.endswith("::values"):
+                values_funcs[name[:-len("::values")]] = func_id
 
         return {
-            name: (init_funcs.get(name), fields_funcs[name])
-            for name in fields_funcs
+            name: (init_funcs.get(name), fields_funcs.get(name), values_funcs.get(name))
+            for name in fields_funcs.keys() | init_funcs.keys()
         }
 
 
@@ -163,12 +215,15 @@ def initialize_worker():
 
     monitor = ConsoleTaskMonitor()
     ifc = DecompInterface()
-    ifc.setOptions(DecompileOptions())
+    options = DecompileOptions()
+    # make sure you have namespaces set to Always, and casting disabled
+    options.grabFromProgram(flat_api.currentProgram)
+    ifc.setOptions(options)
     ifc.openProgram(flat_api.currentProgram)
 
 
-def decompile_type(type_name: str, init_id: typing.Optional[int], fields_id: int,
-                   ) -> tuple[str, typing.Optional[str], dict[str, str]]:
+def decompile_type(type_name: str, init_id: typing.Optional[int], fields_id: typing.Optional[int], values_id: typing.Optional[int]
+                   ) -> tuple[str, typing.Optional[str], dict[str, str], dict[str, int]]:
     if bridge is None:
         raise ValueError("Bridge not initialized")
 
@@ -188,20 +243,32 @@ def find_parent(f):
             )
         )""", func_id=init_id)
 
-    func = bridge.remote_eval("""
-        currentProgram.getFunctionManager().getFunctionAt(
-            currentProgram.getSymbolTable().getSymbol(func_id).getAddress()
-        )
-    """, func_id=fields_id)
+    func = None
+    if fields_id is not None:
+        func = bridge.remote_eval("""
+            currentProgram.getFunctionManager().getFunctionAt(
+                currentProgram.getSymbolTable().getSymbol(func_id).getAddress()
+            )
+        """, func_id=fields_id)
 
     fields = get_field_registrations(bridge, ifc, monitor, func)
+
+    func = None
+    if values_id is not None:
+        func = bridge.remote_eval("""
+            currentProgram.getFunctionManager().getFunctionAt(
+                currentProgram.getSymbolTable().getSymbol(func_id).getAddress()
+            )
+        """, func_id=values_id)
+    values = get_value_registrations(bridge, ifc, monitor, func)
 
     if parent_init is not None:
         if parent_init.startswith("Reflection::"):
             parent_init = parent_init[len("Reflection::"):]
         parent_init = parent_init[:-len("::init")]
+    
 
-    return type_name, parent_init, fields
+    return type_name, parent_init, fields, values
 
 
 def decompile_in_background(all_fields_functions: dict[str, tuple[int, int]]):
@@ -222,8 +289,8 @@ def decompile_in_background(all_fields_functions: dict[str, tuple[int, int]]):
     result = {}
 
     def callback(r):
-        type_name, parent, fields = r
-        result[type_name] = {"parent": parent, "fields": fields}
+        type_name, parent, fields, values = r
+        result[type_name] = {"parent": parent, "fields": fields, "values": values}
         report_update(f"Parsed {type_name}")
 
     if total_count > process_count:
