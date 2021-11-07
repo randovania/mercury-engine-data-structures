@@ -12956,7 +12956,7 @@
         "values": null
     },
     "CDamageTriggerConfig": {
-        "parent": "CDamageTriggerComponent",
+        "parent": null,
         "fields": {
             "fDamagePerTime": "float",
             "fInBetweenDamageTime": "float",
@@ -13473,29 +13473,29 @@
         "parent": null,
         "fields": {
             "sID": "base::global::CStrId",
-            "tFog": "SFog*",
-            "tVerticalFog": "SVerticalFog*",
+            "tFog": "CEnvironmentData::SFog*",
+            "tVerticalFog": "CEnvironmentData::SVerticalFog*",
             "tFogTransitions": "base::global::CRntVector<CEnvironmentData::SFogTransition>*",
-            "tAmbient": "SAmbient*",
+            "tAmbient": "CEnvironmentData::SAmbient*",
             "tAmbientTransitions": "base::global::CRntVector<CEnvironmentData::SAmbientTransition>*",
-            "tDepthTint": "SDepthTint*",
+            "tDepthTint": "CEnvironmentData::SDepthTint*",
             "tDepthTintTransitions": "base::global::CRntVector<CEnvironmentData::SDepthTintTransition>*",
-            "tMaterialTint": "SMaterialTint*",
+            "tMaterialTint": "CEnvironmentData::SMaterialTint*",
             "tMaterialTintTransitions": "base::global::CRntVector<CEnvironmentData::SMaterialTintTransition>*",
-            "tPlayerLight": "SPlayerLight*",
+            "tPlayerLight": "CEnvironmentData::SPlayerLight*",
             "tPlayerLightTransitions": "base::global::CRntVector<CEnvironmentData::SPlayerLightTransition>*",
-            "tHemisphericalLight": "SHemisphericalLight*",
+            "tHemisphericalLight": "CEnvironmentData::SHemisphericalLight*",
             "tHemisphericalLightTransitions": "base::global::CRntVector<CEnvironmentData::SHemisphericalLightTransition>*",
-            "tBloom": "SBloom*",
+            "tBloom": "CEnvironmentData::SBloom*",
             "tBloomTransitions": "base::global::CRntVector<CEnvironmentData::SBloomTransition>*",
             "tVerticalFogTransitions": "base::global::CRntVector<CEnvironmentData::SVerticalFogTransition>*",
-            "tCubeMap": "SCubeMap*",
+            "tCubeMap": "CEnvironmentData::SCubeMap*",
             "tCubeMapTransitions": "base::global::CRntVector<CEnvironmentData::SCubeMapTransition>*",
-            "tSSAO": "SSSAO*",
+            "tSSAO": "CEnvironmentData::SSSAO*",
             "tSSAOTransitions": "base::global::CRntVector<CEnvironmentData::SSSAOTransition>*",
-            "tToneMapping": "SToneMapping*",
+            "tToneMapping": "CEnvironmentData::SToneMapping*",
             "tToneMappingTransitions": "base::global::CRntVector<CEnvironmentData::SToneMappingTransition>*",
-            "tIBLAttenuation": "SIBLAttenuation*",
+            "tIBLAttenuation": "CEnvironmentData::SIBLAttenuation*",
             "tIBLAttenuationTransitions": "base::global::CRntVector<CEnvironmentData::SIBLAttenuationTransition>*"
         },
         "values": null
@@ -13964,7 +13964,7 @@
         "fields": {
             "sID": "base::global::CStrId",
             "sSoundID": "base::global::CFilePathStrId",
-            "tSound": "SSound",
+            "tSound": "CEnvironmentSoundData::SSound",
             "dctTransitions": "base::global::CRntDictionary<base::global::CStrId, CEnvironmentSoundData::SSound>"
         },
         "values": null
@@ -17892,6 +17892,13 @@
         "fields": {},
         "values": null
     },
+    "CSpawnerActorBlueprint": {
+        "parent": null,
+        "fields": {
+            "InnerValue": "base::reflection::CTypedValue"
+        },
+        "values": null
+    },
     "CSpawnerActorBlueprintPtr": {
         "parent": null,
         "fields": {},
@@ -20598,7 +20605,7 @@
         "values": null
     },
     "base::global::CFilePathStrId": {
-        "parent": "base::global::CFilePathStrId",
+        "parent": null,
         "fields": {},
         "values": null
     },
@@ -21353,7 +21360,7 @@
         "values": null
     },
     "base::global::CStrId": {
-        "parent": "base::global::CStrId",
+        "parent": null,
         "fields": {},
         "values": null
     },
@@ -30088,7 +30095,7 @@
     "game::logic::collision::CCollider": {
         "parent": "game::logic::collision::CBroadphaseObject",
         "fields": {
-            "pShape": "CShape*"
+            "pShape": "game::logic::collision::CShape*"
         },
         "values": null
     },
@@ -30916,7 +30923,7 @@
     "sound::TBossMusicTrack": {
         "parent": null,
         "fields": {
-            "oTrack": "TMusicTrack",
+            "oTrack": "sound::TMusicTrack",
             "vFadeOuts": "base::global::CRntVector<sound::SStateFadeOut>"
         },
         "values": null
