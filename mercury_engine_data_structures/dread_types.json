@@ -96,7 +96,7 @@
         }
     },
     "CAIManager::EBumpMode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "EnemyPos2Hit": 0,
@@ -249,7 +249,7 @@
         "values": null
     },
     "CAbilityMultiLockon::SSubState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -298,7 +298,7 @@
         "values": null
     },
     "CAbilityOpticCamouflage::ESelectionInput": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "RS": 0,
@@ -634,7 +634,7 @@
         "values": null
     },
     "CAnimationPrefix::SPrefix::Enum": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -826,7 +826,7 @@
         "values": null
     },
     "CAutoolAIComponent::EThrusterMode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "EPowerOff": 0,
@@ -864,7 +864,7 @@
         "values": null
     },
     "CAutsniperShootAttack::EAutsniperState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "InMovementState": 0,
@@ -1014,7 +1014,7 @@
         "values": null
     },
     "CBigFistAttack::EBigFistAttackState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -1035,7 +1035,7 @@
         "values": null
     },
     "CBigkranXMagmaRainAttack::EState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -1051,7 +1051,7 @@
         "values": null
     },
     "CBigkranXSpitAttack::EState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -1451,7 +1451,7 @@
         "values": null
     },
     "CCentralUnitCannonAIComponent::EState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -1938,7 +1938,7 @@
         "values": null
     },
     "CCharClassAnalogAimTrack::EAbortAnalogAimInput": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -4120,7 +4120,7 @@
         "values": null
     },
     "CCharClassDredhedAIComponent::ESubspecies": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Dredhed": 0,
@@ -4261,7 +4261,7 @@
         "values": null
     },
     "CCharClassDropterAIComponent::ESubspecies": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Dropter": 0,
@@ -4751,7 +4751,7 @@
         "values": null
     },
     "CCharClassEnemyMovement::ETurn180Mode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "AxisX": 0,
@@ -5095,7 +5095,7 @@
         "values": null
     },
     "CCharClassFlockingSwarmControllerComponent::SRotationMode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Raw": 0,
@@ -5581,7 +5581,7 @@
         "values": null
     },
     "CCharClassGooplotAIComponent::ESubspecies": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Gooplot": 0,
@@ -5839,7 +5839,7 @@
         "values": null
     },
     "CCharClassHecathonAIComponent::ESubspecies": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Hecathon": 0,
@@ -6653,7 +6653,7 @@
         "values": null
     },
     "CCharClassInfesterAIComponent::ESubspecies": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Infester": 0,
@@ -7707,7 +7707,7 @@
         "values": null
     },
     "CCharClassNailongThornsAttack::EDepthornAttackType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "ClassicShoot": 0,
@@ -8097,7 +8097,7 @@
         "values": null
     },
     "CCharClassPoisonFlyAIComponent::ESubspecies": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Poisonfly": 0,
@@ -8188,7 +8188,7 @@
         "values": null
     },
     "CCharClassProjectileMovement::EProjectileMeleeHitReaction": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "IMPACT": 0,
@@ -8246,7 +8246,7 @@
         "values": null
     },
     "CCharClassQuetzoaAIComponent::ESubspecies": {
-        "parent": "CCharClassQuetzoaAIComponent::CTunableCharClassQuetzoaAIComponent",
+        "parent": null,
         "fields": {},
         "values": {
             "Quetzoa": 0,
@@ -8625,7 +8625,7 @@
         "values": null
     },
     "CCharClassSabotoruAIComponent::ESubspecies": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Sabotoru": 0,
@@ -9082,7 +9082,7 @@
         "values": null
     },
     "CCharClassSetCameraNearEvent::EDir": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Any": 0,
@@ -10041,7 +10041,7 @@
         "values": null
     },
     "CCharClassTakumakuAIComponent::ESubspecies": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Takumaku": 0,
@@ -10196,7 +10196,7 @@
         "values": null
     },
     "CCharClassToStateTrack::EMaintainFrameMode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Pct": 0,
@@ -10760,7 +10760,7 @@
         }
     },
     "CCharClassVulkranAIComponent::ESubspecies": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Vulkran": 0,
@@ -10902,7 +10902,7 @@
         "values": null
     },
     "CCharClassYamplotXAIComponent::ESubspecies": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Yampa": 0,
@@ -11039,7 +11039,7 @@
         "values": null
     },
     "CChozoCommanderKiGrabAttack::SState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -11099,7 +11099,7 @@
         "values": null
     },
     "CChozoCommanderUltimateGrabAttack::SState": {
-        "parent": "CChozoCommanderUltimateGrabAttack::CTunableCommanderUltimateGrab",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -11193,7 +11193,7 @@
         "values": null
     },
     "CChozoWarriorAIComponent::ETransformationType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -11274,7 +11274,7 @@
         "values": null
     },
     "CChozoWarriorXUltimateGrabAttack::SState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -11309,7 +11309,7 @@
         "values": null
     },
     "CChozoZombieXPoisonClawsAttack::EState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -11795,7 +11795,7 @@
         "values": null
     },
     "CDoorLifeComponent::SState": {
-        "parent": "bool",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -11827,7 +11827,7 @@
         }
     },
     "CDoorShieldLifeComponent::EDoorsShieldType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "MISSILE": 0,
@@ -11976,7 +11976,7 @@
         "values": null
     },
     "CElectricGeneratorComponent::EBlackOutZone": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Zone1": 0,
@@ -12233,7 +12233,7 @@
         "values": null
     },
     "CEmmyStateOverrideLogicAction::EMode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "ShowVisualCone": 0,
@@ -12684,7 +12684,7 @@
         "values": null
     },
     "CEscapeSequenceExplosionComponent::EExplosionType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "SMALL": 0,
@@ -12785,7 +12785,7 @@
         "values": null
     },
     "CExplosionGfx::ETransitionOperationMode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -12914,7 +12914,7 @@
         "values": null
     },
     "CForbiddenEdgesLogicAction::EState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Allowed": 0,
@@ -12939,7 +12939,7 @@
         "values": null
     },
     "CForcedMovementAreaComponent::EForcedDirection": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -13157,7 +13157,7 @@
         "values": null
     },
     "CGoliathAttack::EGoliathAttackState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -13218,7 +13218,7 @@
         "values": null
     },
     "CGrabComponent::ELinkMode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -13262,7 +13262,7 @@
         "values": null
     },
     "CGrappleBeamGun::ESelectionInput": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "LS": 0,
@@ -13299,7 +13299,7 @@
         "values": null
     },
     "CGroundShockerAttack::EState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -13620,7 +13620,7 @@
         "values": null
     },
     "CInfesterShootAttack::EState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -13666,7 +13666,7 @@
         }
     },
     "CInterpolationComponent::EInterpolationType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "ACCUMULATIVE": 0,
@@ -13942,7 +13942,7 @@
         "values": null
     },
     "CLiquidPoolBaseComponent::ELiquidType": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntSmallDictionary<base::global::CStrId,_base::spatial::CAABox2D>>::TElementIterator",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -14001,7 +14001,7 @@
         "values": null
     },
     "CLockOnMissileMovement::SSubState": {
-        "parent": "CLockOnMissileMovement::CTunableLockOnMissileMovement",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -14721,7 +14721,7 @@
         "values": null
     },
     "CNailongAIComponent::EType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Nailong": 0,
@@ -14741,7 +14741,7 @@
         "values": null
     },
     "CNailongThornsAttack::EState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "InitState": 0,
@@ -14764,7 +14764,7 @@
         "values": null
     },
     "CNailuggerAcidBallsAttack::EState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "InitState": 0,
@@ -14787,7 +14787,7 @@
         "values": null
     },
     "CNavMeshItemStage::ESide": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -14812,7 +14812,7 @@
         "values": null
     },
     "CObsydomithonAttack::EState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -14872,7 +14872,7 @@
         "values": null
     },
     "CPerceptionModifierLogicAction::EMode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Add": 0,
@@ -15240,7 +15240,7 @@
         "values": null
     },
     "CPrologueMode::SState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -15373,7 +15373,7 @@
         "values": null
     },
     "CRinkaUnitComponent::ECentralUnitType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Caves": 0,
@@ -15511,7 +15511,7 @@
         "values": null
     },
     "CSabotoruTurnInDoorAttack::EState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -15719,7 +15719,7 @@
         "values": null
     },
     "CSamusMagnetGloveMovementState::ESurfaceType": {
-        "parent": "CSamusMagnetGloveMovementState::CTunableSamusMagnetGloveMovementState",
+        "parent": null,
         "fields": {},
         "values": {
             "WALL": 0,
@@ -15804,7 +15804,7 @@
         "values": null
     },
     "CSamusMovement::EUpdateCollisionsPhaseOrder": {
-        "parent": "CSamusMovement::CTunableSamusMovement",
+        "parent": null,
         "fields": {},
         "values": {
             "SinglePhaseVerticalHorizontal": 0,
@@ -15858,7 +15858,7 @@
         "values": null
     },
     "CSaveGameLogicAction::EDestination": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "savedata": 0,
@@ -16025,7 +16025,7 @@
         "values": null
     },
     "CScourgeTongueSlashAttack::EState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -16089,7 +16089,7 @@
         "values": null
     },
     "CShakernautDoubleGroundShockAttack::ESide": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -16124,7 +16124,7 @@
         "values": null
     },
     "CShakernautPiercingLaserAttack::ESide": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -16161,7 +16161,7 @@
         "values": null
     },
     "CShelmitPlasmaRayAttack::EAttackState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "STARTING": 0,
@@ -16334,7 +16334,7 @@
         "values": null
     },
     "CSideEnemyMovement::EDir": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "left": 0,
@@ -16370,7 +16370,7 @@
         "values": null
     },
     "CSluggerSpitAttack::EState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -16505,7 +16505,7 @@
         }
     },
     "CSpawnPointComponent::EXCellSpawnPositionMode": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<CSpawnerActorBlueprint>>::TKeyElementIterator",
+        "parent": null,
         "fields": {},
         "values": {
             "FarthestToSpawnPoint": 0,
@@ -16809,7 +16809,7 @@
         "values": null
     },
     "CTakumakuDashAttack::EState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -16870,7 +16870,7 @@
         "values": null
     },
     "CThermalDeviceComponent::EPipeGroup": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<SDoorInfo>>::TKeyElementIterator",
+        "parent": null,
         "fields": {},
         "values": {
             "Group0": 0,
@@ -16913,7 +16913,7 @@
         "values": null
     },
     "CTimelineComponent::ENextPolicy": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "NEXT": 0,
@@ -16992,7 +16992,7 @@
         "values": null
     },
     "CTriggerComponent::EEvent": {
-        "parent": "bool",
+        "parent": null,
         "fields": {},
         "values": {
             "OnEnter": 0,
@@ -17268,7 +17268,7 @@
         "values": null
     },
     "CXParasiteAIComponent::EXParasiteBehaviorType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "EDrop": 0,
@@ -17379,7 +17379,7 @@
         "values": null
     },
     "EAIAnimationStates": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -17448,7 +17448,7 @@
         }
     },
     "EActorLayer": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntSmallDictionary<base::global::CStrId,_CActorSublayer>>::TKeyElementConstIterator",
+        "parent": null,
         "fields": {},
         "values": {
             "Entities": 0,
@@ -17458,7 +17458,7 @@
         }
     },
     "EAimDirection": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -17471,7 +17471,7 @@
         }
     },
     "EAmiibo": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "CazadoraSamus": 0,
@@ -17507,7 +17507,7 @@
         }
     },
     "EAutsharpSpawnPointDir": {
-        "parent": "CAutsharpSpawnPointComponent",
+        "parent": null,
         "fields": {},
         "values": {
             "Left": 0,
@@ -17517,7 +17517,7 @@
         }
     },
     "EAutsniperSpawnPointDir": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Clockwise": 0,
@@ -17526,7 +17526,7 @@
         }
     },
     "EBreakableTileType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "UNDEFINED": 0,
@@ -17552,7 +17552,7 @@
         }
     },
     "ECaterzillaSpawnPointOrder": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "First": 0,
@@ -17579,7 +17579,7 @@
         }
     },
     "EDamageStrength": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "DEFAULT": 0,
@@ -17605,7 +17605,7 @@
         }
     },
     "EDemolitionPhase": {
-        "parent": "bool",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -17617,7 +17617,7 @@
         }
     },
     "EElevatorDirection": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "UP": 0,
@@ -17685,7 +17685,7 @@
         }
     },
     "EFollowInPathOrientation": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -17709,7 +17709,7 @@
         }
     },
     "EForceOpticCamouflageMode": {
-        "parent": "CCharClassScorpiusAIComponent",
+        "parent": null,
         "fields": {},
         "values": {
             "Default": 0,
@@ -17719,7 +17719,7 @@
         }
     },
     "EForcedDamageMode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "NOT_FORCED": 0,
@@ -17729,7 +17729,7 @@
         }
     },
     "EGrabEmmySamusQTEMode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "VFX": 0,
@@ -17747,7 +17747,7 @@
         }
     },
     "EInFrustumMode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Position": 0,
@@ -17790,7 +17790,7 @@
         }
     },
     "EInputAimDir": {
-        "parent": "CAimComponent::CTunableAim",
+        "parent": null,
         "fields": {},
         "values": {
             "eFront": 0,
@@ -17804,7 +17804,7 @@
         }
     },
     "EJumpType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Short": 0,
@@ -17918,7 +17918,7 @@
         }
     },
     "ELoadingScreen": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "E_LOADINGSCREEN_GUI_2D": 0,
@@ -17995,7 +17995,7 @@
         }
     },
     "EMusicManagerInGameState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -18010,7 +18010,7 @@
         }
     },
     "ENavMeshItemType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Static": 0,
@@ -18020,7 +18020,7 @@
         }
     },
     "ENavigablePathType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "NONE": 0,
@@ -18054,7 +18054,7 @@
         }
     },
     "ERotationDirection": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "RIGHT": 0,
@@ -18063,7 +18063,7 @@
         }
     },
     "ESamusUsingGrapplePullPointStatePullStage": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -18074,7 +18074,7 @@
         }
     },
     "EShellState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "SHELTERED": 0,
@@ -18083,7 +18083,7 @@
         }
     },
     "EShieldAction": {
-        "parent": "CharClassSakaiModifyShieldEvent",
+        "parent": null,
         "fields": {},
         "values": {
             "Enable": 0,
@@ -18107,7 +18107,7 @@
         }
     },
     "ESlidleOutSpawnPointDir": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "ByDot": 0,
@@ -18165,7 +18165,7 @@
         }
     },
     "ESwifterSpawnGroupSpawnMode": {
-        "parent": "CSwifterSpawnGroupComponent",
+        "parent": null,
         "fields": {},
         "values": {
             "Water": 0,
@@ -18174,7 +18174,7 @@
         }
     },
     "ETeleporterColorSphere": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "BLUE": 0,
@@ -18234,7 +18234,7 @@
         }
     },
     "ETooltipType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Exploration": 0,
@@ -18245,7 +18245,7 @@
         }
     },
     "ETrainDirection": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "LEFT": 0,
@@ -18254,7 +18254,7 @@
         }
     },
     "EWalkInputMode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -18302,7 +18302,7 @@
         }
     },
     "EWings": {
-        "parent": "CCharClassCommanderWingsTrack",
+        "parent": null,
         "fields": {},
         "values": {
             "low": 0,
@@ -18311,7 +18311,7 @@
         }
     },
     "EXpawnAngPolicy": {
-        "parent": "SDeathImpactDisplacement",
+        "parent": null,
         "fields": {},
         "values": {
             "SPAWNPOINT": 0,
@@ -18365,7 +18365,7 @@
         "values": null
     },
     "GUI::CButton::TextAlign": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Align_Centered": 0,
@@ -18635,7 +18635,7 @@
         "values": null
     },
     "GUI::CGlobalMapComposition::SState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -18669,7 +18669,7 @@
         "values": null
     },
     "GUI::CHUD::EForceVisibilityState": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<std::unique_ptr<GUI::CHUD::SResourceAnimation>_>>::TKeyElementConstIterator",
+        "parent": null,
         "fields": {},
         "values": {
             "DONT_FORCE": 0,
@@ -18774,7 +18774,7 @@
         "values": null
     },
     "GUI::CMapMenuController::SState": {
-        "parent": "bool",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -19072,7 +19072,7 @@
         "values": null
     },
     "IPath::EType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -19233,7 +19233,7 @@
         }
     },
     "SDropProbabilities::SType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -19314,7 +19314,7 @@
         }
     },
     "SLoadScenarioRequest::EMode": {
-        "parent": "CGameManager::CTunableMusicVolume",
+        "parent": null,
         "fields": {},
         "values": {
             "Game": 0,
@@ -19551,7 +19551,7 @@
         "values": null
     },
     "animtree::CAnimatedNodeDef::EAnimNodeType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "SkelAnimationPoseBlend": 0,
@@ -19719,7 +19719,7 @@
         "values": null
     },
     "base::animation::EBlendFunction": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Linear": 0,
@@ -19803,7 +19803,7 @@
         "values": null
     },
     "base::curves::EInterpMode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Linear": 0,
@@ -20001,7 +20001,7 @@
         "values": null
     },
     "base::math::EMaxAxis": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -20122,7 +20122,7 @@
         "values": null
     },
     "base::serialization::EDeserializeCollectionElementMode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "UpdateOnly": 0,
@@ -20132,7 +20132,7 @@
         }
     },
     "base::serialization::EPersistence": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Transient": 0,
@@ -20244,7 +20244,7 @@
         }
     },
     "base::snd::ESndLogicId": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "DEFAULT": 0,
@@ -20292,7 +20292,7 @@
         }
     },
     "base::snd::ESoundGroupIds": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "DEFAULT": 0,
@@ -21118,7 +21118,7 @@
         "values": null
     },
     "behaviortree::CParallel::EPolicy": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "RequireOne": 0,
@@ -21249,7 +21249,7 @@
         "values": null
     },
     "behaviortree::CScaredAction::EState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -21666,7 +21666,7 @@
         "values": null
     },
     "behaviortree::SCompareOperator::Enum": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "None": 0,
@@ -21704,7 +21704,7 @@
         "values": null
     },
     "cutscene::EDevelopmentState": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Internal": 0,
@@ -21789,7 +21789,7 @@
         }
     },
     "engine::utils::ELightPreset": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "E_LIGHT_PRESET_NONE": 0,
@@ -21825,7 +21825,7 @@
         "values": null
     },
     "game::curves::EProcessorType": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Base": 0,
@@ -21928,7 +21928,7 @@
         "values": null
     },
     "game::logic::collision::EColMat": {
-        "parent": "unsigned",
+        "parent": null,
         "fields": {},
         "values": {
             "DEFAULT": 0,
@@ -21980,7 +21980,7 @@
         "values": null
     },
     "gameeditor::EEditorModeDataFlow": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "NONE": 0,
@@ -22064,7 +22064,7 @@
         "values": null
     },
     "media::EMovieStatus": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "Unknown": 0,
@@ -22087,7 +22087,7 @@
         "values": null
     },
     "minimap::EIconAnimID": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "SHOW": 0,
@@ -22287,7 +22287,7 @@
         }
     },
     "msapi::api::types::fillMode::EFillMode": {
-        "parent": "int",
+        "parent": null,
         "fields": {},
         "values": {
             "E_FILLMODE_SOLID": 0,
@@ -22344,7 +22344,7 @@
         "values": null
     },
     "msapi::material::ETranslucencyType": {
-        "parent": "msapi::material::SCull",
+        "parent": null,
         "fields": {},
         "values": {
             "E_TRANSLUCENCY_NONE": 0,
