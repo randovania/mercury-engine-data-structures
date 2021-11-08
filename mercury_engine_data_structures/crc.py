@@ -1,6 +1,7 @@
 """
 Module for calculating CRC hashes with the algorithm and data used by Mercury Engine.
 """
+import typing
 
 _crc64_constants = [
     0x0000000000000000, 0xB32E4CBE03A75F6F, 0xF4843657A840A05B, 0x47AA7AE9ABE7FF34, 0x7BD0C384FF8F5E33,
@@ -58,7 +59,10 @@ _crc64_constants = [
 ]
 
 
-def crc64(data: bytes) -> int:
+def crc64(data: typing.Union[bytes, str]) -> int:
+    if isinstance(data, str):
+        data = data.encode("utf-8")
+
     checksum = 0xffffffffffffffff
 
     for it in data:

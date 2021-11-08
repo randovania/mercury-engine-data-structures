@@ -141,9 +141,9 @@ def find_pkg_for(args):
     with PkgEditor.open_pkgs_at(root) as pkg_editor:
         pkg_editor = typing.cast(PkgEditor, pkg_editor)
         if asset_id is not None:
-            items = list(pkg_editor.find_pkgs_for_asset_id(asset_id))
+            items = list(pkg_editor.find_pkgs(asset_id))
         else:
-            items = list(pkg_editor.find_pkgs_for_name(asset_name))
+            items = list(pkg_editor.find_pkgs(asset_name))
 
         print(f"> Pkgs for {asset_id} / {asset_name}:")
         for it in items:

@@ -123,15 +123,15 @@ def decode_world(root: Path, target_level: str):
 
             if name.endswith("bmscc"):
                 print(f"Reading {name}...")
-                bmscc = Bmscc.parse(pkg_editor.get_asset_with_asset_id(asset_id), game)
+                bmscc = Bmscc.parse(pkg_editor.get_raw_asset(asset_id), game)
 
             elif name.endswith("brsa"):
                 print(f"Reading {name}...")
-                brsa = Brsa.parse(pkg_editor.get_asset_with_asset_id(asset_id), game)
+                brsa = Brsa.parse(pkg_editor.get_raw_asset(asset_id), game)
 
             elif name.endswith("brfld"):
                 print(f"Reading {name}...")
-                brfld = Brfld.parse(pkg_editor.get_asset_with_asset_id(asset_id), game)
+                brfld = Brfld.parse(pkg_editor.get_raw_asset(asset_id), game)
                 brfld_path = name
 
     if bmscc is None or brsa is None:

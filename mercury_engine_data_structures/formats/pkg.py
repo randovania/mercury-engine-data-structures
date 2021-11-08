@@ -7,9 +7,9 @@ from construct import (
     Aligned, FocusedSeq, Rebuild, Seek, Pointer, Prefixed, GreedyBytes,
 )
 
-from mercury_engine_data_structures import crc, dread_data
+from mercury_engine_data_structures import dread_data
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
-from mercury_engine_data_structures.formats.base_resource import BaseResource, AssetId
+from mercury_engine_data_structures.formats.base_resource import BaseResource, NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.game_check import Game
 
 Construct_AssetId = Hex(Int64ul)
@@ -121,17 +121,26 @@ class Pkg(BaseResource):
     def construct_class(cls, target_game: Game) -> Construct:
         return PKG
 
-    def get_resource_by_asset_id(self, asset_id: AssetId) -> Optional[bytes]:
+    @classmethod
+    def parse_stream(cls, stream: typing.BinaryIO, target_game: Game) -> "Pkg":
+        return cls(cls.construct_class(target_game).parse_stream(stream, target_game=target_game),
+                   target_game)
+
+    def build_stream(self, stream: typing.BinaryIO) -> bytes:
+        return self.construct_class(self.target_game).build_stream(self._raw, stream, target_game=self.target_game)
+
+    def get_resource(self, asset_id: NameOrAssetId) -> Optional[bytes]:
+        asset_id = resolve_asset_id(asset_id)
         for file in self.raw.files:
             if file.asset_id == asset_id:
                 return file.data
 
-    def get_resource_by_name(self, name: str) -> Optional[bytes]:
-        return self.get_resource_by_asset_id(crc.crc64(name.encode("utf-8")))
+    def replace_asset(self, asset_id: NameOrAssetId, new_file: bytes):
+        asset_id = resolve_asset_id(asset_id)
 
-    def replace_asset(self, asset_id: int, new_file: bytes):
         for file in self.raw.files:
             if file.asset_id == asset_id:
                 file.data = new_file
                 return
+
         raise ValueError(f"Unknown asset id: {asset_id}")
