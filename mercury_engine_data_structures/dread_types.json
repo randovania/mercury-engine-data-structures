@@ -40,6 +40,20 @@
         },
         "values": null
     },
+    "CAIComponent::PathLimitSelectionMode": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "FarthestFromTarget": 0,
+            "FarthestFromEntity": 1,
+            "InCurrentDir": 2,
+            "InOppositeDir2Target": 3,
+            "InOppositePathDir2Target": 4,
+            "InDir2Target": 5,
+            "InPathDir2Target": 6,
+            "Invalid": 2147483647
+        }
+    },
     "CAIGotoPointNavigationState::SEntityTarget": {
         "parent": "CAIGotoPointNavigationState::SPointTarget",
         "fields": {},
@@ -73,11 +87,23 @@
         },
         "values": null
     },
+    "CAIManager::EAIGroup": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Emmy": 0,
+            "Invalid": 2147483647
+        }
+    },
     "CAIManager::EBumpMode": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "EnemyPos2Hit": 0,
+            "SamusRay2Enemy": 1,
+            "SamusShape2Enemy": 2,
+            "SamusShape2EnemyAvg": 3,
+            "Invalid": 2147483647
         }
     },
     "CAINavigationComponent": {
@@ -226,7 +252,11 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Idle": 1,
+            "LockingTargets": 2,
+            "Firing": 3,
+            "Invalid": 2147483647
         }
     },
     "CAbilityOpticCamouflage": {
@@ -271,7 +301,18 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 4294967295
+            "RS": 0,
+            "ZR": 1,
+            "Invalid": 4294967295
+        }
+    },
+    "CAbilityOpticCamouflage::ESelectionMode": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Toggle": 0,
+            "Hold": 1,
+            "Invalid": 4294967295
         }
     },
     "CAbilityShinespark": {
@@ -596,7 +637,27 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 20
+            "None": 0,
+            "water": 1,
+            "speedbooster": 2,
+            "speedbooster45up": 3,
+            "left": 4,
+            "right": 5,
+            "patrol": 6,
+            "search": 7,
+            "chase": 8,
+            "chase2": 9,
+            "chasereachable": 10,
+            "combat": 11,
+            "flee": 12,
+            "brokenshield": 13,
+            "grab2": 14,
+            "grabwater": 15,
+            "protoemmytuto": 16,
+            "preseta": 17,
+            "presetb": 18,
+            "presetc": 19,
+            "Count": 20
         }
     },
     "CArachnusAIComponent": {
@@ -768,7 +829,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "EPowerOff": 0,
+            "EHalfPower": 1,
+            "EFullPower": 2,
+            "Invalid": 2147483647
         }
     },
     "CAutsharpAIComponent": {
@@ -803,7 +867,25 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "InMovementState": 0,
+            "InIdleState": 1,
+            "InFrozenState": 2,
+            "Invalid": 2147483647
+        }
+    },
+    "CAutsniperShootAttack::ELaserState": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "WaitState": 0,
+            "ChargeState": 1,
+            "PrepareToShootState": 2,
+            "CrazyBeforeShootState": 3,
+            "BeforeShootState": 4,
+            "ShootState": 5,
+            "AfterShootState": 6,
+            "RelocateCannonAndFinish": 7,
+            "Invalid": 2147483647
         }
     },
     "CAutsniperSpawnPointComponent": {
@@ -935,7 +1017,11 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Started": 1,
+            "PostAttackLoop": 2,
+            "Recovering": 3,
+            "Invalid": 2147483647
         }
     },
     "CBigkranXAIComponent": {
@@ -952,7 +1038,11 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Started": 1,
+            "Loop": 2,
+            "End": 3,
+            "Invalid": 2147483647
         }
     },
     "CBigkranXSpitAttack": {
@@ -964,7 +1054,11 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Started": 1,
+            "Loop": 2,
+            "End": 3,
+            "Invalid": 2147483647
         }
     },
     "CBillboardCollisionComponent": {
@@ -1360,7 +1454,14 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Closed": 1,
+            "Opening": 2,
+            "Opened": 3,
+            "Preparing": 4,
+            "Shot": 5,
+            "Closing": 6,
+            "Invalid": 2147483647
         }
     },
     "CCentralUnitCannonBeamMovementComponent": {
@@ -1393,6 +1494,17 @@
             "wpDeadCheckpointStartPoint": "CGameLink<CActor>"
         },
         "values": null
+    },
+    "CCentralUnitComponent::ECentralUnitMode": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Default": 0,
+            "Decayed": 1,
+            "Cave": 2,
+            "Shipyard": 3,
+            "Invalid": 2147483647
+        }
     },
     "CCentralUnitComponent::SStartPointInfo": {
         "parent": null,
@@ -1829,7 +1941,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Back": 1,
+            "Any": 2,
+            "Invalid": 2147483647
         }
     },
     "CCharClassAnimSpeedTrack": {
@@ -4008,7 +4123,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Dredhed": 0,
+            "Sakai": 1,
+            "Invalid": 2147483647
         }
     },
     "CCharClassDredhedAttackComponent": {
@@ -4147,7 +4264,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Dropter": 0,
+            "Sharpaw": 1,
+            "Iceflea": 2,
+            "Invalid": 2147483647
         }
     },
     "CCharClassDropterDiveAttack": {
@@ -4634,7 +4754,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "AxisX": 0,
+            "AxisY": 1,
+            "Dot": 2,
+            "Invalid": 2147483647
         }
     },
     "CCharClassEnhanceWeakSpotComponent": {
@@ -4975,7 +5098,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Raw": 0,
+            "Inclinate": 1,
+            "Invalid": 2147483647
         }
     },
     "CCharClassFloorSlide26Track": {
@@ -5459,7 +5584,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Gooplot": 0,
+            "Gooshocker": 1,
+            "Invalid": 2147483647
         }
     },
     "CCharClassGooplotCapsuleComponent": {
@@ -5715,7 +5842,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Hecathon": 0,
+            "Omnithon": 1,
+            "Invalid": 2147483647
         }
     },
     "CCharClassHecathonLifeComponent": {
@@ -6527,7 +6656,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Infester": 0,
+            "Fulmite": 1,
+            "Invalid": 2147483647
         }
     },
     "CCharClassInfesterBallAIComponent": {
@@ -7579,7 +7710,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "ClassicShoot": 0,
+            "SequenceShoot": 1,
+            "SineWaveShoot": 2,
+            "Invalid": 2147483647
         }
     },
     "CCharClassNailuggerAcidBallMovementComponent": {
@@ -7963,10 +8097,12 @@
         "values": null
     },
     "CCharClassPoisonFlyAIComponent::ESubspecies": {
-        "parent": "CCharClassPoisonFlyAIComponent::CTunableCharClassPoisonFlyAIComponent",
+        "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Poisonfly": 0,
+            "Blindfly": 1,
+            "Invalid": 2147483647
         }
     },
     "CCharClassPoisonFlyDiveAttack": {
@@ -8055,7 +8191,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "IMPACT": 0,
+            "IMPACT_ATTACKER": 1,
+            "NONE": 2,
+            "Invalid": 2147483647
         }
     },
     "CCharClassProtoEmmyChaseMusicTriggerComponent": {
@@ -8107,10 +8246,12 @@
         "values": null
     },
     "CCharClassQuetzoaAIComponent::ESubspecies": {
-        "parent": "int",
+        "parent": "CCharClassQuetzoaAIComponent::CTunableCharClassQuetzoaAIComponent",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Quetzoa": 0,
+            "Quetshocker": 1,
+            "Invalid": 2147483647
         }
     },
     "CCharClassQuetzoaChargeAttack": {
@@ -8343,6 +8484,17 @@
         },
         "values": null
     },
+    "CCharClassRodomithonXAIComponent::SFirePillarConfig::EType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "Short": 1,
+            "Medium": 2,
+            "Long": 3,
+            "Invalid": 2147483647
+        }
+    },
     "CCharClassRodomithonXAIComponent::TVFirePillarConfigs": {
         "parent": "int",
         "fields": {},
@@ -8396,6 +8548,17 @@
             "fBombAbsorbAcceleration": "float"
         },
         "values": null
+    },
+    "CCharClassRodotukAIComponent::SAbsorbConfig::EType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "Short": 1,
+            "Medium": 2,
+            "Long": 3,
+            "Invalid": 2147483647
+        }
     },
     "CCharClassRodotukAIComponent::TVAbsorbConfigs": {
         "parent": "base::reflection::CollectionTypeMapper<CCharClassRodotukAIComponent::TVAbsorbConfigs>::TKeyElementIterator",
@@ -8465,7 +8628,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Sabotoru": 0,
+            "Kreep": 1,
+            "Invalid": 2147483647
         }
     },
     "CCharClassSabotoruLifeComponent": {
@@ -8920,7 +9085,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Any": 0,
+            "Left": 1,
+            "Right": 2,
+            "Invalid": 2147483647
         }
     },
     "CCharClassSetComponentEnabledEvent": {
@@ -9876,7 +10044,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Takumaku": 0,
+            "Armadigger": 1,
+            "Klaida": 2,
+            "Invalid": 2147483647
         }
     },
     "CCharClassTakumakuAllowEndForcedTurnTrack": {
@@ -10028,7 +10199,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Pct": 0,
+            "Frame": 1,
+            "Invalid": 2147483647
         }
     },
     "CCharClassTrackTargetTrack": {
@@ -10575,11 +10748,24 @@
         },
         "values": null
     },
+    "CCharClassVulkranAIComponent::EDir": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Right": 0,
+            "Down": 1,
+            "Left": 2,
+            "Up": 3,
+            "Invalid": 2147483647
+        }
+    },
     "CCharClassVulkranAIComponent::ESubspecies": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Vulkran": 0,
+            "Spittail": 1,
+            "Invalid": 2147483647
         }
     },
     "CCharClassVulkranMagmaBallMovementComponent": {
@@ -10719,7 +10905,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Yampa": 0,
+            "YamplotX": 1,
+            "Invalid": 2147483647
         }
     },
     "CCharClassYamplotXBiteAttack": {
@@ -10854,7 +11042,15 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Idle": 1,
+            "SamusImpacted": 2,
+            "GrabSeqPrep1": 3,
+            "GrabSeq1": 4,
+            "GrabSeq1EarlyFail": 5,
+            "GrabSeq1TimeOut": 6,
+            "GrabSeq1Win": 7,
+            "Invalid": 2147483647
         }
     },
     "CChozoCommanderKiStrikeAttack": {
@@ -10903,10 +11099,23 @@
         "values": null
     },
     "CChozoCommanderUltimateGrabAttack::SState": {
-        "parent": "int",
+        "parent": "CChozoCommanderUltimateGrabAttack::CTunableCommanderUltimateGrab",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Idle": 1,
+            "SamusImpacted": 2,
+            "GrabSeqPrep1": 3,
+            "GrabSeq1": 4,
+            "GrabSeq1EarlyFail": 5,
+            "GrabSeq1TimeOut": 6,
+            "GrabSeq1Win": 7,
+            "GrabSeqPrep2": 8,
+            "GrabSeq2": 9,
+            "GrabSeq2EarlyFail": 10,
+            "GrabSeq2TimeOut": 11,
+            "GrabSeq2Win": 12,
+            "Invalid": 2147483647
         }
     },
     "CChozoCommanderXLifeComponent": {
@@ -10987,7 +11196,11 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Quick": 1,
+            "Full": 2,
+            "Quick_without_init": 3,
+            "Invalid": 2147483647
         }
     },
     "CChozoWarriorAttack": {
@@ -11064,7 +11277,20 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Idle": 1,
+            "SamusImpacted": 2,
+            "GrabSeqPrep1": 3,
+            "GrabSeq1": 4,
+            "GrabSeq1EarlyFail": 5,
+            "GrabSeq1TimeOut": 6,
+            "GrabSeq1Win": 7,
+            "GrabSeqPrep2": 8,
+            "GrabSeq2": 9,
+            "GrabSeq2EarlyFail": 10,
+            "GrabSeq2TimeOut": 11,
+            "GrabSeq2Win": 12,
+            "Invalid": 2147483647
         }
     },
     "CChozoWarriorXWallClimbAttack": {
@@ -11086,7 +11312,12 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Started": 1,
+            "AttackState": 2,
+            "AttackEndState": 3,
+            "End": 4,
+            "Invalid": 2147483647
         }
     },
     "CChozoZombieXSpawnPointComponent": {
@@ -11564,10 +11795,14 @@
         "values": null
     },
     "CDoorLifeComponent::SState": {
-        "parent": "CDoorLifeComponent::CTunableDoorLifeComponent",
+        "parent": "bool",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Opened": 1,
+            "Closed": 2,
+            "Locked": 3,
+            "Invalid": 2147483647
         }
     },
     "CDoorShieldLifeComponent": {
@@ -11580,11 +11815,28 @@
         },
         "values": null
     },
+    "CDoorShieldLifeComponent::EColor": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "NONE": 0,
+            "RED": 1,
+            "GREEN": 2,
+            "YELLOW": 3,
+            "Invalid": 2147483647
+        }
+    },
     "CDoorShieldLifeComponent::EDoorsShieldType": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "MISSILE": 0,
+            "SUPERMISSILE": 1,
+            "POWERBOOM": 2,
+            "PLASMA": 3,
+            "WAVE": 4,
+            "WIDE": 5,
+            "Invalid": 2147483647
         }
     },
     "CDredhedAIComponent": {
@@ -11727,7 +11979,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Zone1": 0,
+            "Zone2": 1,
+            "Unknown": 2,
+            "Invalid": 2147483647
         }
     },
     "CElectricReactionComponent": {
@@ -11861,6 +12116,16 @@
         },
         "values": null
     },
+    "CEmmyAIComponent::ETargetPerceptionType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "Indirect": 1,
+            "Direct": 2,
+            "Invalid": 2147483647
+        }
+    },
     "CEmmyAttackComponent": {
         "parent": "CAIAttackComponent",
         "fields": {},
@@ -11971,7 +12236,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "ShowVisualCone": 0,
+            "HideVisualCone": 1,
+            "Invalid": 2147483647
         }
     },
     "CEmmyValveComponent": {
@@ -12420,7 +12687,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "SMALL": 0,
+            "MEDIUM": 1,
+            "BIG": 2,
+            "Invalid": 2147483647
         }
     },
     "CEvacuationCountDown": {
@@ -12515,10 +12785,15 @@
         "values": null
     },
     "CExplosionGfx::ETransitionOperationMode": {
-        "parent": "CExplosionGfxPtr",
+        "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "RGBA": 1,
+            "RGB": 2,
+            "A": 3,
+            "End": 4,
+            "Invalid": 2147483647
         }
     },
     "CExtendDetectionPerceptionRuleSet": {
@@ -12642,7 +12917,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Allowed": 0,
+            "Forbidden": 1,
+            "Invalid": 2147483647
         }
     },
     "CForceMovementLogicAction": {
@@ -12665,7 +12942,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Right": 1,
+            "Left": 2,
+            "Invalid": 2147483647
         }
     },
     "CFreeAimTutoLogicAction": {
@@ -12880,7 +13160,11 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Started": 1,
+            "PostAttackLoop": 2,
+            "Recovering": 3,
+            "Invalid": 2147483647
         }
     },
     "CGoliathXAIComponent": {
@@ -12937,7 +13221,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "RootToDC_Grab": 1,
+            "FeetToRoot": 2,
+            "Invalid": 2147483647
         }
     },
     "CGrappleBeamComponent": {
@@ -12978,7 +13265,22 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 4294967295
+            "LS": 0,
+            "ZR": 1,
+            "RS": 2,
+            "Invalid": 4294967295
+        }
+    },
+    "CGrappleBeamGun::ESelectionMode": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "AIM_AUTOMATIC": 0,
+            "AIM_AUTOMATIC_DESELECT_HOLDING_INPUT": 1,
+            "AIM_MANUAL_SELECT_HOLDING_INPUT": 2,
+            "NO_AIM_SELECT_HOLDING_INPUT": 3,
+            "NO_AIM_TOGGLE_PRESSING_INPUT": 4,
+            "Invalid": 4294967295
         }
     },
     "CGrapplePointComponent": {
@@ -13000,7 +13302,15 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Started": 1,
+            "Start2Init": 2,
+            "InitLoop": 3,
+            "Init2Hit": 4,
+            "HitLoop": 5,
+            "Aborting": 6,
+            "End": 7,
+            "Invalid": 2147483647
         }
     },
     "CGun": {
@@ -13313,7 +13623,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "ShootState": 1,
+            "End": 2,
+            "Invalid": 2147483647
         }
     },
     "CInputComponent": {
@@ -13342,11 +13655,25 @@
         "fields": {},
         "values": null
     },
+    "CInterpolationComponent::EInterpDirection": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "INDIR_Left": 0,
+            "INDIR_Right": 1,
+            "INDIR_Any": 2,
+            "Invalid": 2147483647
+        }
+    },
     "CInterpolationComponent::EInterpolationType": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "ACCUMULATIVE": 0,
+            "LINEAR": 1,
+            "INSTANT": 2,
+            "EASY_IN_EASY_OUT": 3,
+            "Invalid": 2147483647
         }
     },
     "CInventoryComponent": {
@@ -13618,7 +13945,11 @@
         "parent": "base::reflection::CollectionTypeMapper<base::global::CRntSmallDictionary<base::global::CStrId,_base::spatial::CAABox2D>>::TElementIterator",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Water": 1,
+            "Lava": 2,
+            "All": 3,
+            "Invalid": 2147483647
         }
     },
     "CLiquidSimulationComponent": {
@@ -13670,10 +14001,13 @@
         "values": null
     },
     "CLockOnMissileMovement::SSubState": {
-        "parent": "int",
+        "parent": "CLockOnMissileMovement::CTunableLockOnMissileMovement",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Pooled": 1,
+            "Traking": 2,
+            "Invalid": 2147483647
         }
     },
     "CLockRoomLogicAction": {
@@ -13930,7 +14264,9 @@
         "parent": null,
         "fields": {},
         "values": {
-            "null": 2
+            "None": 0,
+            "Trail": 1,
+            "TrailEnd": 2
         }
     },
     "CMenuAnimationChangeComponent": {
@@ -14388,7 +14724,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Nailong": 0,
+            "Nailugger": 1,
+            "Depthorn": 2,
+            "Invalid": 2147483647
         }
     },
     "CNailongThornMovementComponent": {
@@ -14405,7 +14744,13 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "InitState": 0,
+            "ChargeThornsState": 1,
+            "WaitToNextAttackState": 2,
+            "TransitionToNextAttackState": 3,
+            "ReleaseThornsState": 4,
+            "ReleaseEndThornsState": 5,
+            "Invalid": 2147483647
         }
     },
     "CNailuggerAcidBallMovementComponent": {
@@ -14422,7 +14767,11 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "InitState": 0,
+            "ChargeAttackState": 1,
+            "AttackLoopState": 2,
+            "EndAttackState": 3,
+            "Invalid": 2147483647
         }
     },
     "CNavMeshItemComponent": {
@@ -14441,7 +14790,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Left": 1,
+            "Right": 2,
+            "Invalid": 2147483647
         }
     },
     "CNoFreezeRoomComponent": {
@@ -14463,7 +14815,14 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Started": 1,
+            "ChargeLoop": 2,
+            "Charge2Attack": 3,
+            "AttackLoop": 4,
+            "AttackLoopEnd": 5,
+            "Ending": 6,
+            "Invalid": 2147483647
         }
     },
     "COffset": {
@@ -14516,7 +14875,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Add": 0,
+            "Remove": 1,
+            "Invalid": 2147483647
         }
     },
     "CPerceptionRuleSet": {
@@ -14882,7 +15243,11 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "State0": 1,
+            "State1": 2,
+            "State2": 3,
+            "Invalid": 2147483647
         }
     },
     "CProtoCentralUnitComponent": {
@@ -15011,7 +15376,22 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Caves": 0,
+            "Magma": 1,
+            "Lab": 2,
+            "Forest": 3,
+            "Sanc": 4,
+            "Invalid": 2147483647
+        }
+    },
+    "CRinkaUnitComponent::ERinkaType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "A": 0,
+            "B": 1,
+            "C": 2,
+            "Invalid": 2147483647
         }
     },
     "CRobotAIComponent": {
@@ -15134,7 +15514,12 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Started": 1,
+            "TurnState": 2,
+            "TurnInDoorState": 3,
+            "End": 4,
+            "Invalid": 2147483647
         }
     },
     "CSamusAction": {
@@ -15334,10 +15719,13 @@
         "values": null
     },
     "CSamusMagnetGloveMovementState::ESurfaceType": {
-        "parent": "int",
+        "parent": "CSamusMagnetGloveMovementState::CTunableSamusMagnetGloveMovementState",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "WALL": 0,
+            "CEILING": 1,
+            "CEILING_45": 2,
+            "Invalid": 2147483647
         }
     },
     "CSamusModelUpdaterComponent": {
@@ -15416,10 +15804,12 @@
         "values": null
     },
     "CSamusMovement::EUpdateCollisionsPhaseOrder": {
-        "parent": "int",
+        "parent": "CSamusMovement::CTunableSamusMovement",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "SinglePhaseVerticalHorizontal": 0,
+            "TwoPhasesVerticalThenHorizontal": 1,
+            "Invalid": 2147483647
         }
     },
     "CSamusMovementState::CParams": {
@@ -15471,7 +15861,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "savedata": 0,
+            "checkpoint": 1,
+            "Invalid": 2147483647
         }
     },
     "CSaveGameToSnapshotLogicAction": {
@@ -15636,7 +16028,14 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Starting": 1,
+            "Init": 2,
+            "InitLoop": 3,
+            "Stretch": 4,
+            "Shrink": 5,
+            "End": 6,
+            "Invalid": 2147483647
         }
     },
     "CScriptComponent": {
@@ -15693,7 +16092,30 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Left": 1,
+            "Right": 2,
+            "Invalid": 2147483647
+        }
+    },
+    "CShakernautDoubleGroundShockAttack::EState": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "InitState": 1,
+            "ChargeInitState": 2,
+            "ShotInitFirstArmState": 3,
+            "ShotInitSecondArmState": 4,
+            "ChargeLoopFirstArmState": 5,
+            "ChargeLoopSecondArmState": 6,
+            "ShotFirstArmState": 7,
+            "ShotSecondArmState": 8,
+            "ShotEndFirstArmState": 9,
+            "ShotEndSecondArmState": 10,
+            "ChangeArmState": 11,
+            "EndAttackState": 12,
+            "Invalid": 2147483647
         }
     },
     "CShakernautPiercingLaserAttack": {
@@ -15705,7 +16127,25 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Left": 1,
+            "Right": 2,
+            "Invalid": 2147483647
+        }
+    },
+    "CShakernautPiercingLaserAttack::EState": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "ToRelaxInitState": 1,
+            "InitState": 2,
+            "ChargeShotState": 3,
+            "FirstShotState": 4,
+            "ShotLoopState": 5,
+            "RelocateEyeState": 6,
+            "EndState": 7,
+            "Invalid": 2147483647
         }
     },
     "CShelmitAIComponent": {
@@ -15724,7 +16164,19 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "STARTING": 0,
+            "ON_HOLD_CHASE": 1,
+            "CHASING": 2,
+            "PREPARE_SHOOTING": 3,
+            "INIT_SHOOTING": 4,
+            "SHOOTING": 5,
+            "END_SHOOTING": 6,
+            "PREPARE_LAUNCH": 7,
+            "INIT_LAUNCH": 8,
+            "LAUNCHED": 9,
+            "EXPLODING": 10,
+            "ENDING": 11,
+            "Invalid": 2147483647
         }
     },
     "CShineonAIComponent": {
@@ -15885,7 +16337,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "left": 0,
+            "right": 1,
+            "Invalid": 2147483647
         }
     },
     "CSlidleSpawnPointComponent": {
@@ -15919,7 +16373,12 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Started": 1,
+            "Spit": 2,
+            "RepeatAttack": 3,
+            "End": 4,
+            "Invalid": 2147483647
         }
     },
     "CSmartObjectComponent": {
@@ -16035,11 +16494,23 @@
         },
         "values": null
     },
-    "CSpawnPointComponent::EXCellSpawnPositionMode": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<CSpawnerActorBlueprint>>::TKeyElementConstIterator",
+    "CSpawnPointComponent::EDynamicSpawnPositionMode": {
+        "parent": null,
         "fields": {},
         "values": {
-            "null": 2147483647
+            "ClosestToPlayer": 0,
+            "FarthestToPlayer": 1,
+            "Random": 2,
+            "Invalid": 2147483647
+        }
+    },
+    "CSpawnPointComponent::EXCellSpawnPositionMode": {
+        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<CSpawnerActorBlueprint>>::TKeyElementIterator",
+        "fields": {},
+        "values": {
+            "FarthestToSpawnPoint": 0,
+            "ClosestToSpawnPoint": 1,
+            "Invalid": 2147483647
         }
     },
     "CSpawnerActorBlueprint": {
@@ -16205,6 +16676,17 @@
         },
         "values": null
     },
+    "CSubAreaManager::ETransitionType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "Camera": 1,
+            "Fade": 2,
+            "FakeFade": 3,
+            "Invalid": 2147483647
+        }
+    },
     "CSubareaCharclassGroup": {
         "parent": null,
         "fields": {
@@ -16330,7 +16812,12 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Starting": 1,
+            "ChargeLoop": 2,
+            "RunningLoop": 3,
+            "Stopping": 4,
+            "Invalid": 2147483647
         }
     },
     "CTargetComponent": {
@@ -16383,10 +16870,18 @@
         "values": null
     },
     "CThermalDeviceComponent::EPipeGroup": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<SDoorInfo>>::TKeyElementConstIterator",
+        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<SDoorInfo>>::TKeyElementIterator",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Group0": 0,
+            "Group1": 1,
+            "Group2": 2,
+            "Group3": 3,
+            "Group4": 4,
+            "Group5": 5,
+            "Group6": 6,
+            "Group7": 7,
+            "Invalid": 2147483647
         }
     },
     "CThermalReactionComponent": {
@@ -16421,7 +16916,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "NEXT": 0,
+            "RANDOM": 1,
+            "RANDOM_DELAY": 2,
+            "Invalid": 2147483647
         }
     },
     "CTimerComponent": {
@@ -16494,10 +16992,17 @@
         "values": null
     },
     "CTriggerComponent::EEvent": {
-        "parent": "CTriggerComponent::SActivationConditionPtr",
+        "parent": "bool",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "OnEnter": 0,
+            "OnExit": 1,
+            "OnAllExit": 2,
+            "OnStay": 3,
+            "OnEnable": 4,
+            "OnDisable": 5,
+            "TE_COUNT": 6,
+            "Invalid": 2147483647
         }
     },
     "CTriggerComponent::SActivationCondition": {
@@ -16766,7 +17271,16 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "EDrop": 0,
+            "EWanderThenFlee": 1,
+            "EFlee": 2,
+            "EStayOnPlace": 3,
+            "EGoSpawn": 4,
+            "EGoTransform": 5,
+            "EGoToPlayer": 6,
+            "EBeingAbsorbed": 7,
+            "ESpawnOutOfCamera": 8,
+            "Invalid": 2147483647
         }
     },
     "CXParasiteBehavior": {
@@ -16868,252 +17382,944 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Idle": 1,
+            "Walking": 2,
+            "WalkingWall": 3,
+            "WalkingCeil": 4,
+            "Flying": 5,
+            "Side": 6,
+            "Invalid": 2147483647
+        }
+    },
+    "EActionInsertFlags": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "IGNORE_PRIORITY": 0,
+            "FORCE": 1,
+            "LOCAL_TRANSFORM": 2,
+            "CLEAR_ROOT_MOTION": 3,
+            "CLEAR_ROOT_MOTION_IF_NO_ADVANCE": 4,
+            "ACTIONSET_UPDATED": 5,
+            "REPLACE_LOOPED": 6,
+            "UPDATE_MODEL": 7,
+            "USE_LAST_REMAINING_TIME": 8,
+            "NEXT_ACTION": 9,
+            "LAUNCH_EVENTS_ON_SYNC": 10,
+            "RESET_STORED_ENTITY_TRANSFORM": 11,
+            "RESET_STORED_ENTITY_TRANSFORM_TRANSLATION": 12,
+            "START_EVENTS_ON_TICK": 13,
+            "LAUNCH_NON_DISCARDABLES": 14,
+            "NO_SET_SAME_ACTION_WITH_DIFFERENT_PREFIX": 15
+        }
+    },
+    "EActionPlayMode": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "TIME": 0,
+            "MANUAL": 1,
+            "Invalid": 2147483647
+        }
+    },
+    "EActionProps": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "DCRootControlled": 0,
+            "DCRootRotationControlled": 1,
+            "DontBlend": 2,
+            "ForceModelUpdate": 3,
+            "IgnoreCullState": 4,
+            "HasNextAction": 5,
+            "HasEndPose": 6,
+            "Invalid": 2147483647
+        }
+    },
+    "EActionSegmentType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Animation": 0,
+            "BlendSpace": 1,
+            "Wait": 2,
+            "Invalid": 2147483647
         }
     },
     "EActorLayer": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntSmallDictionary<base::global::CStrId,_CActorSublayer>>::TElementIterator",
+        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntSmallDictionary<base::global::CStrId,_CActorSublayer>>::TKeyElementConstIterator",
         "fields": {},
         "values": {
-            "null": 4294967295
+            "Entities": 0,
+            "Sounds": 1,
+            "Lights": 2,
+            "Invalid": 4294967295
         }
     },
     "EAimDirection": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Up": 1,
+            "FrontUp": 2,
+            "Front": 3,
+            "FrontDown": 4,
+            "Down": 5,
+            "Invalid": 2147483647
         }
     },
     "EAmiibo": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "CazadoraSamus": 0,
+            "CazadoraEmmy": 1,
+            "SmashBrosSamus": 2,
+            "SmashBrosDarkSamus": 3,
+            "SmashBrosZeroSamus": 4,
+            "SmashBrosRidley": 5,
+            "SamusReturnsSamus": 6,
+            "SamusReturnsMetroid": 7,
+            "Invalid": 2147483647
+        }
+    },
+    "EAnimationTag": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "slope": 0,
+            "stealth": 1,
+            "left": 2,
+            "right": 3,
+            "shield": 4,
+            "hiddenshield": 5,
+            "attack": 6,
+            "stage2": 7,
+            "super": 8,
+            "low": 9,
+            "preseta": 10,
+            "presetb": 11,
+            "presetc": 12,
+            "chozowarriorx_powerbomb": 13,
+            "slope26up": 14
         }
     },
     "EAutsharpSpawnPointDir": {
-        "parent": "int",
+        "parent": "CAutsharpSpawnPointComponent",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Left": 0,
+            "Right": 1,
+            "Both": 2,
+            "Invalid": 2147483647
         }
     },
     "EAutsniperSpawnPointDir": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Clockwise": 0,
+            "Counterclockwise": 1,
+            "Invalid": 2147483647
         }
     },
     "EBreakableTileType": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "UNDEFINED": 0,
+            "POWERBEAM": 1,
+            "BOMB": 2,
+            "MISSILE": 3,
+            "SUPERMISSILE": 4,
+            "POWERBOMB": 5,
+            "SCREWATTACK": 6,
+            "WEIGHT": 7,
+            "BABYHATCHLING": 8,
+            "SPEEDBOOST": 9,
+            "Invalid": 2147483647
+        }
+    },
+    "ECaterzillaSpawnPointDir": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Front": 0,
+            "Side": 1,
+            "Invalid": 2147483647
         }
     },
     "ECaterzillaSpawnPointOrder": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "First": 0,
+            "Second": 1,
+            "InFrustrum": 2,
+            "Invalid": 2147483647
+        }
+    },
+    "ECoolShinesparkSituation": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Default": 0,
+            "CooldownX": 1
+        }
+    },
+    "ECutPathMode": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "ALWAYS": 0,
+            "ONLY_IN_CLOSE_CORNERS": 1,
+            "Invalid": 2147483647
         }
     },
     "EDamageStrength": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "DEFAULT": 0,
+            "MEDIUM": 1,
+            "MEDIUM_HORIZONTAL": 2,
+            "HARD_WITHOUT_SHAKE": 3,
+            "HARD": 4,
+            "SUPER_HARD": 5,
+            "Invalid": 2147483647
+        }
+    },
+    "EDamageType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "UNKNOWN": 0,
+            "ELECTRIC": 1,
+            "FIRE": 2,
+            "BLOOD": 3,
+            "STEAM": 4,
+            "NO_DAMAGE": 5,
+            "Invalid": 2147483647
         }
     },
     "EDemolitionPhase": {
-        "parent": "int",
+        "parent": "bool",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Idle": 1,
+            "StartSwelling": 2,
+            "HeartBeat": 3,
+            "Explosion": 4,
+            "Invalid": 2147483647
         }
     },
     "EElevatorDirection": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "UP": 0,
+            "DOWN": 1,
+            "Invalid": 2147483647
+        }
+    },
+    "EEmmyAlertLevel": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Patrol": 0,
+            "Search": 1,
+            "Chase": 2,
+            "Invalid": 2147483647
+        }
+    },
+    "EEntryType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "ML_INFO_ENTRY": 0,
+            "ML_DIALOGUE_ENTRY": 1,
+            "ML_TUTO_ENTRY": 2,
+            "Invalid": 2147483647
+        }
+    },
+    "EEventProps": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Layer_0": 0,
+            "Layer_1": 1,
+            "Layer_2": 2,
+            "Layer_3": 3,
+            "Layer_4": 4,
+            "Layer_5": 5,
+            "Layer_6": 6,
+            "Layer_7": 7,
+            "Discardable": 8,
+            "DiscardableOnSync": 9
         }
     },
     "EExecutionReturnValue": {
         "parent": null,
         "fields": {},
         "values": {
-            "null": 1
+            "STOP": 0,
+            "CONTINUE": 1
+        }
+    },
+    "EFXType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "FXTYPE_PARTICLESYSTEM": 0,
+            "FXTYPE_RAGDOLL": 1,
+            "FXTYPE_LIGHT": 2,
+            "FXTYPE_MODEL": 3,
+            "FXTYPE_CUSTOMMATERIAL": 4,
+            "FXTYPE_LIGHTNING": 5,
+            "FXTYPE_CURVEMODELS": 6,
+            "FXTYPE_CURVEPARTICLES": 7,
+            "FXTYPE_TRAIL": 8
         }
     },
     "EFollowInPathOrientation": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "HorizontalOrientation": 1,
+            "VerticalOrientation": 2,
+            "HeuristicOrientation": 3,
+            "Invalid": 2147483647
+        }
+    },
+    "EFollowPathRotationMode": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "VerticalRotationToMovement": 1,
+            "InvertVerticalRotationToMovement": 2,
+            "PositiveVerticalRotationToMovement": 3,
+            "NegativeVerticalRotationToMovement": 4,
+            "HorizontalRotationToMovement": 5,
+            "Invalid": 2147483647
         }
     },
     "EForceOpticCamouflageMode": {
-        "parent": "int",
+        "parent": "CCharClassScorpiusAIComponent",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Default": 0,
+            "ForceEnabled": 1,
+            "ForceDisabled": 2,
+            "Invalid": 2147483647
         }
     },
     "EForcedDamageMode": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "NOT_FORCED": 0,
+            "ONLY_REACTION": 1,
+            "FORCED": 2,
+            "Invalid": 2147483647
         }
     },
     "EGrabEmmySamusQTEMode": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "VFX": 0,
+            "HUD": 1,
+            "Invalid": 2147483647
+        }
+    },
+    "EIceMode": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Mode1": 0,
+            "Mode2": 1,
+            "Invalid": 2147483647
         }
     },
     "EInFrustumMode": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Position": 0,
+            "AnyDimension": 1,
+            "AllDimensions": 2,
+            "HalfDimensions": 3,
+            "VerticalDimension": 4,
+            "HorizontalDimension": 5,
+            "Invalid": 2147483647
+        }
+    },
+    "EInputAction": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "MoveX": 1,
+            "MoveY": 2,
+            "Fire": 4,
+            "SwitchGunMode": 16,
+            "Jump": 32,
+            "Aim": 64,
+            "Melee": 128,
+            "ActivateAbility": 256,
+            "SelectAbilityLeftRight": 512,
+            "SelectAbilityUpDown": 1024,
+            "SwitchGun": 2048,
+            "RawMove": 4096,
+            "RawLook": 8192,
+            "LoosingInputs": 16384,
+            "Convert": 32768,
+            "LookX": 65536,
+            "LookY": 131072,
+            "Walk": 262144,
+            "WalkToggle": 524288,
+            "OpticCamouflage": 1048576,
+            "Sonar": 2097152,
+            "MinimapEx": 4194304,
+            "All": 65535
         }
     },
     "EInputAimDir": {
-        "parent": "int",
+        "parent": "CAimComponent::CTunableAim",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "eFront": 0,
+            "eFrontUp": 1,
+            "eFrontUpUp": 2,
+            "eFrontUpDown": 3,
+            "eFrontDown": 4,
+            "eFrontDownUp": 5,
+            "eFrontDownDown": 6,
+            "Invalid": 2147483647
         }
     },
     "EJumpType": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Short": 0,
+            "Large": 1,
+            "Invalid": 2147483647
+        }
+    },
+    "ELOSCheckLevel": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "CenterPos": 1,
+            "TopPos": 2,
+            "DownPos": 3,
+            "CenterTopPos": 4,
+            "CenterDownPos": 5,
+            "TopDownPos": 6,
+            "CenterTopDownPos": 7,
+            "Invalid": 2147483647
+        }
+    },
+    "ELOSMode": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "Position": 1,
+            "FrontAndBack": 2,
+            "Parabolic": 3,
+            "Invalid": 2147483647
+        }
+    },
+    "ELavaCarpetState": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Init": 0,
+            "ShotInit": 1,
+            "Shot": 2,
+            "StopShot": 3,
+            "Breathe": 4,
+            "End": 5,
+            "Invalid": 2147483647
+        }
+    },
+    "ELavaDropArm": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "LeftUp": 0,
+            "LeftDown": 1,
+            "RightUp": 2,
+            "RightDown": 3,
+            "Invalid": 2147483647
+        }
+    },
+    "ELavaDropArmPos": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "A": 0,
+            "B": 1,
+            "Invalid": 2147483647
+        }
+    },
+    "ELightAttachment": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "PosRot3D": 0,
+            "Pos3D": 1,
+            "Rot3D": 2,
+            "PosRot2D": 3,
+            "Pos2D": 4,
+            "Rot2D": 5,
+            "Invalid": 4294967295
+        }
+    },
+    "ELightType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Directional": 0,
+            "Omni": 1,
+            "Spot": 2,
+            "Seg": 3,
+            "Invalid": 4294967295
         }
     },
     "ELinkType": {
         "parent": null,
         "fields": {},
         "values": {
-            "null": 15
+            "FXLINK_POSITION_FIXED": 0,
+            "FXLINK_POSITION_ENTITY": 1,
+            "FXLINK_POSITION_MODEL": 2,
+            "FXLINK_POSITION_MODEL_NODE": 3,
+            "FXLINK_ATTACH_ENTITY": 4,
+            "FXLINK_ATTACH_MODEL": 5,
+            "FXLINK_ATTACH_MODEL_NODE": 6,
+            "FXLINK_ATTACH_POSITION_ENTITY": 7,
+            "FXLINK_ATTACH_POSITION_MODEL_NODE": 8,
+            "FXLINK_ATTACH_POSITION_MODEL_NODE_LOCAL": 9,
+            "FXLINK_POSITION_LAST_DAMAGE_DONE_HIT": 10,
+            "FXLINK_POSITION_AI_CUSTOM": 11,
+            "FXLINK_MOVEMENT_CUSTOM": 12,
+            "FXLINK_POSITION_CAMERA": 13,
+            "FXLINK_ATTACH_CAMERA": 14,
+            "FXLINK_ATTACH_POSITION_CAMERA": 15
         }
     },
     "ELoadingScreen": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "E_LOADINGSCREEN_GUI_2D": 0,
+            "E_LOADINGSCREEN_VIDEO": 1,
+            "E_LOADINGSCREEN_ELEVATOR_UP": 2,
+            "E_LOADINGSCREEN_ELEVATOR_DOWN": 3,
+            "E_LOADINGSCREEN_MAIN_ELEVATOR_UP": 4,
+            "E_LOADINGSCREEN_MAIN_ELEVATOR_DOWN": 5,
+            "E_LOADINGSCREEN_TELEPORTER": 6,
+            "E_LOADINGSCREEN_TRAIN_LEFT": 7,
+            "E_LOADINGSCREEN_TRAIN_LEFT_AQUA": 8,
+            "E_LOADINGSCREEN_TRAIN_RIGHT": 9,
+            "E_LOADINGSCREEN_TRAIN_RIGHT_AQUA": 10,
+            "Invalid": 2147483647
+        }
+    },
+    "EMapTutoType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "HINT_ZONE": 0,
+            "EMMY_ZONE": 1,
+            "TELEPORTER_NET": 2,
+            "Invalid": 2147483647
+        }
+    },
+    "EMarkerType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "MARKER_A": 0,
+            "MARKER_B": 1,
+            "MARKER_C": 2,
+            "MARKER_D": 3,
+            "MARKER_E": 4,
+            "MARKER_F": 5,
+            "MARKER_G": 6,
+            "MARKER_H": 7,
+            "MARKER_I": 8,
+            "Invalid": 2147483647
+        }
+    },
+    "EMinimapFowType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "CAMERA": 0,
+            "CIRCLE": 1,
+            "CLAMP_CIRCLE": 2,
+            "Invalid": 2147483647
+        }
+    },
+    "EMinimapMode": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Never": 0,
+            "Always": 1,
+            "Patrol2Search": 2,
+            "ChaseAndSearchRange": 3,
+            "Search": 4,
+            "AlwaysExceptPatrol": 5,
+            "Invalid": 2147483647
+        }
+    },
+    "EMusicFadeType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "DEFAULT": 1,
+            "CROSS_FADE": 2,
+            "Invalid": 2147483647
         }
     },
     "EMusicManagerInGameState": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "RELAX": 1,
+            "PATROL": 2,
+            "SEARCH": 3,
+            "PATROL2": 4,
+            "SEARCH2": 5,
+            "DEATH": 6,
+            "COMBAT": 7,
+            "Invalid": 2147483647
         }
     },
     "ENavMeshItemType": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Static": 0,
+            "Dynamic": 1,
+            "Destructible": 2,
+            "Invalid": 2147483647
         }
     },
     "ENavigablePathType": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "NONE": 0,
+            "GROUND": 1,
+            "STICKY": 2,
+            "Invalid": 2147483647
+        }
+    },
+    "EOnActionEnd": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "HOLD": 0,
+            "LOOP": 1,
+            "PLAY_ACTION": 2,
+            "DEFAULT_LOOP": 3,
+            "Invalid": 2147483647
+        }
+    },
+    "EPickingMode": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "INVALID": 0,
+            "ENTITIES_PICKING": 1,
+            "SOUNDS_PICKING": 2,
+            "LIGHTS_PICKING": 3,
+            "PATH_PICKING": 4,
+            "WORLDGRAPH_PICKING": 5,
+            "SUBAREA_PICKING": 6
         }
     },
     "ERotationDirection": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "RIGHT": 0,
+            "LEFT": 1,
+            "Invalid": 2147483647
         }
     },
     "ESamusUsingGrapplePullPointStatePullStage": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "ControlledPull": 1,
+            "UncontrolledPull": 2,
+            "FinalPull": 3,
+            "Invalid": 2147483647
         }
     },
     "EShellState": {
-        "parent": "CShelmitAIComponent",
-        "fields": {},
-        "values": {
-            "null": 2147483647
-        }
-    },
-    "EShieldAction": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "SHELTERED": 0,
+            "UNSHELTERED": 1,
+            "Invalid": 2147483647
+        }
+    },
+    "EShieldAction": {
+        "parent": "CharClassSakaiModifyShieldEvent",
+        "fields": {},
+        "values": {
+            "Enable": 0,
+            "Disable": 1,
+            "Invalid": 2147483647
+        }
+    },
+    "EShinesparkTravellingDirection": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "No_Direction": 0,
+            "Up": 1,
+            "UpRight": 2,
+            "UpLeft": 3,
+            "Right": 4,
+            "Left": 5,
+            "DownRight": 6,
+            "DownLeft": 7,
+            "Down": 8
         }
     },
     "ESlidleOutSpawnPointDir": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "ByDot": 0,
+            "Front": 1,
+            "Side": 2,
+            "Invalid": 2147483647
+        }
+    },
+    "ESpinningNailsSpeed": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "fast": 0,
+            "medium": 1,
+            "slow": 2,
+            "Invalid": 2147483647
+        }
+    },
+    "ESpinningNailsState": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "init": 0,
+            "nail1": 1,
+            "nail2": 2,
+            "nail3": 3,
+            "nail4": 4,
+            "end": 5,
+            "Invalid": 2147483647
+        }
+    },
+    "ESubAreaItem": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "ScenarioCollider": 0,
+            "LightGroup": 1,
+            "SoundGroup": 2,
+            "SceneGroup": 3,
+            "LogicEntityGroup": 4,
+            "BreakableTileGroupGroup": 5,
+            "EnvironmentPreset": 6,
+            "EnvironmentSoundPreset": 7,
+            "EnvironmentMusicPreset": 8,
+            "Invalid": 4294967295
+        }
+    },
+    "ESwifterSpawnGroupDirection": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Left": 0,
+            "Right": 1,
+            "Invalid": 2147483647
         }
     },
     "ESwifterSpawnGroupSpawnMode": {
-        "parent": "int",
+        "parent": "CSwifterSpawnGroupComponent",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Water": 0,
+            "Surface": 1,
+            "Invalid": 2147483647
         }
     },
     "ETeleporterColorSphere": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "BLUE": 0,
+            "DARKBLUE": 1,
+            "GREEN": 2,
+            "ORANGE": 3,
+            "PINK": 4,
+            "PURPLE": 5,
+            "RED": 6,
+            "YELLOW": 7,
+            "Invalid": 2147483647
+        }
+    },
+    "EThermalFreezeRoomType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "FREEZE": 0,
+            "COOL_DOWN": 1,
+            "Invalid": 2147483647
+        }
+    },
+    "EThermalHeatRoomType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "HEAT": 0,
+            "COOL_DOWN": 1,
+            "Invalid": 2147483647
+        }
+    },
+    "ETooltipCond": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Bomb": 0,
+            "CentralUnit": 1,
+            "ChargeBeam": 2,
+            "ChozoWarrior": 3,
+            "DiscoveredEmmyCave": 4,
+            "DiscoveredEmmyZone": 5,
+            "DiscoveredEmmyDoors": 6,
+            "GhostDash": 7,
+            "HiddenItemTutorial": 8,
+            "IceMissile": 9,
+            "LineBomb": 10,
+            "Magnet": 11,
+            "MapRoomUsed": 12,
+            "MorphBall": 13,
+            "OpticCamouflage": 14,
+            "SpaceJump": 15,
+            "SpeedBooster": 16,
+            "TeleportUsed": 17,
+            "TeleportWorldUnlocked": 18,
+            "XParasite": 19,
+            "Count": 20
         }
     },
     "ETooltipType": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Exploration": 0,
+            "EmmyPhase1": 1,
+            "EmmyPhase2": 2,
+            "BossBattle": 3,
+            "Invalid": 2147483647
         }
     },
     "ETrainDirection": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "LEFT": 0,
+            "RIGHT": 1,
+            "Invalid": 2147483647
         }
     },
     "EWalkInputMode": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "ZLHold": 1,
+            "LSHold": 2,
+            "LSToggle": 3,
+            "Invalid": 2147483647
+        }
+    },
+    "EWeaponState": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Charging": 0,
+            "Charged": 1,
+            "ChargedLoop": 2,
+            "Fire": 3,
+            "FireCharged": 4,
+            "Impact": 5,
+            "ImpactCharged": 6,
+            "ImpactDiffusion": 7,
+            "Invalid": 4294967295
+        }
+    },
+    "EWeaponType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "PowerBeam": 0,
+            "WideBeam": 1,
+            "PlasmaBeam": 2,
+            "WaveBeam": 3,
+            "SpecialEnergyBeam": 4,
+            "HyperBeam": 5,
+            "GrappleBeam": 6,
+            "Missile": 7,
+            "SuperMissile": 8,
+            "IceMissile": 9,
+            "LockOnMissile": 10,
+            "SpecialEnergyMissile": 11,
+            "Bomb": 12,
+            "LineBomb": 13,
+            "PowerBomb": 14,
+            "Invalid": 4294967295
         }
     },
     "EWings": {
-        "parent": "int",
+        "parent": "CCharClassCommanderWingsTrack",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "low": 0,
+            "high": 1,
+            "Invalid": 2147483647
         }
     },
     "EXpawnAngPolicy": {
         "parent": "SDeathImpactDisplacement",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "SPAWNPOINT": 0,
+            "TARGET_SIDE": 1,
+            "TARGET_DIR": 2,
+            "TARGET_OPPOSITE_SIDE": 3,
+            "TARGET_OPPOSITE_DIR": 4,
+            "Invalid": 2147483647
         }
     },
     "GUI::CAmiiboButton": {
@@ -17162,7 +18368,10 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Align_Centered": 0,
+            "Align_Left": 1,
+            "Align_Right": 2,
+            "Invalid": 2147483647
         }
     },
     "GUI::CChangeMenuStateButton": {
@@ -17429,7 +18638,14 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "NORMAL": 1,
+            "TRANSPORT_CONNECTION": 2,
+            "TELEPORTER_TRAVELING": 3,
+            "TELEPORTER_NET": 4,
+            "AREA_TRAVEL": 5,
+            "NEWAREA_PRESENTATION": 6,
+            "Invalid": 2147483647
         }
     },
     "GUI::CHUD": {
@@ -17453,10 +18669,14 @@
         "values": null
     },
     "GUI::CHUD::EForceVisibilityState": {
-        "parent": "GUI::CHUD::CEnergyAnimation",
+        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<std::unique_ptr<GUI::CHUD::SResourceAnimation>_>>::TKeyElementConstIterator",
         "fields": {},
         "values": {
-            "null": 4
+            "DONT_FORCE": 0,
+            "FORCE_VISIBLE_WITH_FADE": 1,
+            "FORCE_INVISIBLE_WITH_FADE": 2,
+            "FORCE_VISIBLE_NO_FADE": 3,
+            "FORCE_INVISIBLE_NO_FADE": 4
         }
     },
     "GUI::CHUD::SResourceAnimation": {
@@ -17554,10 +18774,15 @@
         "values": null
     },
     "GUI::CMapMenuController::SState": {
-        "parent": "int",
+        "parent": "bool",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "AreaMap": 1,
+            "GlobalMap": 2,
+            "Markers": 3,
+            "Transition": 4,
+            "Invalid": 2147483647
         }
     },
     "GUI::CMenuEntryDataSet": {
@@ -17850,7 +19075,11 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Once": 1,
+            "PingPong": 2,
+            "Loop": 3,
+            "Invalid": 2147483647
         }
     },
     "IPathNode": {
@@ -17986,11 +19215,31 @@
         },
         "values": null
     },
+    "SDropProbabilities::SDir": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "Front": 1,
+            "Back": 2,
+            "Up": 3,
+            "Down": 4,
+            "FrontUp": 5,
+            "FrontDown": 6,
+            "BackUp": 7,
+            "BackDown": 8,
+            "Player": 9,
+            "Invalid": 2147483647
+        }
+    },
     "SDropProbabilities::SType": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Default": 1,
+            "Melee": 2,
+            "Invalid": 2147483647
         }
     },
     "SFXInstanceData": {
@@ -18047,14 +19296,30 @@
         "parent": null,
         "fields": {},
         "values": {
-            "null": 14
+            "ACTOR": 0,
+            "ENTITY": 1,
+            "SPAWN_GROUP_ACTOR": 2,
+            "SPAWN_POINT_ACTOR": 3,
+            "LOGIC_SHAPE_ACTOR": 4,
+            "CUTSCENE_ACTOR": 5,
+            "LANDMARK": 6,
+            "AI_SMART_OBJECT": 7,
+            "CAMERA_RAIL": 8,
+            "STEAMJET": 9,
+            "ACTIVATABLE": 10,
+            "MORPH_BALL_LAUNCHER_EXIT": 11,
+            "DEMOLITIONBLOCK_LIFE_ACTOR": 12,
+            "ANY": 13,
+            "INVALID": 14
         }
     },
     "SLoadScenarioRequest::EMode": {
         "parent": "CGameManager::CTunableMusicVolume",
         "fields": {},
         "values": {
-            "null": 2
+            "Game": 0,
+            "Debug": 1,
+            "Editor": 2
         }
     },
     "SLogicPath": {
@@ -18103,6 +19368,64 @@
             "vSize": "base::math::CVector2D"
         },
         "values": null
+    },
+    "SMusicManagerState": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "NO_MUSIC": 1,
+            "MAINMENU": 2,
+            "INGAME": 3,
+            "INGAME_MENU": 4,
+            "MAP_MENU": 5,
+            "CREDITS": 6,
+            "PROLOGUE": 7,
+            "Invalid": 2147483647
+        }
+    },
+    "SMusicPlayFlag": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "FORCE": 1,
+            "CLEAR_STACKS": 2,
+            "CLEAR_TRACKS": 3,
+            "POP_CURRENT": 4,
+            "PAUSE_CURRENT": 5,
+            "IGNORE_PAUSE": 6,
+            "SKIP_TO_LOOP": 7,
+            "PAUSE_ON_POP": 8,
+            "Invalid": 2147483647
+        }
+    },
+    "SMusicPriority": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "NONE": 0,
+            "LOWEST": 1,
+            "ENVIRONMENT": 2,
+            "TRIGGER": 3,
+            "NORMAL": 4,
+            "EVENT": 5,
+            "STATE": 6,
+            "SCRIPT": 7,
+            "LOADING": 8,
+            "Invalid": 2147483647
+        }
+    },
+    "SMusicStopFlag": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "PLAY_NEXT": 1,
+            "CLEAR_STACK": 2,
+            "REMOVE_MUSIC_FROM_STACK": 3,
+            "Invalid": 2147483647
+        }
     },
     "STransition": {
         "parent": null,
@@ -18231,7 +19554,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "SkelAnimationPoseBlend": 0,
+            "SkelAnimation": 1,
+            "Invalid": 2147483647
         }
     },
     "animtree::CBlendNode": {
@@ -18397,7 +19722,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Linear": 0,
+            "Smoothstep": 1,
+            "Invalid": 2147483647
         }
     },
     "base::animation::ISkeletalPoseProvider": {
@@ -18479,7 +19806,20 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Linear": 0,
+            "Cubic": 1,
+            "Constant": 2,
+            "Invalid": 2147483647
+        }
+    },
+    "base::curves::ETimeType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Uint16": 0,
+            "Uint8": 1,
+            "F32": 2,
+            "Invalid": 2147483647
         }
     },
     "base::file::CDeviceQueue": {
@@ -18547,6 +19887,11 @@
         "fields": {},
         "values": null
     },
+    "base::global::CRntFile": {
+        "parent": null,
+        "fields": {},
+        "values": null
+    },
     "base::global::CRntPooledDictionary<base::global::CStrId,_CBreakableTileManager::STileGroupGroup>": {
         "parent": "CBreakableTileManager::CTunableBreakableTileManager",
         "fields": {},
@@ -18597,6 +19942,20 @@
         "fields": {},
         "values": null
     },
+    "base::global::timeline::ELayer": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Layer_0": 0,
+            "Layer_1": 1,
+            "Layer_2": 2,
+            "Layer_3": 3,
+            "Layer_4": 4,
+            "Layer_5": 5,
+            "Layer_6": 6,
+            "Layer_7": 7
+        }
+    },
     "base::global::timeline::TLayers": {
         "parent": "int",
         "fields": {},
@@ -18608,6 +19967,18 @@
             "fMainGain": "float"
         },
         "values": null
+    },
+    "base::input::ERumbleType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "RFX": 0,
+            "RGUI": 1,
+            "RGRUNT": 2,
+            "RFX_EMMY": 3,
+            "RMUSIC": 4,
+            "Invalid": 2147483647
+        }
     },
     "base::input::TRumbleFileData": {
         "parent": "int",
@@ -18633,7 +20004,24 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "X": 1,
+            "Y": 2,
+            "Z": 3,
+            "NEG_X": 4,
+            "NEG_Y": 5,
+            "NEG_Z": 6,
+            "Invalid": 2147483647
+        }
+    },
+    "base::math::ETransformSpace": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "WORLD": 0,
+            "LOCAL": 1,
+            "MODEL": 2,
+            "Invalid": 2147483647
         }
     },
     "base::reflection::CClass": {
@@ -18708,14 +20096,19 @@
         "parent": null,
         "fields": {},
         "values": {
-            "null": 3
+            "Type": 0,
+            "Variable": 1,
+            "Function": 2,
+            "FunctionParameter": 3
         }
     },
     "base::reflection::ECollectionAccessMode": {
         "parent": null,
         "fields": {},
         "values": {
-            "null": 2
+            "None": 0,
+            "Indexed": 1,
+            "Associative": 2
         }
     },
     "base::res::CRes": {
@@ -18732,14 +20125,19 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "UpdateOnly": 0,
+            "InsertOnly": 1,
+            "UpdateOrInsert": 2,
+            "Invalid": 2147483647
         }
     },
     "base::serialization::EPersistence": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Transient": 0,
+            "Persistent": 1,
+            "Invalid": 2147483647
         }
     },
     "base::snd::CSoundGroupManager": {
@@ -18783,18 +20181,141 @@
         },
         "values": null
     },
+    "base::snd::EAttenuationCurve": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Logarithmic": 0,
+            "Linear": 1,
+            "Invalid": 2147483647
+        }
+    },
+    "base::snd::ELowPassFilter": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "LPF_DISABLED": 0,
+            "LPF_80HZ": 1,
+            "LPF_100HZ": 2,
+            "LPF_128HZ": 3,
+            "LPF_160HZ": 4,
+            "LPF_200HZ": 5,
+            "LPF_256HZ": 6,
+            "LPF_320HZ": 7,
+            "LPF_400HZ": 8,
+            "LPF_500HZ": 9,
+            "LPF_640HZ": 10,
+            "LPF_800HZ": 11,
+            "LPF_1000HZ": 12,
+            "LPF_1280HZ": 13,
+            "LPF_1600HZ": 14,
+            "LPF_2000HZ": 15,
+            "LPF_2560HZ": 16,
+            "LPF_3200HZ": 17,
+            "LPF_4000HZ": 18,
+            "LPF_5120HZ": 19,
+            "LPF_6400HZ": 20,
+            "LPF_8000HZ": 21,
+            "LPF_10240HZ": 22,
+            "LPF_12800HZ": 23,
+            "LPF_16000HZ": 24,
+            "Invalid": 2147483647
+        }
+    },
+    "base::snd::EPositionalType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "POS_2D": 0,
+            "POS_3D": 1,
+            "Invalid": 2147483647
+        }
+    },
+    "base::snd::EReverbIntensity": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "NONE": 0,
+            "SMALL_ROOM": 1,
+            "MEDIUM_ROOM": 2,
+            "BIG_ROOM": 3,
+            "CATHEDRAL": 4,
+            "Invalid": 2147483647
+        }
+    },
     "base::snd::ESndLogicId": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "DEFAULT": 0,
+            "SHIELD_IMPACT": 1,
+            "FLESH_IMPACT": 2,
+            "WALL_IMPACT": 3,
+            "DOOR_FAIL": 4,
+            "BOSS_DISCOVER": 5,
+            "PHASEDISPLACEMENT": 6,
+            "ENERSHIELDENTER": 7,
+            "ENERSHIELDEXIT": 8,
+            "SAMUS_MOVEMENT": 9,
+            "EMMY_ALARM": 10,
+            "Invalid": 2147483647
+        }
+    },
+    "base::snd::ESndPlayerId": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "SFX": 0,
+            "MUSIC": 1,
+            "SPEECH": 2,
+            "GRUNT": 3,
+            "GUI": 4,
+            "ENVIRONMENT_STREAMS": 5,
+            "SFX_EMMY": 6,
+            "CUTSCENE": 7,
+            "Invalid": 2147483647
+        }
+    },
+    "base::snd::ESndType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "SFX": 0,
+            "MUSIC": 1,
+            "SPEECH": 2,
+            "GRUNT": 3,
+            "GUI": 4,
+            "ENVIRONMENT_STREAMS": 5,
+            "SFX_EMMY": 6,
+            "CUTSCENE": 7,
+            "Invalid": 2147483647
         }
     },
     "base::snd::ESoundGroupIds": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "DEFAULT": 0,
+            "SHIELD_IMPACT": 1,
+            "FLESH_IMPACT": 2,
+            "WALL_IMPACT": 3,
+            "DOOR_FAIL": 4,
+            "BOSS_DISCOVER": 5,
+            "PHASEDISPLACEMENT": 6,
+            "ENERSHIELDENTER": 7,
+            "ENERSHIELDEXIT": 8,
+            "SAMUS_MOVEMENT": 9,
+            "EMMY_ALARM": 10,
+            "Invalid": 2147483647
+        }
+    },
+    "base::snd::ESoundSystemImGuiTabs": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Info": 0,
+            "Players": 1,
+            "Invalid": 2147483647
         }
     },
     "base::spatial::CAABox": {
@@ -19600,7 +21121,9 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "RequireOne": 0,
+            "RequireAll": 1,
+            "Invalid": 2147483647
         }
     },
     "behaviortree::CParticleEnableEmission": {
@@ -19729,7 +21252,13 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "None": 0,
+            "Started": 1,
+            "Init": 2,
+            "Loop": 3,
+            "Ending": 4,
+            "Finished": 5,
+            "Invalid": 2147483647
         }
     },
     "behaviortree::CScorpiusRegereratingMaskAction": {
@@ -20140,7 +21669,28 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 6
+            "None": 0,
+            "LESS": 1,
+            "LESSEQUAL": 2,
+            "EQUAL": 3,
+            "GREATEREQUAL": 4,
+            "GREATER": 5,
+            "Count": 6
+        }
+    },
+    "behaviortree::SStatus::Enum": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "None": 0,
+            "Invalid": 1,
+            "Running": 2,
+            "Aborting": 3,
+            "Suspended": 4,
+            "Success": 5,
+            "Failed": 6,
+            "Aborted": 7,
+            "Count": 8
         }
     },
     "bool": {
@@ -20157,20 +21707,48 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Internal": 0,
+            "PlaceHolder": 1,
+            "WorkInProgress": 2,
+            "Completed": 3,
+            "ShowPlaceholder": 4,
+            "Invalid": 2147483647
+        }
+    },
+    "cutscene::ETakePlayMode": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Once": 0,
+            "Loop": 1,
+            "Wait": 2,
+            "Invalid": 2147483647
         }
     },
     "darkness::EDarknessPreset": {
         "parent": null,
         "fields": {},
         "values": {
-            "null": 2
+            "DISABLED": 0,
+            "ENABLED": 1,
+            "CENTRAL_UNIT": 2
         }
     },
     "double": {
         "parent": null,
         "fields": {},
         "values": null
+    },
+    "eDoorStateLogicAction": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Open": 0,
+            "Close": 1,
+            "Lock": 2,
+            "Unlock": 3,
+            "Invalid": 2147483647
+        }
     },
     "engine::render::anim::CSkeletalAnimTree": {
         "parent": "base::animation::ISkeletonTransformer",
@@ -20198,11 +21776,47 @@
         },
         "values": null
     },
+    "engine::scene::sceneItems::EItemType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "SCENE_BLOCK": 0,
+            "OBJECT": 1,
+            "LIGHT": 2,
+            "COUNT": 3,
+            "INVALID": 4,
+            "Invalid": 2147483647
+        }
+    },
     "engine::utils::ELightPreset": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "E_LIGHT_PRESET_NONE": 0,
+            "E_LIGHT_PRESET_PULSE": 1,
+            "E_LIGHT_PRESET_BLINK": 2,
+            "E_LIGHT_PRESET_LIGHTNING": 3,
+            "ELIGHT_PRESET_COUNT": 4,
+            "ELIGHT_PRESET_INVALID": 5,
+            "Invalid": 2147483647
+        }
+    },
+    "engine::utils::EMaterialConstantColor": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "MATERIAL_CONSTANT_COLOR_0": 0,
+            "MATERIAL_CONSTANT_COLOR_1": 1,
+            "MATERIAL_CONSTANT_COLOR_2": 2,
+            "MATERIAL_CONSTANT_COLOR_3": 3,
+            "MATERIAL_CONSTANT_COLOR_4": 4,
+            "MATERIAL_CONSTANT_COLOR_5": 5,
+            "MATERIAL_CONSTANT_COLOR_6": 6,
+            "MATERIAL_CONSTANT_COLOR_7": 7,
+            "MATERIAL_CONSTANT_COLOR_8": 8,
+            "MATERIAL_CONSTANT_COLOR_9": 9,
+            "EMATERIALCONSTANTCOLOR_COUNT": 10,
+            "Invalid": 2147483647
         }
     },
     "float": {
@@ -20214,7 +21828,23 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Base": 0,
+            "PostProcess_DOF": 1,
+            "Variables": 2,
+            "SceneParam": 3,
+            "MaterialProperty": 4,
+            "MaterialColor": 5,
+            "FxMaterialColor": 6,
+            "FxMaterialProperty": 7,
+            "SceneParamDirtMaskMult": 8,
+            "SceneParamColorTint": 9,
+            "PostProcess_BloomFactor": 10,
+            "PostProcess_SelfIlumFactor": 11,
+            "PostProcess_MotionBlur": 12,
+            "LightIntensity": 13,
+            "PostProcess_AnamorphicBloomFactor": 14,
+            "AI": 15,
+            "Invalid": 2147483647
         }
     },
     "game::logic::collision::CAABoxShape2D": {
@@ -20298,10 +21928,26 @@
         "values": null
     },
     "game::logic::collision::EColMat": {
-        "parent": "int",
+        "parent": "unsigned",
         "fields": {},
         "values": {
-            "null": 4294967295
+            "DEFAULT": 0,
+            "SCENARIO_GENERIC": 1,
+            "FLESH_GENERIC": 2,
+            "DAMAGE_BLOCKED": 3,
+            "METAL": 4,
+            "ENERGY": 5,
+            "DIRT": 6,
+            "ROCK": 7,
+            "ICE": 8,
+            "UNDER_WATER": 9,
+            "UNDER_WATER_SP": 10,
+            "MID_WATER": 11,
+            "MID_WATER_SP": 12,
+            "PUDDLE": 13,
+            "OIL": 14,
+            "END_WORLD": 15,
+            "Invalid": 4294967295
         }
     },
     "gameeditor::CGameModelIndex": {
@@ -20337,7 +21983,29 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "NONE": 0,
+            "EDITOR_TO_GAME": 1,
+            "GAME_TO_EDITOR": 2,
+            "BIDIRECTIONAL": 3,
+            "Invalid": 2147483647
+        }
+    },
+    "gameeditor::EPersistenceTarget": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "Logic": 0,
+            "Logic_Layer_RAL": 1,
+            "Logic_Sublayer_RASL": 2,
+            "Logic_Folders_RLEI": 3,
+            "Sublayer_Folders_RASLEI": 4,
+            "Environment_Data": 5,
+            "Subareas": 6,
+            "Editor": 7,
+            "Audio_Presets": 8,
+            "Collision_Material_Data": 9,
+            "Music_Presets_Data": 10,
+            "Invalid": 2147483647
         }
     },
     "gameeditor::TPropertyId": {
@@ -20399,7 +22067,13 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "Unknown": 0,
+            "Success": 1,
+            "InRequestedState": 2,
+            "InvalidTransition": 3,
+            "AsyncWork": 4,
+            "Error": 5,
+            "Invalid": 2147483647
         }
     },
     "minimap::CAnimatedValue::SAnimConfig": {
@@ -20416,14 +22090,247 @@
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 2147483647
+            "SHOW": 0,
+            "SELECT": 1,
+            "SAMUS_GLOW": 2,
+            "ITEM_SPHERE": 3,
+            "ITEM_CUBE": 4,
+            "ITEM_GLOW": 5,
+            "TELEPORTER_GLOW": 6,
+            "TRANSLUCID": 7,
+            "INVISIBLE": 8,
+            "EMMY_SHOW": 9,
+            "EMMY_GLOW": 10,
+            "HYPERBEAM_GLOW": 11,
+            "Invalid": 2147483647
+        }
+    },
+    "msapi::api::idx::EDataType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "E_DATATYPE_INVALID": 0,
+            "E_BYTE": 1,
+            "E_SHORT": 2,
+            "E_INT": 3,
+            "E_DATATYPE_COUNT": 4
+        }
+    },
+    "msapi::api::idx::EPrimitiveType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "E_PRIMITIVE_INVALID": 0,
+            "E_TRIANGLES": 1,
+            "E_TRIANGLE_STRIP": 2,
+            "E_TRIANGLE_FAN": 3,
+            "E_LINES": 4,
+            "E_LINE_STRIP": 5,
+            "E_PRIMITIVE_COUNT": 6
+        }
+    },
+    "msapi::api::rs::ERenderStateValue": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "E_FALSE": 0,
+            "E_TRUE": 1,
+            "E_CULL_CW": 2,
+            "E_CULL_CCW": 3,
+            "E_CULL_NONE": 4,
+            "E_CMP_LESS": 5,
+            "E_CMP_NEVER": 6,
+            "E_CMP_EQUA": 7,
+            "E_CMP_LESSEQUAL": 8,
+            "E_CMP_GREATER": 9,
+            "E_CMP_NOTEQUAL": 10,
+            "E_CMP_GREATEREQUAL": 11,
+            "E_CMP_ALWAYS": 12,
+            "E_STENCILCAPS_KEEP": 13,
+            "E_STENCILCAPS_ZERO": 14,
+            "E_STENCILCAPS_REPLACE": 15,
+            "E_STENCILCAPS_INCRSAT": 16,
+            "E_STENCILCAPS_DECRSAT": 17,
+            "E_STENCILCAPS_INVERT": 18,
+            "E_STENCILCAPS_INCR": 19,
+            "E_STENCILCAPS_DECR": 20,
+            "E_STENCILCAPS_2SIDED": 21,
+            "E_STENCILOP_KEEP": 22,
+            "E_STENCILOP_REPLACE": 23,
+            "ERENDERSTATEVALUE_INVALID": 4294967295
+        }
+    },
+    "msapi::api::shdr::EShaderType": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "E_VERTEX": 0,
+            "E_PIXEL": 1,
+            "E_GEOMETRY": 2,
+            "Invalid": 2147483647
+        }
+    },
+    "msapi::api::tex::EArrangement": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "E_ARRANGE_INVALID": 0,
+            "E_ARRANGE_RAW_INTERLEAVED": 1,
+            "E_ARRANGE_RAW_COMPONENTS": 2,
+            "E_ARRANGE_COMPRESSED": 3,
+            "EARRAGEMENT_INVALID": 4294967295
+        }
+    },
+    "msapi::api::tex::EComponents": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "E_COMPONENTS_INVALID": 0,
+            "E_COMPONENTS_R8_G8_B8": 1,
+            "E_COMPONENTS_R8_G8_B8_A8": 2,
+            "E_COMPONENTS_A8": 3,
+            "E_COMPONENTS_L8": 4,
+            "E_COMPONENTS_L8_A8": 5,
+            "E_COMPONENTS_R5_G6_B5": 6,
+            "E_COMPONENTS_R5_G5_B5_A1": 7,
+            "E_COMPONENTS_R4_G4_B4_A4": 8,
+            "E_COMPONENTS_A4": 9,
+            "E_COMPONENTS_L4": 10,
+            "E_COMPONENTS_L4_A4": 11,
+            "E_COMPONENTS_U8_V8": 12,
+            "E_COMPONENTS_U16_V16": 13,
+            "E_COMPONENTS_R8_G8_B8_X8": 14,
+            "E_COMPONENTS_R32F": 16,
+            "ECOMPONENTS_INVALID": 4294967295
+        }
+    },
+    "msapi::api::tex::EFiltering": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "E_FILTER_NEAREST": 0,
+            "E_FILTER_LINEAR": 1,
+            "E_FILTER_NEARESTMIPNEAREST": 2,
+            "E_FILTER_NEARESTMIPLINEAR": 3,
+            "E_FILTER_LINEARMIPNEAREST": 4,
+            "E_FILTER_LINEARMIPLINEAR": 5,
+            "EFILTER_INVALID": 4294967295
+        }
+    },
+    "msapi::api::tex::ETiling": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "E_TILING_CLAMP": 0,
+            "E_TILING_CLAMPCOLOR": 1,
+            "E_TILING_REPEAT": 2,
+            "E_TILING_MIRROR": 3,
+            "ETILING_INVALID": 4294967295
+        }
+    },
+    "msapi::api::types::blendFactor::EBlendFactor": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "E_BLENDFACTOR_ZERO": 0,
+            "E_BLENDFACTOR_ONE": 1,
+            "E_BLENDFACTOR_SRC_COLOR": 2,
+            "E_BLENDFACTOR_INV_SRC_COLOR": 3,
+            "E_BLENDFACTOR_DST_COLOR": 4,
+            "E_BLENDFACTOR_INV_DST_COLOR": 5,
+            "E_BLENDFACTOR_SRC_ALPHA": 6,
+            "E_BLENDFACTOR_INV_SRC_ALPHA": 7,
+            "E_BLENDFACTOR_DST_ALPHA": 8,
+            "E_BLENDFACTOR_INV_DST_ALPHA": 9,
+            "E_MAX_BLENDFACTOR_COUNT": 10,
+            "EBLENDFACTOR_INVALID": 4294967295
+        }
+    },
+    "msapi::api::types::blendOp::EBlendOp": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "E_BLENDOP_ADD": 0,
+            "E_BLENDOP_SUBDST": 1,
+            "E_BLENDOP_SUBSRC": 2,
+            "E_BLENDOP_MIN": 3,
+            "E_BLENDOP_MAX": 4,
+            "E_MAX_BLENDOP_COUNT": 5,
+            "EBLENDOP_INVALID": 4294967295
+        }
+    },
+    "msapi::api::types::cmpMode::ECmpMode": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "E_CMPMODE_ALWAYS": 0,
+            "E_CMPMODE_NEVER": 1,
+            "E_CMPMODE_EQUAL": 2,
+            "E_CMPMODE_NOTEQUAL": 3,
+            "E_CMPMODE_LESS": 4,
+            "E_CMPMODE_LESSEQUAL": 5,
+            "E_CMPMODE_GREATER": 6,
+            "E_CMPMODE_GREATEREQUAL": 7,
+            "E_MAX_CMPMODE_COUNT": 8,
+            "ECMPMODE_INVALID": 4294967295
+        }
+    },
+    "msapi::api::types::cullMode::ECullMode": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "E_CULLMODE_CW": 2,
+            "E_CULLMODE_CCW": 3,
+            "E_CULLMODE_NONE": 4,
+            "E_MAX_CULLMODE_COUNT": 5,
+            "ECULLMODE_INVALID": 4294967295
         }
     },
     "msapi::api::types::fillMode::EFillMode": {
         "parent": "int",
         "fields": {},
         "values": {
-            "null": 4294967295
+            "E_FILLMODE_SOLID": 0,
+            "E_FILLMODE_WIRE": 1,
+            "E_FILLMODE_INVALID": 4294967295
+        }
+    },
+    "msapi::api::types::stencilOp::EStencilOp": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "E_STENCILOP_KEEP": 0,
+            "E_STENCILOP_ZERO": 1,
+            "E_STENCILOP_REPLACE": 2,
+            "E_STENCILOP_INCRSAT": 3,
+            "E_STENCILOP_DECRSAT": 4,
+            "E_STENCILOP_INVERT": 5,
+            "E_STENCILOP_INCR": 6,
+            "E_STENCILOP_DECR": 7,
+            "E_MAX_STENCILOP_COUNT": 8,
+            "ESTENCILOP_INVALID": 4294967295
+        }
+    },
+    "msapi::api::types::textureAddress::ETextureAddress": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "E_TEXTUREADDRESS_REPEAT": 2,
+            "E_TEXTUREADDRESS_MIRROR": 3,
+            "E_TEXTUREADDRESS_EDGE": 0,
+            "E_TEXTUREADDRESS_BORDER": 1,
+            "ETEXTUREADDRESS_INVALID": 4294967295
+        }
+    },
+    "msapi::api::types::textureFilter::ETextureFilter": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "E_TEXTUREFILTER_NONE": 0,
+            "E_TEXTUREFILTER_POINT": 1,
+            "E_TEXTUREFILTER_LINEAR": 2,
+            "E_TEXTUREFILTER_ANISOTROPIC": 3,
+            "ETEXTUREFILTER_INVALID": 4294967295
         }
     },
     "msapi::material::CMaterial": {
@@ -20440,7 +22347,15 @@
         "parent": "msapi::material::SCull",
         "fields": {},
         "values": {
-            "null": 4294967295
+            "E_TRANSLUCENCY_NONE": 0,
+            "E_TRANSLUCENCY_OPAQUE": 1,
+            "E_TRANSLUCENCY_TRANSLUCENT": 2,
+            "E_TRANSLUCENCY_SUBSTRACTIVE": 4,
+            "E_TRANSLUCENCY_ADDITIVE": 8,
+            "E_TRANSLUCENCY_OPAQUE_FWD": 16,
+            "E_TRANSLUCENCY_ALL": 31,
+            "E_TRANSLUCENCY_NOT_OPAQUE": 14,
+            "ETRANSLUCENCY_INVALID": 4294967295
         }
     },
     "msapi::material::SAlpha": {
@@ -20622,6 +22537,18 @@
         "parent": "CGameObject",
         "fields": {},
         "values": null
+    },
+    "navmesh::ENavMeshGroup": {
+        "parent": null,
+        "fields": {},
+        "values": {
+            "DEFAULT": 0,
+            "EMMY": 1,
+            "EMMY_PROTO": 2,
+            "EMMY_CAVE": 3,
+            "EMMY_MAGMA": 4,
+            "Invalid": 2147483647
+        }
     },
     "navmesh::SNavMeshPath": {
         "parent": "IPath",
@@ -20959,6 +22886,11 @@
             "sAlias": "base::global::CStrId",
             "vTracks": "base::global::CRntVector<sound::TMusicTrack>"
         },
+        "values": null
+    },
+    "unsigned": {
+        "parent": null,
+        "fields": {},
         "values": null
     }
 }
