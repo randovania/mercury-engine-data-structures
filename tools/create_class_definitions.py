@@ -1,6 +1,7 @@
 import collections
 import json
 import re
+import typing
 from pathlib import Path
 from typing import Optional
 
@@ -61,7 +62,7 @@ def _type_name_to_python_identifier(type_name: str):
 
 
 class TypeExporter:
-    def __init__(self, all_types: dict[str, dict[str, str]]):
+    def __init__(self, all_types: dict[str, dict[str, typing.Any]]):
         self.all_types = all_types
         self._exported_types = {}
         self._types_with_pointer = set()
@@ -86,6 +87,21 @@ class TypeExporter:
 
     def _debug(self, msg: str):
         print("  " * len(self._types_being_exported) + f"* {msg}")
+
+    def _export_enum_type(self, type_variable: str, type_name: str):
+        data = self.all_types[type_name]
+        if data["values"] is None:
+            raise ValueError(f"_export_enum_type called for {type_name}, a non-Enum")
+
+        enum_definition = f"\n\n\nclass {type_variable}(enum.IntEnum):\n"
+        for key, value in data["values"].items():
+            if key == "None":
+                key = "NONE"
+            enum_definition += f'    {key} = {value}\n'
+
+        code = f"{enum_definition}\n\nconstruct_{type_variable} = construct.Enum(construct.Int32ul, {type_variable})"
+
+        return "construct_" + type_variable, code
 
     def _export_known_type(self, type_variable: str, type_name: str):
         data = self.all_types[type_name]
@@ -123,11 +139,16 @@ class TypeExporter:
         type_variable = _type_name_to_python_identifier(type_name)
 
         if type_name in self.all_types:
-            type_code = self._export_known_type(type_variable, type_name)
+            if self.all_types[type_name]["values"] is not None:
+                type_variable, type_code = self._export_enum_type(type_variable, type_name)
+                self._type_definition_code += type_code
+            else:
+                type_code = self._export_known_type(type_variable, type_name)
+                self._type_definition_code += f'\n\n{type_variable} = {type_code}'
         else:
             type_code = self.convert_type_to_construct(None, type_name)
+            self._type_definition_code += f'\n\n{type_variable} = {type_code}'
 
-        self._type_definition_code += f'\n\n{type_variable} = {type_code}'
         self._exported_types[type_name] = type_variable
 
     def ensure_exported_type(self, type_name: str) -> str:
@@ -156,9 +177,6 @@ class TypeExporter:
         if field_type in known_types_to_construct:
             return known_types_to_construct[field_type]
 
-        if field_name is not None and field_name.startswith("e"):
-            return "common_types.UInt"
-
         # Containers
         try:
             make, m = next((make, x) for make, r in all_container_re.items() if (x := r.match(field_type)))
@@ -183,6 +201,8 @@ class TypeExporter:
 
     def export_code(self):
         code = """# This file was generated!
+import enum
+
 import construct
 
 from mercury_engine_data_structures import common_types

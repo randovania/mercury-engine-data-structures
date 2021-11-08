@@ -17016,7 +17016,7 @@
             "fExecutesEvery": "float",
             "fExecutesEveryRandomRange": "float",
             "fLastExecution": "float",
-            "eEvent": "EEvent",
+            "eEvent": "CTriggerComponent::EEvent",
             "vLogicActions": "base::global::CRntVector<std::unique_ptr<CTriggerLogicAction>>"
         },
         "values": null
