@@ -374,6 +374,7 @@ def is_container_or_ptr(name: str):
         "base::global::CRntVector",
         "base::global::CWeakPtr",
         "base::global::CSmartPtr",
+        "base::global::CArray",
         "std::unique_ptr",
     ]
     suffixes = [
@@ -435,6 +436,7 @@ def main(only_missing: bool = True, ignore_without_hash: bool = True,
                 # print(f"Skipping {key}: no known hash - {all_fields_functions[key]}")
                 all_fields_functions.pop(key)
 
+    all_fields_functions = {}
     process_results = decompile_in_background(all_fields_functions)
     for key in sorted(process_results.keys()):
         final_results[key] = process_results[key]
@@ -455,6 +457,9 @@ def main(only_missing: bool = True, ignore_without_hash: bool = True,
         if final_results[key]["parent"] in (f"{key}Ptr", key):
             print(f'Removing parent for {key}: {final_results[key]["parent"]}')
             final_results[key]["parent"] = None
+
+        if final_results[key]["parent"] is not None and is_container_or_ptr(final_results[key]["parent"]):
+            print(f"Inheriting from ptr or container: {key}")
 
     _merge_split_types(final_results)
 

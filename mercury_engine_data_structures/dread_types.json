@@ -1094,11 +1094,6 @@
         },
         "values": null
     },
-    "CBlackboard::TSectionContainer": {
-        "parent": "CBlackboard::CSectionPtr",
-        "fields": {},
-        "values": null
-    },
     "CBombGun": {
         "parent": "CPrimaryGun",
         "fields": {},
@@ -1226,11 +1221,6 @@
             "bIsHidingSecret": "bool",
             "aVignettes": "base::global::CRntVector<CGameLink<CActor>>"
         },
-        "values": null
-    },
-    "CBreakableTileGroupComponent::TActorTileStatesMap": {
-        "parent": "base::reflection::CollectionTypeMapper<CBreakableTileGroupComponent::TMinimapTileStates>::TElementIterator",
-        "fields": {},
         "values": null
     },
     "CBreakableTileGroupSonarTargetComponent": {
@@ -8560,11 +8550,6 @@
             "Invalid": 2147483647
         }
     },
-    "CCharClassRodotukAIComponent::TVAbsorbConfigs": {
-        "parent": "base::reflection::CollectionTypeMapper<CCharClassRodotukAIComponent::TVAbsorbConfigs>::TKeyElementIterator",
-        "fields": {},
-        "values": null
-    },
     "CCharClassRodotukSuckAttack": {
         "parent": "CCharClassAttack",
         "fields": {},
@@ -11570,7 +11555,7 @@
         "values": null
     },
     "CCutscene": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CRntVector<CCutscene::CActor>>::TElementConstIterator",
+        "parent": null,
         "fields": {
             "oDefinition": "const::CCutSceneDef*",
             "lstActors": "base::global::CRntVector<CCutscene::CActor>"
@@ -13077,7 +13062,7 @@
         "values": null
     },
     "CGameLink<CLogicCamera>": {
-        "parent": "CGameObjectPtr",
+        "parent": null,
         "fields": {},
         "values": null
     },
@@ -14413,13 +14398,8 @@
         },
         "values": null
     },
-    "CMinimapDef::TMapLabelDefs": {
-        "parent": "base::reflection::CollectionTypeMapper<CMinimapDef::TMapIconDefs>::TElementIterator",
-        "fields": {},
-        "values": null
-    },
     "CMinimapGrid::SGridDef": {
-        "parent": "base::reflection::CollectionTypeMapper<minimapGrid::TMinimapVisMap>::TElementConstIterator",
+        "parent": null,
         "fields": {
             "sScenarioId": "base::global::CStrId",
             "vGridMin": "base::math::CVector2D",
@@ -15081,11 +15061,6 @@
             "uFormatHash": "unsigned_long",
             "uScenarioHash": "unsigned_long"
         },
-        "values": null
-    },
-    "CPlaythrough::TDictCheckpointDatas": {
-        "parent": "base::global::CSmartPtr<const_CPlaythrough>",
-        "fields": {},
         "values": null
     },
     "CPlaythroughDef": {
@@ -16268,7 +16243,7 @@
         "values": null
     },
     "CShotManager": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CArray<base::global::CFilePathStrId,_EnumClass<EWeaponState>::Count,_EWeaponState>>::TElementConstIterator",
+        "parent": null,
         "fields": {
             "oWeaponAudioPresets": "CShotAudioWeaponPresets"
         },
@@ -18795,11 +18770,6 @@
         "fields": {},
         "values": null
     },
-    "GUI::CMissionLog::TMissionLogEntries": {
-        "parent": "base::reflection::CollectionTypeMapper<GUI::CMissionLog::TMissionLogEntries>::TElementConstIterator",
-        "fields": {},
-        "values": null
-    },
     "GUI::CModel3D": {
         "parent": "GUI::CDisplayObject",
         "fields": {
@@ -19119,7 +19089,7 @@
         "values": null
     },
     "SBigkranXSpitLaunchConfig": {
-        "parent": "base::reflection::CollectionTypeMapper<TBigkranXSpitLaunchPattern>::TKeyElementIterator",
+        "parent": null,
         "fields": {
             "tPattern": "TBigkranXSpitLaunchPattern",
             "sName": "base::global::CStrId"
@@ -19442,16 +19412,6 @@
         },
         "values": null
     },
-    "TActionInsertFlagset": {
-        "parent": "int",
-        "fields": {},
-        "values": null
-    },
-    "TAnimationTagFlagSet": {
-        "parent": "int",
-        "fields": {},
-        "values": null
-    },
     "TCheckpointOffset": {
         "parent": "CCharClassStartPointComponent",
         "fields": {
@@ -19459,31 +19419,6 @@
             "vOffsetPos": "base::math::CVector3D",
             "vOffsetAng": "base::math::CVector3D"
         },
-        "values": null
-    },
-    "TCoolShinesparkSituation": {
-        "parent": "int",
-        "fields": {},
-        "values": null
-    },
-    "TEnabledOccluderCollidersMap": {
-        "parent": "base::reflection::CollectionTypeMapper<TEnabledOccluderCollidersMap>::TKeyElementIterator",
-        "fields": {},
-        "values": null
-    },
-    "TEventPropsFlags": {
-        "parent": "int",
-        "fields": {},
-        "values": null
-    },
-    "TLaunchConfigs": {
-        "parent": "base::reflection::CollectionTypeMapper<TLaunchConfigs>::TElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "TPickingModeFlagSet": {
-        "parent": "int",
-        "fields": {},
         "values": null
     },
     "animtree::CAnimTreeControl": {
@@ -19859,16 +19794,6 @@
     },
     "base::file::nx::CDeviceNX": {
         "parent": "base::file::IDevice",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CArray<base::global::CStrId,_EnumClass<ESubAreaItem>::Count,_ESubAreaItem>": {
-        "parent": "base::reflection::CollectionTypeMapper<base::global::CArray<base::global::CStrId,_EnumClass<ESubAreaItem>::Count,_ESubAreaItem>>::TElementConstIterator",
-        "fields": {},
-        "values": null
-    },
-    "base::global::CArray<sound::CAudioMaterial,_EnumClass<base::snd::EMaterial>::Count,_base::snd::EMaterial>": {
-        "parent": "sound::CAudioMaterial_constPtr",
         "fields": {},
         "values": null
     },
