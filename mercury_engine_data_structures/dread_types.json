@@ -4867,7 +4867,7 @@
             "fPositionOffsetY": "float",
             "fPositionOffsetZ": "float",
             "fAngleOffsetX": "float",
-            "s_m_fAngleOffsetY_71015a902a + 2": "float",
+            "fAngleOffsetY": "float",
             "fAngleOffsetZ": "float",
             "sAdditional": "base::global::CStrId"
         },
@@ -7185,7 +7185,7 @@
     "CCharClassLinkToFloorTrack": {
         "parent": "base::global::timeline::CTrack",
         "fields": {
-            "s_m_fDistanceFromEdge_7101567bf6 + 2": "float"
+            "fDistanceFromEdge": "float"
         },
         "values": null
     },
@@ -18466,7 +18466,7 @@
     "GUI::CDisplayObjectAnimationDef": {
         "parent": null,
         "fields": {
-            "null": "std::unique_ptr<GUI::CTrackSet>::unique_ptr<GUI::CTrackSet>((unique_ptr<GUI::CTrackSet> *)id)"
+            "pTrackSet": "std::unique_ptr<GUI::CTrackSet>"
         },
         "values": null
     },
@@ -18981,7 +18981,7 @@
             "fPositionOffsetY": "float",
             "fPositionOffsetZ": "float",
             "fAngleOffsetX": "float",
-            "s_m_fAngleOffsetY_71015a902a + 2": "float",
+            "fAngleOffsetY": "float",
             "fAngleOffsetZ": "float",
             "fScaleX": "float",
             "fScaleY": "float",
@@ -22728,7 +22728,7 @@
     "sound::CSoundManager": {
         "parent": null,
         "fields": {
-            "pAudioPresets": "CAudioPresets*"
+            "pAudioPresets": "sound::CAudioPresets*"
         },
         "values": null
     },

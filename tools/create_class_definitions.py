@@ -24,29 +24,19 @@ known_types_to_construct = {
     "CGameLink<CSpawnPointComponent>": "common_types.StrId",
     "base::global::CRntFile": "construct.Prefixed(construct.Int32ul, construct.GreedyBytes)",
 
-    # ESubAreaItem::Count = 9
-    "base::global::CArray<base::global::CStrId, EnumClass<ESubAreaItem>::Count, ESubAreaItem>": (
-        "common_types.make_vector(common_types.StrId)"
-    ),
-
     # TODO: test if works
     "base::global::CName": "common_types.StrId",
     "base::core::CAssetLink": "common_types.StrId",
-
-    # Hacky
-    # Enums that don't use enum-like names in fields
-    "CDoorLifeComponent::SState": "common_types.UInt",
-    "base::snd::ELowPassFilter": "common_types.UInt",
-    "EShinesparkTravellingDirection": "common_types.UInt",
-    "ECoolShinesparkSituation": "common_types.UInt",
 }
 
 vector_re = re.compile(r"(?:base::)?global::CRntVector<(.*?)(?:, false)?>$")
-dict_re = re.compile(r"base::global::CRnt(?:Small)?Dictionary<base::global::CStrId,[\s_](.*)>$")
-all_container_re = {
-    "common_types.make_vector": vector_re,
-    "common_types.make_dict": dict_re,
-}
+array_re = re.compile(r"(?:base::)?global::CArray<(.*?), [^,]*?, [^>]*?>$")
+dict_re = re.compile(r"base::global::CRnt(?:Small)?Dictionary<base::global::C(?:FilePath)?StrId,[\s_](.*)>$")
+all_container_re = [
+    ("common_types.make_vector", vector_re),
+    ("common_types.make_vector", array_re),
+    ("common_types.make_dict", dict_re),
+]
 
 unique_ptr_re = re.compile(r"std::unique_ptr<(.*)>$")
 weak_ptr_re = re.compile(r"base::global::CWeakPtr<(.*)>$")
@@ -179,7 +169,7 @@ class TypeExporter:
 
         # Containers
         try:
-            make, m = next((make, x) for make, r in all_container_re.items() if (x := r.match(field_type)))
+            make, m = next((make, x) for make, r in all_container_re if (x := r.match(field_type)))
             if (inner_field := self.convert_type_to_construct(field_name, m.group(1))) is not None:
                 self._debug(f"Container! {field_name} -> {field_type} -> {make} -> {inner_field}")
                 return f"{make}({inner_field})"
@@ -258,14 +248,9 @@ def main():
 
     all_types.pop("CBlackboard")
     all_types.pop("CGameBlackboard")
-    all_types["gameeditor::CGameModelRoot"]["fields"].pop("pSoundManager")
-    all_types["gameeditor::CGameModelRoot"]["fields"].pop("pShotManager")
-    all_types["gameeditor::CGameModelRoot"]["fields"].pop("pLightManager")
-    all_types["gameeditor::CGameModelRoot"]["fields"].pop("pMusicManager")
-
     type_exporter = TypeExporter(all_types)
 
-    needs_exporting = {"gameeditor::CGameModelRoot", "CActor", "CCharClass"}
+    needs_exporting = {"gameeditor::CGameModelRoot", "CCharClass"}
     while needs_exporting:
         next_type = needs_exporting.pop()
         if next_type not in type_exporter._exported_types:
