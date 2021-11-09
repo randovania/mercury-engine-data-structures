@@ -6,7 +6,7 @@ from contextlib import ExitStack
 from pathlib import Path
 from typing import BinaryIO, Dict, Optional, Generator, Iterator, Set
 
-from mercury_engine_data_structures import crc, formats, dread_data
+from mercury_engine_data_structures import formats, dread_data
 from mercury_engine_data_structures.formats.base_resource import AssetId, BaseResource, NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.formats.pkg import PKGHeader, Pkg
 from mercury_engine_data_structures.game_check import Game
@@ -17,6 +17,7 @@ class PkgEditor:
     Manages efficiently reading all PKGs in the game and writing out modifications to a new path.
     """
     _files_for_asset_id: Dict[AssetId, Set[str]]
+    _ensured_asset_ids: Dict[str, Set[AssetId]]
     _modified_resources: Dict[AssetId, bytes]
 
     def __init__(self, files: Dict[str, BinaryIO], target_game: Game = Game.DREAD):
@@ -27,7 +28,9 @@ class PkgEditor:
             for name, file in files.items()
         }
         self._files_for_asset_id = collections.defaultdict(set)
+        self._ensured_asset_ids = {}
         for name, header in self.headers.items():
+            self._ensured_asset_ids[name] = set()
             for entry in header.file_entries:
                 self._files_for_asset_id[entry.asset_id].add(name)
         self._modified_resources = {}
@@ -80,8 +83,7 @@ class PkgEditor:
         raise ValueError(f"Unknown asset_id: {asset_id:0x}")
 
     def get_parsed_asset(self, name: str, in_pkg: Optional[str] = None) -> BaseResource:
-        asset_id = crc.crc64(name)
-        data = self.get_raw_asset(asset_id, in_pkg)
+        data = self.get_raw_asset(name, in_pkg)
         file_format = os.path.splitext(name)[1][1:]
         return formats.format_for(file_format).parse(data, target_game=self.target_game)
 
@@ -90,10 +92,29 @@ class PkgEditor:
             new_data = new_data.build()
         self._modified_resources[resolve_asset_id(asset_id)] = new_data
 
+    def ensure_present(self, pkg_name: str, asset_id: NameOrAssetId):
+        """
+        Ensures the given pkg has the give assets, collecting from other pkgs if needed.
+        """
+        if pkg_name not in self._ensured_asset_ids:
+            raise ValueError(f"Unknown pkg_name: {pkg_name}")
+        asset_id = resolve_asset_id(asset_id)
+
+        # If the pkg already has the given asset, do nothing
+        if pkg_name not in self._files_for_asset_id[asset_id]:
+            self._ensured_asset_ids[pkg_name].add(asset_id)
+
     def save_modified_pkgs(self, out: Path):
         modified_pkgs = set()
         for asset_id in self._modified_resources.keys():
             modified_pkgs.update(self._files_for_asset_id[asset_id])
+
+        # Read all asset ids we need to copy somewhere else
+        asset_ids_to_copy = {}
+        for asset_ids in self._ensured_asset_ids.values():
+            for asset_id in asset_ids:
+                if asset_id not in asset_ids_to_copy:
+                    asset_ids_to_copy[asset_id] = self.get_raw_asset(asset_id)
 
         for pkg_name in modified_pkgs:
             self.files[pkg_name].seek(0)
@@ -102,6 +123,9 @@ class PkgEditor:
             for asset_id, data in self._modified_resources.items():
                 if pkg_name in self._files_for_asset_id[asset_id]:
                     pkg.replace_asset(asset_id, data)
+
+            for asset_id in self._ensured_asset_ids[pkg_name]:
+                pkg.add_asset(asset_id, asset_ids_to_copy[asset_id])
 
             pkg_out = out.joinpath(pkg_name)
             pkg_out.parent.mkdir(parents=True, exist_ok=True)

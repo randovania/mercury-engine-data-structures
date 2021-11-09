@@ -144,3 +144,14 @@ class Pkg(BaseResource):
                 return
 
         raise ValueError(f"Unknown asset id: {asset_id}")
+
+    def add_asset(self, asset_id: NameOrAssetId, new_file: bytes):
+        asset_id = resolve_asset_id(asset_id)
+
+        if self.get_resource(asset_id) is not None:
+            raise ValueError(f"Asset id already exists: {asset_id}")
+
+        self.raw.files.append(construct.Container(
+            asset_id=asset_id,
+            data=new_file,
+        ))
