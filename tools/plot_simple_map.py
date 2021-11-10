@@ -109,30 +109,29 @@ def decode_world(root: Path, target_level: str):
     all_names = dread_data.all_asset_id_to_name()
     game = Game.DREAD
 
-    with PkgEditor.open_pkgs_at(root) as pkg_editor:
-        pkg_editor = typing.cast(PkgEditor, pkg_editor)
+    pkg_editor = PkgEditor(root)
 
-        bmscc: Bmscc = None
-        brsa: Brsa = None
-        brfld: Brfld = None
-        brfld_path: str
+    bmscc: Bmscc = None
+    brsa: Brsa = None
+    brfld: Brfld = None
+    brfld_path: str
 
-        for asset_id, name in all_names.items():
-            if target_level not in name:
-                continue
+    for asset_id, name in all_names.items():
+        if target_level not in name:
+            continue
 
-            if name.endswith("bmscc"):
-                print(f"Reading {name}...")
-                bmscc = Bmscc.parse(pkg_editor.get_raw_asset(asset_id), game)
+        if name.endswith("bmscc"):
+            print(f"Reading {name}...")
+            bmscc = Bmscc.parse(pkg_editor.get_raw_asset(asset_id), game)
 
-            elif name.endswith("brsa"):
-                print(f"Reading {name}...")
-                brsa = Brsa.parse(pkg_editor.get_raw_asset(asset_id), game)
+        elif name.endswith("brsa"):
+            print(f"Reading {name}...")
+            brsa = Brsa.parse(pkg_editor.get_raw_asset(asset_id), game)
 
-            elif name.endswith("brfld"):
-                print(f"Reading {name}...")
-                brfld = Brfld.parse(pkg_editor.get_raw_asset(asset_id), game)
-                brfld_path = name
+        elif name.endswith("brfld"):
+            print(f"Reading {name}...")
+            brfld = Brfld.parse(pkg_editor.get_raw_asset(asset_id), game)
+            brfld_path = name
 
     if bmscc is None or brsa is None:
         raise ValueError("DATA IS NONE")

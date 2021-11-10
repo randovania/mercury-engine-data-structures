@@ -15,37 +15,35 @@ from mercury_engine_data_structures.game_check import Game
 class PkgEditor:
     """
     Manages efficiently reading all PKGs in the game and writing out modifications to a new path.
+
+    _files_for_asset_id: mapping of asset id to all pkgs it can be found at
+    _ensured_asset_ids: mapping of pkg name to assets we'll copy into it when saving
+    _modified_resources: mapping of asset id to bytes. When saving, these asset ids are replaced
     """
     _files_for_asset_id: Dict[AssetId, Set[str]]
     _ensured_asset_ids: Dict[str, Set[AssetId]]
     _modified_resources: Dict[AssetId, bytes]
 
-    def __init__(self, files: Dict[str, BinaryIO], target_game: Game = Game.DREAD):
-        self.files = files
-        self.target_game = target_game
-        self.headers = {
-            name: PKGHeader.parse_stream(file, target_game=target_game)
-            for name, file in files.items()
-        }
-        self._files_for_asset_id = collections.defaultdict(set)
-        self._ensured_asset_ids = {}
-        for name, header in self.headers.items():
-            self._ensured_asset_ids[name] = set()
-            for entry in header.file_entries:
-                self._files_for_asset_id[entry.asset_id].add(name)
-        self._modified_resources = {}
-
-    @classmethod
-    @contextlib.contextmanager
-    def open_pkgs_at(cls, root: Path) -> Generator["PkgEditor", None, None]:
+    def __init__(self, root: Path, target_game: Game = Game.DREAD):
         all_pkgs = root.rglob("*.pkg")
 
-        with ExitStack() as stack:
-            files = {
-                file.relative_to(root).as_posix(): stack.enter_context(file.open("rb"))
-                for file in all_pkgs
-            }
-            yield PkgEditor(files)
+        self.files = {}
+        self.root = root
+        self.target_game = target_game
+        self.headers = {}
+        self._files_for_asset_id = collections.defaultdict(set)
+        self._ensured_asset_ids = {}
+        self._modified_resources = {}
+
+        for pkg_path in all_pkgs:
+            name = pkg_path.relative_to(root).as_posix()
+            self.files[name] = pkg_path
+            with pkg_path.open("rb") as f:
+                self.headers[name] = PKGHeader.parse_stream(f, target_game=target_game)
+
+            self._ensured_asset_ids[name] = set()
+            for entry in self.headers[name].file_entries:
+                self._files_for_asset_id[entry.asset_id].add(name)
 
     def all_asset_ids(self) -> Iterator[AssetId]:
         """
@@ -77,8 +75,9 @@ class PkgEditor:
 
             for entry in header.file_entries:
                 if entry.asset_id == asset_id:
-                    self.files[name].seek(entry.start_offset)
-                    return self.files[name].read(entry.end_offset - entry.start_offset)
+                    with self.files[name].open("rb") as f:
+                        f.seek(entry.start_offset)
+                        return f.read(entry.end_offset - entry.start_offset)
 
         raise ValueError(f"Unknown asset_id: {asset_id:0x}")
 
@@ -104,7 +103,7 @@ class PkgEditor:
         if pkg_name not in self._files_for_asset_id[asset_id]:
             self._ensured_asset_ids[pkg_name].add(asset_id)
 
-    def save_modified_pkgs(self, out: Path):
+    def save_modified_pkgs(self):
         modified_pkgs = set()
         for asset_id in self._modified_resources.keys():
             modified_pkgs.update(self._files_for_asset_id[asset_id])
@@ -117,8 +116,8 @@ class PkgEditor:
                     asset_ids_to_copy[asset_id] = self.get_raw_asset(asset_id)
 
         for pkg_name in modified_pkgs:
-            self.files[pkg_name].seek(0)
-            pkg = Pkg.parse_stream(self.files[pkg_name], target_game=self.target_game)
+            with self.files[pkg_name].open("rb") as f:
+                pkg = Pkg.parse_stream(f, target_game=self.target_game)
 
             for asset_id, data in self._modified_resources.items():
                 if pkg_name in self._files_for_asset_id[asset_id]:
@@ -126,8 +125,12 @@ class PkgEditor:
 
             for asset_id in self._ensured_asset_ids[pkg_name]:
                 pkg.add_asset(asset_id, asset_ids_to_copy[asset_id])
+                self._files_for_asset_id[asset_id].add(pkg_name)
 
-            pkg_out = out.joinpath(pkg_name)
-            pkg_out.parent.mkdir(parents=True, exist_ok=True)
-            with pkg_out.open("wb") as f:
+            with self.files[pkg_name].open("wb") as f:
                 pkg.build_stream(f)
+
+            # Clear the ensured asset ids, since we've written these
+            self._ensured_asset_ids[pkg_name] = set()
+
+        self._modified_resources = {}
