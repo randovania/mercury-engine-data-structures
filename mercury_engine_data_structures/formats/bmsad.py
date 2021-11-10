@@ -1,9 +1,9 @@
 import construct
 from construct import (
     Struct, Construct, Const, Int32ul, Hex, CString, Switch, Int16ul,
-    PrefixedArray, Byte, Array, Float32l, Bytes, Tell, PascalString, Flag,
-)
+    PrefixedArray, Byte, Array, Float32l, Flag, )
 
+from mercury_engine_data_structures import common_types
 from mercury_engine_data_structures.common_types import make_dict, StrId, Float
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource
@@ -14,7 +14,6 @@ from mercury_engine_data_structures.object import Object
 Char = construct.PaddedString(1, 'ascii')
 
 FunctionArgument = Struct(
-    prop=PropertyEnum,
     type=Char,
     value=Switch(
         construct.this.type,
@@ -26,58 +25,64 @@ FunctionArgument = Struct(
         ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}")
     )
 )
+Functions = make_dict(Struct(
+    unk=Int16ul,
+    params=common_types.DictAdapter(common_types.make_vector(
+        construct.Sequence(PropertyEnum, FunctionArgument)
+    )),
+))
 
 CPickableItemComponent = Struct(
     unk_1=Array(3, Hex(Int32ul)),
+
     empty_string=PropertyEnum,
     root=PropertyEnum,
-
     fields=Object({
+        "sOnPickFX": StrId,
         "sOnPickCaption": StrId,
+        "sOnPickTankUnknownCaption": StrId,
     }),
 
     unk_2=Int32ul,
-
-    functions=make_dict(Struct(
-        unk=Int16ul,
-        params=PrefixedArray(Int32ul, FunctionArgument),
-    )),
+    functions=Functions,
 )
 
 CScriptComponent = Struct(
     unk_1=Array(3, Hex(Int32ul)),
+
     unk_2=Int32ul,
-    functions=make_dict(Struct(
-        unk=Int16ul,
-        params=PrefixedArray(Int32ul, FunctionArgument),
-    )),
+    functions=Functions,
 )
 
 CModelUpdaterComponent = Struct(
-    tell=Tell,
-    unk=Bytes(0xA6),
+    unk_1=Array(3, Hex(Int32ul)),
+
+    unk_2=Int32ul,
+    functions=Functions,
 )
 
 CAnimationComponent = Struct(
-    unk_1a=Array(3, Hex(Int32ul)),
+    unk_1=Array(3, Hex(Int32ul)),
+
     empty_string=PropertyEnum,
     root=PropertyEnum,
-
     fields=Object({
         "sInitialAction": StrId,
         "sAnimTree": StrId,
     }),
-    unk_2=Int32ul,
 
-    functions=make_dict(Struct(
-        unk=Int16ul,
-        params=PrefixedArray(Int32ul, FunctionArgument),
-    )),
+    unk_2=Int32ul,
+    functions=Functions,
 )
 
 CAudioComponent = Struct(
-    tell=Tell,
-    unk=Bytes(0x61),
+    unk_1=Array(3, Hex(Int32ul)),
+    unk_2=Int32ul,
+    unk_3=Int32ul,
+
+    count=Int32ul,
+    bmsas=StrId,
+    unk_4=Int32ul,
 )
 
 component_types = {
@@ -109,18 +114,6 @@ CCharClass = Struct(
             )
         )
     )
-
-    # components=PrefixedArray(
-    #     Int32ul,
-    #     Struct(
-    #         type=CString("utf-8"),
-    #         component=Switch(
-    #             construct.this.type,
-    #             component_types,
-    #             ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx.type}"),
-    #         )
-    #     ),
-    # ),
 )
 
 property_types = {
@@ -142,7 +135,8 @@ BMSAD = Struct(
         construct.this.type,
         property_types,
         ErrorWithMessage("Unknown property type"),
-    )
+    ),
+    _end=construct.Terminated,
 )
 
 
