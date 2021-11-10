@@ -1,53 +1,91 @@
 import construct
 from construct import (
     Struct, Construct, Const, Int32ul, Hex, CString, Switch, Int16ul,
-    PrefixedArray, Byte, Array, Float32l, Probe, Int64ul, Flag,
+    PrefixedArray, Byte, Array, Float32l, Bytes, Tell, PascalString, Flag,
 )
 
-from mercury_engine_data_structures.common_types import CVector3D
+from mercury_engine_data_structures.common_types import make_dict, StrId, Float
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
-from mercury_engine_data_structures.formats import BaseResource, game_model_root
+from mercury_engine_data_structures.formats import BaseResource
+from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.object import Object
+
+Char = construct.PaddedString(1, 'ascii')
+
+FunctionArgument = Struct(
+    prop=PropertyEnum,
+    type=Char,
+    value=Switch(
+        construct.this.type,
+        {
+            's': StrId,
+            'f': Float,
+            'b': Flag,
+        },
+        ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}")
+    )
+)
 
 CPickableItemComponent = Struct(
-    unknown=Int32ul,
+    unk_1=Array(3, Hex(Int32ul)),
+    empty_string=PropertyEnum,
+    root=PropertyEnum,
+
+    fields=Object({
+        "sOnPickCaption": StrId,
+    }),
+
+    unk_2=Int32ul,
+
+    functions=make_dict(Struct(
+        unk=Int16ul,
+        params=PrefixedArray(Int32ul, FunctionArgument),
+    )),
 )
 
-CCollisionComponent = Struct(
-    k=Hex(Int64ul),
+CScriptComponent = Struct(
+    unk_1=Array(3, Hex(Int32ul)),
+    unk_2=Int32ul,
+    functions=make_dict(Struct(
+        unk=Int16ul,
+        params=PrefixedArray(Int32ul, FunctionArgument),
+    )),
 )
 
-CActorComponentDef = {
-    "parent": "base::core::CBaseObject",
-    "fields": {
-        "bStartEnabled": "bool",
-        "bDisabledInEditor": "bool",
-        "bPrePhysicsUpdateInEditor": "bool",
-        "bPostPhysicsUpdateInEditor": "bool"
-    }
-}
+CModelUpdaterComponent = Struct(
+    tell=Tell,
+    unk=Bytes(0xA6),
+)
 
-CCharClassCollisionComponent = {
-    "parent": "CCharClassComponent",
-    "fields": {
-        "v3SpawnPointCollisionSizeInc": "base::math::CVector3D",
-        "eDefaultCollisionMaterial": "game::logic::collision::EColMat",
-        "bShouldIgnoreSlopeSupport": "bool",
-        "bForceSlopeDirectionOnFloorHit": "bool",
-        "mExplicitCollisionMaterials": "base::global::CRntSmallDictionary<base::global::CStrId, game::logic::collision::EColMat>"
-    },
-}
+CAnimationComponent = Struct(
+    unk_1a=Array(3, Hex(Int32ul)),
+    empty_string=PropertyEnum,
+    root=PropertyEnum,
 
+    fields=Object({
+        "sInitialAction": StrId,
+        "sAnimTree": StrId,
+    }),
+    unk_2=Int32ul,
+
+    functions=make_dict(Struct(
+        unk=Int16ul,
+        params=PrefixedArray(Int32ul, FunctionArgument),
+    )),
+)
+
+CAudioComponent = Struct(
+    tell=Tell,
+    unk=Bytes(0x61),
+)
 
 component_types = {
     "CPickableItemComponent": CPickableItemComponent,
-    "CCollisionComponent": Struct(
-        "bStartEnabled" / Flag,
-        "bDisabledInEditor" / Flag,
-        "bPrePhysicsUpdateInEditor" / Flag,
-        "bPostPhysicsUpdateInEditor" / Flag,
-        "v3SpawnPointCollisionSizeInc" / CVector3D,
-    ),
+    "CScriptComponent": CScriptComponent,
+    "CModelUpdaterComponent": CModelUpdaterComponent,
+    "CAnimationComponent": CAnimationComponent,
+    "CAudioComponent": CAudioComponent,
 }
 
 CCharClass = Struct(
@@ -61,16 +99,16 @@ CCharClass = Struct(
     unk_5=Int16ul,
     unk_6=Byte,
 
-
-    some_count=Int32ul,
-    key_name=CString("utf-8"),
-    component_type=CString("utf-8"),
-    component=Switch(
-        construct.this.component_type,
-        component_types,
-        ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx.component_type}"),
+    components=make_dict(
+        Struct(
+            component_type=CString("utf-8"),
+            component=Switch(
+                construct.this.component_type,
+                component_types,
+                ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx.component_type}"),
+            )
+        )
     )
-
 
     # components=PrefixedArray(
     #     Int32ul,
@@ -106,6 +144,7 @@ BMSAD = Struct(
         ErrorWithMessage("Unknown property type"),
     )
 )
+
 
 # BMSAD = game_model_root.create('CActorDef', 0x02000031)
 
