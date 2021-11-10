@@ -1,10 +1,27 @@
+from typing import Dict
+
 import construct
-from construct import Hex, Int64ul
-from construct.lib import HexDisplayedInteger
 
-from mercury_engine_data_structures.dread_data import all_property_id_to_name
+from mercury_engine_data_structures import dread_data
 
-PropertyEnum = construct.Enum(Hex(Int64ul), **{
-    name: HexDisplayedInteger.new(property_id, "0%sX" % (2 * 8))
-    for property_id, name in all_property_id_to_name().items()
-})
+
+class CRCAdapter(construct.Adapter):
+    def __init__(self, subcon, known_hashes: Dict[str, int]):
+        super().__init__(subcon)
+        self.known_hashes = known_hashes
+        self.inverted_hashes = {value: name for name, value in known_hashes.items()}
+
+    def _decode(self, obj, context, path):
+        try:
+            return self.inverted_hashes[obj]
+        except KeyError:
+            raise construct.MappingError("building failed, no mapping for %r" % (obj,), path=path)
+
+    def _encode(self, obj, context, path):
+        try:
+            return self.known_hashes[obj]
+        except KeyError:
+            raise construct.MappingError("building failed, no mapping for %r" % (obj,), path=path)
+
+
+PropertyEnum = CRCAdapter(construct.Hex(construct.Int64ul), dread_data.all_name_to_property_id())
