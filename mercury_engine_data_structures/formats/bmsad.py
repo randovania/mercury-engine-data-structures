@@ -1,15 +1,16 @@
 import construct
 from construct import (
     Struct, Construct, Const, Int32ul, Hex, CString, Switch, Int16ul,
-    PrefixedArray, Byte, Array, Float32l, Flag, )
+    PrefixedArray, Byte, Array, Float32l, Flag, Probe, Tell, )
 
 from mercury_engine_data_structures import common_types
 from mercury_engine_data_structures.common_types import make_dict, StrId, Float
-from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
+from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, ForceQuit
 from mercury_engine_data_structures.formats import BaseResource
+from mercury_engine_data_structures.formats.dread_types import CCharClassCollisionComponent, \
+    CCharClassPickableComponent, CCharClassAnimationComponent, CCharClassBasicLifeComponent
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
-from mercury_engine_data_structures.object import Object
 
 Char = construct.PaddedString(1, 'ascii')
 
@@ -37,11 +38,7 @@ CPickableItemComponent = Struct(
 
     empty_string=PropertyEnum,
     root=PropertyEnum,
-    fields=Object({
-        "sOnPickFX": StrId,
-        "sOnPickCaption": StrId,
-        "sOnPickTankUnknownCaption": StrId,
-    }),
+    fields=CCharClassPickableComponent,
 
     unk_2=Int32ul,
     functions=Functions,
@@ -66,10 +63,7 @@ CAnimationComponent = Struct(
 
     empty_string=PropertyEnum,
     root=PropertyEnum,
-    fields=Object({
-        "sInitialAction": StrId,
-        "sAnimTree": StrId,
-    }),
+    fields=CCharClassAnimationComponent,
 
     unk_2=Int32ul,
     functions=Functions,
@@ -77,12 +71,72 @@ CAnimationComponent = Struct(
 
 CAudioComponent = Struct(
     unk_1=Array(3, Hex(Int32ul)),
+    # unk_2=Int32ul,
+    # unk_3=Int32ul,
+
+    count=common_types.make_vector(StrId),
+    unk_4=Int32ul,
+)
+
+# CAudioComponent = Struct(
+#     unk_1=Array(3, Hex(Int32ul)),
+#     unk_2=Int32ul,
+#     unk_3=Int32ul,
+#
+#     count=Int32ul,
+#     bmsas=StrId,
+#     unk_4=Int32ul,
+# )
+
+CCollisionComponent = Struct(
+    unk_1=Array(3, Hex(Int32ul)),
+
+    empty_string=PropertyEnum,
+    root=PropertyEnum,
+    fields=CCharClassCollisionComponent,
+
+    unk_2=Int32ul,
+    unk_3=Int32ul,
+    s=StrId,
+    k=Int16ul,
+)
+CPowerUpLifeComponent = Struct(
+    unk_1=Array(3, Hex(Int32ul)),
+
+    empty_string=PropertyEnum,
+    root=PropertyEnum,
+    fields=CCharClassBasicLifeComponent,
+
+    unk_2=Int32ul,
+    functions=Functions,
+)
+CTimelineComponent = Struct(
+    unk_1=Array(3, Hex(Int32ul)),
+    unk_2=Int32ul,
+    functions=Functions,
+)
+CMaterialFXComponent = Struct(
+    unk_1=Array(3, Hex(Int32ul)),
+    unk_2=Int32ul,
+    functions=Functions,
+)
+CFXComponent = Struct(
+    unk_1=Array(3, Hex(Int32ul)),
     unk_2=Int32ul,
     unk_3=Int32ul,
 
-    count=Int32ul,
-    bmsas=StrId,
-    unk_4=Int32ul,
+    unk_4=PrefixedArray(
+        Int32ul,
+        Struct(
+            s1=StrId,
+            a1=Int32ul,
+            a2=Int32ul,
+            a3=Flag,
+        )
+    ),
+    bmsas=PrefixedArray(Int32ul, StrId),
+    other=PrefixedArray(Int32ul, StrId),
+    unk_5=Flag,
 )
 
 component_types = {
@@ -91,6 +145,11 @@ component_types = {
     "CModelUpdaterComponent": CModelUpdaterComponent,
     "CAnimationComponent": CAnimationComponent,
     "CAudioComponent": CAudioComponent,
+    "CCollisionComponent": CCollisionComponent,
+    "CPowerUpLifeComponent": CPowerUpLifeComponent,
+    "CTimelineComponent": CTimelineComponent,
+    "CMaterialFXComponent": CMaterialFXComponent,
+    "CFXComponent": CFXComponent,
 }
 
 CCharClass = Struct(
@@ -136,7 +195,8 @@ BMSAD = Struct(
         property_types,
         ErrorWithMessage("Unknown property type"),
     ),
-    _end=construct.Terminated,
+    rest=construct.GreedyBytes,
+    # _end=construct.Terminated,
 )
 
 

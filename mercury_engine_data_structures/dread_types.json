@@ -8524,7 +8524,7 @@
     "CCharClassRodotukAIComponent::SAbsorbConfig": {
         "parent": null,
         "fields": {
-            "eType": "EType",
+            "eType": "CCharClassRodotukAIComponent::SAbsorbConfig::EType",
             "fBaseAbsorbDistance": "float",
             "fAngryAbsorbDistance": "float",
             "fBombAbsorbExtraHeight": "float",
@@ -19175,8 +19175,8 @@
             "sNodeToDrop": "base::global::CStrId",
             "vNodeOffset": "base::math::CVector3D",
             "vRawOffset": "base::math::CVector3D",
-            "eDirToDrop": "SDir",
-            "eType": "SType",
+            "eDirToDrop": "SDropProbabilities::SDir",
+            "eType": "SDropProbabilities::SType",
             "bStrictDir": "bool",
             "bForceAttract": "bool",
             "bAutomaticGrab": "bool",

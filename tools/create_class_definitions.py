@@ -28,6 +28,13 @@ known_types_to_construct = {
     "base::global::CName": "common_types.StrId",
     "base::core::CAssetLink": "common_types.StrId",
 }
+known_typedefs = {
+    "TPatterns": "base::global::CRntDictionary<base::global::CStrId, COffset>",
+    "CCharClassRodotukAIComponent::TVAbsorbConfigs": "base::global::CRntDictionary<base::global::CStrId, CCharClassRodotukAIComponent::SAbsorbConfig>",
+    "TLaunchPattern": "base::global::CRntDictionary<base::global::CStrId, SLaunchPatternStep>",
+    "TLaunchConfigs": "base::global::CRntDictionary<base::global::CStrId, SLaunchConfig>",
+    "TBigkranXSpitLaunchPattern": "base::global::CRntDictionary<base::global::CStrId, SBigkranXSpitLaunchPatternStep>",
+}
 
 vector_re = re.compile(r"(?:base::)?global::CRntVector<(.*?)(?:, false)?>$")
 array_re = re.compile(r"(?:base::)?global::CArray<(.*?), [^,]*?, [^>]*?>$")
@@ -129,9 +136,13 @@ class TypeExporter:
         type_variable = _type_name_to_python_identifier(type_name)
 
         if type_name in self.all_types:
-            if self.all_types[type_name]["values"] is not None:
+            type_data = self.all_types[type_name]
+            if type_data["values"] is not None:
                 type_variable, type_code = self._export_enum_type(type_variable, type_name)
                 self._type_definition_code += type_code
+            elif type_data.get("typedef") is not None:
+                reference = self.ensure_exported_type(type_data["typedef"])
+                self._type_definition_code += f'\n\n{type_variable} = {reference}'
             else:
                 type_code = self._export_known_type(type_variable, type_name)
                 self._type_definition_code += f'\n\n{type_variable} = {type_code}'
@@ -248,9 +259,18 @@ def main():
 
     all_types.pop("CBlackboard")
     all_types.pop("CGameBlackboard")
+
+    for type_name, alias in known_typedefs.items():
+        all_types[type_name] = {
+            "parent": None,
+            "fields": {},
+            "values": None,
+            "typedef": alias,
+        }
+
     type_exporter = TypeExporter(all_types)
 
-    needs_exporting = {"gameeditor::CGameModelRoot", "CCharClass"}
+    needs_exporting = {"gameeditor::CGameModelRoot", "CCharClass", "CActorComponentDef"}
     while needs_exporting:
         next_type = needs_exporting.pop()
         if next_type not in type_exporter._exported_types:
