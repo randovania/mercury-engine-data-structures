@@ -25,7 +25,7 @@ known_types_to_construct = {
     "base::global::CRntFile": "construct.Prefixed(construct.Int32ul, construct.GreedyBytes)",
 
     # TODO: test if works
-    "base::global::CName": "common_types.StrId",
+    "base::global::CName": "PropertyEnum",
     "base::core::CAssetLink": "common_types.StrId",
 }
 known_typedefs = {
@@ -210,6 +210,7 @@ import construct
 from mercury_engine_data_structures import common_types
 from mercury_engine_data_structures.object import Object
 from mercury_engine_data_structures.pointer_set import PointerSet
+from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 
 """
         seen_types_with_pointer = set()
