@@ -250,7 +250,7 @@ def main():
     output_path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "formats", "dread_types.py")
 
     with p.open() as f:
-        all_types: dict[str, dict[str, str]] = json.load(f)
+        all_types: dict[str, dict[str, typing.Any]] = json.load(f)
 
     all_types.pop("base::global::CStrId")
     all_types.pop("base::global::CRntString")

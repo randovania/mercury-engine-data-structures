@@ -16794,6 +16794,7 @@
     "fMinEntitySpeedForMinRotation": 8142576375028182438,
     "fMinExplosionHeight": 11770166113407860403,
     "fMinExtraZDist": 14143547281072381690,
+    "fMinFlyingDistToFloor": 15792186200111530425,
     "fMinFlyngDistToFloor": 5761395144423744905,
     "fMinFreezeTime": 14594320940264066946,
     "fMinGrapplePullTimeToBreak": 10719739891586204142,
