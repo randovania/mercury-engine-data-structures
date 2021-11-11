@@ -2,6 +2,7 @@ import io
 
 import construct
 from construct import Construct, stream_tell, Subconstruct, GreedyBytes
+from construct.core import FocusedSeq, If, IfThenElse, Optional, Peek, Prefixed
 
 
 class AlignTo(Construct):
@@ -105,3 +106,18 @@ class PrefixedWithPaddingBefore(Subconstruct):
 
         construct.stream_write(stream, data, len(data), path)
         return buildret
+
+def PrefixedAllowZeroLen(lengthfield, subcon, includelengthfield=False):
+    return FocusedSeq(
+        "prefixed",
+        "len" / Peek(lengthfield),
+        "prefixed" / Prefixed(
+            lengthfield,
+            IfThenElse(
+                construct.this._parsing,
+                If(construct.this.len > 0, subcon),
+                Optional(subcon)
+            ),
+            includelengthfield
+        )
+    )
