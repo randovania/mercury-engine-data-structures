@@ -38,6 +38,7 @@ component_keys = [
     "CHANGE_STAGE_NAVMESH_ITEM",
     "CHOZOMBIEFXCOMPONENT",
     "COLLISION",
+    "COLLISION MATERIAL CACHE",
     "CONTROLLER",
     "COOLDOWNFAN",
     "CUBEMAP",
@@ -207,15 +208,25 @@ CCharClass = Struct(
     sub_actors=PrefixedArray(Int32ul, StrId),
     unk_4=Array(9, Float32l),
     magic=Const(0xFFFFFFFF, Hex(Int32ul)),
-    unk_5=StrId,
+    unk_5=Byte,
     unk_6=StrId,
-    unk_7=StrId,
+    unk_7=Byte,
 
     components=make_dict(Component),
 )
 
+CActorDef = Struct(
+    unk_1=Int16ul,
+    unk_2=Int32ul,
+    unk_3=Int16ul,
+    sub_actors=PrefixedArray(Int32ul, StrId),
+    unk_4=StrId,
+    components=make_dict(Component)
+)
+
 property_types = {
     "CCharClass": CCharClass,
+    "CActorDef": CActorDef
 }
 #
 BMSAD = Struct(
