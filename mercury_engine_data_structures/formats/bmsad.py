@@ -207,8 +207,9 @@ CCharClass = Struct(
     sub_actors=PrefixedArray(Int32ul, StrId),
     unk_4=Array(9, Float32l),
     magic=Const(0xFFFFFFFF, Hex(Int32ul)),
-    unk_5=Int16ul,
-    unk_6=Byte,
+    unk_5=StrId,
+    unk_6=StrId,
+    unk_7=StrId,
 
     components=make_dict(Component),
 )
