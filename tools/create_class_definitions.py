@@ -34,6 +34,7 @@ known_typedefs = {
     "TLaunchPattern": "base::global::CRntDictionary<base::global::CStrId, SLaunchPatternStep>",
     "TLaunchConfigs": "base::global::CRntDictionary<base::global::CStrId, SLaunchConfig>",
     "TBigkranXSpitLaunchPattern": "base::global::CRntDictionary<base::global::CStrId, SBigkranXSpitLaunchPatternStep>",
+    "base::global::timeline::TLayers": "base::global::timeline::ELayer",  # flagset
 }
 
 vector_re = re.compile(r"(?:base::)?global::CRntVector<(.*?)(?:, false)?>$")

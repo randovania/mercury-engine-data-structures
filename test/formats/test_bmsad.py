@@ -1,10 +1,10 @@
 import pytest
+
 from mercury_engine_data_structures.formats.bmsad import BMSAD
 from mercury_engine_data_structures.game_check import Game
 from test.test_lib import parse_and_build_compare
 
-# @pytest.mark.skip()
-@pytest.mark.parametrize("bmsad_path", [
+all_bmsad = [
     "actors/characters/armadigger/charclasses/armadigger.bmsad",
     "actors/characters/autclast/charclasses/autclast.bmsad",
     "actors/characters/autector/charclasses/autector.bmsad",
@@ -901,14 +901,18 @@ from test.test_lib import parse_and_build_compare
     "cutscenes/0155scorpiusphase3/actors/missile_cut_3/actor.bmsad",
     "cutscenes/0155scorpiusphase3/actors/missile_cut_4/actor.bmsad",
     "cutscenes/100commandershowswings/actors/cut_100_comandercap/actor.bmsad"
-])
+]
+
+
+@pytest.mark.parametrize("bmsad_path", all_bmsad)
 def test_compare_dread_all(dread_path, bmsad_path):
     parse_and_build_compare(
         BMSAD, Game.DREAD, dread_path.joinpath(bmsad_path)
     )
 
+
 def test_compare_dread(dread_path):
     parse_and_build_compare(
-        BMSAD, Game.DREAD, dread_path.joinpath("actors/items/itemsphere_plasmabeam/charclasses/itemsphere_plasmabeam.bmsad"), True
+        BMSAD, Game.DREAD,
+        dread_path.joinpath("actors/items/itemsphere_plasmabeam/charclasses/itemsphere_plasmabeam.bmsad"), True
     )
-

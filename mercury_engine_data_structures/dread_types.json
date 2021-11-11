@@ -20024,11 +20024,6 @@
             "Layer_7": 7
         }
     },
-    "base::global::timeline::TLayers": {
-        "parent": "int",
-        "fields": {},
-        "values": null
-    },
     "base::input::CRumbleManager::CTunableRumbleManager": {
         "parent": "base::tunable::CTunable",
         "fields": {
