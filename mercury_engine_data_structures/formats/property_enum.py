@@ -15,7 +15,10 @@ class CRCAdapter(construct.Adapter):
         try:
             return self.inverted_hashes[obj]
         except KeyError:
-            raise construct.MappingError("parsing failed, no mapping for %r" % (hex(obj),), path=path)
+            raise construct.MappingError(
+                "parsing failed, no mapping for 0x{:8X} ({})".format(obj, obj.to_bytes(8, "little")),
+                path=path,
+            )
 
     def _encode(self, obj, context, path):
         try:
