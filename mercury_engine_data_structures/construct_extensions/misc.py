@@ -27,18 +27,19 @@ class LazyPatchedForBug(construct.Lazy):
 
 
 class ErrorWithMessage(Construct):
-    def __init__(self, message):
+    def __init__(self, message, error=construct.ExplicitError):
         super().__init__()
         self.message = message
         self.flagbuildnone = True
+        self.error = error
 
     def _parse(self, stream, context, path):
         message = construct.evaluate(self.message, context)
-        raise construct.ExplicitError(f"Error field was activated during parsing with error {message}", path=path)
+        raise self.error(f"Error field was activated during parsing with error {message}", path=path)
 
     def _build(self, obj, stream, context, path):
         message = construct.evaluate(self.message, context)
-        raise construct.ExplicitError(f"Error field was activated during building with error {message}", path=path)
+        raise self.error(f"Error field was activated during building with error {message}", path=path)
 
     def _sizeof(self, context, path):
         raise construct.SizeofError("Error does not have size, because it interrupts parsing and building", path=path)

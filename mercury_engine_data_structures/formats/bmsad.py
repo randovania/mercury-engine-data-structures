@@ -1,16 +1,57 @@
-import construct
-from construct import (
-    Struct, Construct, Const, Int32ul, Hex, CString, Switch, Int16ul,
-    PrefixedArray, Byte, Array, Float32l, Flag, Probe, Tell, )
+import re
 
+import construct
+from construct.core import (Array, Byte, Bytes, Const, Construct, ExprAdapter,
+                            Flag, Float32l, FocusedSeq, GreedyRange, Hex,
+                            Int16ul, Int32sl, Int32ul, Optional, Peek,
+                            PrefixedArray, StopIf, Struct, Switch)
+from construct.lib.containers import Container
 from mercury_engine_data_structures import common_types
-from mercury_engine_data_structures.common_types import make_dict, StrId, Float
-from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, ForceQuit
-from mercury_engine_data_structures.formats import BaseResource
-from mercury_engine_data_structures.formats.dread_types import CCharClassCollisionComponent, \
-    CCharClassPickableComponent, CCharClassAnimationComponent, CCharClassBasicLifeComponent
+from mercury_engine_data_structures.common_types import Float, StrId, make_dict
+from mercury_engine_data_structures.construct_extensions.alignment import \
+    PrefixedAllowZeroLen
+from mercury_engine_data_structures.construct_extensions.misc import \
+    ErrorWithMessage
+from mercury_engine_data_structures.formats import BaseResource, dread_types
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
+
+component_keys = [
+    "PICKABLE",
+    "SCRIPT",
+    "MODELUPDATER",
+    "ANIMATION",
+    "AUDIO",
+    "COLLISION",
+    "LIFE",
+    "TIMELINE",
+    "MATERIALFX",
+    "FX",
+    "INPUT",
+    "TRIGGER",
+    "MOVEMENT",
+    "BILLBOARD",
+    "INTERPOLATION",
+    "AI",
+    "CAMERA",
+    "POSITIONALSOUND",
+    "ATTACK",
+    "GRAB",
+    "FACTION",
+    "INVENTORY",
+    "TARGETCOMP",
+    "AINAVIGATION",
+    "GUN",
+    "AIM",
+    "RUMBLE",
+    "FROZEN",
+    "SHOT",
+    "SCENEANIM",
+    "ABILITY",
+    "MELEE",
+    "EMMYVALVE"
+]
+component_keys.extend([s+"COMPONENT" for s in component_keys])
 
 Char = construct.PaddedString(1, 'ascii')
 
@@ -22,8 +63,9 @@ FunctionArgument = Struct(
             's': StrId,
             'f': Float,
             'b': Flag,
+            'i': Int32ul,
         },
-        ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}")
+        ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
     )
 )
 Functions = make_dict(Struct(
@@ -33,146 +75,76 @@ Functions = make_dict(Struct(
     )),
 ))
 
-CPickableItemComponent = Struct(
-    unk_1=Array(3, Hex(Int32ul)),
+fieldtypes = Container({k: v for k, v in vars(dread_types).items() if re.match(r"^CCharClass\w*?Component$", k)})
 
-    empty_string=PropertyEnum,
-    root=PropertyEnum,
-    fields=CCharClassPickableComponent,
+def component_charclass(this):
+    field_type = this._._.type
 
-    unk_2=Int32ul,
-    functions=Functions,
-)
+    overrides = {
+        "CPickableItemComponent": "CCharClassPickableComponent",
+        "CPickableSuitComponent": "CCharClassPickableComponent",
 
-CScriptComponent = Struct(
-    unk_1=Array(3, Hex(Int32ul)),
+        "CPowerUpLifeComponent": "CCharClassBasicLifeComponent",
+        "CHyperBeamBlockLifeComponent": "CCharClassBasicLifeComponent",
+        "CBeamDoorLifeComponent": "CCharClassBasicLifeComponent",
 
-    unk_2=Int32ul,
-    functions=Functions,
-)
+        "CSideEnemyMovement": "CCharClassEnemyMovement",
+        "CEnemyMovement": "CCharClassEnemyMovement",
+        "CMorphBallMovement": "CCharClassMorphBallMovement",
 
-CModelUpdaterComponent = Struct(
-    unk_1=Array(3, Hex(Int32ul)),
+        "CAmmoRechargeComponent": "CCharClassUsableComponent",
+        "CLifeRechargeComponent": "CCharClassUsableComponent",
+        "CElevatorCommanderUsableComponent": "CCharClassUsableComponent",
+        "CThermalDeviceComponent": "CCharClassUsableComponent",
 
-    unk_2=Int32ul,
-    functions=Functions,
-)
+        "CSamusModelUpdaterComponent": "CCharClassMultiModelUpdaterComponent"
+    }
+    return overrides.get(field_type, "CCharClass"+field_type[1:])
 
-CAnimationComponent = Struct(
-    unk_1=Array(3, Hex(Int32ul)),
+def Dependencies():
+    return ExprAdapter(
+        GreedyRange(FocusedSeq(
+            "byte",
+            "next_key" / Optional(Peek(StrId)),
+            StopIf(lambda this: this.next_key is not None and this.next_key in component_keys),
+            "byte" / Bytes(1)
+        )),
+        lambda obj, ctx: b''.join(obj),
+        lambda obj, ctx: [obj[i:i+1] for i in range(len(obj))]
+    )
 
-    empty_string=PropertyEnum,
-    root=PropertyEnum,
-    fields=CCharClassAnimationComponent,
-
-    unk_2=Int32ul,
-    functions=Functions,
-)
-
-CAudioComponent = Struct(
-    unk_1=Array(3, Hex(Int32ul)),
-    # unk_2=Int32ul,
-    # unk_3=Int32ul,
-
-    count=common_types.make_vector(StrId),
-    unk_4=Int32ul,
-)
-
-# CAudioComponent = Struct(
-#     unk_1=Array(3, Hex(Int32ul)),
-#     unk_2=Int32ul,
-#     unk_3=Int32ul,
-#
-#     count=Int32ul,
-#     bmsas=StrId,
-#     unk_4=Int32ul,
-# )
-
-CCollisionComponent = Struct(
-    unk_1=Array(3, Hex(Int32ul)),
-
-    empty_string=PropertyEnum,
-    root=PropertyEnum,
-    fields=CCharClassCollisionComponent,
-
-    unk_2=Int32ul,
-    unk_3=Int32ul,
-    s=StrId,
-    k=Int16ul,
-)
-CPowerUpLifeComponent = Struct(
-    unk_1=Array(3, Hex(Int32ul)),
-
-    empty_string=PropertyEnum,
-    root=PropertyEnum,
-    fields=CCharClassBasicLifeComponent,
-
-    unk_2=Int32ul,
-    functions=Functions,
-)
-CTimelineComponent = Struct(
-    unk_1=Array(3, Hex(Int32ul)),
-    unk_2=Int32ul,
-    functions=Functions,
-)
-CMaterialFXComponent = Struct(
-    unk_1=Array(3, Hex(Int32ul)),
-    unk_2=Int32ul,
-    functions=Functions,
-)
-CFXComponent = Struct(
-    unk_1=Array(3, Hex(Int32ul)),
-    unk_2=Int32ul,
-    unk_3=Int32ul,
-
-    unk_4=PrefixedArray(
-        Int32ul,
-        Struct(
-            s1=StrId,
-            a1=Int32ul,
-            a2=Int32ul,
-            a3=Flag,
-        )
-    ),
-    bmsas=PrefixedArray(Int32ul, StrId),
-    other=PrefixedArray(Int32ul, StrId),
-    unk_5=Flag,
-)
-
-component_types = {
-    "CPickableItemComponent": CPickableItemComponent,
-    "CScriptComponent": CScriptComponent,
-    "CModelUpdaterComponent": CModelUpdaterComponent,
-    "CAnimationComponent": CAnimationComponent,
-    "CAudioComponent": CAudioComponent,
-    "CCollisionComponent": CCollisionComponent,
-    "CPowerUpLifeComponent": CPowerUpLifeComponent,
-    "CTimelineComponent": CTimelineComponent,
-    "CMaterialFXComponent": CMaterialFXComponent,
-    "CFXComponent": CFXComponent,
-}
+Component = Struct(
+        type=StrId,
+        unk_1=Array(2, Hex(Int32ul)),
+        fields=PrefixedAllowZeroLen(
+            Int32ul,
+            Struct(
+                empty_string=PropertyEnum,
+                root=PropertyEnum,
+                fields=Switch(
+                    component_charclass,
+                    fieldtypes,
+                    ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx._._.type}", construct.SwitchError)
+                )
+            )
+        ),
+        unk_2=Int32sl,
+        functions=Functions,
+        dependencies=Dependencies()
+    )
 
 CCharClass = Struct(
-    model_name=CString("utf-8"),
+    model_name=StrId,
     unk_1=Int16ul,
     unk_2=Int32ul,
     unk_3=Int16ul,
-    sub_actors=PrefixedArray(Int32ul, CString("utf-8")),
+    sub_actors=PrefixedArray(Int32ul, StrId),
     unk_4=Array(9, Float32l),
     magic=Const(0xFFFFFFFF, Hex(Int32ul)),
     unk_5=Int16ul,
     unk_6=Byte,
 
-    components=make_dict(
-        Struct(
-            component_type=CString("utf-8"),
-            component=Switch(
-                construct.this.component_type,
-                component_types,
-                ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx.component_type}"),
-            )
-        )
-    )
+    components=make_dict(Component)
 )
 
 property_types = {
@@ -180,15 +152,15 @@ property_types = {
 }
 #
 BMSAD = Struct(
-    magic_a=Const(b"MSAD"),
-    magic_b=Const(0x0200000F, Hex(Int32ul)),
+    magic=Const(b"MSAD"),
+    version=Const(0x0200000F, Hex(Int32ul)),
 
     # # gameeditor::CGameModelRoot
     # root_type=construct.Const('Root', PropertyEnum),
     # Root=gameeditor_CGameModelRoot,
 
-    name=CString("utf-8"),
-    type=CString("utf-8"),
+    name=StrId,
+    type=StrId,
 
     property=Switch(
         construct.this.type,
