@@ -17,21 +17,69 @@ class DictAdapter(Adapter):
     def _decode(self, obj: construct.ListContainer, context, path):
         result = construct.Container()
         for item in obj:
-            key = item[0]
+            key = item.key
             if key in result:
                 raise construct.ConstructError(f"Key {key} found twice in object", path)
-            result[key] = item[1]
+            result[key] = item.value
         return result
 
     def _encode(self, obj: construct.Container, context, path):
         return construct.ListContainer(
-            construct.ListContainer([type_, item])
+            construct.Container(key=type_, value=item)
             for type_, item in obj.items()
         )
 
 
+class DictElement(construct.Construct):
+    def __init__(self, field, key=StrId):
+        super().__init__()
+        self.field = field
+        self.key = key
+
+    def _parse(self, stream, context, path):
+        context = construct.Container(
+            _=context, _params=context._params, _root=None, _parsing=context._parsing,
+            _building=context._building, _sizing=context._sizing, _io=stream,
+            _index=context.get("_index", None))
+        context._root = context._.get("_root", context)
+
+        key = self.key._parsereport(stream, context, path)
+        value = self.field._parsereport(stream, context, f"{path} -> {key}")
+
+        return construct.Container(
+            key=key,
+            value=value,
+        )
+
+    def _build(self, obj, stream, context, path):
+        context = construct.Container(
+            _=context, _params=context._params, _root=None, _parsing=context._parsing,
+            _building=context._building, _sizing=context._sizing, _io=stream,
+            _index=context.get("_index", None))
+        context._root = context._.get("_root", context)
+
+        key = self.key._build(obj.key, stream, context, path)
+        value = self.field._build(obj.value, stream, context, f"{path} -> {key}")
+
+        return construct.Container(
+            key=key,
+            value=value,
+        )
+
+    def _sizeof(self, context, path):
+        context = construct.Container(
+            _=context, _params=context._params, _root=None, _parsing=context._parsing,
+            _building=context._building, _sizing=context._sizing, _io=None,
+            _index=context.get("_index", None))
+        context._root = context._.get("_root", context)
+
+        key = self.key._sizeof(context, path)
+        value = self.field._sizeof(context, f"{path} -> {key}")
+        return key + value
+
+
 def make_dict(value: construct.Construct):
-    return DictAdapter(make_vector(construct.Sequence(StrId, value)))
+    return DictAdapter(make_vector(DictElement(value)))
 
 
 def make_vector(value: construct.Construct):

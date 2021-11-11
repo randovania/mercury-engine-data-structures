@@ -8,7 +8,7 @@ from construct.core import (Array, Byte, Bytes, Const, Construct, ExprAdapter,
 from construct.lib.containers import Container
 
 from mercury_engine_data_structures import common_types
-from mercury_engine_data_structures.common_types import Float, StrId, make_dict
+from mercury_engine_data_structures.common_types import Float, StrId, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.alignment import \
     PrefixedAllowZeroLen
 from mercury_engine_data_structures.construct_extensions.misc import \
@@ -69,14 +69,15 @@ FunctionArgument = Struct(
         ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
     )
 )
-Functions = make_dict(Struct(
+Functions = make_vector(Struct(
+    name=StrId,
     unk=Int16ul,
     params=common_types.DictAdapter(common_types.make_vector(
-        construct.Sequence(PropertyEnum, FunctionArgument)
+        common_types.DictElement(FunctionArgument, key=PropertyEnum)
     )),
 ))
 
-fieldtypes = Container({k: v for k, v in vars(dread_types).items() if re.match(r"^CCharClass\w*?Component$", k)})
+fieldtypes = {k: v for k, v in vars(dread_types).items() if isinstance(v, construct.Construct)}
 
 
 def component_charclass(this):
@@ -134,7 +135,7 @@ Component = Struct(
     ),
     unk_2=Int32sl,
     functions=Functions,
-    dependencies=Dependencies()
+    dependencies=Dependencies(),
 )
 
 CCharClass = Struct(
@@ -148,7 +149,7 @@ CCharClass = Struct(
     unk_5=Int16ul,
     unk_6=Byte,
 
-    components=make_dict(Component)
+    components=make_dict(Component),
 )
 
 property_types = {
