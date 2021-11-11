@@ -6,7 +6,7 @@ from construct.core import (
     PrefixedArray, StopIf, Struct, Switch,
 )
 
-from mercury_engine_data_structures import common_types
+from mercury_engine_data_structures import common_types, dread_data
 from mercury_engine_data_structures.common_types import Float, StrId, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
@@ -156,29 +156,13 @@ Functions = make_vector(Struct(
 fieldtypes = {k: v for k, v in vars(dread_types).items() if isinstance(v, construct.Construct)}
 
 
-def component_charclass(this):
-    field_type = this._._.type
-
-    overrides = {
-        "CPickableItemComponent": "CCharClassPickableComponent",
-        "CPickableSuitComponent": "CCharClassPickableComponent",
-
-        "CPowerUpLifeComponent": "CCharClassBasicLifeComponent",
-        "CHyperBeamBlockLifeComponent": "CCharClassBasicLifeComponent",
-        "CBeamDoorLifeComponent": "CCharClassBasicLifeComponent",
-
-        "CSideEnemyMovement": "CCharClassEnemyMovement",
-        "CEnemyMovement": "CCharClassEnemyMovement",
-        "CMorphBallMovement": "CCharClassMorphBallMovement",
-
-        "CAmmoRechargeComponent": "CCharClassUsableComponent",
-        "CLifeRechargeComponent": "CCharClassUsableComponent",
-        "CElevatorCommanderUsableComponent": "CCharClassUsableComponent",
-        "CThermalDeviceComponent": "CCharClassUsableComponent",
-
-        "CSamusModelUpdaterComponent": "CCharClassMultiModelUpdaterComponent"
-    }
-    return overrides.get(field_type, "CCharClass" + field_type[1:])
+def find_charclass_for_type(type_name: str):
+    as_char = "CCharClass" + type_name[1:]
+    if as_char in fieldtypes:
+        return as_char
+    return find_charclass_for_type(
+        dread_data.get_raw_types()[type_name]["parent"],
+    )
 
 
 def Dependencies():
@@ -203,7 +187,7 @@ Component = Struct(
             empty_string=PropertyEnum,
             root=PropertyEnum,
             fields=Switch(
-                component_charclass,
+                lambda ctx: find_charclass_for_type(ctx._._.type),
                 fieldtypes,
                 ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx._._.type}", construct.SwitchError)
             )

@@ -1,11 +1,12 @@
 import functools
 import json
+import typing
 from pathlib import Path
 from typing import Dict, Optional
 
 
 @functools.lru_cache()
-def get_raw_types() -> Dict[str, str]:
+def get_raw_types() -> Dict[str, typing.Any]:
     path = Path(__file__).parent.joinpath("dread_types.json")
     with path.open() as f:
         return json.load(f)
