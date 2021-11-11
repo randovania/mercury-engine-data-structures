@@ -1,11 +1,15 @@
 from pathlib import Path
 
+import pytest
 from construct.lib.containers import Container
 
 from mercury_engine_data_structures.game_check import Game
 
 
 def _parse_and_build_compare(module, game: Game, file_path: Path, print_data=False, save_file=None):
+    if not file_path.is_file():
+        return pytest.skip(f"missing {file_path}")
+
     raw = file_path.read_bytes()
 
     data = module.parse(raw, target_game=game)
