@@ -6,6 +6,7 @@ from construct.core import (Array, Byte, Bytes, Const, Construct, ExprAdapter,
                             Int16ul, Int32sl, Int32ul, Optional, Peek,
                             PrefixedArray, StopIf, Struct, Switch)
 from construct.lib.containers import Container
+
 from mercury_engine_data_structures import common_types
 from mercury_engine_data_structures.common_types import Float, StrId, make_dict
 from mercury_engine_data_structures.construct_extensions.alignment import \
@@ -51,7 +52,7 @@ component_keys = [
     "MELEE",
     "EMMYVALVE"
 ]
-component_keys.extend([s+"COMPONENT" for s in component_keys])
+component_keys.extend([s + "COMPONENT" for s in component_keys])
 
 Char = construct.PaddedString(1, 'ascii')
 
@@ -77,6 +78,7 @@ Functions = make_dict(Struct(
 
 fieldtypes = Container({k: v for k, v in vars(dread_types).items() if re.match(r"^CCharClass\w*?Component$", k)})
 
+
 def component_charclass(this):
     field_type = this._._.type
 
@@ -99,7 +101,8 @@ def component_charclass(this):
 
         "CSamusModelUpdaterComponent": "CCharClassMultiModelUpdaterComponent"
     }
-    return overrides.get(field_type, "CCharClass"+field_type[1:])
+    return overrides.get(field_type, "CCharClass" + field_type[1:])
+
 
 def Dependencies():
     return ExprAdapter(
@@ -110,28 +113,29 @@ def Dependencies():
             "byte" / Bytes(1)
         )),
         lambda obj, ctx: b''.join(obj),
-        lambda obj, ctx: [obj[i:i+1] for i in range(len(obj))]
+        lambda obj, ctx: [obj[i:i + 1] for i in range(len(obj))]
     )
 
+
 Component = Struct(
-        type=StrId,
-        unk_1=Array(2, Hex(Int32ul)),
-        fields=PrefixedAllowZeroLen(
-            Int32ul,
-            Struct(
-                empty_string=PropertyEnum,
-                root=PropertyEnum,
-                fields=Switch(
-                    component_charclass,
-                    fieldtypes,
-                    ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx._._.type}", construct.SwitchError)
-                )
+    type=StrId,
+    unk_1=Array(2, Hex(Int32ul)),
+    fields=PrefixedAllowZeroLen(
+        Int32ul,
+        Struct(
+            empty_string=PropertyEnum,
+            root=PropertyEnum,
+            fields=Switch(
+                component_charclass,
+                fieldtypes,
+                ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx._._.type}", construct.SwitchError)
             )
-        ),
-        unk_2=Int32sl,
-        functions=Functions,
-        dependencies=Dependencies()
-    )
+        )
+    ),
+    unk_2=Int32sl,
+    functions=Functions,
+    dependencies=Dependencies()
+)
 
 CCharClass = Struct(
     model_name=StrId,

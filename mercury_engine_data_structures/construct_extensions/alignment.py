@@ -107,6 +107,7 @@ class PrefixedWithPaddingBefore(Subconstruct):
         construct.stream_write(stream, data, len(data), path)
         return buildret
 
+
 def PrefixedAllowZeroLen(lengthfield, subcon, includelengthfield=False):
     return FocusedSeq(
         "prefixed",

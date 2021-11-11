@@ -48,6 +48,7 @@ class ErrorWithMessage(Construct):
 def ForceQuit():
     def force_quit(ctx):
         raise SystemExit(1)
+
     return ErrorWithMessage(force_quit)
 
 

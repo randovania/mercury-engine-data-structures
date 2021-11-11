@@ -1,8 +1,8 @@
 import construct
-from construct import Construct, Struct, Const, Hex, Int16ul, Switch, Array, Optional, Rebuild, Flag, Probe, Terminated
+from construct import Construct, Struct, Const, Hex, Int16ul, Switch, Array, Rebuild, Flag, Terminated
 
 from mercury_engine_data_structures.common_types import UInt, make_vector, StrId, Float
-from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, ForceQuit, OptionalValue
+from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, OptionalValue
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
