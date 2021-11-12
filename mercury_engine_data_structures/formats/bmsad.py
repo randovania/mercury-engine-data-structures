@@ -196,7 +196,7 @@ Component = Struct(
             )
         )
     ),
-    unk_2=If(lambda this: dread_data.child_of(this.type, "CComponent"), Int32sl),
+    unk_2=construct.If(lambda this: dread_data.child_of(this.type, "CComponent"), Int32sl),
     functions=Functions,
     dependencies=Dependencies(),
     z=construct.Probe(),
