@@ -2,7 +2,7 @@ import construct
 from construct.core import (
     Array, Byte, Bytes, Const, Construct, ExprAdapter,
     Flag, Float32l, FocusedSeq, GreedyRange, Hex,
-    Int16ul, Int32sl, Int32ul, Optional, Peek,
+    Int16ul, Int32ul, Optional, Peek,
     PrefixedArray, StopIf, Struct, Switch,
 )
 
@@ -196,7 +196,22 @@ Component = Struct(
             )
         )
     ),
-    unk_2=construct.If(lambda this: dread_data.child_of(this.type, "CComponent"), Int32sl),
+    extra_fields=construct.If(
+        lambda this: dread_data.child_of(this.type, "CComponent"),
+        common_types.DictAdapter(common_types.make_vector(
+            common_types.DictElement(Struct(
+                "type" / StrId,
+                "value" / Switch(
+                    construct.this.type,
+                    {
+                        "bool": Flag,
+                        "string": StrId
+                    },
+                    ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
+                )
+            ))
+        ))
+    ),
     functions=Functions,
     dependencies=Dependencies(),
     z=construct.Probe(),
