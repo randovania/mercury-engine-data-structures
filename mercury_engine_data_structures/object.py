@@ -2,6 +2,7 @@ from typing import Dict, Union, Type
 
 import construct
 from construct import Construct, Probe, Struct, Adapter
+from construct.core import FocusedSeq, Byte, If, IfThenElse, Optional, Peek
 
 import mercury_engine_data_structures.dread_data
 from mercury_engine_data_structures.common_types import make_vector
@@ -62,7 +63,16 @@ def Object(fields: Dict[str, Union[Construct, Type[Construct]]], *,
     all_types = list(fields)
 
     fields = {
-        name: name / conn
+        name: name / FocusedSeq(
+            "conn",
+            "next_field" / Optional(Peek(PropertyEnum)),
+            "remaining" / Optional(Peek(Byte)),
+            "conn" / IfThenElse(
+                construct.this._parsing,
+                If(lambda this: this.remaining is not None and (this.next_field is None or this.next_field not in fields.keys()), conn),
+                Optional(conn)
+            )
+        )
         for name, conn in fields.items()
     }
     for type_name in all_types:
