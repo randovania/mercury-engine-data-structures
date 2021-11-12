@@ -213,8 +213,7 @@ Component = Struct(
         ))
     ),
     functions=Functions,
-    dependencies=Dependencies(),
-    z=construct.Probe(),
+    dependencies=Dependencies()
 )
 
 CCharClass = Struct(
@@ -230,6 +229,9 @@ CCharClass = Struct(
     unk_7=Byte,
 
     components=make_dict(Component),
+    # TODO: figure out how on earth to differentiate between deps for final component and deps for charclass itself
+    binaries=Optional(make_vector(StrId)),
+    sources=Optional(make_vector(StrId))
 )
 
 CActorDef = Struct(
@@ -239,6 +241,7 @@ CActorDef = Struct(
     sub_actors=PrefixedArray(Int32ul, StrId),
     unk_4=StrId,
     components=make_dict(Component)
+    # TODO: determine whether binaries/sources are here too
 )
 
 property_types = {
@@ -262,8 +265,8 @@ BMSAD = Struct(
         property_types,
         ErrorWithMessage(lambda ctx: f"Unknown property type: {ctx.type}"),
     ),
-    rest=construct.GreedyBytes,
-    # _end=construct.Terminated,
+    # rest=construct.GreedyBytes,
+    _end=construct.Terminated,
 )
 
 
