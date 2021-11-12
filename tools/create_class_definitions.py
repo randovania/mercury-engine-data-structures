@@ -25,7 +25,7 @@ known_types_to_construct = {
     "base::global::CRntFile": "construct.Prefixed(construct.Int32ul, construct.GreedyBytes)",
 
     # TODO: test if works
-    "base::global::CName": "PropertyEnumUnsafe",
+    "base::global::CName": "PropertyEnum",
     "base::core::CAssetLink": "common_types.StrId",
 }
 known_typedefs = {

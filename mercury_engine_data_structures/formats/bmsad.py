@@ -150,7 +150,7 @@ Functions = make_vector(Struct(
     name=StrId,
     unk=Int16ul,
     params=common_types.DictAdapter(common_types.make_vector(
-        common_types.DictElement(FunctionArgument, key=PropertyEnumUnsafe)
+        common_types.DictElement(FunctionArgument, key=PropertyEnum)
     )),
 ))
 
