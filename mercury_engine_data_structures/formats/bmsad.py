@@ -1,10 +1,13 @@
+import re
+
 import construct
 from construct.core import (
-    Array, Byte, Bytes, Const, Construct, ExprAdapter,
-    Flag, Float32l, FocusedSeq, GreedyRange, Hex,
+    Array, Byte, Bytes, Computed, Const, Construct, ExprAdapter,
+    Flag, Float32l, FocusedSeq, GreedyRange, Hex, If, IfThenElse,
     Int16ul, Int32ul, Optional, Peek,
     PrefixedArray, StopIf, Struct, Switch,
 )
+from construct.debug import Probe
 
 from mercury_engine_data_structures import common_types, dread_data
 from mercury_engine_data_structures.common_types import Float, StrId, make_dict, make_vector
@@ -168,12 +171,42 @@ def find_charclass_for_type(type_name: str):
     )
 
 
+
 def Dependencies():
+    dependency_extras = {
+        "bcptl": Int32ul >> Int32ul >> Byte,
+        "wav": Byte,
+        "bmscd": Int16ul,
+        "bmsas": Int32ul,
+        "bcmdl": Int32ul >> Int32ul >> Byte,
+    }
+
+    stop = lambda _next: lambda this: (this._parsing and this.get(_next) is not None and this[_next] in component_keys) or (this._building and (this.get("deps") is None or len(this.deps) == 0))
+    def fileextension(this):
+        period = this.file.rfind(".")
+        return this.file[period+1:]
+    
+    dependency = Struct(
+        "file" / StrId,
+        "extra" / Switch(fileextension, dependency_extras)
+    )
+    return FocusedSeq(
+        "deps",
+        "next_key" / Optional(Peek(StrId)),
+        "deps" / If(lambda this: not stop("next_key")(this), IfThenElse(
+            lambda this: (this._parsing and (this.get("next_key") is None or not re.match(r'^[\w\/]+?\.\w+$', this.next_key))) or (this._building and len(this.deps) != 1),
+            make_vector(dependency),
+            Array(1, dependency)
+        ))
+        # "_next_key_2" / Optional(Peek(StrId)),
+        # StopIf(stop("_next_key_2")),
+        # "sources" / Optional(make_vector(dependency))
+    )
     return ExprAdapter(
         GreedyRange(FocusedSeq(
             "byte",
-            "next_key" / Optional(Peek(StrId)),
-            StopIf(lambda this: this.next_key is not None and this.next_key in component_keys),
+            "_next_key" / Optional(Peek(StrId)),
+            StopIf(lambda this: this.get("_next_key") is not None and this["_next_key"] in component_keys),
             "byte" / Bytes(1)
         )),
         lambda obj, ctx: b''.join(obj),
@@ -213,7 +246,8 @@ Component = Struct(
         ))
     ),
     functions=Functions,
-    dependencies=Dependencies()
+    dependencies=Dependencies(),
+    dependencytype=Computed(lambda this: this.type if this.dependencies is not None else None)
 )
 
 CCharClass = Struct(
@@ -231,7 +265,7 @@ CCharClass = Struct(
     components=make_dict(Component),
     # TODO: figure out how on earth to differentiate between deps for final component and deps for charclass itself
     binaries=Optional(make_vector(StrId)),
-    sources=Optional(make_vector(StrId))
+    sources=Optional(make_vector(StrId >> Byte)),
 )
 
 CActorDef = Struct(
@@ -265,8 +299,10 @@ BMSAD = Struct(
         property_types,
         ErrorWithMessage(lambda ctx: f"Unknown property type: {ctx.type}"),
     ),
-    # rest=construct.GreedyBytes,
-    _end=construct.Terminated,
+    rest=construct.GreedyBytes,
+
+    z=Probe()
+    # _end=construct.Terminated,
 )
 
 
