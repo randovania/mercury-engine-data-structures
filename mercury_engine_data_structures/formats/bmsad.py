@@ -181,7 +181,7 @@ def Dependencies():
         "bcmdl": Int32ul >> Int32ul >> Byte,
     }
 
-    stop = lambda _next: lambda this: (this._parsing and this.get(_next) is not None and this[_next] in component_keys) or (this._building and (this.get("deps") is None or len(this.deps) == 0))
+    stop = lambda _next: lambda this: (this._parsing and this.get(_next) is not None and this[_next] in component_keys) or (this._building and this.get("deps") is None)
     def fileextension(this):
         period = this.file.rfind(".")
         return this.file[period+1:]
