@@ -158,6 +158,8 @@ fieldtypes = {k: v for k, v in vars(dread_types).items() if isinstance(v, constr
 
 
 def find_charclass_for_type(type_name: str):
+    if type_name == "CActorComponent":
+        return "CActorComponentDef"
     as_char = "CCharClass" + type_name[1:]
     if as_char in fieldtypes:
         return as_char
@@ -194,7 +196,7 @@ Component = Struct(
             )
         )
     ),
-    unk_2=Int32sl,
+    unk_2=If(lambda this: dread_data.child_of(this.type, "CComponent"), Int32sl),
     functions=Functions,
     dependencies=Dependencies(),
     z=construct.Probe(),
