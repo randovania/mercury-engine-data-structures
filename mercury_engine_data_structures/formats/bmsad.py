@@ -1,10 +1,13 @@
+import re
+
 import construct
 from construct.core import (
-    Array, Byte, Bytes, Const, Construct, ExprAdapter,
-    Flag, Float32l, FocusedSeq, GreedyRange, Hex,
+    Array, Byte, Bytes, Computed, Const, Construct, ExprAdapter,
+    Flag, Float32l, FocusedSeq, GreedyRange, Hex, If, IfThenElse,
     Int16ul, Int32ul, Optional, Peek,
     PrefixedArray, StopIf, Struct, Switch,
 )
+from construct.debug import Probe
 
 from mercury_engine_data_structures import common_types, dread_data
 from mercury_engine_data_structures.common_types import Float, StrId, make_dict, make_vector
@@ -168,18 +171,63 @@ def find_charclass_for_type(type_name: str):
     )
 
 
-def Dependencies():
-    return ExprAdapter(
-        GreedyRange(FocusedSeq(
-            "byte",
-            "next_key" / Optional(Peek(StrId)),
-            StopIf(lambda this: this.next_key is not None and this.next_key in component_keys),
-            "byte" / Bytes(1)
-        )),
-        lambda obj, ctx: b''.join(obj),
-        lambda obj, ctx: [obj[i:i + 1] for i in range(len(obj))]
-    )
 
+def Dependencies():
+    component_dependencies = {
+        "CFXComponent": make_vector(Struct(
+            "file" / StrId,
+            "unk1" / Int32ul,
+            "unk2" / Int32ul,
+            "unk3" / Byte
+        )),
+        "CCollisionComponent": Struct(
+            "file" / StrId,
+            "unk" / Int16ul
+        ),
+        "CGrabComponent": make_vector(Struct(
+            "unk1" / StrId,
+            "unk2" / StrId,
+            "unk3" / StrId,
+            "unk4" / Float32l,
+            "unk5" / Byte,
+            "unk6" / Byte,
+            "unk7" / Int16ul,
+            "unk8" / Array(2, Struct(
+                "unk2" / Int16ul,
+                "unk1" / Array(8, Float32l),
+            )),
+        )),
+        "CBillboardComponent": Struct(
+            "id1" / StrId,
+            "unk1" / make_vector(Struct(
+                "id" / StrId,
+                "unk1" / Array(3, Int32ul),
+                "unk2" / Byte,
+                "unk3" / Array(2, Int32ul),
+                "unk4" / Float32l
+            )),
+            "id2" / StrId,
+            "unk2" / make_vector(Struct(
+                "id" / StrId,
+                "unk1" / Byte, 
+                "unk2" / Array(4, Int32ul)
+            )),
+        ),
+        "CSwarmControllerComponent": Struct(
+            "unk1" / make_vector(StrId),
+            "unk2" / make_vector(StrId),
+            "unk3" / make_vector(StrId)
+        )
+    }
+    component_dependencies["CStandaloneFXComponent"] = component_dependencies["CFXComponent"]
+
+    def component_type(this):
+        for component_type in component_dependencies.keys():
+            if dread_data.child_of(this.type, component_type):
+                return component_type
+        return None
+    
+    return Switch(component_type, component_dependencies)
 
 Component = Struct(
     type=StrId,
@@ -229,9 +277,9 @@ CCharClass = Struct(
     unk_7=Byte,
 
     components=make_dict(Component),
-    # TODO: figure out how on earth to differentiate between deps for final component and deps for charclass itself
-    binaries=Optional(make_vector(StrId)),
-    sources=Optional(make_vector(StrId))
+    
+    binaries=make_vector(StrId),
+    sources=make_vector(StrId >> Byte),
 )
 
 CActorDef = Struct(
@@ -240,8 +288,11 @@ CActorDef = Struct(
     unk_3=Int16ul,
     sub_actors=PrefixedArray(Int32ul, StrId),
     unk_4=StrId,
-    components=make_dict(Component)
-    # TODO: determine whether binaries/sources are here too
+
+    components=make_dict(Component),
+    
+    binaries=make_vector(StrId),
+    sources=make_vector(StrId >> Byte),
 )
 
 property_types = {
@@ -265,7 +316,9 @@ BMSAD = Struct(
         property_types,
         ErrorWithMessage(lambda ctx: f"Unknown property type: {ctx.type}"),
     ),
-    # rest=construct.GreedyBytes,
+    # rest=Peek(construct.GreedyBytes),
+
+    # z=Probe(),
     _end=construct.Terminated,
 )
 
