@@ -566,7 +566,7 @@ all_bmsad = [
     "actors/props/mblauncher_launcher_gen_001/charclasses/mblauncher_launcher_gen_001.bmsad",
     "actors/props/mlm_block/charclasses/mlm_block.bmsad",
     "actors/props/mlm_point/charclasses/mlm_point.bmsad",
-    pytest.param("actors/props/pf_mushr_fr/charclasses/pf_mushr_fr.bmsad", marks=pytest.mark.xfail(reason="Malformed; has a field with no value")),
+    "actors/props/pf_mushr_fr/charclasses/pf_mushr_fr.bmsad",
     "actors/props/pf_mushr_fr_ice_cube/charclasses/pf_mushr_fr_ice_cube.bmsad",
     "actors/props/pistonmag01/charclasses/pistonmag01.bmsad",
     "actors/props/piston_right_kraid/charclasses/piston_right_kraid.bmsad",
