@@ -9,6 +9,7 @@ from construct import (
 
 from mercury_engine_data_structures import dread_data
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
+from mercury_engine_data_structures.construct_extensions.misc import Skip
 from mercury_engine_data_structures.formats.base_resource import BaseResource, NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.game_check import Game
 
@@ -67,10 +68,10 @@ PKGHeader = Struct(
 )
 
 PKG = Struct(
-    _header_size=Int32ul,
+    _header_size=Skip(1, Int32ul),
 
     _data_section_size_address=Tell,
-    _data_section_size=Int32ul,
+    _data_section_size=Skip(1, Int32ul),
 
     _num_files=Rebuild(Int32ul, construct.len_(construct.this.files)),
     _start_headers=Tell,
@@ -155,3 +156,13 @@ class Pkg(BaseResource):
             asset_id=asset_id,
             data=new_file,
         ))
+
+    def remove_asset(self, asset_id: NameOrAssetId):
+        asset_id = resolve_asset_id(asset_id)
+
+        for file in self.raw.files:
+            if file.asset_id == asset_id:
+                self.raw.files.remove(file)
+                return
+
+        raise ValueError(f"Unknown asset id: {asset_id}")
