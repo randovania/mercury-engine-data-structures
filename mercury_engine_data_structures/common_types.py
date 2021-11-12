@@ -15,6 +15,37 @@ CVector3D = construct.Array(3, Float)
 CVector4D = construct.Array(4, Float)
 
 
+class ListContainerWithKeyAccess(construct.ListContainer):
+    def __init__(self, item_key_field: str, item_value_field: str = "value"):
+        super().__init__()
+        self.item_key_field = item_key_field
+        self.item_value_field = item_value_field
+
+    def _wrap(self, key, value):
+        new_item = construct.Container()
+        new_item[self.item_key_field] = key
+        new_item[self.item_value_field] = value
+        return new_item
+
+    def __getitem__(self, key):
+        for it in reversed(self):
+            if it[self.item_key_field] == key:
+                return it[self.item_value_field]
+        return super().__getitem__(key)
+
+    def __setitem__(self, key, value):
+        for i, it in enumerate(self):
+            if i == key:
+                return super().__setitem__(i, value)
+            if it[self.item_key_field] == key:
+                return super().__setitem__(i, self._wrap(key, value))
+        self.append(value)
+
+    def items(self):
+        for it in self:
+            yield it[self.item_key_field], it[self.item_value_field]
+
+
 class DictAdapter(Adapter):
     def _decode(self, obj: construct.ListContainer, context, path):
         result = construct.Container()

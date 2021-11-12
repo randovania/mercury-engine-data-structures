@@ -23,16 +23,31 @@ def ConfirmType(name: str):
     )
 
 
+def _has_duplicated_keys(obj):
+    seen = set()
+    for item in obj:
+        if item.type in seen:
+            return True
+        seen.add(item.type)
+    return False
+
+
 class ObjectAdapter(Adapter):
     def _decode(self, obj: construct.ListContainer, context, path):
+        if _has_duplicated_keys(obj):
+            return obj
+
         result = construct.Container()
         for item in obj:
             if item.type in result:
                 raise construct.ConstructError(f"Type {item.type} found twice in object", path)
             result[item.type] = item.item
+
         return result
 
     def _encode(self, obj: construct.Container, context, path):
+        if isinstance(obj, construct.ListContainer):
+            return obj
         return construct.ListContainer(
             construct.Container(
                 type=type_,
