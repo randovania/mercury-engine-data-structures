@@ -29,11 +29,12 @@ known_types_to_construct = {
     "base::core::CAssetLink": "common_types.StrId",
 }
 known_typedefs = {
-    "TPatterns": "base::global::CRntDictionary<base::global::CStrId, COffset>",
-    "CCharClassRodotukAIComponent::TVAbsorbConfigs": "base::global::CRntDictionary<base::global::CStrId, CCharClassRodotukAIComponent::SAbsorbConfig>",
-    "TLaunchPattern": "base::global::CRntDictionary<base::global::CStrId, SLaunchPatternStep>",
-    "TLaunchConfigs": "base::global::CRntDictionary<base::global::CStrId, SLaunchConfig>",
-    "TBigkranXSpitLaunchPattern": "base::global::CRntDictionary<base::global::CStrId, SBigkranXSpitLaunchPatternStep>",
+    "TPatterns": "base::global::CRntVector<COffset>",
+    "CCharClassRodotukAIComponent::TVAbsorbConfigs": "base::global::CRntVector<CCharClassRodotukAIComponent::SAbsorbConfig>",
+    "TLaunchPattern": "base::global::CRntVector<SLaunchPatternStep>",
+    "TLaunchConfigs": "base::global::CRntVector<SLaunchConfig>",
+    "TBigkranXSpitLaunchPattern": "base::global::CRntVector<SBigkranXSpitLaunchPatternStep>",
+    "CCharClassRodomithonXAIComponent::TVFirePillarConfigs": "base::global::CRntVector<CCharClassRodomithonXAIComponent::SFirePillarConfig>",
     "base::global::timeline::TLayers": "base::global::timeline::ELayer",  # flagset
 }
 

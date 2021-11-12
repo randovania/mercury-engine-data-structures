@@ -8610,7 +8610,7 @@
     "CCharClassRodomithonXAIComponent::SFirePillarConfig": {
         "parent": null,
         "fields": {
-            "eType": "EType",
+            "eType": "CCharClassRodomithonXAIComponent::SFirePillarConfig::EType",
             "fFirePillarLength": "float",
             "fFirePillarWidth": "float",
             "fFirePillarLengthOffset": "float"
