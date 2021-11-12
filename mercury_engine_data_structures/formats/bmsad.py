@@ -11,7 +11,7 @@ from mercury_engine_data_structures.common_types import Float, StrId, make_dict,
 from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource, dread_types
-from mercury_engine_data_structures.formats.property_enum import PropertyEnum
+from mercury_engine_data_structures.formats.property_enum import PropertyEnum, PropertyEnumUnsafe
 from mercury_engine_data_structures.game_check import Game
 
 component_keys = [
@@ -150,7 +150,7 @@ Functions = make_vector(Struct(
     name=StrId,
     unk=Int16ul,
     params=common_types.DictAdapter(common_types.make_vector(
-        common_types.DictElement(FunctionArgument, key=PropertyEnum)
+        common_types.DictElement(FunctionArgument, key=PropertyEnumUnsafe)
     )),
 ))
 
