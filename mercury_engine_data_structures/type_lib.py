@@ -180,3 +180,16 @@ def all_types() -> Dict[str, BaseType]:
         name: decode_type(data)
         for name, data in dread_data.get_raw_types().items()
     }
+
+
+def get_type(type_name: str) -> BaseType:
+    return all_types()[type_name]
+
+
+def get_parent_for(type_name: str) -> Optional[str]:
+    data = get_type(type_name)
+    if data.kind == TypeKind.STRUCT:
+        assert isinstance(data, StructType)
+        return data.parent
+
+    return None

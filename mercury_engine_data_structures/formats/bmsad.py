@@ -9,7 +9,7 @@ from construct.core import (
 )
 from construct.debug import Probe
 
-from mercury_engine_data_structures import common_types, dread_data
+from mercury_engine_data_structures import common_types, dread_data, type_lib
 from mercury_engine_data_structures.common_types import Float, StrId, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
@@ -163,13 +163,14 @@ fieldtypes = {k: v for k, v in vars(dread_types).items() if isinstance(v, constr
 def find_charclass_for_type(type_name: str):
     if type_name == "CActorComponent":
         return "CActorComponentDef"
+
     as_char = "CCharClass" + type_name[1:]
     if as_char in fieldtypes:
         return as_char
-    return find_charclass_for_type(
-        dread_data.get_raw_types()[type_name]["parent"],
-    )
 
+    return find_charclass_for_type(
+        type_lib.get_parent_for(type_name),
+    )
 
 
 def Dependencies():

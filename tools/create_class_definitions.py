@@ -1,82 +1,28 @@
 import collections
-import json
-import re
-import typing
+import copy
 from pathlib import Path
 from typing import Optional
 
-from mercury_engine_data_structures.type_lib import TypeKind, PrimitiveKind
+from mercury_engine_data_structures import type_lib
+from mercury_engine_data_structures.type_lib import (
+    PrimitiveKind, BaseType, StructType, EnumType,
+    TypedefType, PrimitiveType, VectorType, DictionaryType, PointerType, FlagsetType
+)
 
-known_types_to_construct = {
-    "bool": "construct.Flag",
-    "float": "common_types.Float",
-    "float32": "common_types.Float",
-    "int": "common_types.Int",
-    "unsigned_short": "construct.Int16ul",
-    "unsigned": "common_types.UInt",
-    "unsigned_int": "common_types.UInt",
-    "unsigned_long": "construct.Int64ul",
-    "uint64": "construct.Int64ul",
-    "base::global::CStrId": "common_types.StrId",
-    "base::global::CFilePathStrId": "common_types.StrId",
-    "base::global::CRntString": "common_types.StrId",
-    "base::math::CVector2D": "common_types.CVector2D",
-    "base::math::CVector3D": "common_types.CVector3D",
-    "base::math::CVector4D": "common_types.CVector4D",
-    "CGameLink<CActor>": "common_types.StrId",
-    "CGameLink<CEntity>": "common_types.StrId",
-    "CGameLink<CSpawnPointComponent>": "common_types.StrId",
-    "base::global::CRntFile": "construct.Prefixed(construct.Int32ul, construct.GreedyBytes)",
-
-    # TODO: test if works
-    "base::global::CName": "PropertyEnum",
-    "base::core::CAssetLink": "common_types.StrId",
+primitive_to_construct = {
+    PrimitiveKind.VECTOR_2: "common_types.CVector2D",
+    PrimitiveKind.VECTOR_3: "common_types.CVector3D",
+    PrimitiveKind.VECTOR_4: "common_types.CVector4D",
+    PrimitiveKind.FLOAT: "common_types.Float",
+    PrimitiveKind.INT: "common_types.Int",
+    PrimitiveKind.STRING: "common_types.StrId",
+    PrimitiveKind.UINT: "common_types.UInt",
+    PrimitiveKind.BOOL: "construct.Flag",
+    PrimitiveKind.UINT_16: "construct.Int16ul",
+    PrimitiveKind.UINT_64: "construct.Int64ul",
+    PrimitiveKind.BYTES: "construct.Prefixed(construct.Int32ul, construct.GreedyBytes)",
+    PrimitiveKind.PROPERTY: "PropertyEnum",
 }
-known_flagsets = {
-    "base::global::timeline::TLayers": "base::global::timeline::ELayer",
-    "TShinesparkTravellingDirectionFlagSet": "EShinesparkTravellingDirection",
-    "TCoolShinesparkSituation": "ECoolShinesparkSituation",
-    "TActionInsertFlagset": "EActionInsertFlags",
-    "TAnimationTagFlagSet": "EAnimationTag",
-}
-known_typedefs = {
-    "TPatterns": "base::global::CRntVector<COffset>",
-    "CCharClassRodotukAIComponent::TVAbsorbConfigs": "base::global::CRntVector<CCharClassRodotukAIComponent::SAbsorbConfig>",
-    "TLaunchPattern": "base::global::CRntVector<SLaunchPatternStep>",
-    "TLaunchConfigs": "base::global::CRntVector<SLaunchConfig>",
-    "TBigkranXSpitLaunchPattern": "base::global::CRntVector<SBigkranXSpitLaunchPatternStep>",
-    "CCharClassRodomithonXAIComponent::TVFirePillarConfigs": "base::global::CRntVector<CCharClassRodomithonXAIComponent::SFirePillarConfig>",
-    "CMinimapDef::TMapLabelDefs": "base::global::CRntDictionary<base::global::CStrId, SMapLabelDef>",
-    "CMinimapDef::TMapIconDefs": "base::global::CRntDictionary<base::global::CStrId, SMapIconDef>",
-    "CBlackboard::TSectionContainer": "base::global::CRntDictionary<base::global::CStrId, CBlackboard::CSection*>",
-    "CPlaythrough::TDictCheckpointDatas": "base::global::CRntDictionary<base::global::CStrId, std::unique_ptr<CPlaythrough::SCheckpointData>>",
-    "TSoundEventRules": "base::global::CRntVector<std::unique_ptr<sound::CSoundEventsDef::SSoundEventsRule>>",
-    "CGameBlackboard::TPropDeltaValues": "base::global::CRntSmallDictionary<base::global::CStrId, float>",
-    "CMinimapData::TOccludedIcons": "base::global::CRntVector<base::global::CStrId>",
-    "CMinimapData::TColliderGeoDatasMap": "base::global::CRntSmallDictionary<uint64, SGeoData>",
-
-    'GUI::CDisplayObjectTrack<bool>::SKey': 'GUI::CDisplayObjectTrackBool::SKey',
-    'GUI::CDisplayObjectTrack<float>::SKey': 'GUI::CDisplayObjectTrackFloat::SKey',
-    'GUI::CDisplayObjectTrack<base::global::CRntString>::SKey': 'GUI::CDisplayObjectTrackString::SKey',
-}
-
-vector_re = re.compile(r"base::global::CRntVector<\s*(.*?)(?:, false)?\s*>$")
-list_re = re.compile(r"base::global::C(?:Pooled)?List<\s*(.*?)\s*>$")
-array_re = re.compile(r"base::global::CArray<\s*(.*?), [^,]*?, [^>]*?>$")
-dict_re = re.compile(r"base::global::CRnt(?:Small)?(?:Pooled)?Dictionary<\s*base::global::C(?:Rnt)?(?:FilePath)?StrId\s*,[\s_]*(.*)\s*>$")
-all_container_re = [
-    ("common_types.make_vector", vector_re),
-    ("common_types.make_vector", list_re),
-    ("common_types.make_vector", array_re),
-    ("common_types.make_dict", dict_re),
-]
-
-unique_ptr_re = re.compile(r"std::unique_ptr<\s*(.*)\s*>$")
-weak_ptr_re = re.compile(r"base::global::CWeakPtr<\s*(.*)\s*>$")
-raw_ptr_re = re.compile(r"(.*?)(?:[ ]?const)?\s*\*$")
-ref_re = re.compile(r"CGameObjectRef<(.*)>$")
-typed_var_re = re.compile(r"(base::reflection::CTypedValue)$")
-all_ptr_re = [unique_ptr_re, weak_ptr_re, raw_ptr_re, ref_re, typed_var_re]
 
 
 def _type_name_to_python_identifier(type_name: str):
@@ -85,7 +31,7 @@ def _type_name_to_python_identifier(type_name: str):
 
 
 class TypeExporter:
-    def __init__(self, all_types: dict[str, dict[str, typing.Any]]):
+    def __init__(self, all_types: dict[str, BaseType]):
         self.all_types = all_types
         self._exported_types = {}
         self._types_with_pointer = set()
@@ -99,8 +45,8 @@ class TypeExporter:
         self._children_for["base::reflection::CTypedValue"].add("base::global::CRntFile")
 
         for type_name, data in all_types.items():
-            if data["parent"] is not None:
-                self._children_for[data["parent"]].add(type_name)
+            if isinstance(data, StructType) and data.parent is not None:
+                self._children_for[data.parent].add(type_name)
 
     def children_for(self, type_name: str, recursive: bool = True):
         for child in self._children_for[type_name]:
@@ -113,11 +59,11 @@ class TypeExporter:
 
     def _export_enum_type(self, type_variable: str, type_name: str):
         data = self.all_types[type_name]
-        if data["values"] is None:
+        if not isinstance(data, EnumType):
             raise ValueError(f"_export_enum_type called for {type_name}, a non-Enum")
 
         enum_definition = f"\n\n\nclass {type_variable}(enum.IntEnum):\n"
-        for key, value in data["values"].items():
+        for key, value in data.values.items():
             if key == "None":
                 key = "NONE"
             enum_definition += f'    {key} = {value}\n'
@@ -130,14 +76,14 @@ class TypeExporter:
         data = self.all_types[type_name]
 
         parent_name = None
-        if data["parent"] is not None:
-            parent_name = self.ensure_exported_type(data["parent"])
+        if isinstance(data, StructType) and data.parent is not None:
+            parent_name = self.ensure_exported_type(data.parent)
 
-        if data["fields"]:
+        if isinstance(data, StructType):
             field_lines = []
-            for field_name, field_type in data["fields"].items():
+            for field_name, field_type in data.fields.items():
                 self._debug(f"Exporting field! {field_name} = {field_type}")
-                converted_type = self.convert_type_to_construct(field_name, field_type)
+                converted_type = self.convert_type_to_construct(field_type)
                 field_lines.append(f'    "{field_name}": {converted_type},')
 
             if parent_name is not None:
@@ -163,17 +109,20 @@ class TypeExporter:
 
         if type_name in self.all_types:
             type_data = self.all_types[type_name]
-            if type_data["values"] is not None:
+            if isinstance(type_data, EnumType):
                 type_variable, type_code = self._export_enum_type(type_variable, type_name)
                 self._type_definition_code += type_code
-            elif type_data.get("typedef") is not None:
-                reference = self.ensure_exported_type(type_data["typedef"])
+            elif isinstance(type_data, TypedefType):
+                reference = self.ensure_exported_type(type_data.alias)
+                self._type_definition_code += f'\n\n{type_variable} = {reference}'
+            elif isinstance(type_data, FlagsetType):
+                reference = self.ensure_exported_type(type_data.enum)
                 self._type_definition_code += f'\n\n{type_variable} = {reference}'
             else:
                 type_code = self._export_known_type(type_variable, type_name)
                 self._type_definition_code += f'\n\n{type_variable} = {type_code}'
         else:
-            type_code = self.convert_type_to_construct(None, type_name)
+            type_code = self.convert_type_to_construct(type_name)
             self._type_definition_code += f'\n\n{type_variable} = {type_code}'
 
         self._exported_types[type_name] = type_variable
@@ -200,29 +149,26 @@ class TypeExporter:
         self.ensure_exported_type(type_name)
         return "Pointer_" + _type_name_to_python_identifier(type_name)
 
-    def convert_type_to_construct(self, field_name: Optional[str], field_type: str):
-        if field_type in known_types_to_construct:
-            return known_types_to_construct[field_type]
+    def convert_type_to_construct(self, field_type: str):
+        field_data = self.all_types[field_type]
+
+        if isinstance(field_data, PrimitiveType):
+            return primitive_to_construct[field_data.primitive_kind]
 
         # Containers
-        try:
-            make, m = next((make, x) for make, r in all_container_re if (x := r.match(field_type)))
-            if (inner_field := self.convert_type_to_construct(field_name, m.group(1))) is not None:
-                self._debug(f"Container! {field_name} -> {field_type} -> {make} -> {inner_field}")
-                return f"{make}({inner_field})"
-            return None
-        except StopIteration:
-            pass
+        if isinstance(field_data, VectorType):
+            inner_field = self.convert_type_to_construct(field_data.value_type)
+            return f"common_types.make_vector({inner_field})"
+
+        if isinstance(field_data, DictionaryType):
+            key_field = self.convert_type_to_construct(field_data.key_type)
+            inner_field = self.convert_type_to_construct(field_data.value_type)
+            return f"common_types.make_dict({inner_field}, key={key_field})"
 
         # Pointers
-        try:
-            m = next(x for r in all_ptr_re if (x := r.match(field_type)))
-            return f'{self.pointer_to_type(m.group(1))}.create_construct()'
-        except StopIteration:
-            pass
-
-        if field_type not in self.all_types:
-            raise ValueError(f"Unknown type: {field_type}")
+        if isinstance(field_data, PointerType):
+            inner_field = self.pointer_to_type(field_data.target)
+            return f"{inner_field}.create_construct()"
 
         return self.ensure_exported_type(field_type)
 
@@ -273,27 +219,16 @@ from mercury_engine_data_structures.formats.property_enum import PropertyEnum, P
 
 
 def main():
-    p = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "dread_types.json")
     output_path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "formats", "dread_types.py")
 
-    with p.open() as f:
-        all_types: dict[str, dict[str, typing.Any]] = json.load(f)
+    all_types: dict[str, BaseType] = copy.copy(type_lib.all_types())
 
-    all_types.pop("base::global::CStrId")
-    all_types.pop("base::global::CRntString")
-    all_types.pop("base::global::CFilePathStrId")
-    all_types.pop("base::global::CRntFile")
-
+    # all_types.pop("base::global::CStrId")
+    # all_types.pop("base::global::CRntString")
+    # all_types.pop("base::global::CFilePathStrId")
+    # all_types.pop("base::global::CRntFile")
     all_types.pop("CBlackboard")
     all_types.pop("CGameBlackboard")
-
-    for type_name, alias in known_typedefs.items():
-        all_types[type_name] = {
-            "parent": None,
-            "fields": {},
-            "values": None,
-            "typedef": alias,
-        }
 
     type_exporter = TypeExporter(all_types)
 
@@ -307,128 +242,5 @@ def main():
     output_path.write_text(type_exporter.export_code())
 
 
-construct_to_primitive = {
-    "common_types.CVector2D": PrimitiveKind.VECTOR_2,
-    "common_types.CVector3D": PrimitiveKind.VECTOR_3,
-    "common_types.CVector4D": PrimitiveKind.VECTOR_4,
-    "common_types.Float": PrimitiveKind.FLOAT,
-    "common_types.Int": PrimitiveKind.INT,
-    "common_types.StrId": PrimitiveKind.STRING,
-    "common_types.UInt": PrimitiveKind.UINT,
-    "construct.Flag": PrimitiveKind.BOOL,
-    "construct.Int16ul": PrimitiveKind.UINT_16,
-    "construct.Int64ul": PrimitiveKind.UINT_64,
-    "construct.Prefixed(construct.Int32ul, construct.GreedyBytes)": PrimitiveKind.BYTES,
-    "PropertyEnum": PrimitiveKind.PROPERTY,
-}
-
-dict2_re = re.compile(r"base::global::CRnt(?:Small)?(?:Pooled)?Dictionary<\s*([^,]+?)\s*,[\s_]*(.*)\s*>$")
-
-
-def find_ptr_match(type_name: str):
-    for expr in all_ptr_re:
-        m = expr.match(type_name)
-        if m is not None:
-            return m
-
-
-def convert_type(type_name: str, type_data: dict):
-    if type_name in known_types_to_construct:
-        return {
-            "kind": TypeKind.PRIMITIVE.value,
-            "primitive_kind": construct_to_primitive[known_types_to_construct[type_name]].value
-        }
-
-    if type_name in known_typedefs:
-        return {
-            "kind": TypeKind.TYPEDEF.value,
-            "alias": known_typedefs[type_name]
-        }
-
-    if type_name in known_flagsets:
-        return {
-            "kind": TypeKind.FLAGSET.value,
-            "enum": known_flagsets[type_name]
-        }
-
-    if type_data["values"] is not None:
-        return {
-            "kind": TypeKind.ENUM.value,
-            "values": type_data["values"],
-        }
-
-    if (m := vector_re.match(type_name) or array_re.match(type_name) or list_re.match(type_name)) is not None:
-        return {
-            "kind": TypeKind.VECTOR.value,
-            "value_type": m.group(1),
-        }
-
-    elif (m := dict2_re.match(type_name)) is not None:
-        return {
-            "kind": TypeKind.DICTIONARY.value,
-            "key_type": m.group(1),
-            "value_type": m.group(2).strip(),
-        }
-
-    elif (m := find_ptr_match(type_name)) is not None:
-        return {
-            "kind": TypeKind.POINTER.value,
-            "target": m.group(1),
-        }
-
-    return {
-        "kind": TypeKind.STRUCT.value,
-        "parent": type_data["parent"],
-        "fields": type_data["fields"],
-    }
-
-
-def fix_stuff():
-    p = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "dread_types.json")
-    out = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "dread_types_new.json")
-
-    with p.open() as f:
-        all_types: dict[str, dict[str, typing.Any]] = json.load(f)
-
-    to_add = set()
-    converted = {}
-    for type_name, type_data in all_types.items():
-        converted[type_name] = convert_type(type_name, type_data)
-
-        # Try to find extra types from the values
-        if converted[type_name]["kind"] == TypeKind.STRUCT.value:
-            for field_type in converted[type_name]["fields"].values():
-                if field_type not in all_types:
-                    to_add.add(field_type)
-
-    while to_add:
-        new_type = to_add.pop()
-        converted[new_type] = convert_type(new_type, {"values": None, "parent": None, "fields": {}})
-
-        next_type = None
-        next_type2 = None
-        if converted[new_type]["kind"] == TypeKind.STRUCT.value:
-            print(f"{new_type}")
-            pass
-        elif converted[new_type]["kind"] == TypeKind.POINTER.value:
-            next_type = converted[new_type]["target"]
-        elif converted[new_type]["kind"] == TypeKind.DICTIONARY.value:
-            next_type2 = converted[new_type]["key_type"]
-            next_type = converted[new_type]["value_type"]
-        elif converted[new_type]["kind"] == TypeKind.VECTOR.value:
-            next_type = converted[new_type]["value_type"]
-        elif converted[new_type]["kind"] == TypeKind.FLAGSET.value:
-            next_type = converted[new_type]["enum"]
-        elif converted[new_type]["kind"] == TypeKind.TYPEDEF.value:
-            next_type = converted[new_type]["alias"]
-
-        for it in [next_type, next_type2]:
-            if it is not None and it not in converted:
-                to_add.add(it)
-
-    with out.open("w") as f:
-        json.dump({key: converted[key] for key in sorted(converted)}, f, indent=4)
-
-
 if __name__ == '__main__':
-    fix_stuff()
+    main()

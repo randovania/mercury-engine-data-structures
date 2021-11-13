@@ -11,6 +11,176 @@ from pathlib import Path
 import ghidra_bridge
 
 from mercury_engine_data_structures import dread_data
+from mercury_engine_data_structures.type_lib import TypeKind, PrimitiveKind
+
+# New JSON Format
+known_types_to_construct = {
+    "bool": PrimitiveKind.BOOL,
+    "float": PrimitiveKind.FLOAT,
+    "float32": PrimitiveKind.FLOAT,
+    "int": PrimitiveKind.INT,
+    "unsigned_short": PrimitiveKind.UINT_16,
+    "unsigned": PrimitiveKind.UINT,
+    "unsigned_int": PrimitiveKind.UINT,
+    "unsigned_long": PrimitiveKind.UINT_64,
+    "uint64": PrimitiveKind.UINT_64,
+    "base::global::CStrId": PrimitiveKind.STRING,
+    "base::global::CFilePathStrId": PrimitiveKind.STRING,
+    "base::global::CRntString": PrimitiveKind.STRING,
+    "base::math::CVector2D": PrimitiveKind.VECTOR_2,
+    "base::math::CVector3D": PrimitiveKind.VECTOR_3,
+    "base::math::CVector4D": PrimitiveKind.VECTOR_4,
+    "CGameLink<CActor>": PrimitiveKind.STRING,
+    "CGameLink<CEntity>": PrimitiveKind.STRING,
+    "CGameLink<CSpawnPointComponent>": PrimitiveKind.STRING,
+    "base::global::CRntFile": PrimitiveKind.BYTES,
+
+    # TODO: test if works
+    "base::global::CName": PrimitiveKind.PROPERTY,
+    "base::core::CAssetLink": PrimitiveKind.STRING,
+}
+known_flagsets = {
+    "base::global::timeline::TLayers": "base::global::timeline::ELayer",
+    "TShinesparkTravellingDirectionFlagSet": "EShinesparkTravellingDirection",
+    "TCoolShinesparkSituation": "ECoolShinesparkSituation",
+    "TActionInsertFlagset": "EActionInsertFlags",
+    "TAnimationTagFlagSet": "EAnimationTag",
+}
+known_typedefs = {
+    "TPatterns": "base::global::CRntVector<COffset>",
+    "CCharClassRodotukAIComponent::TVAbsorbConfigs": "base::global::CRntVector<CCharClassRodotukAIComponent::SAbsorbConfig>",
+    "TLaunchPattern": "base::global::CRntVector<SLaunchPatternStep>",
+    "TLaunchConfigs": "base::global::CRntVector<SLaunchConfig>",
+    "TBigkranXSpitLaunchPattern": "base::global::CRntVector<SBigkranXSpitLaunchPatternStep>",
+    "CCharClassRodomithonXAIComponent::TVFirePillarConfigs": "base::global::CRntVector<CCharClassRodomithonXAIComponent::SFirePillarConfig>",
+    "CMinimapDef::TMapLabelDefs": "base::global::CRntDictionary<base::global::CStrId, SMapLabelDef>",
+    "CMinimapDef::TMapIconDefs": "base::global::CRntDictionary<base::global::CStrId, SMapIconDef>",
+    "CBlackboard::TSectionContainer": "base::global::CRntDictionary<base::global::CStrId, CBlackboard::CSection*>",
+    "CPlaythrough::TDictCheckpointDatas": "base::global::CRntDictionary<base::global::CStrId, std::unique_ptr<CPlaythrough::SCheckpointData>>",
+    "TSoundEventRules": "base::global::CRntVector<std::unique_ptr<sound::CSoundEventsDef::SSoundEventsRule>>",
+    "CGameBlackboard::TPropDeltaValues": "base::global::CRntSmallDictionary<base::global::CStrId, float>",
+    "CMinimapData::TOccludedIcons": "base::global::CRntVector<base::global::CStrId>",
+    "CMinimapData::TColliderGeoDatasMap": "base::global::CRntSmallDictionary<uint64, SGeoData>",
+
+    'GUI::CDisplayObjectTrack<bool>::SKey': 'GUI::CDisplayObjectTrackBool::SKey',
+    'GUI::CDisplayObjectTrack<float>::SKey': 'GUI::CDisplayObjectTrackFloat::SKey',
+    'GUI::CDisplayObjectTrack<base::global::CRntString>::SKey': 'GUI::CDisplayObjectTrackString::SKey',
+}
+
+vector_re = re.compile(r"base::global::CRntVector<\s*(.*?)(?:, false)?\s*>$")
+list_re = re.compile(r"base::global::C(?:Pooled)?List<\s*(.*?)\s*>$")
+array_re = re.compile(r"base::global::CArray<\s*(.*?), [^,]*?, [^>]*?>$")
+dict_re = re.compile(r"base::global::CRnt(?:Small)?(?:Pooled)?Dictionary<\s*([^,]+?)\s*,[\s_]*(.*)\s*>$")
+all_container_re = [
+    ("common_types.make_vector", vector_re),
+    ("common_types.make_vector", array_re),
+    ("common_types.make_dict", dict_re),
+]
+
+unique_ptr_re = re.compile(r"std::unique_ptr<\s*(.*)\s*>$")
+weak_ptr_re = re.compile(r"base::global::CWeakPtr<\s*(.*)\s*>$")
+raw_ptr_re = re.compile(r"(.*?)(?:[ ]?const)?\s*\*$")
+ref_re = re.compile(r"CGameObjectRef<(.*)>$")
+typed_var_re = re.compile(r"(base::reflection::CTypedValue)$")
+all_ptr_re = [unique_ptr_re, weak_ptr_re, raw_ptr_re, ref_re, typed_var_re]
+
+
+def find_ptr_match(type_name: str):
+    for expr in all_ptr_re:
+        m = expr.match(type_name)
+        if m is not None:
+            return m
+
+
+def convert_type(type_name: str, type_data: dict):
+    if type_name in known_types_to_construct:
+        return {
+            "kind": TypeKind.PRIMITIVE.value,
+            "primitive_kind": known_types_to_construct[type_name].value
+        }
+
+    if type_name in known_typedefs:
+        return {
+            "kind": TypeKind.TYPEDEF.value,
+            "alias": known_typedefs[type_name]
+        }
+
+    if type_name in known_flagsets:
+        return {
+            "kind": TypeKind.FLAGSET.value,
+            "enum": known_flagsets[type_name]
+        }
+
+    if type_data["values"] is not None:
+        return {
+            "kind": TypeKind.ENUM.value,
+            "values": type_data["values"],
+        }
+
+    if (m := vector_re.match(type_name) or array_re.match(type_name) or list_re.match(type_name)) is not None:
+        return {
+            "kind": TypeKind.VECTOR.value,
+            "value_type": m.group(1),
+        }
+
+    elif (m := dict_re.match(type_name)) is not None:
+        return {
+            "kind": TypeKind.DICTIONARY.value,
+            "key_type": m.group(1),
+            "value_type": m.group(2),
+        }
+
+    elif (m := find_ptr_match(type_name)) is not None:
+        return {
+            "kind": TypeKind.POINTER.value,
+            "target": m.group(1),
+        }
+
+    return {
+        "kind": TypeKind.STRUCT.value,
+        "parent": type_data["parent"],
+        "fields": type_data["fields"],
+    }
+
+
+def convert_old_to_new(old_types: dict[str, dict[str, typing.Any]]):
+    to_add = set()
+    converted = {}
+    for type_name, type_data in old_types.items():
+        converted[type_name] = convert_type(type_name, type_data)
+
+        # Try to find extra types from the values
+        if converted[type_name]["kind"] == TypeKind.STRUCT.value:
+            for field_type in converted[type_name]["fields"].values():
+                if field_type not in old_types:
+                    to_add.add(field_type)
+
+    while to_add:
+        new_type = to_add.pop()
+        converted[new_type] = convert_type(new_type, {"values": None, "parent": None, "fields": {}})
+
+        next_type = None
+        next_type2 = None
+        if converted[new_type]["kind"] == TypeKind.STRUCT.value:
+            pass
+        elif converted[new_type]["kind"] == TypeKind.POINTER.value:
+            next_type = converted[new_type]["target"]
+        elif converted[new_type]["kind"] == TypeKind.DICTIONARY.value:
+            next_type2 = converted[new_type]["key_type"]
+            next_type = converted[new_type]["value_type"]
+        elif converted[new_type]["kind"] == TypeKind.VECTOR.value:
+            next_type = converted[new_type]["value_type"]
+        elif converted[new_type]["kind"] == TypeKind.FLAGSET.value:
+            next_type = converted[new_type]["enum"]
+        elif converted[new_type]["kind"] == TypeKind.TYPEDEF.value:
+            next_type = converted[new_type]["alias"]
+
+        for it in [next_type, next_type2]:
+            if it is not None and it not in converted:
+                to_add.add(it)
+
+    return {key: converted[key] for key in sorted(converted)}
+
 
 hash_str = "HashString"
 register_field = "RegisterField"
@@ -391,7 +561,7 @@ def is_container_or_ptr(name: str):
 
 
 def main(only_missing: bool = True, ignore_without_hash: bool = True,
-         ignore_existing_invalid_fields: bool = True, ignore_container_or_ptr: bool = True):
+         ignore_container_or_ptr: bool = True):
     print("Getting function list")
     all_fields_functions = get_function_list()
     print(f"Got {len(all_fields_functions)} functions!")
@@ -400,30 +570,19 @@ def main(only_missing: bool = True, ignore_without_hash: bool = True,
 
     try:
         with path.open() as f:
-            final_results = json.load(f)
+            old_data = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
-        final_results = {}
+        old_data = {}
 
-    final_results = typing.cast(dict[str, typing.Any], final_results)
+    old_data = typing.cast(dict[str, typing.Any], old_data)
 
     if ignore_container_or_ptr:
         for key in list(all_fields_functions.keys()):
             if is_container_or_ptr(key):
                 all_fields_functions.pop(key)
 
-    if ignore_existing_invalid_fields:
-        for key in list(final_results.keys()):
-            invalid = is_invalid_data(key, final_results[key])
-            container = ignore_container_or_ptr and is_container_or_ptr(key)
-            unknown_hash = False
-            # unknown_hash = ignore_without_hash and key not in dread_data.all_name_to_property_id()
-
-            if invalid or container or unknown_hash:
-                print(f"Removing existing type: {key}")
-                final_results.pop(key)
-
     if only_missing:
-        for key in final_results.keys():
+        for key in old_data.keys():
             all_fields_functions.pop(key, None)
 
     if ignore_without_hash:
@@ -439,10 +598,8 @@ def main(only_missing: bool = True, ignore_without_hash: bool = True,
 
     all_fields_functions = {}
     process_results = decompile_in_background(all_fields_functions)
-    for key in sorted(process_results.keys()):
-        final_results[key] = process_results[key]
 
-    for data in final_results.values():
+    for data in process_results.values():
         for field in data["fields"].keys():
             value = data["fields"][field]
             if value in _aliases:
@@ -453,21 +610,24 @@ def main(only_missing: bool = True, ignore_without_hash: bool = True,
 
             data["fields"][field] = value
 
-    for key in list(final_results.keys()):
+    for key in list(process_results.keys()):
         # Something causes a type to inherit from a pointer to itself, that's wrong
-        if final_results[key]["parent"] in (f"{key}Ptr", key):
-            print(f'Removing parent for {key}: {final_results[key]["parent"]}')
-            final_results[key]["parent"] = None
+        if process_results[key]["parent"] in (f"{key}Ptr", key):
+            print(f'Removing parent for {key}: {process_results[key]["parent"]}')
+            process_results[key]["parent"] = None
 
-        if final_results[key]["parent"] is not None and is_container_or_ptr(final_results[key]["parent"]):
+        if process_results[key]["parent"] is not None and is_container_or_ptr(process_results[key]["parent"]):
             print(f"Inheriting from ptr or container: {key}")
 
-    _merge_split_types(final_results)
+    _merge_split_types(process_results)
+
+    for key, value in convert_old_to_new(process_results).items():
+        old_data[key] = value
 
     with path.open("w") as f:
         json.dump({
-            key: final_results[key]
-            for key in sorted(final_results.keys())
+            key: old_data[key]
+            for key in sorted(old_data.keys())
         }, f, indent=4)
 
 

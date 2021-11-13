@@ -111,8 +111,8 @@ class DictElement(construct.Construct):
         return key + value
 
 
-def make_dict(value: construct.Construct):
-    return DictAdapter(make_vector(DictElement(value)))
+def make_dict(value: construct.Construct, key=StrId):
+    return DictAdapter(make_vector(DictElement(value, key)))
 
 
 def make_vector(value: construct.Construct):
