@@ -332,7 +332,7 @@ def convert_type(type_name: str, type_data: dict):
             "values": type_data["values"],
         }
 
-    if (m := vector_re.match(type_name)) is not None:
+    if (m := vector_re.match(type_name) or array_re.match(type_name)) is not None:
         return {
             "kind": TypeKind.VECTOR.value,
             "value_type": m.group(1),

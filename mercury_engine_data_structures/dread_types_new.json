@@ -20538,24 +20538,20 @@
         "fields": {}
     },
     "base::global::CArray<CShotAudioWeaponStates, EnumClass<EWeaponType>::Count, EWeaponType>": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "vector",
+        "value_type": "CShotAudioWeaponStates"
     },
     "base::global::CArray<base::global::CFilePathStrId, EnumClass<EWeaponState>::Count, EWeaponState>": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "vector",
+        "value_type": "base::global::CFilePathStrId"
     },
     "base::global::CArray<base::global::CStrId, EnumClass<ESubAreaItem>::Count, ESubAreaItem>": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "vector",
+        "value_type": "base::global::CStrId"
     },
     "base::global::CArray<sound::CAudioMaterial, EnumClass<base::snd::EMaterial>::Count, base::snd::EMaterial>": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "vector",
+        "value_type": "sound::CAudioMaterial"
     },
     "base::global::CFilePathStrId": {
         "kind": "primitive",
