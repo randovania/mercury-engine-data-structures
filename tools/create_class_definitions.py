@@ -103,17 +103,28 @@ class TypeExporter:
         type_variable = _type_name_to_python_identifier(type_name)
         type_data = self.all_types[type_name]
 
-        if isinstance(type_data, EnumType):
+        if isinstance(type_data, PrimitiveType):
+            type_variable = primitive_to_construct[type_data.primitive_kind]
+
+        elif isinstance(type_data, StructType):
+            type_code = self._export_struct_type(type_variable, type_name)
+            self._type_definition_code += f'\n\n{type_variable} = {type_code}'
+
+        elif isinstance(type_data, EnumType):
             type_variable, type_code = self._export_enum_type(type_variable, type_name)
             self._type_definition_code += type_code
+
+        elif isinstance(type_data, FlagsetType):
+            reference = self.ensure_exported_type(type_data.enum)
+            self._type_definition_code += f'\n\n{type_variable} = {reference}'
 
         elif isinstance(type_data, TypedefType):
             reference = self.ensure_exported_type(type_data.alias)
             self._type_definition_code += f'\n\n{type_variable} = {reference}'
 
-        elif isinstance(type_data, FlagsetType):
-            reference = self.ensure_exported_type(type_data.enum)
-            self._type_definition_code += f'\n\n{type_variable} = {reference}'
+        elif isinstance(type_data, PointerType):
+            inner_field = self.pointer_to_type(type_data.target)
+            self._type_definition_code += f'\n\n{type_variable} = {inner_field}.create_construct()'
 
         elif isinstance(type_data, VectorType):
             inner_field = self.ensure_exported_type(type_data.value_type)
@@ -126,12 +137,8 @@ class TypeExporter:
             type_code = f"common_types.make_dict({inner_field}, key={key_field})"
             self._type_definition_code += f'\n\n{type_variable} = {type_code}'
 
-        elif isinstance(type_data, StructType):
-            type_code = self._export_struct_type(type_variable, type_name)
-            self._type_definition_code += f'\n\n{type_variable} = {type_code}'
         else:
-            type_code = self.convert_type_to_construct(type_name)
-            self._type_definition_code += f'\n\n{type_variable} = {type_code}'
+            raise ValueError(f"Unknown type_data: {type_data}")
 
         self._exported_types[type_name] = type_variable
 
@@ -154,31 +161,7 @@ class TypeExporter:
 
     def pointer_to_type(self, type_name: str) -> str:
         self._types_with_pointer.add(type_name)
-        self.ensure_exported_type(type_name)
         return "Pointer_" + _type_name_to_python_identifier(type_name)
-
-    def convert_type_to_construct(self, field_type: str):
-        field_data = self.all_types[field_type]
-
-        if isinstance(field_data, PrimitiveType):
-            return primitive_to_construct[field_data.primitive_kind]
-
-        # Containers
-        if isinstance(field_data, VectorType):
-            inner_field = self.convert_type_to_construct(field_data.value_type)
-            return f"common_types.make_vector({inner_field})"
-
-        if isinstance(field_data, DictionaryType):
-            key_field = self.convert_type_to_construct(field_data.key_type)
-            inner_field = self.convert_type_to_construct(field_data.value_type)
-            return f"common_types.make_dict({inner_field}, key={key_field})"
-
-        # Pointers
-        if isinstance(field_data, PointerType):
-            inner_field = self.pointer_to_type(field_data.target)
-            return f"{inner_field}.create_construct()"
-
-        return self.ensure_exported_type(field_type)
 
     def export_code(self):
         code = """# This file was generated!
@@ -196,6 +179,7 @@ from mercury_engine_data_structures.formats.property_enum import PropertyEnum, P
         while unchecked_types := self._types_with_pointer - seen_types_with_pointer:
             for type_name in sorted(unchecked_types):
                 seen_types_with_pointer.add(type_name)
+                self.ensure_exported_type(type_name)
                 for child in sorted(self.children_for(type_name)):
                     self.ensure_exported_type(child)
 
@@ -231,16 +215,9 @@ def main():
 
     all_types: dict[str, BaseType] = copy.copy(type_lib.all_types())
 
-    # all_types.pop("base::global::CStrId")
-    # all_types.pop("base::global::CRntString")
-    # all_types.pop("base::global::CFilePathStrId")
-    # all_types.pop("base::global::CRntFile")
-    all_types.pop("CBlackboard")
-    all_types.pop("CGameBlackboard")
-
     type_exporter = TypeExporter(all_types)
 
-    needs_exporting = {"gameeditor::CGameModelRoot", "CCharClass", "CActorComponentDef"}
+    needs_exporting = set(all_types.keys())
     while needs_exporting:
         next_type = needs_exporting.pop()
         if next_type not in type_exporter._exported_types:
