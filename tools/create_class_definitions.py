@@ -1,26 +1,33 @@
 import collections
 import copy
+import json
 from pathlib import Path
 
-from mercury_engine_data_structures import type_lib
-from mercury_engine_data_structures.type_lib import (
-    PrimitiveKind, BaseType, StructType, EnumType,
-    TypedefType, PrimitiveType, VectorType, DictionaryType, PointerType, FlagsetType
-)
+import construct
+
+dread_types_path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "dread_types.json")
+dread_types = json.loads(dread_types_path.read_text())
+
+type_lib_path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "type_lib.py")
+type_lib_source = type_lib_path.read_text().replace("from mercury_engine_data_structures import dread_data", ""
+                                                    ).replace("dread_data.get_raw_types()", "dread_types")
+
+type_lib = construct.Container(dread_types=dread_types)
+exec(compile(type_lib_source, type_lib_path, "exec"), type_lib)
 
 primitive_to_construct = {
-    PrimitiveKind.VECTOR_2: "common_types.CVector2D",
-    PrimitiveKind.VECTOR_3: "common_types.CVector3D",
-    PrimitiveKind.VECTOR_4: "common_types.CVector4D",
-    PrimitiveKind.FLOAT: "common_types.Float",
-    PrimitiveKind.INT: "common_types.Int",
-    PrimitiveKind.STRING: "common_types.StrId",
-    PrimitiveKind.UINT: "common_types.UInt",
-    PrimitiveKind.BOOL: "construct.Flag",
-    PrimitiveKind.UINT_16: "construct.Int16ul",
-    PrimitiveKind.UINT_64: "construct.Int64ul",
-    PrimitiveKind.BYTES: "construct.Prefixed(construct.Int32ul, construct.GreedyBytes)",
-    PrimitiveKind.PROPERTY: "PropertyEnum",
+    type_lib.PrimitiveKind.VECTOR_2: "common_types.CVector2D",
+    type_lib.PrimitiveKind.VECTOR_3: "common_types.CVector3D",
+    type_lib.PrimitiveKind.VECTOR_4: "common_types.CVector4D",
+    type_lib.PrimitiveKind.FLOAT: "common_types.Float",
+    type_lib.PrimitiveKind.INT: "common_types.Int",
+    type_lib.PrimitiveKind.STRING: "common_types.StrId",
+    type_lib.PrimitiveKind.UINT: "common_types.UInt",
+    type_lib.PrimitiveKind.BOOL: "construct.Flag",
+    type_lib.PrimitiveKind.UINT_16: "construct.Int16ul",
+    type_lib.PrimitiveKind.UINT_64: "construct.Int64ul",
+    type_lib.PrimitiveKind.BYTES: "construct.Prefixed(construct.Int32ul, construct.GreedyBytes)",
+    type_lib.PrimitiveKind.PROPERTY: "PropertyEnum",
 }
 
 
@@ -30,7 +37,7 @@ def _type_name_to_python_identifier(type_name: str):
 
 
 class TypeExporter:
-    def __init__(self, all_types: dict[str, BaseType]):
+    def __init__(self, all_types: dict[str, type_lib.BaseType]):
         self.all_types = all_types
         self._exported_types = {}
         self._types_with_pointer = set()
@@ -39,7 +46,7 @@ class TypeExporter:
         self._type_definition_code = ""
 
         for type_name, data in all_types.items():
-            if isinstance(data, StructType) and data.parent is not None:
+            if isinstance(data, type_lib.StructType) and data.parent is not None:
                 self._children_for[data.parent].add(type_name)
 
     def children_for(self, type_name: str, recursive: bool = True):
@@ -53,7 +60,7 @@ class TypeExporter:
 
     def _export_enum_type(self, type_variable: str, type_name: str):
         data = self.all_types[type_name]
-        if not isinstance(data, EnumType):
+        if not isinstance(data, type_lib.EnumType):
             raise ValueError(f"_export_enum_type called for {type_name}, a non-Enum")
 
         enum_definition = f"\n\n\nclass {type_variable}(enum.IntEnum):\n"
@@ -68,7 +75,7 @@ class TypeExporter:
 
     def _export_struct_type(self, type_variable: str, type_name: str):
         data = self.all_types[type_name]
-        assert isinstance(data, StructType)
+        assert isinstance(data, type_lib.StructType)
 
         parent_name = None
         if data.parent is not None:
@@ -104,35 +111,35 @@ class TypeExporter:
         type_variable = _type_name_to_python_identifier(type_name)
         type_data = self.all_types[type_name]
 
-        if isinstance(type_data, PrimitiveType):
+        if isinstance(type_data, type_lib.PrimitiveType):
             type_variable = primitive_to_construct[type_data.primitive_kind]
 
-        elif isinstance(type_data, StructType):
+        elif isinstance(type_data, type_lib.StructType):
             type_code = self._export_struct_type(type_variable, type_name)
             self._type_definition_code += f'\n\n{type_variable} = {type_code}'
 
-        elif isinstance(type_data, EnumType):
+        elif isinstance(type_data, type_lib.EnumType):
             type_variable, type_code = self._export_enum_type(type_variable, type_name)
             self._type_definition_code += type_code
 
-        elif isinstance(type_data, FlagsetType):
+        elif isinstance(type_data, type_lib.FlagsetType):
             reference = self.ensure_exported_type(type_data.enum)
             self._type_definition_code += f'\n\n{type_variable} = {reference}'
 
-        elif isinstance(type_data, TypedefType):
+        elif isinstance(type_data, type_lib.TypedefType):
             reference = self.ensure_exported_type(type_data.alias)
             self._type_definition_code += f'\n\n{type_variable} = {reference}'
 
-        elif isinstance(type_data, PointerType):
+        elif isinstance(type_data, type_lib.PointerType):
             inner_field = self.pointer_to_type(type_data.target)
             self._type_definition_code += f'\n\n{type_variable} = {inner_field}.create_construct()'
 
-        elif isinstance(type_data, VectorType):
+        elif isinstance(type_data, type_lib.VectorType):
             inner_field = self.ensure_exported_type(type_data.value_type)
             type_code = f"common_types.make_vector({inner_field})"
             self._type_definition_code += f'\n\n{type_variable} = {type_code}'
 
-        elif isinstance(type_data, DictionaryType):
+        elif isinstance(type_data, type_lib.DictionaryType):
             key_field = self.ensure_exported_type(type_data.key_type)
             inner_field = self.ensure_exported_type(type_data.value_type)
             type_code = f"common_types.make_dict({inner_field}, key={key_field})"
@@ -214,7 +221,7 @@ from mercury_engine_data_structures.formats.property_enum import PropertyEnum, P
 def main():
     output_path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "formats", "dread_types.py")
 
-    all_types: dict[str, BaseType] = copy.copy(type_lib.all_types())
+    all_types: dict[str, type_lib.BaseType] = copy.copy(type_lib.all_types())
 
     type_exporter = TypeExporter(all_types)
     for type_name in sorted(all_types.keys()):
