@@ -1,7 +1,6 @@
 import collections
 import copy
 from pathlib import Path
-from typing import Optional
 
 from mercury_engine_data_structures import type_lib
 from mercury_engine_data_structures.type_lib import (

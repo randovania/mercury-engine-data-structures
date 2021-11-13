@@ -1,2 +1,5 @@
 construct==2.10.67
-setuptools==49.2.1
+packaging==21.2
+pyparsing==2.4.7
+setuptools-scm==6.3.2
+tomli==1.2.2
