@@ -1,3 +1,4 @@
+import dataclasses
 import typing
 from typing import Optional
 
@@ -10,7 +11,7 @@ from construct import (
 from mercury_engine_data_structures import dread_data
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
 from mercury_engine_data_structures.construct_extensions.misc import Skip
-from mercury_engine_data_structures.formats.base_resource import BaseResource, NameOrAssetId, resolve_asset_id
+from mercury_engine_data_structures.formats.base_resource import BaseResource, NameOrAssetId, resolve_asset_id, AssetId
 from mercury_engine_data_structures.game_check import Game
 
 Construct_AssetId = Hex(Int64ul)
@@ -117,6 +118,16 @@ PKG = Struct(
 )
 
 
+@dataclasses.dataclass(frozen=True)
+class PkgFile:
+    asset_id: AssetId
+    data: bytes
+
+    @property
+    def asset_name(self) -> Optional[str]:
+        return dread_data.name_for_asset_id(self.asset_id)
+
+
 class Pkg(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
@@ -130,7 +141,12 @@ class Pkg(BaseResource):
     def build_stream(self, stream: typing.BinaryIO) -> bytes:
         return self.construct_class(self.target_game).build_stream(self._raw, stream, target_game=self.target_game)
 
-    def get_resource(self, asset_id: NameOrAssetId) -> Optional[bytes]:
+    @property
+    def all_assets(self) -> typing.Iterator[PkgFile]:
+        for file in self.raw.files:
+            yield PkgFile(file.asset_id, file.data)
+
+    def get_asset(self, asset_id: NameOrAssetId) -> Optional[bytes]:
         asset_id = resolve_asset_id(asset_id)
         for file in self.raw.files:
             if file.asset_id == asset_id:
@@ -149,7 +165,7 @@ class Pkg(BaseResource):
     def add_asset(self, asset_id: NameOrAssetId, new_file: bytes):
         asset_id = resolve_asset_id(asset_id)
 
-        if self.get_resource(asset_id) is not None:
+        if self.get_asset(asset_id) is not None:
             raise ValueError(f"Asset id already exists: {asset_id}")
 
         self.raw.files.append(construct.Container(

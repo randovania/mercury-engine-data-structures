@@ -12,6 +12,9 @@ from mercury_engine_data_structures.formats.pkg import PKGHeader, Pkg
 from mercury_engine_data_structures.game_check import Game
 
 
+T = typing.TypeVar("T")
+
+
 def _find_entry_for_asset_id(asset_id: AssetId, pkg_header):
     for entry in pkg_header.file_entries:
         if entry.asset_id == asset_id:
@@ -111,7 +114,7 @@ class PkgEditor:
                 return result
 
         for name, pkg in self._in_memory_pkgs.items():
-            result = pkg.get_resource(asset_id)
+            result = pkg.get_asset(asset_id)
             if result is not None:
                 return result
 
@@ -125,13 +128,23 @@ class PkgEditor:
 
         raise ValueError(f"Unknown asset_id: {asset_id:0x}")
 
-    def get_parsed_asset(self, name: str, *, in_pkg: Optional[str] = None) -> BaseResource:
+    def get_parsed_asset(self, name: str, *, in_pkg: Optional[str] = None,
+                         type_hint: typing.Type[T] = BaseResource) -> T:
         """
         Gets the resource with the given name and decodes it based on the extension.
         """
         data = self.get_raw_asset(name, in_pkg=in_pkg)
-        file_format = os.path.splitext(name)[1][1:]
-        return formats.format_for(file_format).parse(data, target_game=self.target_game)
+
+        format_class = type_hint
+        if isinstance(name, str):
+            file_format = os.path.splitext(name)[1][1:]
+            type_from_name = formats.format_for(file_format)
+            if type_hint is BaseResource:
+                format_class = type_from_name
+            elif type_hint != type_from_name:
+                raise ValueError(f"type_hint was {type_hint}, expected {type_from_name} from name")
+
+        return format_class.parse(data, target_game=self.target_game)
 
     def replace_asset(self, asset_id: NameOrAssetId, new_data: typing.Union[bytes, BaseResource]):
         if not isinstance(new_data, bytes):
@@ -167,14 +180,26 @@ class PkgEditor:
         if pkg_name not in self._files_for_asset_id[asset_id]:
             self._ensured_asset_ids[pkg_name].add(asset_id)
 
+    def get_pkg(self, pkg_name: str) -> Pkg:
+        if pkg_name not in self._ensured_asset_ids:
+            raise ValueError(f"Unknown pkg_name: {pkg_name}")
+
+        if pkg_name not in self._in_memory_pkgs:
+            with self.files[pkg_name].open("rb") as f:
+                self._in_memory_pkgs[pkg_name] = Pkg.parse_stream(f, target_game=self.target_game)
+
+        return self._in_memory_pkgs[pkg_name]
+
     def save_modified_pkgs(self):
         modified_pkgs = set()
         for asset_id in self._modified_resources.keys():
             modified_pkgs.update(self._files_for_asset_id[asset_id])
 
+        # Ensure all pkgs we'll modify is in memory already.
+        # We'll need to read these files anyway to modify, so do it early to speedup
+        # the get_raw_assets for _ensured_asset_ids.
         for pkg_name in modified_pkgs:
-            with self.files[pkg_name].open("rb") as f:
-                self._in_memory_pkgs[pkg_name] = Pkg.parse_stream(f, target_game=self.target_game)
+            self.get_pkg(pkg_name)
 
         # Read all asset ids we need to copy somewhere else
         asset_ids_to_copy = {}
