@@ -69,12 +69,13 @@ class TypeExporter:
 
     def _export_struct_type(self, type_variable: str, type_name: str):
         data = self.all_types[type_name]
+        assert isinstance(data, StructType)
 
         parent_name = None
-        if isinstance(data, StructType) and data.parent is not None:
+        if data.parent is not None:
             parent_name = self.ensure_exported_type(data.parent)
 
-        if isinstance(data, StructType):
+        if data.fields:
             field_lines = []
             for field_name, field_type in data.fields.items():
                 self._debug(f"Exporting field! {field_name} = {field_type}")
@@ -85,6 +86,7 @@ class TypeExporter:
                 field_lines.insert(0, f"    **{parent_name}Fields,")
 
             fields_def = "{{\n{}\n}}".format("\n".join(field_lines))
+
         elif parent_name is not None:
             # No fields, just use the parent dict
             fields_def = f"{parent_name}Fields"
@@ -216,13 +218,8 @@ def main():
     all_types: dict[str, BaseType] = copy.copy(type_lib.all_types())
 
     type_exporter = TypeExporter(all_types)
-
-    needs_exporting = set(all_types.keys())
-    while needs_exporting:
-        next_type = needs_exporting.pop()
-        if next_type not in type_exporter._exported_types:
-            type_exporter.ensure_exported_type(next_type)
-            needs_exporting.update(type_exporter._children_for[next_type])
+    for type_name in sorted(all_types.keys()):
+        type_exporter.ensure_exported_type(type_name)
 
     output_path.write_text(type_exporter.export_code())
 
