@@ -9,12 +9,14 @@ from mercury_engine_data_structures import dread_data
 
 @dataclasses.dataclass(frozen=True)
 class BaseType:
+    name: str
+    
     @property
     def kind(self) -> "TypeKind":
         raise NotImplementedError()
 
     @classmethod
-    def from_json(cls, data: dict) -> "BaseType":
+    def from_json(cls, name: str, data: dict) -> "BaseType":
         raise NotImplementedError()
 
 
@@ -73,8 +75,8 @@ class PrimitiveType(BaseType):
         return TypeKind.PRIMITIVE
 
     @classmethod
-    def from_json(cls, data: dict) -> "PrimitiveType":
-        return cls(PrimitiveKind(data["primitive_kind"]))
+    def from_json(cls, name: str, data: dict) -> "PrimitiveType":
+        return cls(name, PrimitiveKind(data["primitive_kind"]))
 
 
 @dataclasses.dataclass(frozen=True)
@@ -87,8 +89,8 @@ class StructType(BaseType):
         return TypeKind.STRUCT
 
     @classmethod
-    def from_json(cls, data: dict) -> "StructType":
-        return cls(data["parent"], data["fields"])
+    def from_json(cls, name: str, data: dict) -> "StructType":
+        return cls(name, data["parent"], data["fields"])
 
 
 @dataclasses.dataclass(frozen=True)
@@ -100,8 +102,8 @@ class EnumType(BaseType):
         return TypeKind.ENUM
 
     @classmethod
-    def from_json(cls, data: dict) -> "EnumType":
-        return cls(data["values"])
+    def from_json(cls, name: str, data: dict) -> "EnumType":
+        return cls(name, data["values"])
 
 
 @dataclasses.dataclass(frozen=True)
@@ -113,8 +115,8 @@ class FlagsetType(BaseType):
         return TypeKind.FLAGSET
 
     @classmethod
-    def from_json(cls, data: dict) -> "FlagsetType":
-        return cls(data["enum"])
+    def from_json(cls, name: str, data: dict) -> "FlagsetType":
+        return cls(name, data["enum"])
 
 
 @dataclasses.dataclass(frozen=True)
@@ -126,8 +128,8 @@ class TypedefType(BaseType):
         return TypeKind.TYPEDEF
 
     @classmethod
-    def from_json(cls, data: dict) -> "TypedefType":
-        return cls(data["alias"])
+    def from_json(cls, name: str, data: dict) -> "TypedefType":
+        return cls(name, data["alias"])
 
 
 @dataclasses.dataclass(frozen=True)
@@ -139,8 +141,8 @@ class PointerType(BaseType):
         return TypeKind.POINTER
 
     @classmethod
-    def from_json(cls, data: dict) -> "PointerType":
-        return cls(data["target"])
+    def from_json(cls, name: str, data: dict) -> "PointerType":
+        return cls(name, data["target"])
 
 
 @dataclasses.dataclass(frozen=True)
@@ -152,8 +154,8 @@ class VectorType(BaseType):
         return TypeKind.VECTOR
 
     @classmethod
-    def from_json(cls, data: dict) -> "VectorType":
-        return cls(data["value_type"])
+    def from_json(cls, name: str, data: dict) -> "VectorType":
+        return cls(name, data["value_type"])
 
 
 @dataclasses.dataclass(frozen=True)
@@ -166,24 +168,24 @@ class DictionaryType(BaseType):
         return TypeKind.DICTIONARY
 
     @classmethod
-    def from_json(cls, data: dict) -> "DictionaryType":
-        return cls(data["key_type"], data["value_type"])
+    def from_json(cls, name: str, data: dict) -> "DictionaryType":
+        return cls(name, data["key_type"], data["value_type"])
 
 
-def decode_type(data: dict) -> BaseType:
+def decode_type(name: str, data: dict) -> BaseType:
     kind: TypeKind = TypeKind(data["kind"])
-    return kind.type_class.from_json(data)
+    return kind.type_class.from_json(name, data)
 
 
 @functools.lru_cache()
 def all_types() -> Dict[str, BaseType]:
     return {
-        name: decode_type(data)
+        name: decode_type(name, data)
         for name, data in dread_data.get_raw_types().items()
     }
 
 
-def get_type(type_name: str, *, follow_typedef: bool = False) -> BaseType:
+def get_type(type_name: str, *, follow_typedef: bool = True) -> BaseType:
     result = all_types()[type_name]
 
     if follow_typedef and result.kind == TypeKind.TYPEDEF:
