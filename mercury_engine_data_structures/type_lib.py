@@ -232,7 +232,7 @@ def all_direct_children() -> Dict[str, Set[str]]:
     return dict(result)
 
 
-def get_all_children_for(type_name: str) -> set[str]:
+def get_all_children_for(type_name: str) -> Set[str]:
     """
     Get all direct and indirect children for a given type.
     """
