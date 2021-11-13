@@ -161,19 +161,30 @@ def convert_old_to_new(old_types: dict[str, dict[str, typing.Any]]):
 
         next_type = None
         next_type2 = None
-        if converted[new_type]["kind"] == TypeKind.STRUCT.value:
+
+        new_kind = TypeKind(converted[new_type]["kind"])
+
+        if new_kind in (TypeKind.PRIMITIVE, TypeKind.STRUCT, TypeKind.ENUM):
             pass
-        elif converted[new_type]["kind"] == TypeKind.POINTER.value:
+
+        elif new_kind == TypeKind.FLAGSET:
+            next_type = converted[new_type]["enum"]
+
+        elif new_kind == TypeKind.TYPEDEF:
+            next_type = converted[new_type]["alias"]
+
+        elif new_kind == TypeKind.POINTER:
             next_type = converted[new_type]["target"]
-        elif converted[new_type]["kind"] == TypeKind.DICTIONARY.value:
+
+        elif new_kind == TypeKind.VECTOR:
+            next_type = converted[new_type]["value_type"]
+
+        elif new_kind == TypeKind.DICTIONARY:
             next_type2 = converted[new_type]["key_type"]
             next_type = converted[new_type]["value_type"]
-        elif converted[new_type]["kind"] == TypeKind.VECTOR.value:
-            next_type = converted[new_type]["value_type"]
-        elif converted[new_type]["kind"] == TypeKind.FLAGSET.value:
-            next_type = converted[new_type]["enum"]
-        elif converted[new_type]["kind"] == TypeKind.TYPEDEF.value:
-            next_type = converted[new_type]["alias"]
+
+        else:
+            raise ValueError(f"unknown kind: {new_kind}")
 
         for it in [next_type, next_type2]:
             if it is not None and it not in converted:

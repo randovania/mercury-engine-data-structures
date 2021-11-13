@@ -20757,6 +20757,10 @@
         "kind": "vector",
         "value_type": "CCentralUnitComponent::SStartPointInfo"
     },
+    "base::global::CRntVector<CCharClassRodomithonXAIComponent::SFirePillarConfig>": {
+        "kind": "vector",
+        "value_type": "CCharClassRodomithonXAIComponent::SFirePillarConfig"
+    },
     "base::global::CRntVector<CCharClassRodotukAIComponent::SAbsorbConfig>": {
         "kind": "vector",
         "value_type": "CCharClassRodotukAIComponent::SAbsorbConfig"

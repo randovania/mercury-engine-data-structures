@@ -9031,11 +9031,6 @@
             "Invalid": 2147483647
         }
     },
-    "CCharClassRodomithonXAIComponent::TVFirePillarConfigs": {
-        "parent": "int",
-        "fields": {},
-        "values": null
-    },
     "CCharClassRodomithonXSuckAttack": {
         "parent": "CCharClassRodotukSuckAttack",
         "fields": {},
