@@ -63,11 +63,11 @@ def Object(fields: Dict[str, Union[Construct, Type[Construct]]], *,
     all_types = list(fields)
 
     fields = {
-        name: name / FocusedSeq(
-            "conn",
+        name: FocusedSeq(
+            name,
             "next_field" / Optional(Peek(PropertyEnum)),
             "remaining" / Optional(Peek(Byte)),
-            "conn" / IfThenElse(
+            name / IfThenElse(
                 construct.this._parsing,
                 If(lambda this: this.remaining is not None and (this.next_field is None or this.next_field not in fields.keys()), conn),
                 Optional(conn)

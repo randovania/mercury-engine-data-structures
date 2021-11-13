@@ -39,11 +39,6 @@ class TypeExporter:
         self._children_for = collections.defaultdict(set)
         self._type_definition_code = ""
 
-        self._exported_types["base::reflection::CTypedValue"] = _type_name_to_python_identifier(
-            "base::reflection::CTypedValue"
-        )
-        self._children_for["base::reflection::CTypedValue"].add("base::global::CRntFile")
-
         for type_name, data in all_types.items():
             if isinstance(data, StructType) and data.parent is not None:
                 self._children_for[data.parent].add(type_name)
@@ -72,7 +67,7 @@ class TypeExporter:
 
         return "construct_" + type_variable, code
 
-    def _export_known_type(self, type_variable: str, type_name: str):
+    def _export_struct_type(self, type_variable: str, type_name: str):
         data = self.all_types[type_name]
 
         parent_name = None
@@ -83,7 +78,7 @@ class TypeExporter:
             field_lines = []
             for field_name, field_type in data.fields.items():
                 self._debug(f"Exporting field! {field_name} = {field_type}")
-                converted_type = self.convert_type_to_construct(field_type)
+                converted_type = self.ensure_exported_type(field_type)
                 field_lines.append(f'    "{field_name}": {converted_type},')
 
             if parent_name is not None:
@@ -106,21 +101,34 @@ class TypeExporter:
 
     def _export_type(self, type_name: str):
         type_variable = _type_name_to_python_identifier(type_name)
+        type_data = self.all_types[type_name]
 
-        if type_name in self.all_types:
-            type_data = self.all_types[type_name]
-            if isinstance(type_data, EnumType):
-                type_variable, type_code = self._export_enum_type(type_variable, type_name)
-                self._type_definition_code += type_code
-            elif isinstance(type_data, TypedefType):
-                reference = self.ensure_exported_type(type_data.alias)
-                self._type_definition_code += f'\n\n{type_variable} = {reference}'
-            elif isinstance(type_data, FlagsetType):
-                reference = self.ensure_exported_type(type_data.enum)
-                self._type_definition_code += f'\n\n{type_variable} = {reference}'
-            else:
-                type_code = self._export_known_type(type_variable, type_name)
-                self._type_definition_code += f'\n\n{type_variable} = {type_code}'
+        if isinstance(type_data, EnumType):
+            type_variable, type_code = self._export_enum_type(type_variable, type_name)
+            self._type_definition_code += type_code
+
+        elif isinstance(type_data, TypedefType):
+            reference = self.ensure_exported_type(type_data.alias)
+            self._type_definition_code += f'\n\n{type_variable} = {reference}'
+
+        elif isinstance(type_data, FlagsetType):
+            reference = self.ensure_exported_type(type_data.enum)
+            self._type_definition_code += f'\n\n{type_variable} = {reference}'
+
+        elif isinstance(type_data, VectorType):
+            inner_field = self.ensure_exported_type(type_data.value_type)
+            type_code = f"common_types.make_vector({inner_field})"
+            self._type_definition_code += f'\n\n{type_variable} = {type_code}'
+
+        elif isinstance(type_data, DictionaryType):
+            key_field = self.ensure_exported_type(type_data.key_type)
+            inner_field = self.ensure_exported_type(type_data.value_type)
+            type_code = f"common_types.make_dict({inner_field}, key={key_field})"
+            self._type_definition_code += f'\n\n{type_variable} = {type_code}'
+
+        elif isinstance(type_data, StructType):
+            type_code = self._export_struct_type(type_variable, type_name)
+            self._type_definition_code += f'\n\n{type_variable} = {type_code}'
         else:
             type_code = self.convert_type_to_construct(type_name)
             self._type_definition_code += f'\n\n{type_variable} = {type_code}'
