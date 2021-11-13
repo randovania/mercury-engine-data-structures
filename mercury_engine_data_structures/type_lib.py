@@ -1,7 +1,8 @@
+import collections
 import dataclasses
 import functools
 from enum import Enum
-from typing import Optional, Dict, Type
+from typing import Optional, Dict, Type, Set
 
 from mercury_engine_data_structures import dread_data
 
@@ -182,12 +183,19 @@ def all_types() -> Dict[str, BaseType]:
     }
 
 
-def get_type(type_name: str) -> BaseType:
-    return all_types()[type_name]
+def get_type(type_name: str, *, follow_typedef: bool = False) -> BaseType:
+    result = all_types()[type_name]
+
+    if follow_typedef and result.kind == TypeKind.TYPEDEF:
+        assert isinstance(result, TypedefType)
+        return get_type(result.alias, follow_typedef=follow_typedef)
+
+    return result
 
 
 def get_parent_for(type_name: str) -> Optional[str]:
     data = get_type(type_name)
+
     if data.kind == TypeKind.STRUCT:
         assert isinstance(data, StructType)
         return data.parent
@@ -196,6 +204,9 @@ def get_parent_for(type_name: str) -> Optional[str]:
 
 
 def is_child_of(type_name: Optional[str], parent_name: str) -> bool:
+    """
+    Checks if the type_name is a direct or indirect child of the type parent_name
+    """
     if type_name == parent_name:
         return True
 
@@ -203,3 +214,36 @@ def is_child_of(type_name: Optional[str], parent_name: str) -> bool:
         return False
 
     return is_child_of(get_parent_for(type_name), parent_name)
+
+
+@functools.lru_cache()
+def all_direct_children() -> Dict[str, Set[str]]:
+    """
+    Returns a mapping of type names to all their direct children.
+    """
+    result = collections.defaultdict(set)
+
+    for type_name in all_types().keys():
+        if (parent := get_parent_for(type_name)) is not None:
+            result[parent].add(type_name)
+
+    return dict(result)
+
+
+def get_all_children_for(type_name: str) -> set[str]:
+    """
+    Get all direct and indirect children for a given type.
+    """
+    result = set()
+
+    types_to_check = {type_name}
+    while types_to_check:
+        next_type = types_to_check.pop()
+
+        if next_type in result:
+            continue
+        result.add(next_type)
+
+        types_to_check.update(all_direct_children().get(next_type, set()))
+
+    return result
