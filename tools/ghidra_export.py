@@ -126,8 +126,8 @@ def convert_type(type_name: str, type_data: dict):
     elif (m := dict_re.match(type_name)) is not None:
         return {
             "kind": TypeKind.DICTIONARY.value,
-            "key_type": m.group(1),
-            "value_type": m.group(2),
+            "key_type": m.group(1).strip(),
+            "value_type": m.group(2).strip(),
         }
 
     elif (m := find_ptr_match(type_name)) is not None:
