@@ -91,6 +91,7 @@ def fix_alternative_ghidra_name(name: str) -> str:
         name = name[:-len("Ptr")] + "*"
     name = name.replace("_const", " const")
     name = name.replace(",_", ", ")
+    name = name.replace("_Ptr", " Ptr")
     name = name.replace("Ptr>", "*>")
     return name
 

@@ -79,7 +79,7 @@
         "fields": {
             "iIgnorePlayerMode": "int",
             "bShowBossLifebar": "bool",
-            "eBumpMode": "EBumpMode",
+            "eBumpMode": "CAIManager::EBumpMode",
             "bShowEnemyLife": "bool",
             "bShowEnemyDamage": "bool",
             "bShowPlayerDamage": "bool",
@@ -494,10 +494,18 @@
             "bEnabled": "bool"
         }
     },
+    "CActor*": {
+        "kind": "pointer",
+        "target": "CActor"
+    },
     "CActorComponent": {
         "kind": "struct",
         "parent": "CGameObject",
         "fields": {}
+    },
+    "CActorComponent*": {
+        "kind": "pointer",
+        "target": "CActorComponent"
     },
     "CActorComponentDef": {
         "kind": "struct",
@@ -606,11 +614,6 @@
             "sEyeRFX": "base::global::CStrId",
             "sEyeLFX": "base::global::CStrId"
         }
-    },
-    "CAnimTreeDef": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
     },
     "CAnimatedCameraCtrl": {
         "kind": "struct",
@@ -1076,7 +1079,7 @@
         "kind": "struct",
         "parent": null,
         "fields": {
-            "hashSections": "TSectionContainer"
+            "hashSections": "CBlackboard::TSectionContainer"
         }
     },
     "CBlackboard::CSection": {
@@ -1085,6 +1088,14 @@
         "fields": {
             "dctProps": "base::global::CRntSmallDictionary<base::global::CStrId, base::reflection::CTypedValue>"
         }
+    },
+    "CBlackboard::CSection*": {
+        "kind": "pointer",
+        "target": "CBlackboard::CSection"
+    },
+    "CBlackboard::TSectionContainer": {
+        "kind": "typedef",
+        "alias": "base::global::CRntDictionary<base::global::CStrId, CBlackboard::CSection*>"
     },
     "CBombGun": {
         "kind": "struct",
@@ -1248,6 +1259,11 @@
             "fRespawnTimeWhenDestroyedWithHyperBeam": "float"
         }
     },
+    "CBreakableTileManager::STileGroupGroup": {
+        "kind": "struct",
+        "parent": null,
+        "fields": {}
+    },
     "CBreakableVignetteComponent": {
         "kind": "struct",
         "parent": "CLogicShapeComponent",
@@ -1257,11 +1273,6 @@
             "bPreventVisibilityOnly": "bool",
             "bForceNotVisible": "bool"
         }
-    },
-    "CButton::TextAlign": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
     },
     "CCameraBoundaryCtrl": {
         "kind": "struct",
@@ -12023,6 +12034,10 @@
             "oPoolDefinitions": "CFXPoolPack"
         }
     },
+    "CCutSceneDef*": {
+        "kind": "pointer",
+        "target": "CCutSceneDef"
+    },
     "CCutSceneDef::CActorDef": {
         "kind": "struct",
         "parent": null,
@@ -12070,9 +12085,14 @@
         "kind": "struct",
         "parent": null,
         "fields": {
-            "oDefinition": "const::CCutSceneDef*",
+            "oDefinition": "CCutSceneDef*",
             "lstActors": "base::global::CRntVector<CCutscene::CActor>"
         }
+    },
+    "CCutscene::CActor": {
+        "kind": "struct",
+        "parent": null,
+        "fields": {}
     },
     "CCutscene::CTunableCutscene": {
         "kind": "struct",
@@ -13467,11 +13487,11 @@
             "vRandomDelay": "base::math::CVector2D",
             "oConstantColor0TransitionInit": "base::math::CVector4D",
             "oConstantColor0TransitionEnd": "base::math::CVector4D",
-            "eConstant0TransitionMode": "ETransitionOperationMode",
+            "eConstant0TransitionMode": "CExplosionGfx::ETransitionOperationMode",
             "fConstantColor0TransitionTime": "float",
             "oConstantColor1TransitionInit": "base::math::CVector4D",
             "oConstantColor1TransitionEnd": "base::math::CVector4D",
-            "eConstant1TransitionMode": "ETransitionOperationMode",
+            "eConstant1TransitionMode": "CExplosionGfx::ETransitionOperationMode",
             "fConstantColor1TransitionTime": "float"
         }
     },
@@ -13751,8 +13771,12 @@
         "kind": "struct",
         "parent": "CBlackboard",
         "fields": {
-            "dctDeltaValues": "base::global::CRntSmallDictionary<_base::global::CStrId, CGameBlackboard::TPropDeltaValues_>"
+            "dctDeltaValues": "base::global::CRntSmallDictionary< base::global::CStrId, CGameBlackboard::TPropDeltaValues >"
         }
+    },
+    "CGameBlackboard::TPropDeltaValues": {
+        "kind": "typedef",
+        "alias": "base::global::CRntSmallDictionary<base::global::CStrId, float>"
     },
     "CGameLink<CActor>": {
         "kind": "primitive",
@@ -13766,6 +13790,10 @@
         "kind": "struct",
         "parent": null,
         "fields": {}
+    },
+    "CGameLink<CSpawnPointComponent>": {
+        "kind": "primitive",
+        "primitive_kind": "string"
     },
     "CGameManager::CTunableEnemies": {
         "kind": "struct",
@@ -15080,6 +15108,14 @@
             "fZOffset": "float"
         }
     },
+    "CMinimapData::TColliderGeoDatasMap": {
+        "kind": "typedef",
+        "alias": "base::global::CRntSmallDictionary<uint64, SGeoData>"
+    },
+    "CMinimapData::TOccludedIcons": {
+        "kind": "typedef",
+        "alias": "base::global::CRntVector<base::global::CStrId>"
+    },
     "CMinimapDef": {
         "kind": "struct",
         "parent": "base::core::CDefinition",
@@ -15092,14 +15128,12 @@
         }
     },
     "CMinimapDef::TMapIconDefs": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "typedef",
+        "alias": "base::global::CRntDictionary<base::global::CStrId, SMapIconDef>"
     },
     "CMinimapDef::TMapLabelDefs": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "typedef",
+        "alias": "base::global::CRntDictionary<base::global::CStrId, SMapLabelDef>"
     },
     "CMinimapGrid::SGridDef": {
         "kind": "struct",
@@ -15748,7 +15782,7 @@
         "parent": null,
         "fields": {
             "sCheckpointDefID": "base::global::CStrId",
-            "oValidationInfo": "SValidationInfo"
+            "oValidationInfo": "CPlaythrough::SCheckpointData::SValidationInfo"
         }
     },
     "CPlaythrough::SCheckpointData::SValidationInfo": {
@@ -15761,9 +15795,8 @@
         }
     },
     "CPlaythrough::TDictCheckpointDatas": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "typedef",
+        "alias": "base::global::CRntDictionary<base::global::CStrId, std::unique_ptr<CPlaythrough::SCheckpointData>>"
     },
     "CPlaythroughDef": {
         "kind": "struct",
@@ -16596,10 +16629,6 @@
         "kind": "struct",
         "parent": null,
         "fields": {}
-    },
-    "CScene*": {
-        "kind": "pointer",
-        "target": "CScene"
     },
     "CSceneComponent": {
         "kind": "struct",
@@ -18147,11 +18176,6 @@
             "Invalid": 2147483647
         }
     },
-    "EAnimNodeType": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
     "EAnimationTag": {
         "kind": "enum",
         "values": {
@@ -18204,11 +18228,6 @@
             "SPEEDBOOST": 9,
             "Invalid": 2147483647
         }
-    },
-    "EBumpMode": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
     },
     "ECaterzillaSpawnPointDir": {
         "kind": "enum",
@@ -18679,11 +18698,6 @@
             "SUBAREA_PICKING": 6
         }
     },
-    "EPolicy": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
     "ERotationDirection": {
         "kind": "enum",
         "values": {
@@ -18867,16 +18881,6 @@
             "Invalid": 2147483647
         }
     },
-    "ETransitionOperationMode": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
-    "ETranslucencyType": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
     "EWalkInputMode": {
         "kind": "enum",
         "values": {
@@ -18973,7 +18977,7 @@
             "ActivationState": "base::global::CStrId",
             "OnActivatedSound": "base::global::CStrId",
             "OnSelectedSound": "base::global::CStrId",
-            "eTextLabelAlignment": "TextAlign",
+            "eTextLabelAlignment": "GUI::CButton::TextAlign",
             "sOnActivatedSound": "base::global::CRntString",
             "sOnSelectedSound": "base::global::CRntString",
             "sTopNeighbour": "base::global::CStrId",
@@ -19106,6 +19110,10 @@
             "sSkinName": "base::global::CStrId"
         }
     },
+    "GUI::CDisplayObject*": {
+        "kind": "pointer",
+        "target": "GUI::CDisplayObject"
+    },
     "GUI::CDisplayObjectAnimationDef": {
         "kind": "struct",
         "parent": null,
@@ -19130,6 +19138,10 @@
             "lstpChildren": "base::global::CRntVector<GUI::CDisplayObjectDef*>"
         }
     },
+    "GUI::CDisplayObjectDef*": {
+        "kind": "pointer",
+        "target": "GUI::CDisplayObjectDef"
+    },
     "GUI::CDisplayObjectStateDef": {
         "kind": "struct",
         "parent": null,
@@ -19137,6 +19149,22 @@
             "sID": "base::global::CRntString",
             "pDOAnimationDef": "std::unique_ptr<GUI::CDisplayObjectAnimationDef>"
         }
+    },
+    "GUI::CDisplayObjectStateDef*": {
+        "kind": "pointer",
+        "target": "GUI::CDisplayObjectStateDef"
+    },
+    "GUI::CDisplayObjectTrack<base::global::CRntString>::SKey": {
+        "kind": "typedef",
+        "alias": "GUI::CDisplayObjectTrackString::SKey"
+    },
+    "GUI::CDisplayObjectTrack<bool>::SKey": {
+        "kind": "typedef",
+        "alias": "GUI::CDisplayObjectTrackBool::SKey"
+    },
+    "GUI::CDisplayObjectTrack<float>::SKey": {
+        "kind": "typedef",
+        "alias": "GUI::CDisplayObjectTrackFloat::SKey"
     },
     "GUI::CDisplayObjectTrackBool": {
         "kind": "struct",
@@ -19214,7 +19242,7 @@
         "kind": "struct",
         "parent": null,
         "fields": {
-            "mapShapes": "base::global::CRntDictionary<base::global::CStrId, base::spatial::CPolygon2D_*>"
+            "mapShapes": "base::global::CRntDictionary<base::global::CStrId, base::spatial::CPolygon2D *>"
         }
     },
     "GUI::CGUIManager::SkinContainer": {
@@ -19363,7 +19391,7 @@
             "Autoselect": "bool",
             "ItemRendererType": "base::global::CStrId",
             "NumItemRenderers": "int",
-            "eButtonsTextAlignment": "CButton::TextAlign",
+            "eButtonsTextAlignment": "GUI::CButton::TextAlign",
             "iMaxItemNum": "int",
             "bDebugBehaviour": "bool",
             "bVerticalLayout": "bool"
@@ -19502,6 +19530,10 @@
             "vecDisplayObjDefs": "base::global::CRntVector<GUI::CDisplayObjectDef*>"
         }
     },
+    "GUI::CSkin*": {
+        "kind": "pointer",
+        "target": "GUI::CSkin"
+    },
     "GUI::CSlotInfoComposition": {
         "kind": "struct",
         "parent": "GUI::CDisplayObjectContainer",
@@ -19556,13 +19588,21 @@
             "vecItems": "base::global::CRntVector<GUI::CSpriteSheetItem*>"
         }
     },
+    "GUI::CSpriteSheet*": {
+        "kind": "pointer",
+        "target": "GUI::CSpriteSheet"
+    },
     "GUI::CSpriteSheetItem": {
         "kind": "struct",
         "parent": null,
         "fields": {
             "sID": "base::global::CStrId",
-            "oTexUVs": "STexUV"
+            "oTexUVs": "GUI::CSpriteSheetItem::STexUV"
         }
+    },
+    "GUI::CSpriteSheetItem*": {
+        "kind": "pointer",
+        "target": "GUI::CSpriteSheetItem"
     },
     "GUI::CSpriteSheetItem::STexUV": {
         "kind": "struct",
@@ -19608,6 +19648,10 @@
         "kind": "struct",
         "parent": null,
         "fields": {}
+    },
+    "GUI::IDisplayObjectTrack*": {
+        "kind": "pointer",
+        "target": "GUI::IDisplayObjectTrack"
     },
     "ICharClassFXCreateAndLinkEvent": {
         "kind": "struct",
@@ -19768,11 +19812,6 @@
         "fields": {
             "tNodes": "base::global::CRntVector<SCameraRailNode>"
         }
-    },
-    "SCompareOperator::Enum": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
     },
     "SDeathImpactDisplacement": {
         "kind": "struct",
@@ -20033,22 +20072,7 @@
             "Invalid": 2147483647
         }
     },
-    "SStatus::Enum": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
-    "STexUV": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
     "STransition": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
-    "SValidationInfo": {
         "kind": "struct",
         "parent": null,
         "fields": {}
@@ -20064,14 +20088,12 @@
         }
     },
     "TActionInsertFlagset": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "flagset",
+        "enum": "EActionInsertFlags"
     },
     "TAnimationTagFlagSet": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "flagset",
+        "enum": "EAnimationTag"
     },
     "TBigkranXSpitLaunchPattern": {
         "kind": "typedef",
@@ -20087,9 +20109,8 @@
         }
     },
     "TCoolShinesparkSituation": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "flagset",
+        "enum": "ECoolShinesparkSituation"
     },
     "TLaunchConfigs": {
         "kind": "typedef",
@@ -20103,25 +20124,13 @@
         "kind": "typedef",
         "alias": "base::global::CRntVector<COffset>"
     },
-    "TSectionContainer": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
     "TShinesparkTravellingDirectionFlagSet": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "flagset",
+        "enum": "EShinesparkTravellingDirection"
     },
     "TSoundEventRules": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
-    "TextAlign": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "typedef",
+        "alias": "base::global::CRntVector<std::unique_ptr<sound::CSoundEventsDef::SSoundEventsRule>>"
     },
     "animtree::CAnimTreeControl": {
         "kind": "struct",
@@ -20167,7 +20176,7 @@
         "kind": "struct",
         "parent": "base::core::CAsset",
         "fields": {
-            "oAnimTreeDef": "CAnimTreeDef"
+            "oAnimTreeDef": "animtree::CAnimTreeDef"
         }
     },
     "animtree::CAnimatedNode": {
@@ -20179,7 +20188,7 @@
         "kind": "struct",
         "parent": "animtree::CAnimTreeElementDef",
         "fields": {
-            "eNodeType": "EAnimNodeType",
+            "eNodeType": "animtree::CAnimatedNodeDef::EAnimNodeType",
             "fEventsWeightThreshold": "float",
             "bLaunchEvents": "bool",
             "bAllowRootMotion": "bool",
@@ -20312,51 +20321,6 @@
             "sMaxFootCorrectionDist": "float"
         }
     },
-    "api::shdr::EShaderType": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
-    "api::types::blendFactor::EBlendFactor": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
-    "api::types::blendOp::EBlendOp": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
-    "api::types::cmpMode::ECmpMode": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
-    "api::types::cullMode::ECullMode": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
-    "api::types::fillMode::EFillMode": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
-    "api::types::stencilOp::EStencilOp": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
-    "api::types::textureAddress::ETextureAddress": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
-    "api::types::textureFilter::ETextureFilter": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
     "base::animation::CAnimationBlendSkeletonTransformer": {
         "kind": "struct",
         "parent": "base::animation::CAnimationSkeletonTransformer",
@@ -20382,7 +20346,7 @@
         "parent": "base::core::CAsset",
         "fields": {
             "sVarName": "base::global::CStrId",
-            "vTargets": "global::CRntVector<base::animation::CBlendSpaceResource::SBlendTarget>"
+            "vTargets": "base::global::CRntVector<base::animation::CBlendSpaceResource::SBlendTarget>"
         }
     },
     "base::animation::CBlendSpaceResource::SBlendTarget": {
@@ -20571,177 +20535,211 @@
         "primitive_kind": "property"
     },
     "base::global::CPooledList<GUI::CDisplayObject*>": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "vector",
+        "value_type": "GUI::CDisplayObject*"
     },
     "base::global::CRntDictionary<base::global::CFilePathStrId, CLightsDef>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CFilePathStrId",
         "value_type": "CLightsDef"
     },
     "base::global::CRntDictionary<base::global::CStrId, CActor*>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "CActor*"
     },
+    "base::global::CRntDictionary<base::global::CStrId, CBlackboard::CSection*>": {
+        "kind": "dictionary",
+        "key_type": "base::global::CStrId",
+        "value_type": "CBlackboard::CSection*"
+    },
     "base::global::CRntDictionary<base::global::CStrId, CEnvironmentData>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "CEnvironmentData"
     },
     "base::global::CRntDictionary<base::global::CStrId, CEnvironmentMusicData>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "CEnvironmentMusicData"
     },
     "base::global::CRntDictionary<base::global::CStrId, CEnvironmentSoundData::SSound>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "CEnvironmentSoundData::SSound"
     },
     "base::global::CRntDictionary<base::global::CStrId, CEnvironmentSoundData>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "CEnvironmentSoundData"
     },
     "base::global::CRntDictionary<base::global::CStrId, GUI::CSpriteSheet*>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "GUI::CSpriteSheet*"
     },
+    "base::global::CRntDictionary<base::global::CStrId, SMapIconDef>": {
+        "kind": "dictionary",
+        "key_type": "base::global::CStrId",
+        "value_type": "SMapIconDef"
+    },
+    "base::global::CRntDictionary<base::global::CStrId, SMapLabelDef>": {
+        "kind": "dictionary",
+        "key_type": "base::global::CStrId",
+        "value_type": "SMapLabelDef"
+    },
     "base::global::CRntDictionary<base::global::CStrId, base::global::CRntVector<CGameLink<CActor>>>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "base::global::CRntVector<CGameLink<CActor>>"
     },
     "base::global::CRntDictionary<base::global::CStrId, base::global::CRntVector<base::global::CStrId>>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "base::global::CRntVector<base::global::CStrId>"
     },
-    "base::global::CRntDictionary<base::global::CStrId, base::spatial::CPolygon2D_*>": {
-        "kind": "struct",
+    "base::global::CRntDictionary<base::global::CStrId, base::spatial::CPolygon2D *>": {
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
-        "value_type": "base::spatial::CPolygon2D_*"
+        "value_type": "base::spatial::CPolygon2D *"
     },
     "base::global::CRntDictionary<base::global::CStrId, sound::CAudioPreset>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "sound::CAudioPreset"
     },
     "base::global::CRntDictionary<base::global::CStrId, sound::TBossMusicPreset>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "sound::TBossMusicPreset"
     },
     "base::global::CRntDictionary<base::global::CStrId, sound::TBossMusicSpawnGroupConfig>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "sound::TBossMusicSpawnGroupConfig"
     },
     "base::global::CRntDictionary<base::global::CStrId, sound::TBossMusicSubStateConfig>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "sound::TBossMusicSubStateConfig"
+    },
+    "base::global::CRntDictionary<base::global::CStrId, std::unique_ptr<CPlaythrough::SCheckpointData>>": {
+        "kind": "dictionary",
+        "key_type": "base::global::CStrId",
+        "value_type": "std::unique_ptr<CPlaythrough::SCheckpointData>"
     },
     "base::global::CRntFile": {
         "kind": "primitive",
         "primitive_kind": "bytes"
     },
     "base::global::CRntPooledDictionary<base::global::CStrId, CBreakableTileManager::STileGroupGroup>": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "dictionary",
+        "key_type": "base::global::CStrId",
+        "value_type": "CBreakableTileManager::STileGroupGroup"
     },
     "base::global::CRntPooledDictionary<base::global::CStrId,_CBreakableTileManager::STileGroupGroup>": {
-        "kind": "struct",
-        "parent": "CBreakableTileManager::CTunableBreakableTileManager",
-        "fields": {}
+        "kind": "dictionary",
+        "key_type": "base::global::CStrId",
+        "value_type": "CBreakableTileManager::STileGroupGroup"
     },
-    "base::global::CRntSmallDictionary<_base::global::CStrId, CGameBlackboard::TPropDeltaValues_>": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+    "base::global::CRntSmallDictionary< base::global::CStrId, CGameBlackboard::TPropDeltaValues >": {
+        "kind": "dictionary",
+        "key_type": "base::global::CStrId",
+        "value_type": "CGameBlackboard::TPropDeltaValues"
+    },
+    "base::global::CRntSmallDictionary<base::global::CRntString, base::tunable::CTunable*>": {
+        "kind": "dictionary",
+        "key_type": "base::global::CRntString",
+        "value_type": "base::tunable::CTunable*"
+    },
+    "base::global::CRntSmallDictionary<base::global::CStrId, CActorComponent*>": {
+        "kind": "dictionary",
+        "key_type": "base::global::CStrId",
+        "value_type": "CActorComponent*"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, CActorComponent*>*": {
         "kind": "pointer",
         "target": "base::global::CRntSmallDictionary<base::global::CStrId, CActorComponent*>"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, CActorSublayer>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "CActorSublayer"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, CCutSceneDef::CAnimationLayerDef>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "CCutSceneDef::CAnimationLayerDef"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, CMinimapData::SDoorData>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "CMinimapData::SDoorData"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, CMinimapData::SEntityData>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "CMinimapData::SEntityData"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, CMinimapData::SMagnetSurfaceData>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "CMinimapData::SMagnetSurfaceData"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, CMinimapData::STransportSignData>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "CMinimapData::STransportSignData"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, CMinimapData::TColliderGeoDatasMap>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "CMinimapData::TColliderGeoDatasMap"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, CMinimapData::TOccludedIcons>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "CMinimapData::TOccludedIcons"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, SGeoData>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "SGeoData"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, base::core::CAssetLink>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "base::core::CAssetLink"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, base::global::CFilePathStrId>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "base::global::CFilePathStrId"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, base::global::CStrId>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "base::global::CStrId"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, base::reflection::CTypedValue>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "base::reflection::CTypedValue"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, float>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "float"
     },
     "base::global::CRntSmallDictionary<base::global::CStrId, game::logic::collision::EColMat>": {
-        "kind": "struct",
+        "kind": "dictionary",
         "key_type": "base::global::CStrId",
         "value_type": "game::logic::collision::EColMat"
+    },
+    "base::global::CRntSmallDictionary<uint64, SGeoData>": {
+        "kind": "dictionary",
+        "key_type": "uint64",
+        "value_type": "SGeoData"
     },
     "base::global::CRntString": {
         "kind": "primitive",
@@ -20749,7 +20747,7 @@
     },
     "base::global::CRntVector< std::unique_ptr<CPlaythroughDef::SCheckpointDef> >": {
         "kind": "vector",
-        "value_type": " std::unique_ptr<CPlaythroughDef::SCheckpointDef> "
+        "value_type": "std::unique_ptr<CPlaythroughDef::SCheckpointDef>"
     },
     "base::global::CRntVector<CBreakableTileGroupComponent::STileInfo>": {
         "kind": "vector",
@@ -20758,6 +20756,10 @@
     "base::global::CRntVector<CCentralUnitComponent::SStartPointInfo>": {
         "kind": "vector",
         "value_type": "CCentralUnitComponent::SStartPointInfo"
+    },
+    "base::global::CRntVector<CCharClassRodotukAIComponent::SAbsorbConfig>": {
+        "kind": "vector",
+        "value_type": "CCharClassRodotukAIComponent::SAbsorbConfig"
     },
     "base::global::CRntVector<CCooldownXBossFireBallDef>": {
         "kind": "vector",
@@ -20783,49 +20785,97 @@
         "kind": "vector",
         "value_type": "CCutsceneComponent::SActorInfo"
     },
+    "base::global::CRntVector<CEnvironmentData::SAmbientTransition>": {
+        "kind": "vector",
+        "value_type": "CEnvironmentData::SAmbientTransition"
+    },
     "base::global::CRntVector<CEnvironmentData::SAmbientTransition>*": {
         "kind": "pointer",
         "target": "base::global::CRntVector<CEnvironmentData::SAmbientTransition>"
+    },
+    "base::global::CRntVector<CEnvironmentData::SBloomTransition>": {
+        "kind": "vector",
+        "value_type": "CEnvironmentData::SBloomTransition"
     },
     "base::global::CRntVector<CEnvironmentData::SBloomTransition>*": {
         "kind": "pointer",
         "target": "base::global::CRntVector<CEnvironmentData::SBloomTransition>"
     },
+    "base::global::CRntVector<CEnvironmentData::SCubeMapTransition>": {
+        "kind": "vector",
+        "value_type": "CEnvironmentData::SCubeMapTransition"
+    },
     "base::global::CRntVector<CEnvironmentData::SCubeMapTransition>*": {
         "kind": "pointer",
         "target": "base::global::CRntVector<CEnvironmentData::SCubeMapTransition>"
+    },
+    "base::global::CRntVector<CEnvironmentData::SDepthTintTransition>": {
+        "kind": "vector",
+        "value_type": "CEnvironmentData::SDepthTintTransition"
     },
     "base::global::CRntVector<CEnvironmentData::SDepthTintTransition>*": {
         "kind": "pointer",
         "target": "base::global::CRntVector<CEnvironmentData::SDepthTintTransition>"
     },
+    "base::global::CRntVector<CEnvironmentData::SFogTransition>": {
+        "kind": "vector",
+        "value_type": "CEnvironmentData::SFogTransition"
+    },
     "base::global::CRntVector<CEnvironmentData::SFogTransition>*": {
         "kind": "pointer",
         "target": "base::global::CRntVector<CEnvironmentData::SFogTransition>"
+    },
+    "base::global::CRntVector<CEnvironmentData::SHemisphericalLightTransition>": {
+        "kind": "vector",
+        "value_type": "CEnvironmentData::SHemisphericalLightTransition"
     },
     "base::global::CRntVector<CEnvironmentData::SHemisphericalLightTransition>*": {
         "kind": "pointer",
         "target": "base::global::CRntVector<CEnvironmentData::SHemisphericalLightTransition>"
     },
+    "base::global::CRntVector<CEnvironmentData::SIBLAttenuationTransition>": {
+        "kind": "vector",
+        "value_type": "CEnvironmentData::SIBLAttenuationTransition"
+    },
     "base::global::CRntVector<CEnvironmentData::SIBLAttenuationTransition>*": {
         "kind": "pointer",
         "target": "base::global::CRntVector<CEnvironmentData::SIBLAttenuationTransition>"
+    },
+    "base::global::CRntVector<CEnvironmentData::SMaterialTintTransition>": {
+        "kind": "vector",
+        "value_type": "CEnvironmentData::SMaterialTintTransition"
     },
     "base::global::CRntVector<CEnvironmentData::SMaterialTintTransition>*": {
         "kind": "pointer",
         "target": "base::global::CRntVector<CEnvironmentData::SMaterialTintTransition>"
     },
+    "base::global::CRntVector<CEnvironmentData::SPlayerLightTransition>": {
+        "kind": "vector",
+        "value_type": "CEnvironmentData::SPlayerLightTransition"
+    },
     "base::global::CRntVector<CEnvironmentData::SPlayerLightTransition>*": {
         "kind": "pointer",
         "target": "base::global::CRntVector<CEnvironmentData::SPlayerLightTransition>"
+    },
+    "base::global::CRntVector<CEnvironmentData::SSSAOTransition>": {
+        "kind": "vector",
+        "value_type": "CEnvironmentData::SSSAOTransition"
     },
     "base::global::CRntVector<CEnvironmentData::SSSAOTransition>*": {
         "kind": "pointer",
         "target": "base::global::CRntVector<CEnvironmentData::SSSAOTransition>"
     },
+    "base::global::CRntVector<CEnvironmentData::SToneMappingTransition>": {
+        "kind": "vector",
+        "value_type": "CEnvironmentData::SToneMappingTransition"
+    },
     "base::global::CRntVector<CEnvironmentData::SToneMappingTransition>*": {
         "kind": "pointer",
         "target": "base::global::CRntVector<CEnvironmentData::SToneMappingTransition>"
+    },
+    "base::global::CRntVector<CEnvironmentData::SVerticalFogTransition>": {
+        "kind": "vector",
+        "value_type": "CEnvironmentData::SVerticalFogTransition"
     },
     "base::global::CRntVector<CEnvironmentData::SVerticalFogTransition>*": {
         "kind": "pointer",
@@ -20858,6 +20908,10 @@
     "base::global::CRntVector<CMinimapData::SMovingMagnetSurfaceData>": {
         "kind": "vector",
         "value_type": "CMinimapData::SMovingMagnetSurfaceData"
+    },
+    "base::global::CRntVector<COffset>": {
+        "kind": "vector",
+        "value_type": "COffset"
     },
     "base::global::CRntVector<CSpawnerActorBlueprint>": {
         "kind": "vector",
@@ -20919,6 +20973,10 @@
         "kind": "vector",
         "value_type": "SBeamBoxActivatable"
     },
+    "base::global::CRntVector<SBigkranXSpitLaunchPatternStep>": {
+        "kind": "vector",
+        "value_type": "SBigkranXSpitLaunchPatternStep"
+    },
     "base::global::CRntVector<SCameraRailNode>": {
         "kind": "vector",
         "value_type": "SCameraRailNode"
@@ -20943,6 +21001,14 @@
         "kind": "vector",
         "value_type": "SGeoData"
     },
+    "base::global::CRntVector<SLaunchConfig>": {
+        "kind": "vector",
+        "value_type": "SLaunchConfig"
+    },
+    "base::global::CRntVector<SLaunchPatternStep>": {
+        "kind": "vector",
+        "value_type": "SLaunchPatternStep"
+    },
     "base::global::CRntVector<SLogicPathNode>": {
         "kind": "vector",
         "value_type": "SLogicPathNode"
@@ -20958,6 +21024,10 @@
     "base::global::CRntVector<animtree::CAnimTreeDef::TAnimTreeLinkDef>": {
         "kind": "vector",
         "value_type": "animtree::CAnimTreeDef::TAnimTreeLinkDef"
+    },
+    "base::global::CRntVector<base::animation::CBlendSpaceResource::SBlendTarget>": {
+        "kind": "vector",
+        "value_type": "base::animation::CBlendSpaceResource::SBlendTarget"
     },
     "base::global::CRntVector<base::global::CFilePathStrId>": {
         "kind": "vector",
@@ -20995,6 +21065,14 @@
         "kind": "vector",
         "value_type": "base::math::CVector3D"
     },
+    "base::global::CRntVector<base::spatial::CPolygon2D>": {
+        "kind": "vector",
+        "value_type": "base::spatial::CPolygon2D"
+    },
+    "base::global::CRntVector<base::spatial::SSegmentData>": {
+        "kind": "vector",
+        "value_type": "base::spatial::SSegmentData"
+    },
     "base::global::CRntVector<bool>": {
         "kind": "vector",
         "value_type": "bool"
@@ -21027,6 +21105,10 @@
         "kind": "vector",
         "value_type": "sound::TMusicTrack"
     },
+    "base::global::CRntVector<std::unique_ptr<CAcidBlobsLaunchPattern>>": {
+        "kind": "vector",
+        "value_type": "std::unique_ptr<CAcidBlobsLaunchPattern>"
+    },
     "base::global::CRntVector<std::unique_ptr<CAttackPreset>>": {
         "kind": "vector",
         "value_type": "std::unique_ptr<CAttackPreset>"
@@ -21035,6 +21117,10 @@
         "kind": "vector",
         "value_type": "std::unique_ptr<CBarelyFrozenIceInfo>"
     },
+    "base::global::CRntVector<std::unique_ptr<CBouncingCreaturesLaunchPattern>>": {
+        "kind": "vector",
+        "value_type": "std::unique_ptr<CBouncingCreaturesLaunchPattern>"
+    },
     "base::global::CRntVector<std::unique_ptr<CCentralUnitWeightedEdges>>": {
         "kind": "vector",
         "value_type": "std::unique_ptr<CCentralUnitWeightedEdges>"
@@ -21042,6 +21128,14 @@
     "base::global::CRntVector<std::unique_ptr<CChozoRobotSoldierCannonShotPattern>>": {
         "kind": "vector",
         "value_type": "std::unique_ptr<CChozoRobotSoldierCannonShotPattern>"
+    },
+    "base::global::CRntVector<std::unique_ptr<CCooldownXBossFireWallDef>>": {
+        "kind": "vector",
+        "value_type": "std::unique_ptr<CCooldownXBossFireWallDef>"
+    },
+    "base::global::CRntVector<std::unique_ptr<CCooldownXBossLavaCarpetDef>>": {
+        "kind": "vector",
+        "value_type": "std::unique_ptr<CCooldownXBossLavaCarpetDef>"
     },
     "base::global::CRntVector<std::unique_ptr<CCooldownXBossLavaDropsDef>>": {
         "kind": "vector",
@@ -21063,6 +21157,10 @@
         "kind": "vector",
         "value_type": "std::unique_ptr<CEnemyPreset>"
     },
+    "base::global::CRntVector<std::unique_ptr<CKraidSpinningNailsDef>>": {
+        "kind": "vector",
+        "value_type": "std::unique_ptr<CKraidSpinningNailsDef>"
+    },
     "base::global::CRntVector<std::unique_ptr<CPattern>>": {
         "kind": "vector",
         "value_type": "std::unique_ptr<CPattern>"
@@ -21079,6 +21177,10 @@
         "kind": "vector",
         "value_type": "std::unique_ptr<CShotLaunchConfig>"
     },
+    "base::global::CRntVector<std::unique_ptr<CSubareaCharclassGroup>>": {
+        "kind": "vector",
+        "value_type": "std::unique_ptr<CSubareaCharclassGroup>"
+    },
     "base::global::CRntVector<std::unique_ptr<CSubareaCharclassGroup>>const*": {
         "kind": "pointer",
         "target": "base::global::CRntVector<std::unique_ptr<CSubareaCharclassGroup>>"
@@ -21086,6 +21188,10 @@
     "base::global::CRntVector<std::unique_ptr<CSubareaInfo>>": {
         "kind": "vector",
         "value_type": "std::unique_ptr<CSubareaInfo>"
+    },
+    "base::global::CRntVector<std::unique_ptr<CSubareaSetup>>": {
+        "kind": "vector",
+        "value_type": "std::unique_ptr<CSubareaSetup>"
     },
     "base::global::CRntVector<std::unique_ptr<CSubareaSetup>>const*": {
         "kind": "pointer",
@@ -21119,6 +21225,10 @@
         "kind": "vector",
         "value_type": "std::unique_ptr<querysystem::CFilter>"
     },
+    "base::global::CRntVector<std::unique_ptr<sound::CSoundEventsDef::SSoundEventsRule>>": {
+        "kind": "vector",
+        "value_type": "std::unique_ptr<sound::CSoundEventsDef::SSoundEventsRule>"
+    },
     "base::global::CRntVector<unsigned>": {
         "kind": "vector",
         "value_type": "unsigned"
@@ -21130,6 +21240,10 @@
     "base::global::CStrId": {
         "kind": "primitive",
         "primitive_kind": "string"
+    },
+    "base::global::CWeakPtr<game::logic::collision::CCollider>": {
+        "kind": "pointer",
+        "target": "game::logic::collision::CCollider"
     },
     "base::global::TRntString128": {
         "kind": "struct",
@@ -21180,8 +21294,8 @@
         }
     },
     "base::global::timeline::TLayers": {
-        "kind": "typedef",
-        "alias": "base::global::timeline::ELayer"
+        "kind": "flagset",
+        "enum": "base::global::timeline::ELayer"
     },
     "base::input::CRumbleManager::CTunableRumbleManager": {
         "kind": "struct",
@@ -21532,8 +21646,8 @@
         "kind": "struct",
         "parent": null,
         "fields": {
-            "Min": "math::CVector2D",
-            "Max": "math::CVector2D"
+            "Min": "base::math::CVector2D",
+            "Max": "base::math::CVector2D"
         }
     },
     "base::spatial::CEditorSegment": {
@@ -21547,8 +21661,8 @@
         "kind": "struct",
         "parent": null,
         "fields": {
-            "vCenter": "math::CVector2D",
-            "vExtent": "math::CVector2D",
+            "vCenter": "base::math::CVector2D",
+            "vExtent": "base::math::CVector2D",
             "fRotation": "float"
         }
     },
@@ -21557,15 +21671,19 @@
         "parent": null,
         "fields": {
             "bClosed": "bool",
-            "oSegmentData": "global::CRntVector<base::spatial::SSegmentData>",
+            "oSegmentData": "base::global::CRntVector<base::spatial::SSegmentData>",
             "bOutwardsNormal": "bool"
         }
+    },
+    "base::spatial::CPolygon2D *": {
+        "kind": "pointer",
+        "target": "base::spatial::CPolygon2D"
     },
     "base::spatial::CPolygonCollection2D": {
         "kind": "struct",
         "parent": null,
         "fields": {
-            "vPolys": "global::CRntVector<base::spatial::CPolygon2D>"
+            "vPolys": "base::global::CRntVector<base::spatial::CPolygon2D>"
         }
     },
     "base::spatial::SSegmentData": {
@@ -21582,11 +21700,15 @@
             "sName": "base::global::CStrId"
         }
     },
+    "base::tunable::CTunable*": {
+        "kind": "pointer",
+        "target": "base::tunable::CTunable"
+    },
     "base::tunable::CTunableManager": {
         "kind": "struct",
         "parent": null,
         "fields": {
-            "hashTunables": "global::CRntSmallDictionary<base::global::CRntString, base::tunable::CTunable*>"
+            "hashTunables": "base::global::CRntSmallDictionary<base::global::CRntString, base::tunable::CTunable*>"
         }
     },
     "behaviortree::CAgitateInNervousnessAction": {
@@ -21640,8 +21762,8 @@
         "parent": "behaviortree::CBehavior",
         "fields": {
             "bNegate": "bool",
-            "eReturnStatusSuccess": "SStatus::Enum",
-            "eReturnStatusFailed": "SStatus::Enum"
+            "eReturnStatusSuccess": "behaviortree::SStatus::Enum",
+            "eReturnStatusFailed": "behaviortree::SStatus::Enum"
         }
     },
     "behaviortree::CBatalloonGoToTargetAction": {
@@ -21953,7 +22075,7 @@
             "sValueB": "base::global::CStrId",
             "sTunableB": "base::global::CStrId",
             "sTunableVarB": "base::global::CStrId",
-            "eCompareOperator": "SCompareOperator::Enum"
+            "eCompareOperator": "behaviortree::SCompareOperator::Enum"
         }
     },
     "behaviortree::CFlyingChaseTargetAction": {
@@ -22315,8 +22437,8 @@
         "kind": "struct",
         "parent": "behaviortree::CComposite",
         "fields": {
-            "eSuccessPolicy": "EPolicy",
-            "eFailurePolicy": "EPolicy"
+            "eSuccessPolicy": "behaviortree::CParallel::EPolicy",
+            "eFailurePolicy": "behaviortree::CParallel::EPolicy"
         }
     },
     "behaviortree::CParallel::EPolicy": {
@@ -22669,7 +22791,7 @@
             "sMinTime": "base::global::CStrId",
             "sMaxTime": "base::global::CStrId",
             "bResetElapsedTimeOnSuccess": "bool",
-            "eReturnStatusFailed": "SStatus::Enum"
+            "eReturnStatusFailed": "behaviortree::SStatus::Enum"
         }
     },
     "behaviortree::CStoreBoolInBlcAction": {
@@ -22723,7 +22845,7 @@
         "kind": "struct",
         "parent": "behaviortree::CDecorator",
         "fields": {
-            "eReturnStatus": "SStatus::Enum"
+            "eReturnStatus": "behaviortree::SStatus::Enum"
         }
     },
     "behaviortree::CSwitchBetweenAIModesAction": {
@@ -22736,7 +22858,7 @@
             "ePrefixToAdd": "CAnimationPrefix::SPrefix::Enum",
             "ePrefixToRemove": "CAnimationPrefix::SPrefix::Enum",
             "bWaitUntilActionEnds": "bool",
-            "eStatusIfCantSetAction": "SStatus::Enum",
+            "eStatusIfCantSetAction": "behaviortree::SStatus::Enum",
             "sTimelineStart": "base::global::CStrId",
             "sTimelineEnd": "base::global::CStrId",
             "bCheckIfSmartLink": "bool",
@@ -22900,10 +23022,6 @@
         "parent": null,
         "fields": {}
     },
-    "const::CCutSceneDef*": {
-        "kind": "pointer",
-        "target": "const::CCutSceneDef"
-    },
     "cutscene::EDevelopmentState": {
         "kind": "enum",
         "values": {
@@ -22952,6 +23070,15 @@
         "parent": "base::animation::ISkeletonTransformer",
         "fields": {}
     },
+    "engine::scene::CScene": {
+        "kind": "struct",
+        "parent": null,
+        "fields": {}
+    },
+    "engine::scene::CScene*": {
+        "kind": "pointer",
+        "target": "engine::scene::CScene"
+    },
     "engine::scene::CSceneManager": {
         "kind": "struct",
         "parent": null,
@@ -22963,8 +23090,12 @@
         "kind": "struct",
         "parent": null,
         "fields": {
-            "pScene": "CScene*"
+            "pScene": "engine::scene::CScene*"
         }
+    },
+    "engine::scene::CSceneSlot*": {
+        "kind": "pointer",
+        "target": "engine::scene::CSceneSlot"
     },
     "engine::scene::sceneItems::CSceneGroup": {
         "kind": "struct",
@@ -23014,6 +23145,10 @@
         }
     },
     "float": {
+        "kind": "primitive",
+        "primitive_kind": "float"
+    },
+    "float32": {
         "kind": "primitive",
         "primitive_kind": "float"
     },
@@ -23206,23 +23341,6 @@
         "parent": null,
         "fields": {}
     },
-    "global::CRntSmallDictionary<base::global::CRntString, base::tunable::CTunable*>": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
-    "global::CRntVector<base::animation::CBlendSpaceResource::SBlendTarget>": {
-        "kind": "vector",
-        "value_type": "base::animation::CBlendSpaceResource::SBlendTarget"
-    },
-    "global::CRntVector<base::spatial::CPolygon2D>": {
-        "kind": "vector",
-        "value_type": "base::spatial::CPolygon2D"
-    },
-    "global::CRntVector<base::spatial::SSegmentData>": {
-        "kind": "vector",
-        "value_type": "base::spatial::SSegmentData"
-    },
     "int": {
         "kind": "primitive",
         "primitive_kind": "int"
@@ -23238,11 +23356,6 @@
         "fields": {}
     },
     "luaGameObject": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
-    },
-    "math::CVector2D": {
         "kind": "struct",
         "parent": null,
         "fields": {}
@@ -23534,7 +23647,7 @@
         "parent": "base::core::CBaseObject",
         "fields": {
             "sId": "base::global::CStrId",
-            "eType": "ETranslucencyType",
+            "eType": "msapi::material::ETranslucencyType",
             "uRenderLayer": "unsigned",
             "sProgramName": "base::global::CStrId"
         }
@@ -23558,7 +23671,7 @@
         "parent": "base::core::CBaseObject",
         "fields": {
             "bEnabled": "bool",
-            "eFunction": "api::types::cmpMode::ECmpMode",
+            "eFunction": "msapi::api::types::cmpMode::ECmpMode",
             "fRef": "float"
         }
     },
@@ -23567,9 +23680,9 @@
         "parent": "base::core::CBaseObject",
         "fields": {
             "bEnabled": "bool",
-            "eOp": "api::types::blendOp::EBlendOp",
-            "eSrc": "api::types::blendFactor::EBlendFactor",
-            "eDst": "api::types::blendFactor::EBlendFactor"
+            "eOp": "msapi::api::types::blendOp::EBlendOp",
+            "eSrc": "msapi::api::types::blendFactor::EBlendFactor",
+            "eDst": "msapi::api::types::blendFactor::EBlendFactor"
         }
     },
     "msapi::material::SConstant": {
@@ -23584,7 +23697,7 @@
         "kind": "struct",
         "parent": "base::core::CBaseObject",
         "fields": {
-            "eMode": "api::types::cullMode::ECullMode"
+            "eMode": "msapi::api::types::cullMode::ECullMode"
         }
     },
     "msapi::material::SDepth": {
@@ -23593,7 +23706,7 @@
         "fields": {
             "bTest": "bool",
             "bWrite": "bool",
-            "eTestMode": "api::types::cmpMode::ECmpMode",
+            "eTestMode": "msapi::api::types::cmpMode::ECmpMode",
             "bZPrepass": "bool"
         }
     },
@@ -23601,14 +23714,14 @@
         "kind": "struct",
         "parent": "base::core::CBaseObject",
         "fields": {
-            "eFillMode": "api::types::fillMode::EFillMode"
+            "eFillMode": "msapi::api::types::fillMode::EFillMode"
         }
     },
     "msapi::material::SStage": {
         "kind": "struct",
         "parent": "base::core::CBaseObject",
         "fields": {
-            "eType": "api::shdr::EShaderType"
+            "eType": "msapi::api::shdr::EShaderType"
         }
     },
     "msapi::material::SStencil": {
@@ -23618,11 +23731,11 @@
             "bEnabled": "bool",
             "uMask": "unsigned",
             "uRef": "unsigned",
-            "eStencilFail": "api::types::stencilOp::EStencilOp",
-            "eStencilPass": "api::types::stencilOp::EStencilOp",
-            "eStencilDepthFail": "api::types::stencilOp::EStencilOp",
-            "eStencilDepthPass": "api::types::stencilOp::EStencilOp",
-            "eStencilCmpMode": "api::types::cmpMode::ECmpMode"
+            "eStencilFail": "msapi::api::types::stencilOp::EStencilOp",
+            "eStencilPass": "msapi::api::types::stencilOp::EStencilOp",
+            "eStencilDepthFail": "msapi::api::types::stencilOp::EStencilOp",
+            "eStencilDepthPass": "msapi::api::types::stencilOp::EStencilOp",
+            "eStencilCmpMode": "msapi::api::types::cmpMode::ECmpMode"
         }
     },
     "msapi::material::STexture": {
@@ -23634,12 +23747,12 @@
             "sType": "base::global::CStrId",
             "iSlot": "int",
             "sAddress": "base::global::CFilePathStrId",
-            "eMinFilter": "api::types::textureFilter::ETextureFilter",
-            "eMagFilter": "api::types::textureFilter::ETextureFilter",
-            "eMipFilter": "api::types::textureFilter::ETextureFilter",
-            "eCompMode": "api::types::cmpMode::ECmpMode",
-            "eWrapModeU": "api::types::textureAddress::ETextureAddress",
-            "eWrapModeV": "api::types::textureAddress::ETextureAddress",
+            "eMinFilter": "msapi::api::types::textureFilter::ETextureFilter",
+            "eMagFilter": "msapi::api::types::textureFilter::ETextureFilter",
+            "eMipFilter": "msapi::api::types::textureFilter::ETextureFilter",
+            "eCompMode": "msapi::api::types::cmpMode::ECmpMode",
+            "eWrapModeU": "msapi::api::types::textureAddress::ETextureAddress",
+            "eWrapModeV": "msapi::api::types::textureAddress::ETextureAddress",
             "uBorderColor": "unsigned",
             "fMinLod": "float",
             "fLodBias": "float",
@@ -24169,6 +24282,114 @@
             "vTracks": "base::global::CRntVector<sound::TMusicTrack>"
         }
     },
+    "std::unique_ptr<CAcidBlobsLaunchPattern>": {
+        "kind": "pointer",
+        "target": "CAcidBlobsLaunchPattern"
+    },
+    "std::unique_ptr<CAttackPreset>": {
+        "kind": "pointer",
+        "target": "CAttackPreset"
+    },
+    "std::unique_ptr<CBarelyFrozenIceInfo>": {
+        "kind": "pointer",
+        "target": "CBarelyFrozenIceInfo"
+    },
+    "std::unique_ptr<CBouncingCreaturesLaunchPattern>": {
+        "kind": "pointer",
+        "target": "CBouncingCreaturesLaunchPattern"
+    },
+    "std::unique_ptr<CCentralUnitWeightedEdges>": {
+        "kind": "pointer",
+        "target": "CCentralUnitWeightedEdges"
+    },
+    "std::unique_ptr<CChozoRobotSoldierCannonShotPattern>": {
+        "kind": "pointer",
+        "target": "CChozoRobotSoldierCannonShotPattern"
+    },
+    "std::unique_ptr<CCooldownXBossFireWallDef>": {
+        "kind": "pointer",
+        "target": "CCooldownXBossFireWallDef"
+    },
+    "std::unique_ptr<CCooldownXBossLavaCarpetDef>": {
+        "kind": "pointer",
+        "target": "CCooldownXBossLavaCarpetDef"
+    },
+    "std::unique_ptr<CCooldownXBossLavaDropsDef>": {
+        "kind": "pointer",
+        "target": "CCooldownXBossLavaDropsDef"
+    },
+    "std::unique_ptr<CEmmyAutoForbiddenEdgesDef>": {
+        "kind": "pointer",
+        "target": "CEmmyAutoForbiddenEdgesDef"
+    },
+    "std::unique_ptr<CEmmyAutoGlobalSmartLinkDef>": {
+        "kind": "pointer",
+        "target": "CEmmyAutoGlobalSmartLinkDef"
+    },
+    "std::unique_ptr<CEmmyOverrideDeathPositionDef>": {
+        "kind": "pointer",
+        "target": "CEmmyOverrideDeathPositionDef"
+    },
+    "std::unique_ptr<CEnemyPreset>": {
+        "kind": "pointer",
+        "target": "CEnemyPreset"
+    },
+    "std::unique_ptr<CKraidSpinningNailsDef>": {
+        "kind": "pointer",
+        "target": "CKraidSpinningNailsDef"
+    },
+    "std::unique_ptr<CPattern>": {
+        "kind": "pointer",
+        "target": "CPattern"
+    },
+    "std::unique_ptr<CPlaythrough::SCheckpointData>": {
+        "kind": "pointer",
+        "target": "CPlaythrough::SCheckpointData"
+    },
+    "std::unique_ptr<CPlaythroughDef::SCheckpointDef>": {
+        "kind": "pointer",
+        "target": "CPlaythroughDef::SCheckpointDef"
+    },
+    "std::unique_ptr<CPolypFallPattern>": {
+        "kind": "pointer",
+        "target": "CPolypFallPattern"
+    },
+    "std::unique_ptr<CShootDCBones>": {
+        "kind": "pointer",
+        "target": "CShootDCBones"
+    },
+    "std::unique_ptr<CShotLaunchConfig>": {
+        "kind": "pointer",
+        "target": "CShotLaunchConfig"
+    },
+    "std::unique_ptr<CSubareaCharclassGroup>": {
+        "kind": "pointer",
+        "target": "CSubareaCharclassGroup"
+    },
+    "std::unique_ptr<CSubareaInfo>": {
+        "kind": "pointer",
+        "target": "CSubareaInfo"
+    },
+    "std::unique_ptr<CSubareaSetup>": {
+        "kind": "pointer",
+        "target": "CSubareaSetup"
+    },
+    "std::unique_ptr<CTentacle>": {
+        "kind": "pointer",
+        "target": "CTentacle"
+    },
+    "std::unique_ptr<CTriggerComponent::SActivationCondition>": {
+        "kind": "pointer",
+        "target": "CTriggerComponent::SActivationCondition"
+    },
+    "std::unique_ptr<CTriggerLogicAction>": {
+        "kind": "pointer",
+        "target": "CTriggerLogicAction"
+    },
+    "std::unique_ptr<CXParasiteBehavior>": {
+        "kind": "pointer",
+        "target": "CXParasiteBehavior"
+    },
     "std::unique_ptr<GUI::CDisplayObjectAnimationDef>": {
         "kind": "pointer",
         "target": "GUI::CDisplayObjectAnimationDef"
@@ -24177,17 +24398,33 @@
         "kind": "pointer",
         "target": "GUI::CTrackSet"
     },
+    "std::unique_ptr<animtree::CAnimTreeElementDef>": {
+        "kind": "pointer",
+        "target": "animtree::CAnimTreeElementDef"
+    },
     "std::unique_ptr<game::logic::collision::CShape>": {
         "kind": "pointer",
         "target": "game::logic::collision::CShape"
+    },
+    "std::unique_ptr<querysystem::CEvaluator>": {
+        "kind": "pointer",
+        "target": "querysystem::CEvaluator"
     },
     "std::unique_ptr<querysystem::CFilter>": {
         "kind": "pointer",
         "target": "querysystem::CFilter"
     },
+    "std::unique_ptr<sound::CSoundEventsDef::SSoundEventsRule>": {
+        "kind": "pointer",
+        "target": "sound::CSoundEventsDef::SSoundEventsRule"
+    },
     "std::unique_ptr<sound::CSoundEventsDef::SSoundEventsSelector>": {
         "kind": "pointer",
         "target": "sound::CSoundEventsDef::SSoundEventsSelector"
+    },
+    "uint64": {
+        "kind": "primitive",
+        "primitive_kind": "uint64"
     },
     "unsigned": {
         "kind": "primitive",
@@ -24200,5 +24437,9 @@
     "unsigned_long": {
         "kind": "primitive",
         "primitive_kind": "uint64"
+    },
+    "unsigned_short": {
+        "kind": "primitive",
+        "primitive_kind": "uint16"
     }
 }

@@ -12,9 +12,11 @@ known_types_to_construct = {
     "float": "common_types.Float",
     "float32": "common_types.Float",
     "int": "common_types.Int",
+    "unsigned_short": "construct.Int16ul",
     "unsigned": "common_types.UInt",
     "unsigned_int": "common_types.UInt",
     "unsigned_long": "construct.Int64ul",
+    "uint64": "construct.Int64ul",
     "base::global::CStrId": "common_types.StrId",
     "base::global::CFilePathStrId": "common_types.StrId",
     "base::global::CRntString": "common_types.StrId",
@@ -30,6 +32,13 @@ known_types_to_construct = {
     "base::global::CName": "PropertyEnum",
     "base::core::CAssetLink": "common_types.StrId",
 }
+known_flagsets = {
+    "base::global::timeline::TLayers": "base::global::timeline::ELayer",
+    "TShinesparkTravellingDirectionFlagSet": "EShinesparkTravellingDirection",
+    "TCoolShinesparkSituation": "ECoolShinesparkSituation",
+    "TActionInsertFlagset": "EActionInsertFlags",
+    "TAnimationTagFlagSet": "EAnimationTag",
+}
 known_typedefs = {
     "TPatterns": "base::global::CRntVector<COffset>",
     "CCharClassRodotukAIComponent::TVAbsorbConfigs": "base::global::CRntVector<CCharClassRodotukAIComponent::SAbsorbConfig>",
@@ -37,25 +46,34 @@ known_typedefs = {
     "TLaunchConfigs": "base::global::CRntVector<SLaunchConfig>",
     "TBigkranXSpitLaunchPattern": "base::global::CRntVector<SBigkranXSpitLaunchPatternStep>",
     "CCharClassRodomithonXAIComponent::TVFirePillarConfigs": "base::global::CRntVector<CCharClassRodomithonXAIComponent::SFirePillarConfig>",
-    "base::global::timeline::TLayers": "base::global::timeline::ELayer",  # flagset
+    "CMinimapDef::TMapLabelDefs": "base::global::CRntDictionary<base::global::CStrId, SMapLabelDef>",
+    "CMinimapDef::TMapIconDefs": "base::global::CRntDictionary<base::global::CStrId, SMapIconDef>",
+    "CBlackboard::TSectionContainer": "base::global::CRntDictionary<base::global::CStrId, CBlackboard::CSection*>",
+    "CPlaythrough::TDictCheckpointDatas": "base::global::CRntDictionary<base::global::CStrId, std::unique_ptr<CPlaythrough::SCheckpointData>>",
+    "TSoundEventRules": "base::global::CRntVector<std::unique_ptr<sound::CSoundEventsDef::SSoundEventsRule>>",
+    "CGameBlackboard::TPropDeltaValues": "base::global::CRntSmallDictionary<base::global::CStrId, float>",
+    "CMinimapData::TOccludedIcons": "base::global::CRntVector<base::global::CStrId>",
+    "CMinimapData::TColliderGeoDatasMap": "base::global::CRntSmallDictionary<uint64, SGeoData>",
 
     'GUI::CDisplayObjectTrack<bool>::SKey': 'GUI::CDisplayObjectTrackBool::SKey',
     'GUI::CDisplayObjectTrack<float>::SKey': 'GUI::CDisplayObjectTrackFloat::SKey',
     'GUI::CDisplayObjectTrack<base::global::CRntString>::SKey': 'GUI::CDisplayObjectTrackString::SKey',
 }
 
-vector_re = re.compile(r"(?:base::)?global::CRntVector<(.*?)(?:, false)?>$")
-array_re = re.compile(r"(?:base::)?global::CArray<(.*?), [^,]*?, [^>]*?>$")
-dict_re = re.compile(r"base::global::CRnt(?:Small)?Dictionary<base::global::C(?:FilePath)?StrId,[\s_](.*)>$")
+vector_re = re.compile(r"base::global::CRntVector<\s*(.*?)(?:, false)?\s*>$")
+list_re = re.compile(r"base::global::C(?:Pooled)?List<\s*(.*?)\s*>$")
+array_re = re.compile(r"base::global::CArray<\s*(.*?), [^,]*?, [^>]*?>$")
+dict_re = re.compile(r"base::global::CRnt(?:Small)?(?:Pooled)?Dictionary<\s*base::global::C(?:Rnt)?(?:FilePath)?StrId\s*,[\s_]*(.*)\s*>$")
 all_container_re = [
     ("common_types.make_vector", vector_re),
+    ("common_types.make_vector", list_re),
     ("common_types.make_vector", array_re),
     ("common_types.make_dict", dict_re),
 ]
 
-unique_ptr_re = re.compile(r"std::unique_ptr<(.*)>$")
-weak_ptr_re = re.compile(r"base::global::CWeakPtr<(.*)>$")
-raw_ptr_re = re.compile(r"(.*?)(?:[ ]?const)?\*$")
+unique_ptr_re = re.compile(r"std::unique_ptr<\s*(.*)\s*>$")
+weak_ptr_re = re.compile(r"base::global::CWeakPtr<\s*(.*)\s*>$")
+raw_ptr_re = re.compile(r"(.*?)(?:[ ]?const)?\s*\*$")
 ref_re = re.compile(r"CGameObjectRef<(.*)>$")
 typed_var_re = re.compile(r"(base::reflection::CTypedValue)$")
 all_ptr_re = [unique_ptr_re, weak_ptr_re, raw_ptr_re, ref_re, typed_var_re]
@@ -298,12 +316,13 @@ construct_to_primitive = {
     "common_types.StrId": PrimitiveKind.STRING,
     "common_types.UInt": PrimitiveKind.UINT,
     "construct.Flag": PrimitiveKind.BOOL,
+    "construct.Int16ul": PrimitiveKind.UINT_16,
     "construct.Int64ul": PrimitiveKind.UINT_64,
     "construct.Prefixed(construct.Int32ul, construct.GreedyBytes)": PrimitiveKind.BYTES,
     "PropertyEnum": PrimitiveKind.PROPERTY,
 }
 
-dict2_re = re.compile(r"base::global::CRnt(?:Small)?Dictionary<(base::global::C(?:FilePath)?StrId),[\s_](.*)>$")
+dict2_re = re.compile(r"base::global::CRnt(?:Small)?(?:Pooled)?Dictionary<\s*([^,]+?)\s*,[\s_]*(.*)\s*>$")
 
 
 def find_ptr_match(type_name: str):
@@ -326,13 +345,19 @@ def convert_type(type_name: str, type_data: dict):
             "alias": known_typedefs[type_name]
         }
 
+    if type_name in known_flagsets:
+        return {
+            "kind": TypeKind.FLAGSET.value,
+            "enum": known_flagsets[type_name]
+        }
+
     if type_data["values"] is not None:
         return {
             "kind": TypeKind.ENUM.value,
             "values": type_data["values"],
         }
 
-    if (m := vector_re.match(type_name) or array_re.match(type_name)) is not None:
+    if (m := vector_re.match(type_name) or array_re.match(type_name) or list_re.match(type_name)) is not None:
         return {
             "kind": TypeKind.VECTOR.value,
             "value_type": m.group(1),
@@ -340,9 +365,9 @@ def convert_type(type_name: str, type_data: dict):
 
     elif (m := dict2_re.match(type_name)) is not None:
         return {
-            "kind": TypeKind.STRUCT.value,
+            "kind": TypeKind.DICTIONARY.value,
             "key_type": m.group(1),
-            "value_type": m.group(2),
+            "value_type": m.group(2).strip(),
         }
 
     elif (m := find_ptr_match(type_name)) is not None:
@@ -376,10 +401,30 @@ def fix_stuff():
                 if field_type not in all_types:
                     to_add.add(field_type)
 
-    for new_type in to_add:
+    while to_add:
+        new_type = to_add.pop()
         converted[new_type] = convert_type(new_type, {"values": None, "parent": None, "fields": {}})
-        if converted[new_type] == TypeKind.STRUCT.value:
-            print(f"New type {new_type} shouldn't be a struct")
+
+        next_type = None
+        next_type2 = None
+        if converted[new_type]["kind"] == TypeKind.STRUCT.value:
+            print(f"{new_type}")
+            pass
+        elif converted[new_type]["kind"] == TypeKind.POINTER.value:
+            next_type = converted[new_type]["target"]
+        elif converted[new_type]["kind"] == TypeKind.DICTIONARY.value:
+            next_type2 = converted[new_type]["key_type"]
+            next_type = converted[new_type]["value_type"]
+        elif converted[new_type]["kind"] == TypeKind.VECTOR.value:
+            next_type = converted[new_type]["value_type"]
+        elif converted[new_type]["kind"] == TypeKind.FLAGSET.value:
+            next_type = converted[new_type]["enum"]
+        elif converted[new_type]["kind"] == TypeKind.TYPEDEF.value:
+            next_type = converted[new_type]["alias"]
+
+        for it in [next_type, next_type2]:
+            if it is not None and it not in converted:
+                to_add.add(it)
 
     with out.open("w") as f:
         json.dump({key: converted[key] for key in sorted(converted)}, f, indent=4)

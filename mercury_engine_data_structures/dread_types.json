@@ -79,7 +79,7 @@
         "fields": {
             "iIgnorePlayerMode": "int",
             "bShowBossLifebar": "bool",
-            "eBumpMode": "EBumpMode",
+            "eBumpMode": "CAIManager::EBumpMode",
             "bShowEnemyLife": "bool",
             "bShowEnemyDamage": "bool",
             "bShowPlayerDamage": "bool",
@@ -1083,7 +1083,7 @@
     "CBlackboard": {
         "parent": null,
         "fields": {
-            "hashSections": "TSectionContainer"
+            "hashSections": "CBlackboard::TSectionContainer"
         },
         "values": null
     },
@@ -1254,6 +1254,11 @@
             "fChainDestructionTimePerTile": "float",
             "fRespawnTimeWhenDestroyedWithHyperBeam": "float"
         },
+        "values": null
+    },
+    "CBreakableTileManager::STileGroupGroup": {
+        "parent": null,
+        "fields": {},
         "values": null
     },
     "CBreakableVignetteComponent": {
@@ -12098,8 +12103,14 @@
     "CCutscene": {
         "parent": null,
         "fields": {
-            "oDefinition": "const::CCutSceneDef*",
+            "oDefinition": "CCutSceneDef*",
             "lstActors": "base::global::CRntVector<CCutscene::CActor>"
+        },
+        "values": null
+    },
+    "CCutscene::CActor": {
+        "parent": null,
+        "fields": {
         },
         "values": null
     },
@@ -13439,11 +13450,11 @@
             "vRandomDelay": "base::math::CVector2D",
             "oConstantColor0TransitionInit": "base::math::CVector4D",
             "oConstantColor0TransitionEnd": "base::math::CVector4D",
-            "eConstant0TransitionMode": "ETransitionOperationMode",
+            "eConstant0TransitionMode": "CExplosionGfx::ETransitionOperationMode",
             "fConstantColor0TransitionTime": "float",
             "oConstantColor1TransitionInit": "base::math::CVector4D",
             "oConstantColor1TransitionEnd": "base::math::CVector4D",
-            "eConstant1TransitionMode": "ETransitionOperationMode",
+            "eConstant1TransitionMode": "CExplosionGfx::ETransitionOperationMode",
             "fConstantColor1TransitionTime": "float"
         },
         "values": null
@@ -13726,7 +13737,7 @@
     "CGameBlackboard": {
         "parent": "CBlackboard",
         "fields": {
-            "dctDeltaValues": "base::global::CRntSmallDictionary<_base::global::CStrId, CGameBlackboard::TPropDeltaValues_>"
+            "dctDeltaValues": "base::global::CRntSmallDictionary< base::global::CStrId, CGameBlackboard::TPropDeltaValues >"
         },
         "values": null
     },
@@ -15729,7 +15740,7 @@
         "parent": null,
         "fields": {
             "sCheckpointDefID": "base::global::CStrId",
-            "oValidationInfo": "SValidationInfo"
+            "oValidationInfo": "CPlaythrough::SCheckpointData::SValidationInfo"
         },
         "values": null
     },
@@ -19007,7 +19018,7 @@
             "ActivationState": "base::global::CStrId",
             "OnActivatedSound": "base::global::CStrId",
             "OnSelectedSound": "base::global::CStrId",
-            "eTextLabelAlignment": "TextAlign",
+            "eTextLabelAlignment": "GUI::CButton::TextAlign",
             "sOnActivatedSound": "base::global::CRntString",
             "sOnSelectedSound": "base::global::CRntString",
             "sTopNeighbour": "base::global::CStrId",
@@ -19249,7 +19260,7 @@
     "GUI::CGUIManager::ShapeContainer": {
         "parent": null,
         "fields": {
-            "mapShapes": "base::global::CRntDictionary<base::global::CStrId, base::spatial::CPolygon2D_*>"
+            "mapShapes": "base::global::CRntDictionary<base::global::CStrId, base::spatial::CPolygon2D *>"
         },
         "values": null
     },
@@ -19400,7 +19411,7 @@
             "Autoselect": "bool",
             "ItemRendererType": "base::global::CStrId",
             "NumItemRenderers": "int",
-            "eButtonsTextAlignment": "CButton::TextAlign",
+            "eButtonsTextAlignment": "GUI::CButton::TextAlign",
             "iMaxItemNum": "int",
             "bDebugBehaviour": "bool",
             "bVerticalLayout": "bool"
@@ -19599,7 +19610,7 @@
         "parent": null,
         "fields": {
             "sID": "base::global::CStrId",
-            "oTexUVs": "STexUV"
+            "oTexUVs": "GUI::CSpriteSheetItem::STexUV"
         },
         "values": null
     },
@@ -20143,7 +20154,7 @@
     "animtree::CAnimTreeRes": {
         "parent": "base::core::CAsset",
         "fields": {
-            "oAnimTreeDef": "CAnimTreeDef"
+            "oAnimTreeDef": "animtree::CAnimTreeDef"
         },
         "values": null
     },
@@ -20155,7 +20166,7 @@
     "animtree::CAnimatedNodeDef": {
         "parent": "animtree::CAnimTreeElementDef",
         "fields": {
-            "eNodeType": "EAnimNodeType",
+            "eNodeType": "animtree::CAnimatedNodeDef::EAnimNodeType",
             "fEventsWeightThreshold": "float",
             "bLaunchEvents": "bool",
             "bAllowRootMotion": "bool",
@@ -20314,7 +20325,7 @@
         "parent": "base::core::CAsset",
         "fields": {
             "sVarName": "base::global::CStrId",
-            "vTargets": "global::CRntVector<base::animation::CBlendSpaceResource::SBlendTarget>"
+            "vTargets": "base::global::CRntVector<base::animation::CBlendSpaceResource::SBlendTarget>"
         },
         "values": null
     },
@@ -20928,8 +20939,8 @@
     "base::spatial::CAABox2D": {
         "parent": null,
         "fields": {
-            "Min": "math::CVector2D",
-            "Max": "math::CVector2D"
+            "Min": "base::math::CVector2D",
+            "Max": "base::math::CVector2D"
         },
         "values": null
     },
@@ -20943,8 +20954,8 @@
     "base::spatial::COBox2D": {
         "parent": null,
         "fields": {
-            "vCenter": "math::CVector2D",
-            "vExtent": "math::CVector2D",
+            "vCenter": "base::math::CVector2D",
+            "vExtent": "base::math::CVector2D",
             "fRotation": "float"
         },
         "values": null
@@ -20953,7 +20964,7 @@
         "parent": null,
         "fields": {
             "bClosed": "bool",
-            "oSegmentData": "global::CRntVector<base::spatial::SSegmentData>",
+            "oSegmentData": "base::global::CRntVector<base::spatial::SSegmentData>",
             "bOutwardsNormal": "bool"
         },
         "values": null
@@ -20961,7 +20972,7 @@
     "base::spatial::CPolygonCollection2D": {
         "parent": null,
         "fields": {
-            "vPolys": "global::CRntVector<base::spatial::CPolygon2D>"
+            "vPolys": "base::global::CRntVector<base::spatial::CPolygon2D>"
         },
         "values": null
     },
@@ -20982,7 +20993,7 @@
     "base::tunable::CTunableManager": {
         "parent": null,
         "fields": {
-            "hashTunables": "global::CRntSmallDictionary<base::global::CRntString, base::tunable::CTunable*>"
+            "hashTunables": "base::global::CRntSmallDictionary<base::global::CRntString, base::tunable::CTunable*>"
         },
         "values": null
     },
@@ -21036,8 +21047,8 @@
         "parent": "behaviortree::CBehavior",
         "fields": {
             "bNegate": "bool",
-            "eReturnStatusSuccess": "SStatus::Enum",
-            "eReturnStatusFailed": "SStatus::Enum"
+            "eReturnStatusSuccess": "behaviortree::SStatus::Enum",
+            "eReturnStatusFailed": "behaviortree::SStatus::Enum"
         },
         "values": null
     },
@@ -21349,7 +21360,7 @@
             "sValueB": "base::global::CStrId",
             "sTunableB": "base::global::CStrId",
             "sTunableVarB": "base::global::CStrId",
-            "eCompareOperator": "SCompareOperator::Enum"
+            "eCompareOperator": "behaviortree::SCompareOperator::Enum"
         },
         "values": null
     },
@@ -21711,8 +21722,8 @@
     "behaviortree::CParallel": {
         "parent": "behaviortree::CComposite",
         "fields": {
-            "eSuccessPolicy": "EPolicy",
-            "eFailurePolicy": "EPolicy"
+            "eSuccessPolicy": "behaviortree::CParallel::EPolicy",
+            "eFailurePolicy": "behaviortree::CParallel::EPolicy"
         },
         "values": null
     },
@@ -22067,7 +22078,7 @@
             "sMinTime": "base::global::CStrId",
             "sMaxTime": "base::global::CStrId",
             "bResetElapsedTimeOnSuccess": "bool",
-            "eReturnStatusFailed": "SStatus::Enum"
+            "eReturnStatusFailed": "behaviortree::SStatus::Enum"
         },
         "values": null
     },
@@ -22121,7 +22132,7 @@
     "behaviortree::CSuppressDecorator": {
         "parent": "behaviortree::CDecorator",
         "fields": {
-            "eReturnStatus": "SStatus::Enum"
+            "eReturnStatus": "behaviortree::SStatus::Enum"
         },
         "values": null
     },
@@ -22134,7 +22145,7 @@
             "ePrefixToAdd": "CAnimationPrefix::SPrefix::Enum",
             "ePrefixToRemove": "CAnimationPrefix::SPrefix::Enum",
             "bWaitUntilActionEnds": "bool",
-            "eStatusIfCantSetAction": "SStatus::Enum",
+            "eStatusIfCantSetAction": "behaviortree::SStatus::Enum",
             "sTimelineStart": "base::global::CStrId",
             "sTimelineEnd": "base::global::CStrId",
             "bCheckIfSmartLink": "bool",
@@ -22354,6 +22365,11 @@
         "fields": {},
         "values": null
     },
+    "engine::scene::CScene": {
+        "parent": null,
+        "fields": {},
+        "values": null
+    },
     "engine::scene::CSceneManager": {
         "parent": null,
         "fields": {
@@ -22364,7 +22380,7 @@
     "engine::scene::CSceneSlot": {
         "parent": null,
         "fields": {
-            "pScene": "CScene*"
+            "pScene": "engine::scene::CScene*"
         },
         "values": null
     },
@@ -22936,7 +22952,7 @@
         "parent": "base::core::CBaseObject",
         "fields": {
             "sId": "base::global::CStrId",
-            "eType": "ETranslucencyType",
+            "eType": "msapi::material::ETranslucencyType",
             "uRenderLayer": "unsigned",
             "sProgramName": "base::global::CStrId"
         },
@@ -22961,7 +22977,7 @@
         "parent": "base::core::CBaseObject",
         "fields": {
             "bEnabled": "bool",
-            "eFunction": "api::types::cmpMode::ECmpMode",
+            "eFunction": "msapi::api::types::cmpMode::ECmpMode",
             "fRef": "float"
         },
         "values": null
@@ -22970,9 +22986,9 @@
         "parent": "base::core::CBaseObject",
         "fields": {
             "bEnabled": "bool",
-            "eOp": "api::types::blendOp::EBlendOp",
-            "eSrc": "api::types::blendFactor::EBlendFactor",
-            "eDst": "api::types::blendFactor::EBlendFactor"
+            "eOp": "msapi::api::types::blendOp::EBlendOp",
+            "eSrc": "msapi::api::types::blendFactor::EBlendFactor",
+            "eDst": "msapi::api::types::blendFactor::EBlendFactor"
         },
         "values": null
     },
@@ -22987,7 +23003,7 @@
     "msapi::material::SCull": {
         "parent": "base::core::CBaseObject",
         "fields": {
-            "eMode": "api::types::cullMode::ECullMode"
+            "eMode": "msapi::api::types::cullMode::ECullMode"
         },
         "values": null
     },
@@ -22996,7 +23012,7 @@
         "fields": {
             "bTest": "bool",
             "bWrite": "bool",
-            "eTestMode": "api::types::cmpMode::ECmpMode",
+            "eTestMode": "msapi::api::types::cmpMode::ECmpMode",
             "bZPrepass": "bool"
         },
         "values": null
@@ -23004,14 +23020,14 @@
     "msapi::material::SFill": {
         "parent": "base::core::CBaseObject",
         "fields": {
-            "eFillMode": "api::types::fillMode::EFillMode"
+            "eFillMode": "msapi::api::types::fillMode::EFillMode"
         },
         "values": null
     },
     "msapi::material::SStage": {
         "parent": "base::core::CBaseObject",
         "fields": {
-            "eType": "api::shdr::EShaderType"
+            "eType": "msapi::api::shdr::EShaderType"
         },
         "values": null
     },
@@ -23021,11 +23037,11 @@
             "bEnabled": "bool",
             "uMask": "unsigned",
             "uRef": "unsigned",
-            "eStencilFail": "api::types::stencilOp::EStencilOp",
-            "eStencilPass": "api::types::stencilOp::EStencilOp",
-            "eStencilDepthFail": "api::types::stencilOp::EStencilOp",
-            "eStencilDepthPass": "api::types::stencilOp::EStencilOp",
-            "eStencilCmpMode": "api::types::cmpMode::ECmpMode"
+            "eStencilFail": "msapi::api::types::stencilOp::EStencilOp",
+            "eStencilPass": "msapi::api::types::stencilOp::EStencilOp",
+            "eStencilDepthFail": "msapi::api::types::stencilOp::EStencilOp",
+            "eStencilDepthPass": "msapi::api::types::stencilOp::EStencilOp",
+            "eStencilCmpMode": "msapi::api::types::cmpMode::ECmpMode"
         },
         "values": null
     },
@@ -23037,12 +23053,12 @@
             "sType": "base::global::CStrId",
             "iSlot": "int",
             "sAddress": "base::global::CFilePathStrId",
-            "eMinFilter": "api::types::textureFilter::ETextureFilter",
-            "eMagFilter": "api::types::textureFilter::ETextureFilter",
-            "eMipFilter": "api::types::textureFilter::ETextureFilter",
-            "eCompMode": "api::types::cmpMode::ECmpMode",
-            "eWrapModeU": "api::types::textureAddress::ETextureAddress",
-            "eWrapModeV": "api::types::textureAddress::ETextureAddress",
+            "eMinFilter": "msapi::api::types::textureFilter::ETextureFilter",
+            "eMagFilter": "msapi::api::types::textureFilter::ETextureFilter",
+            "eMipFilter": "msapi::api::types::textureFilter::ETextureFilter",
+            "eCompMode": "msapi::api::types::cmpMode::ECmpMode",
+            "eWrapModeU": "msapi::api::types::textureAddress::ETextureAddress",
+            "eWrapModeV": "msapi::api::types::textureAddress::ETextureAddress",
             "uBorderColor": "unsigned",
             "fMinLod": "float",
             "fLodBias": "float",

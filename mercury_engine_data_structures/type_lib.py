@@ -21,6 +21,7 @@ class TypeKind(Enum):
     PRIMITIVE = "primitive"
     STRUCT = "struct"
     ENUM = "enum"
+    FLAGSET = "flagset"
     TYPEDEF = "typedef"
     POINTER = "pointer"
     VECTOR = "vector"
@@ -34,6 +35,8 @@ class TypeKind(Enum):
             return StructType
         if self == TypeKind.ENUM:
             return EnumType
+        if self == TypeKind.FLAGSET:
+            return FlagsetType
         if self == TypeKind.TYPEDEF:
             return TypedefType
         if self == TypeKind.POINTER:
@@ -50,6 +53,7 @@ class PrimitiveKind(Enum):
     BOOL = "bool"
     INT = "int"
     UINT = "uint"
+    UINT_16 = "uint16"
     UINT_64 = "uint64"
     FLOAT = "float"
     VECTOR_2 = "float_vec2"
@@ -97,6 +101,19 @@ class EnumType(BaseType):
     @classmethod
     def from_json(cls, data: dict) -> "EnumType":
         return cls(data["values"])
+
+
+@dataclasses.dataclass(frozen=True)
+class FlagsetType(BaseType):
+    enum: str
+
+    @property
+    def kind(self):
+        return TypeKind.FLAGSET
+
+    @classmethod
+    def from_json(cls, data: dict) -> "FlagsetType":
+        return cls(data["enum"])
 
 
 @dataclasses.dataclass(frozen=True)
