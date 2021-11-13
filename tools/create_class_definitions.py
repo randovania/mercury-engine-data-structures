@@ -293,7 +293,7 @@ construct_to_primitive = {
     "common_types.CVector2D": PrimitiveKind.VECTOR_2,
     "common_types.CVector3D": PrimitiveKind.VECTOR_3,
     "common_types.CVector4D": PrimitiveKind.VECTOR_4,
-    "common_types.Float": PrimitiveKind.BOOL,
+    "common_types.Float": PrimitiveKind.FLOAT,
     "common_types.Int": PrimitiveKind.INT,
     "common_types.StrId": PrimitiveKind.STRING,
     "common_types.UInt": PrimitiveKind.UINT,

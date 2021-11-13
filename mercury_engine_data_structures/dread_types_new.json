@@ -23019,7 +23019,7 @@
     },
     "float": {
         "kind": "primitive",
-        "primitive_kind": "bool"
+        "primitive_kind": "float"
     },
     "game::curves::EProcessorType": {
         "kind": "enum",
