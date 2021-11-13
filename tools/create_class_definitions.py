@@ -5,6 +5,8 @@ import typing
 from pathlib import Path
 from typing import Optional
 
+from mercury_engine_data_structures.type_lib import TypeKind, PrimitiveKind
+
 known_types_to_construct = {
     "bool": "construct.Flag",
     "float": "common_types.Float",
@@ -36,6 +38,10 @@ known_typedefs = {
     "TBigkranXSpitLaunchPattern": "base::global::CRntVector<SBigkranXSpitLaunchPatternStep>",
     "CCharClassRodomithonXAIComponent::TVFirePillarConfigs": "base::global::CRntVector<CCharClassRodomithonXAIComponent::SFirePillarConfig>",
     "base::global::timeline::TLayers": "base::global::timeline::ELayer",  # flagset
+
+    'GUI::CDisplayObjectTrack<bool>::SKey': 'GUI::CDisplayObjectTrackBool::SKey',
+    'GUI::CDisplayObjectTrack<float>::SKey': 'GUI::CDisplayObjectTrackFloat::SKey',
+    'GUI::CDisplayObjectTrack<base::global::CRntString>::SKey': 'GUI::CDisplayObjectTrackString::SKey',
 }
 
 vector_re = re.compile(r"(?:base::)?global::CRntVector<(.*?)(?:, false)?>$")
@@ -283,5 +289,101 @@ def main():
     output_path.write_text(type_exporter.export_code())
 
 
+construct_to_primitive = {
+    "common_types.CVector2D": PrimitiveKind.VECTOR_2,
+    "common_types.CVector3D": PrimitiveKind.VECTOR_3,
+    "common_types.CVector4D": PrimitiveKind.VECTOR_4,
+    "common_types.Float": PrimitiveKind.BOOL,
+    "common_types.Int": PrimitiveKind.INT,
+    "common_types.StrId": PrimitiveKind.STRING,
+    "common_types.UInt": PrimitiveKind.UINT,
+    "construct.Flag": PrimitiveKind.BOOL,
+    "construct.Int64ul": PrimitiveKind.UINT_64,
+    "construct.Prefixed(construct.Int32ul, construct.GreedyBytes)": PrimitiveKind.BYTES,
+    "PropertyEnum": PrimitiveKind.PROPERTY,
+}
+
+dict2_re = re.compile(r"base::global::CRnt(?:Small)?Dictionary<(base::global::C(?:FilePath)?StrId),[\s_](.*)>$")
+
+
+def find_ptr_match(type_name: str):
+    for expr in all_ptr_re:
+        m = expr.match(type_name)
+        if m is not None:
+            return m
+
+
+def convert_type(type_name: str, type_data: dict):
+    if type_name in known_types_to_construct:
+        return {
+            "kind": TypeKind.PRIMITIVE.value,
+            "primitive_kind": construct_to_primitive[known_types_to_construct[type_name]].value
+        }
+
+    if type_name in known_typedefs:
+        return {
+            "kind": TypeKind.TYPEDEF.value,
+            "alias": known_typedefs[type_name]
+        }
+
+    if type_data["values"] is not None:
+        return {
+            "kind": TypeKind.ENUM.value,
+            "values": type_data["values"],
+        }
+
+    if (m := vector_re.match(type_name)) is not None:
+        return {
+            "kind": TypeKind.VECTOR.value,
+            "value_type": m.group(1),
+        }
+
+    elif (m := dict2_re.match(type_name)) is not None:
+        return {
+            "kind": TypeKind.STRUCT.value,
+            "key_type": m.group(1),
+            "value_type": m.group(2),
+        }
+
+    elif (m := find_ptr_match(type_name)) is not None:
+        return {
+            "kind": TypeKind.POINTER.value,
+            "target": m.group(1),
+        }
+
+    return {
+        "kind": TypeKind.STRUCT.value,
+        "parent": type_data["parent"],
+        "fields": type_data["fields"],
+    }
+
+
+def fix_stuff():
+    p = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "dread_types.json")
+    out = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "dread_types_new.json")
+
+    with p.open() as f:
+        all_types: dict[str, dict[str, typing.Any]] = json.load(f)
+
+    to_add = set()
+    converted = {}
+    for type_name, type_data in all_types.items():
+        converted[type_name] = convert_type(type_name, type_data)
+
+        # Try to find extra types from the values
+        if converted[type_name]["kind"] == TypeKind.STRUCT.value:
+            for field_type in converted[type_name]["fields"].values():
+                if field_type not in all_types:
+                    to_add.add(field_type)
+
+    for new_type in to_add:
+        converted[new_type] = convert_type(new_type, {"values": None, "parent": None, "fields": {}})
+        if converted[new_type] == TypeKind.STRUCT.value:
+            print(f"New type {new_type} shouldn't be a struct")
+
+    with out.open("w") as f:
+        json.dump({key: converted[key] for key in sorted(converted)}, f, indent=4)
+
+
 if __name__ == '__main__':
-    main()
+    fix_stuff()
