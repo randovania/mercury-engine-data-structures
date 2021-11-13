@@ -561,9 +561,9 @@ def is_container_or_ptr(name: str):
 
 
 def main(only_missing: bool = True, ignore_without_hash: bool = True,
-         ignore_container_or_ptr: bool = True):
+         ignore_container_or_ptr: bool = True, query_ghidra: bool = True):
     print("Getting function list")
-    all_fields_functions = get_function_list()
+    all_fields_functions = get_function_list() if query_ghidra else {}
     print(f"Got {len(all_fields_functions)} functions!")
 
     path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "dread_types.json")
@@ -596,8 +596,7 @@ def main(only_missing: bool = True, ignore_without_hash: bool = True,
                 # print(f"Skipping {key}: no known hash - {all_fields_functions[key]}")
                 all_fields_functions.pop(key)
 
-    all_fields_functions = {}
-    process_results = decompile_in_background(all_fields_functions)
+    process_results = decompile_in_background(all_fields_functions) if query_ghidra else {}
 
     for data in process_results.values():
         for field in data["fields"].keys():
