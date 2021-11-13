@@ -193,3 +193,13 @@ def get_parent_for(type_name: str) -> Optional[str]:
         return data.parent
 
     return None
+
+
+def is_child_of(type_name: Optional[str], parent_name: str) -> bool:
+    if type_name == parent_name:
+        return True
+
+    if type_name is None:
+        return False
+
+    return is_child_of(get_parent_for(type_name), parent_name)

@@ -12,14 +12,6 @@ def get_raw_types() -> Dict[str, typing.Any]:
         return json.load(f)
 
 
-def child_of(type_name, parent_name):
-    if type_name == parent_name:
-        return True
-    if type_name is None:
-        return False
-    return child_of(get_raw_types()[type_name]["parent"], parent_name)
-
-
 @functools.lru_cache()
 def all_asset_id_to_name() -> Dict[int, str]:
     path = Path(__file__).parent.joinpath("resource_names.json")

@@ -224,7 +224,7 @@ def Dependencies():
 
     def component_type(this):
         for component_type in component_dependencies.keys():
-            if dread_data.child_of(this.type, component_type):
+            if type_lib.is_child_of(this.type, component_type):
                 return component_type
         return None
     
@@ -246,7 +246,7 @@ Component = Struct(
         )
     ),
     extra_fields=construct.If(
-        lambda this: dread_data.child_of(this.type, "CComponent"),
+        lambda this: type_lib.is_child_of(this.type, "CComponent"),
         common_types.DictAdapter(common_types.make_vector(
             common_types.DictElement(Struct(
                 "type" / StrId,
