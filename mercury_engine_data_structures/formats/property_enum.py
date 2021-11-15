@@ -42,3 +42,6 @@ class CRCAdapter(construct.Adapter):
 
 PropertyEnum = CRCAdapter(construct.Hex(construct.Int64ul), dread_data.all_name_to_property_id())
 PropertyEnumUnsafe = CRCAdapter(construct.Hex(construct.Int64ul), dread_data.all_name_to_property_id(), True)
+
+FileNameEnum = CRCAdapter(construct.Hex(construct.Int64ul), dread_data.all_name_to_asset_id())
+FileNameEnumUnsafe = CRCAdapter(construct.Hex(construct.Int64ul), dread_data.all_name_to_asset_id(), True)

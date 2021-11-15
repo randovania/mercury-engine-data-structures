@@ -13,14 +13,17 @@ def get_raw_types() -> Dict[str, typing.Any]:
 
 
 @functools.lru_cache()
-def all_asset_id_to_name() -> Dict[int, str]:
+def all_name_to_asset_id() -> Dict[str, int]:
     path = Path(__file__).parent.joinpath("resource_names.json")
     with path.open() as names_file:
-        names: Dict[str, int] = json.load(names_file)
+        return json.load(names_file)
 
+
+@functools.lru_cache()
+def all_asset_id_to_name() -> Dict[int, str]:
     return {
         asset_id: name
-        for name, asset_id in names.items()
+        for name, asset_id in all_name_to_asset_id().items()
     }
 
 
