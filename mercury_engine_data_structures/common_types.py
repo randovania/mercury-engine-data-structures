@@ -2,17 +2,30 @@ import copy
 import typing
 
 import construct
-from construct import Adapter
+from construct.core import Adapter, Byte, Const, Construct, ConstructError, Enum, FocusedSeq, FormatField, Int16ul, Int32sl, Int32ul, Float32l, Array, Rebuild, Struct, IfThenElse, this
+from construct.lib.containers import Container, ListContainer
 
-from mercury_engine_data_structures.construct_extensions.strings import CStringRobust
+from mercury_engine_data_structures.construct_extensions.strings import CStringRobust, PascalStringRobust
 
-StrId = CStringRobust("utf-8")
-Int: construct.FormatField = typing.cast(construct.FormatField, construct.Int32sl)
-UInt: construct.FormatField = typing.cast(construct.FormatField, construct.Int32ul)
-Float: construct.FormatField = typing.cast(construct.FormatField, construct.Float32l)
-CVector2D = construct.Array(2, Float)
-CVector3D = construct.Array(3, Float)
-CVector4D = construct.Array(4, Float)
+def Version(major, minor, patch):
+    return Struct(
+        "major" / Const(major, Int16ul),
+        "minor" / Const(minor, Byte),
+        "patch" / Const(patch, Byte)
+    )
+
+StrId = IfThenElse(
+    lambda this: hasattr(this._params, "prefixed_string"),
+    PascalStringRobust(Int16ul, "utf-8"),
+    CStringRobust("utf-8")
+)
+
+Int: FormatField = typing.cast(FormatField, Int32sl)
+UInt: FormatField = typing.cast(FormatField, Int32ul)
+Float: FormatField = typing.cast(FormatField, Float32l)
+CVector2D = Array(2, Float)
+CVector3D = Array(3, Float)
+CVector4D = Array(4, Float)
 
 
 class ListContainerWithKeyAccess(construct.ListContainer):
@@ -47,18 +60,18 @@ class ListContainerWithKeyAccess(construct.ListContainer):
 
 
 class DictAdapter(Adapter):
-    def _decode(self, obj: construct.ListContainer, context, path):
-        result = construct.Container()
+    def _decode(self, obj: ListContainer, context, path):
+        result = Container()
         for item in obj:
             key = item.key
             if key in result:
-                raise construct.ConstructError(f"Key {key} found twice in object", path)
+                raise ConstructError(f"Key {key} found twice in object", path)
             result[key] = item.value
         return result
 
-    def _encode(self, obj: construct.Container, context, path):
-        return construct.ListContainer(
-            construct.Container(key=type_, value=item)
+    def _encode(self, obj: Container, context, path):
+        return ListContainer(
+            Container(key=type_, value=item)
             for type_, item in obj.items()
         )
 
@@ -70,7 +83,7 @@ class DictElement(construct.Construct):
         self.key = key
 
     def _parse(self, stream, context, path):
-        context = construct.Container(
+        context = Container(
             _=context, _params=context._params, _root=None, _parsing=context._parsing,
             _building=context._building, _sizing=context._sizing, _io=stream,
             _index=context.get("_index", None))
@@ -79,13 +92,13 @@ class DictElement(construct.Construct):
         key = self.key._parsereport(stream, context, path)
         value = self.field._parsereport(stream, context, f"{path} -> {key}")
 
-        return construct.Container(
+        return Container(
             key=key,
             value=value,
         )
 
     def _build(self, obj, stream, context, path):
-        context = construct.Container(
+        context = Container(
             _=context, _params=context._params, _root=None, _parsing=context._parsing,
             _building=context._building, _sizing=context._sizing, _io=stream,
             _index=context.get("_index", None))
@@ -94,13 +107,13 @@ class DictElement(construct.Construct):
         key = self.key._build(obj.key, stream, context, path)
         value = self.field._build(obj.value, stream, context, f"{path} -> {key}")
 
-        return construct.Container(
+        return Container(
             key=key,
             value=value,
         )
 
     def _sizeof(self, context, path):
-        context = construct.Container(
+        context = Container(
             _=context, _params=context._params, _root=None, _parsing=context._parsing,
             _building=context._building, _sizing=context._sizing, _io=None,
             _index=context.get("_index", None))
@@ -115,9 +128,9 @@ def make_dict(value: construct.Construct, key=StrId):
     return DictAdapter(make_vector(DictElement(value, key)))
 
 
-def make_vector(value: construct.Construct):
-    arr = construct.Array(
-        construct.this.count,
+def make_vector(value: Construct):
+    arr = Array(
+        this.count,
         value,
     )
     arr.name = "items"
@@ -125,9 +138,9 @@ def make_vector(value: construct.Construct):
     def get_len(ctx):
         return len(ctx['items'])
 
-    return construct.FocusedSeq(
+    return FocusedSeq(
         "items",
-        "count" / construct.Rebuild(construct.Int32ul, get_len),
+        "count" / Rebuild(Int32ul, get_len),
         arr,
     )
 
@@ -143,4 +156,4 @@ def make_enum(values: typing.Union[typing.List[str], typing.Dict[str, int]], *,
         }
     if add_invalid:
         mapping["Invalid"] = 0x7fffffff
-    return construct.Enum(construct.Int32ul, **mapping)
+    return Enum(Int32ul, **mapping)
