@@ -1,8 +1,6 @@
 import copy
-import hashlib
 import json
 import os
-import pprint
 import sys
 import typing
 from pathlib import Path
@@ -33,6 +31,11 @@ id_to_name = {
     for path, name in world_names.items()
 }
 pickup_index = 0
+bmscc: typing.Optional[Bmscc] = None
+brsa: typing.Optional[Brsa] = None
+brfld: typing.Optional[Brfld] = None
+brfld_path: str = None
+
 
 _polygon_override = {
     ("s010_cave", "collision_camera_010"): [
@@ -85,6 +88,8 @@ _camera_skip = {
     ("s050_forest", "collision_camera_025_C"),
     ("s080_shipyard", "collision_camera_009_C"),
     ("s080_shipyard", "collision_camera_015_B"),
+    ("s090_skybase", "collision_camera_005"),
+    ("s090_skybase", "collision_camera_900"),
 }
 dock_weakness = {
     "frame": 0,
@@ -3083,6 +3088,11 @@ _rooms_for_actors = {
         'weightactivatedplatform_total_000': ['collision_camera_001 (I)']}}
 
 
+class NodeDefinition(typing.NamedTuple):
+    name: str
+    data: dict[str, typing.Any]
+
+
 class ActorDetails:
     def __init__(self, actor: construct.Container, all_rooms: dict[str, Polygon]):
         self.actor = actor
@@ -3095,19 +3105,116 @@ class ActorDetails:
         self.is_pickup = "actors/items" in actor.oActorDefLink
         self.is_elevator = "USABLE" in actor.pComponents and actor.pComponents.USABLE["@type"] in _ELEVATOR_USABLE
 
+    def create_node_template(self, node_type: str) -> dict[str, typing.Any]:
+        return {
+            "node_type": node_type,
+            "heal": False,
+            "coordinates": {
+                "x": self.actor.vPos[0],
+                "y": self.actor.vPos[1],
+                "z": self.actor.vPos[2],
+            },
+            "description": "",
+            "extra": {
+                "actor_name": self.actor.sName,
+                "actor_def": self.actor.oActorDefLink,
+            },
+        }
+
+
+def _find_room_orientation(world: dict, room_a: str, room_b: str):
+    a_bounds = world["areas"][room_a]["extra"]["total_boundings"]
+    b_bounds = world["areas"][room_b]["extra"]["total_boundings"]
+    a_cx = (a_bounds["x1"] + a_bounds["x2"]) / 2
+    b_cx = (b_bounds["x1"] + b_bounds["x2"]) / 2
+    if a_cx < b_cx:
+        return 0, 1
+    elif a_cx > b_cx:
+        return 1, 0
+    else:
+        raise ValueError(f"{room_a} and {room_b} are aligned")
+
+
+def get_def_link_for_entity(actor_ref: str) -> typing.Optional[str]:
+    a = brfld.follow_link(actor_ref)
+    if a is not None:
+        return a.oActorDefLink
+
+
+def create_door_nodes_for_actor(
+        details: ActorDetails,
+        node_data_for_area: dict[str, dict[str, tuple[str, dict]]],
+        world: dict
+) -> list[NodeDefinition]:
+    doors: list[NodeDefinition] = []
+    actor = details.actor
+
+    extra = {}
+    if "LIFE" in actor.pComponents:
+        extra = {
+            "left_shield_entity": actor.pComponents.LIFE.wpLeftDoorShieldEntity,
+            "left_shield_def": get_def_link_for_entity(actor.pComponents.LIFE.wpLeftDoorShieldEntity),
+            "right_shield_entity": actor.pComponents.LIFE.wpRightDoorShieldEntity,
+            "right_shield_def": get_def_link_for_entity(actor.pComponents.LIFE.wpRightDoorShieldEntity),
+        }
+
+    simple = {"def": details.actor_def,
+              "left": extra.get("left_shield_def"),
+              "right": extra.get("right_shield_def")}
+
+    left_room, right_room = _find_room_orientation(world, *details.rooms)
+
+    custom_weakness = [None, None]
+    if simple["left"] == simple["right"] and simple["left"] is None:
+        if details.actor_def in _weakness_table_for_def:
+            custom_weakness[left_room], custom_weakness[right_room] = _weakness_table_for_def[details.actor_def]
+        else:
+            print(f"no weakness for {details.actor_def} without shields")
+
+    node_name = f"Door ({actor.sName})"
+    door_template = details.create_node_template("dock")
+    door_template["extra"].update(extra)
+    door_template["destination"] = {
+        "world_name": world["name"],
+        "area_name": None,
+        "node_name": None,
+    }
+    door_template["dock_type"] = 2
+    door_template["dock_weakness_index"] = 1
+
+    node_names = [
+        node_data_for_area[room_name][actor.sName][0]
+        if actor.sName in node_data_for_area.get(room_name, {}) else
+        node_name
+        for i, room_name in enumerate(details.rooms)
+    ]
+    for i, room_name in enumerate(details.rooms):
+        door = copy.deepcopy(door_template)
+        door["destination"]["area_name"] = details.rooms[(i + 1) % 2]
+        door["destination"]["node_name"] = node_names[(i + 1) % 2]
+        if custom_weakness[i] is not None:
+            door["dock_type"] = 0
+            door["dock_weakness_index"] = custom_weakness[i]
+
+        if actor.sName in node_data_for_area.get(room_name, {}):
+            old_node_data = node_data_for_area[room_name][actor.sName]
+            door["heal"] = old_node_data[1]["heal"]
+            door["connections"] = old_node_data[1]["connections"]
+        else:
+            door["connections"] = {}
+
+        doors.append(NodeDefinition(node_names[i], door))
+
+    return doors
+
 
 def decode_world(root: Path, target_level: str, out_path: Path, only_update_existing_areas: bool = True,
                  skip_existing_actors: bool = True):
-    global pickup_index
+    global pickup_index, bmscc, brsa, brfld, brfld_path
     all_names = dread_data.all_asset_id_to_name()
     game = Game.DREAD
 
     pkg_editor = PkgEditor(root)
-
-    bmscc: typing.Optional[Bmscc] = None
-    brsa: typing.Optional[Brsa] = None
-    brfld: typing.Optional[Brfld] = None
-    brfld_path: str = None
 
     for asset_id, name in all_names.items():
         if target_level not in name:
@@ -3187,7 +3294,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         vertices = numpy.array(raw_vertices)
 
         area_name = area_names[entry.name]
-        if only_update_existing_areas and area_name not in world["areas"]:
+        if only_update_existing_areas and area_name in world["areas"]:
             continue
 
         all_rooms[area_name] = Polygon(vertices)
@@ -3207,27 +3314,15 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             "nodes": {},
         }
 
-    def _find_room_orientation(room_a: str, room_b: str):
-        a_bounds = world["areas"][room_a]["extra"]["total_boundings"]
-        b_bounds = world["areas"][room_b]["extra"]["total_boundings"]
-        a_cx = (a_bounds["x1"] + a_bounds["x2"]) / 2
-        b_cx = (b_bounds["x1"] + b_bounds["x2"]) / 2
-        if a_cx < b_cx:
-            return 0, 1
-        elif a_cx > b_cx:
-            return 1, 0
-        else:
-            raise ValueError(f"{room_a} and {room_b} are aligned")
-
-    def get_def_link_for_entity(actor_ref: str) -> typing.Optional[str]:
-        a = brfld.follow_link(actor_ref)
-        if a is not None:
-            return a.oActorDefLink
-
     all_default_details: dict[str, ActorDetails] = {
         actor.sName: ActorDetails(actor, all_rooms)
         for actor in brfld.actors_for_layer("default").values()
     }
+    actor_to_node: dict[str, NodeDefinition] = {}
+
+    def add_node(target_area: str, node_def: NodeDefinition):
+        world["areas"][target_area]["nodes"][node_def.name] = node_def.data
+        actor_to_node[node_def.data["extra"]["actor_name"]] = node_def
 
     for actor in brfld.actors_for_layer("default").values():
         details = all_default_details[actor.sName]
@@ -3240,78 +3335,11 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         if details.is_door:
             if details.is_start_point:
                 print(f"{actor.sName} is a door and start point")
-            extra = {
-                "actor_name": actor.sName,
-                "actor_def": actor.oActorDefLink,
-            }
-            if "LIFE" in actor.pComponents:
-                extra.update({
-                    "left_shield_entity": actor.pComponents.LIFE.wpLeftDoorShieldEntity,
-                    "left_shield_def": get_def_link_for_entity(actor.pComponents.LIFE.wpLeftDoorShieldEntity),
-                    "right_shield_entity": actor.pComponents.LIFE.wpRightDoorShieldEntity,
-                    "right_shield_def": get_def_link_for_entity(actor.pComponents.LIFE.wpRightDoorShieldEntity),
-                })
 
             if len(details.rooms) == 2:
-                simple = {"def": details.actor_def,
-                          "left": extra.get("left_shield_def"),
-                          "right": extra.get("right_shield_def")}
-
-                left_room, right_room = _find_room_orientation(*details.rooms)
-                custom_weakness = [None, None]
-
-                if simple["left"] == simple["right"] and simple["left"] is None:
-                    if details.actor_def in _weakness_table_for_def:
-                        custom_weakness[left_room], custom_weakness[right_room] = _weakness_table_for_def[details.actor_def]
-                    else:
-                        print(f"no weakness for {details.actor_def} without shields")
-
-                node_name = f"Door ({actor.sName})"
-                door_template = {
-                    "node_type": "dock",
-                    "heal": False,
-                    "coordinates": {
-                        "x": actor.vPos[0],
-                        "y": actor.vPos[1],
-                        "z": actor.vPos[2],
-                    },
-                    "description": "",
-                    "extra": extra,
-                    "destination": {
-                        "world_name": world["name"],
-                        "area_name": None,
-                        "node_name": None,
-                    },
-                    "dock_type": 2,
-                    "dock_weakness_index": 1,
-                }
-
-                doors: list[tuple[str, dict]] = []
-                node_names = [
-                    node_data_for_area[room_name][actor.sName][0]
-                    if actor.sName in node_data_for_area.get(room_name, {}) else
-                    node_name
-                    for i, room_name in enumerate(details.rooms)
-                ]
-
+                doors = create_door_nodes_for_actor(details, node_data_for_area, world)
                 for i, room_name in enumerate(details.rooms):
-                    door = copy.deepcopy(door_template)
-                    door["destination"]["area_name"] = details.rooms[(i + 1) % 2]
-                    door["destination"]["node_name"] = node_names[(i + 1) % 2]
-                    if custom_weakness[i] is not None:
-                        door["dock_type"] = 0
-                        door["dock_weakness_index"] = custom_weakness[i]
-
-                    if actor.sName in node_data_for_area.get(room_name, {}):
-                        old_node_data = node_data_for_area[room_name][actor.sName]
-                        door["heal"] = old_node_data[1]["heal"]
-                        door["connections"] = old_node_data[1]["connections"]
-                    else:
-                        door["connections"] = {}
-                    doors.append((node_names[i], door))
-
-                for i, room_name in enumerate(details.rooms):
-                    world["areas"][room_name]["nodes"][doors[i][0]] = doors[i][1]
+                    add_node(room_name, doors[i])
 
             elif len(details.rooms) > 2:
                 print("multiple rooms for door!", actor.sName, details.rooms)
@@ -3385,7 +3413,8 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
 
                 "destination": {
                     "world_name": id_to_name[actor.pComponents.USABLE.sScenarioName],
-                    "area_name": _rooms_for_actors[actor.pComponents.USABLE.sScenarioName][actor.pComponents.USABLE.sTargetSpawnPoint][0],
+                    "area_name": _rooms_for_actors[actor.pComponents.USABLE.sScenarioName][
+                        actor.pComponents.USABLE.sTargetSpawnPoint][0],
                 },
                 "keep_name_when_vanilla": True,
                 "editable": True,
@@ -3395,7 +3424,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
     for actor in brfld.actors_for_layer("default").values():
         details = all_default_details[actor.sName]
         if not details.is_start_point:
-            return
+            continue
 
         if len(details.rooms) != 1:
             print("start point for multiple rooms?", actor.sName, details.rooms)
@@ -3437,7 +3466,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
 
         this_area["nodes"][node_name] = node_data
 
-    for area in world["areas"].values():
+    for area_name, area in world["areas"].items():
         if not area["nodes"]:
             area["nodes"]["Placeholder"] = {
                 "node_type": "generic",
@@ -3448,6 +3477,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                 "connections": {},
             }
 
+    print(f"Writing updated {world_names[brfld_path]}")
     with out_path.joinpath(f"{world_names[brfld_path]}.json").open("w") as f:
         json.dump(world, f, indent=4)
 
@@ -3460,4 +3490,4 @@ def decode_all_worlds(root: Path, out_path: Path):
 
 if __name__ == '__main__':
     # decode_all_worlds(Path("E:/DreadExtract"), Path(sys.argv[1]))
-    decode_world(Path("E:/DreadExtract"), "s010_cave", Path(sys.argv[1]))
+    decode_world(Path("E:/DreadExtract"), "s090_skybase", Path(sys.argv[1]))
