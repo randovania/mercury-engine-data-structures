@@ -9,6 +9,8 @@ from pathlib import Path
 
 import construct
 import numpy
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
 
 from mercury_engine_data_structures import dread_data
 from mercury_engine_data_structures.formats import Bmscc, Brfld, Brsa
@@ -3082,9 +3084,11 @@ _rooms_for_actors = {
 
 
 class ActorDetails:
-    def __init__(self, actor: construct.Container):
+    def __init__(self, actor: construct.Container, all_rooms: dict[str, Polygon]):
         self.actor = actor
         self.actor_def = os.path.splitext(os.path.split(actor.oActorDefLink)[1])[0]
+        self.position = Point(actor.vPos)
+        self.rooms: list[str] = [name for name, pol in all_rooms.items() if pol.contains(self.position)]
         self.is_door = "LIFE" in actor.pComponents and "CDoorLifeComponent" == actor.pComponents.LIFE["@type"]
         self.is_door = self.is_door or "SENSORDOOR" in actor.pComponents or self.actor_def == "dooremmy"
         self.is_start_point = "STARTPOINT" in actor.pComponents and "dooremmy" not in self.actor_def
@@ -3100,9 +3104,9 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
 
     pkg_editor = PkgEditor(root)
 
-    bmscc: Bmscc = None
-    brsa: Brsa = None
-    brfld: Brfld = None
+    bmscc: typing.Optional[Bmscc] = None
+    brsa: typing.Optional[Brsa] = None
+    brfld: typing.Optional[Brfld] = None
     brfld_path: str = None
 
     for asset_id, name in all_names.items():
@@ -3122,7 +3126,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             brfld = Brfld.parse(pkg_editor.get_raw_asset(asset_id), game)
             brfld_path = name
 
-    if bmscc is None or brsa is None:
+    if bmscc is None or brsa is None or brfld is None:
         raise ValueError("DATA IS NONE")
 
     cams: dict[str, set[str]] = {}
@@ -3134,16 +3138,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                 if config.sCharclassGroupId:
                     cams[cam].add(config.sCharclassGroupId)
 
-    import matplotlib.pyplot as plt
-    from shapely.geometry import Point
-    from shapely.geometry.polygon import Polygon
-    from matplotlib.patches import Polygon as mtPolygon
-
-    def rand_color(s):
-        return [x / 300.0 for x in hashlib.md5(bytes(str(sorted(s)), 'ascii')).digest()[0:3]]
-
-    handles = []
-    rooms = {}
+    all_rooms = {}
 
     try:
         with out_path.joinpath(f"{world_names[brfld_path]}.json").open() as f:
@@ -3170,9 +3165,6 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                 if "actor_name" in node_data["extra"]:
                     node_data_for_area[area_name][node_data["extra"]["actor_name"]] = node_name, node_data
 
-    plt.figure(1, figsize=(20, 10))
-    plt.title(target_level)
-
     for entry in bmscc.raw.layers[0].entries:
         assert entry.type == "POLYCOLLECTION2D"
 
@@ -3193,18 +3185,12 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
 
         raw_vertices = _polygon_override.get((target_level, entry.name), raw_vertices)
         vertices = numpy.array(raw_vertices)
-        c = [0.2, 0.7, 0.6]
 
-        area_name = area_names.get(entry.name, f"{entry.name} ({world_names[brfld_path][0]})")
+        area_name = area_names[entry.name]
         if only_update_existing_areas and area_name not in world["areas"]:
             continue
 
-        patch = mtPolygon(vertices, linewidth=1, edgecolor=c, facecolor=(c[0], c[1], c[2], 0.1))
-        plt.gca().add_patch(patch)
-        plt.text((x1 + x2) / 2, (y1 + y2) / 2, entry.name[17:], color=c, ha='center', size='x-small')
-        handles.append(patch)
-
-        rooms[area_name] = Polygon(vertices)
+        all_rooms[area_name] = Polygon(vertices)
         world["areas"][area_name] = {
             "default_node": None,
             "valid_starting_location": False,
@@ -3221,11 +3207,6 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             "nodes": {},
         }
 
-    handles_by_label = {}
-    door_color = [0.8, 0.2, 0.2]
-    item_color = [0.2, 0.2, 0.8]
-    actor_positions = {}
-
     def _find_room_orientation(room_a: str, room_b: str):
         a_bounds = world["areas"][room_a]["extra"]["total_boundings"]
         b_bounds = world["areas"][room_b]["extra"]["total_boundings"]
@@ -3238,39 +3219,23 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         else:
             raise ValueError(f"{room_a} and {room_b} are aligned")
 
-    def count_docks(rm: str) -> int:
-        return sum(
-            1 for node in world["areas"][rm]["nodes"].values()
-            if node["node_type"] == "dock"
-        )
-
     def get_def_link_for_entity(actor_ref: str) -> typing.Optional[str]:
         a = brfld.follow_link(actor_ref)
         if a is not None:
             return a.oActorDefLink
 
-    all_default_details = {
-        actor.sName: ActorDetails(actor)
+    all_default_details: dict[str, ActorDetails] = {
+        actor.sName: ActorDetails(actor, all_rooms)
         for actor in brfld.actors_for_layer("default").values()
     }
 
     for actor in brfld.actors_for_layer("default").values():
         details = all_default_details[actor.sName]
-        if not any([details.is_door, details.is_start_point, details.is_pickup, details.is_elevator]):
+        if not any([details.is_door, details.is_pickup, details.is_elevator]):
             continue
 
-        handles_by_label[details.actor_def], = plt.plot(actor.vPos[0], actor.vPos[1], "o",
-                                                        color=rand_color(details.actor_def))
-
-        p = Point(actor.vPos)
-        # if others := [name for name, other in actor_positions.items() if p.distance(other) < 3]:
+        # if others := [name for name, details in all_default_details.items() if p.distance(details.position) < 3]:
         #     print(f"{actor.sName} is very close to {[other for other in others]}")
-
-        actor_positions[actor.sName] = p
-        rooms_for_actor: list[str] = [name for name, pol in rooms.items() if pol.contains(p)]
-
-        va = "bottom" if details.is_door else "top"
-        plt.annotate(actor.sName, actor.vPos[:2], fontsize='xx-small', ha='center', va=va)
 
         if details.is_door:
             if details.is_start_point:
@@ -3287,12 +3252,12 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                     "right_shield_def": get_def_link_for_entity(actor.pComponents.LIFE.wpRightDoorShieldEntity),
                 })
 
-            if len(rooms_for_actor) == 2:
+            if len(details.rooms) == 2:
                 simple = {"def": details.actor_def,
                           "left": extra.get("left_shield_def"),
                           "right": extra.get("right_shield_def")}
 
-                left_room, right_room = _find_room_orientation(*rooms_for_actor)
+                left_room, right_room = _find_room_orientation(*details.rooms)
                 custom_weakness = [None, None]
 
                 if simple["left"] == simple["right"] and simple["left"] is None:
@@ -3326,12 +3291,12 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                     node_data_for_area[room_name][actor.sName][0]
                     if actor.sName in node_data_for_area.get(room_name, {}) else
                     node_name
-                    for i, room_name in enumerate(rooms_for_actor)
+                    for i, room_name in enumerate(details.rooms)
                 ]
 
-                for i, room_name in enumerate(rooms_for_actor):
+                for i, room_name in enumerate(details.rooms):
                     door = copy.deepcopy(door_template)
-                    door["destination"]["area_name"] = rooms_for_actor[(i + 1) % 2]
+                    door["destination"]["area_name"] = details.rooms[(i + 1) % 2]
                     door["destination"]["node_name"] = node_names[(i + 1) % 2]
                     if custom_weakness[i] is not None:
                         door["dock_type"] = 0
@@ -3345,17 +3310,17 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                         door["connections"] = {}
                     doors.append((node_names[i], door))
 
-                for i, room_name in enumerate(rooms_for_actor):
+                for i, room_name in enumerate(details.rooms):
                     world["areas"][room_name]["nodes"][doors[i][0]] = doors[i][1]
 
-            elif len(rooms_for_actor) > 2:
-                print("multiple rooms for door!", actor.sName, rooms_for_actor)
+            elif len(details.rooms) > 2:
+                print("multiple rooms for door!", actor.sName, details.rooms)
 
         elif details.is_pickup:
             if details.is_start_point:
                 print(f"{actor.sName} is a pickup and start point")
 
-            for room_name in rooms_for_actor:
+            for room_name in details.rooms:
                 if actor.sName in node_data_for_area.get(room_name, {}):
                     node_name, old_node_data = node_data_for_area[room_name][actor.sName]
                     heal, connections = old_node_data["heal"], old_node_data["connections"]
@@ -3379,17 +3344,17 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                     "major_location": "tank" not in details.actor_def,
                     "connections": connections,
                 }
-            if len(rooms_for_actor) != 1:
-                print("wrong item!", actor.sName, rooms_for_actor)
+            if len(details.rooms) != 1:
+                print("wrong item!", actor.sName, details.rooms)
             pickup_index += 1
 
         elif details.is_elevator:
-            if len(rooms_for_actor) != 1:
-                print("elevator for multiple rooms?", actor.sName, rooms_for_actor)
+            if len(details.rooms) != 1:
+                print("elevator for multiple rooms?", actor.sName, details.rooms)
                 continue
 
-            room_name = rooms_for_actor[0]
-            this_area = world["areas"][rooms_for_actor[0]]
+            room_name = details.rooms[0]
+            this_area = world["areas"][details.rooms[0]]
 
             if actor.sName in node_data_for_area.get(room_name, {}):
                 node_name, old_node_data = node_data_for_area[room_name][actor.sName]
@@ -3427,51 +3392,50 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                 "connections": connections
             }
 
-        elif details.is_start_point:
-            if len(rooms_for_actor) != 1:
-                print("start point for multiple rooms?", actor.sName, rooms_for_actor)
-                continue
+    for actor in brfld.actors_for_layer("default").values():
+        details = all_default_details[actor.sName]
+        if not details.is_start_point:
+            return
 
-            this_area = world["areas"][rooms_for_actor[0]]
+        if len(details.rooms) != 1:
+            print("start point for multiple rooms?", actor.sName, details.rooms)
+            continue
 
-            if actor.sName in node_data_for_area.get(rooms_for_actor[0], {}):
-                node_name, node_data = node_data_for_area[rooms_for_actor[0]][actor.sName]
-            else:
-                start_count = sum(1 for name in this_area["nodes"] if name.startswith("Start Point"))
-                node_name = f"Start Point {start_count + 1}"
-                node_data = {
-                    "node_type": "generic",
-                    "heal": False,
-                    "coordinates": None,
-                    "description": "",
-                    "extra": {
-                        "actor_name": actor.sName,
-                    },
-                    "connections": {},
-                }
+        this_area = world["areas"][details.rooms[0]]
 
-            if this_area["default_node"] is None or details.actor_def == "startpoint":
-                this_area["default_node"] = node_name
-
-            if details.actor_def == "startpoint":
-                this_area["valid_starting_location"] = True
-
-            node_data["coordinates"] = {
-                "x": actor.vPos[0],
-                "y": actor.vPos[1],
-                "z": actor.vPos[2],
+        if actor.sName in node_data_for_area.get(details.rooms[0], {}):
+            node_name, node_data = node_data_for_area[details.rooms[0]][actor.sName]
+        else:
+            start_count = sum(1 for name in this_area["nodes"] if name.startswith("Start Point"))
+            node_name = f"Start Point {start_count + 1}"
+            node_data = {
+                "node_type": "generic",
+                "heal": False,
+                "coordinates": None,
+                "description": "",
+                "extra": {
+                    "actor_name": actor.sName,
+                },
+                "connections": {},
             }
 
-            node_data["extra"]["actor_def"] = actor.oActorDefLink
-            if "SMARTOBJECT" in actor.pComponents and "sUsableEntity" in actor.pComponents.SMARTOBJECT:
-                node_data["extra"]["usable_entity"] = actor.pComponents.SMARTOBJECT.sUsableEntity
+        if this_area["default_node"] is None or details.actor_def == "startpoint":
+            this_area["default_node"] = node_name
 
-            this_area["nodes"][node_name] = node_data
+        if details.actor_def == "startpoint":
+            this_area["valid_starting_location"] = True
 
-    handles_by_label = {
-        key: value
-        for key, value in sorted(handles_by_label.items(), key=lambda it: it[0])
-    }
+        node_data["coordinates"] = {
+            "x": actor.vPos[0],
+            "y": actor.vPos[1],
+            "z": actor.vPos[2],
+        }
+
+        node_data["extra"]["actor_def"] = actor.oActorDefLink
+        if "SMARTOBJECT" in actor.pComponents and "sUsableEntity" in actor.pComponents.SMARTOBJECT:
+            node_data["extra"]["usable_entity"] = actor.pComponents.SMARTOBJECT.sUsableEntity
+
+        this_area["nodes"][node_name] = node_data
 
     for area in world["areas"].values():
         if not area["nodes"]:
@@ -3483,11 +3447,6 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                 "extra": {},
                 "connections": {},
             }
-
-    plt.legend(handles_by_label.values(), handles_by_label.keys())
-    # plt.show()
-    # plt.savefig(f"{target_level}.png", dpi=200, bbox_inches='tight')
-    plt.close()
 
     with out_path.joinpath(f"{world_names[brfld_path]}.json").open("w") as f:
         json.dump(world, f, indent=4)
