@@ -3270,6 +3270,8 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
 
     all_rooms = {}
 
+    area_name_by_world_and_actor = _get_area_name_from_actors_in_existing_db(out_path)
+
     try:
         with out_path.joinpath(f"{world_names[brfld_path]}.json").open() as f:
             world: dict = json.load(f)
@@ -3397,17 +3399,21 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             room_name = details.rooms[0]
             this_area = world["areas"][details.rooms[0]]
 
+            usable = actor.pComponents.USABLE
             definition = details.create_node_template("teleporter", f"Elevator ({actor.sName})",
                                                       node_data_for_area.get(room_name))
             definition.data["extra"].update({
-                "elevator_component": actor.pComponents.USABLE["@type"],
-                "target_spawn_point": actor.pComponents.USABLE.sTargetSpawnPoint,
+                "elevator_component": usable["@type"],
+                "target_spawn_point": usable.sTargetSpawnPoint,
             })
+            target_world_name = id_to_name[usable.sScenarioName]
             definition.data.update({
                 "destination": {
-                    "world_name": id_to_name[actor.pComponents.USABLE.sScenarioName],
-                    "area_name": _rooms_for_actors[actor.pComponents.USABLE.sScenarioName][
-                        actor.pComponents.USABLE.sTargetSpawnPoint][0],
+                    "world_name": target_world_name,
+                    "area_name": area_name_by_world_and_actor[target_world_name].get(
+                        usable.sTargetSpawnPoint,
+                        _rooms_for_actors[usable.sScenarioName][usable.sTargetSpawnPoint][0],
+                    ),
                 }
             })
             add_node(room_name, definition)
@@ -3497,6 +3503,24 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
     print(f"Writing updated {world_names[brfld_path]}")
     with out_path.joinpath(f"{world_names[brfld_path]}.json").open("w") as f:
         json.dump(world, f, indent=4)
+
+
+def _get_area_name_from_actors_in_existing_db(out_path: Path) -> dict[str, dict[str, str]]:
+    area_name_by_world_and_actor = {}
+
+    for world_name in world_names.values():
+        with out_path.joinpath(f"{world_name}.json").open() as f:
+            area_name_by_world_and_actor[world_name] = {}
+            try:
+                for area_name, area_data in json.load(f)["areas"].items():
+                    for node_data in area_data["nodes"].values():
+                        for variable in ["actor_name", "start_point_actor_name"]:
+                            if variable in node_data["extra"]:
+                                area_name_by_world_and_actor[world_name][node_data["extra"][variable]] = area_name
+            except FileNotFoundError:
+                area_name_by_world_and_actor[world_name] = {}
+
+    return area_name_by_world_and_actor
 
 
 def _build_node_name_with_prefix(node_prefix: str, this_area: dict) -> str:
