@@ -3085,6 +3085,15 @@ _rooms_for_actors = {
         'weightactivatedplatform_commanderelevator_000': ['collision_camera_002 (I)'],
         'weightactivatedplatform_total_000': ['collision_camera_001 (I)']}}
 
+_usable_component_to_node_name = {
+    "CAccessPointComponent": "Navigation Room",
+    "CSaveStationUsableComponent": "Save Station",
+    "CLifeRechargeComponent": "Life Recharge",
+    "CAmmoRechargeComponent": "Ammo Recharge",
+    "CMapAcquisitionComponent": "Map Station",
+    "CTotalRechargeComponent": "Total Recharge",
+}
+
 
 class NodeDefinition(typing.NamedTuple):
     name: str
@@ -3102,6 +3111,7 @@ class ActorDetails:
         self.is_start_point = "STARTPOINT" in actor.pComponents and "dooremmy" not in self.actor_def
         self.is_pickup = "actors/items" in actor.oActorDefLink
         self.is_elevator = "USABLE" in actor.pComponents and actor.pComponents.USABLE["@type"] in _ELEVATOR_USABLE
+        self.is_usable = "USABLE" in actor.pComponents
 
     def create_node_template(
             self, node_type: str,
@@ -3344,7 +3354,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
 
     for actor in brfld.actors_for_layer("default").values():
         details = all_default_details[actor.sName]
-        if not any([details.is_door, details.is_pickup, details.is_elevator]):
+        if not any([details.is_door, details.is_pickup, details.is_elevator, details.is_usable]):
             continue
 
         # if others := [name for name, details in all_default_details.items() if p.distance(details.position) < 3]:
@@ -3406,6 +3416,31 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                 if this_area["default_node"] is None:
                     this_area["default_node"] = definition.name
 
+        elif details.is_usable:
+            if len(details.rooms) != 1:
+                print("usable multiple rooms?", actor.sName, details.rooms)
+                continue
+
+            usable_type = actor.pComponents.USABLE["@type"]
+            if usable_type not in _usable_component_to_node_name:
+                raise ValueError(f"Unknown usable type: {usable_type}")
+
+            room_name = details.rooms[0]
+            this_area = world["areas"][room_name]
+            node_prefix = _usable_component_to_node_name[usable_type]
+
+            definition = details.create_node_template(
+                "generic",
+                _build_node_name_with_prefix(node_prefix, this_area),
+                node_data_for_area.get(room_name),
+            )
+            if usable_type in {"CLifeRechargeComponent", "CTotalRechargeComponent"}:
+                definition.data["heal"] = True
+            add_node(room_name, definition)
+
+    # Add start points
+    # Since these include the "platforms for usable", we do this after everything else so we have a chance of
+    # merging this node into the existing one.
     for actor in brfld.actors_for_layer("default").values():
         details = all_default_details[actor.sName]
         if not details.is_start_point:
@@ -3418,9 +3453,11 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         room_name = details.rooms[0]
         this_area = world["areas"][room_name]
 
-        start_count = sum(1 for name in this_area["nodes"] if name.startswith("Start Point"))
-        definition = details.create_node_template("generic", f"Start Point {start_count + 1}",
-                                                  node_data_for_area.get(room_name))
+        definition = details.create_node_template(
+            "generic",
+            _build_node_name_with_prefix("Start Point", this_area),
+            node_data_for_area.get(room_name),
+        )
 
         other_actor = None
         if "SMARTOBJECT" in actor.pComponents and "sUsableEntity" in actor.pComponents.SMARTOBJECT:
@@ -3429,6 +3466,8 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
 
         if other_actor is not None:
             this_area["nodes"].pop(definition.name, None)
+            if this_area["default_node"] == definition.name:
+                this_area["default_node"] = None
             definition = other_actor
         else:
             definition.data["extra"].pop("actor_name")
@@ -3460,6 +3499,17 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         json.dump(world, f, indent=4)
 
 
+def _build_node_name_with_prefix(node_prefix: str, this_area: dict) -> str:
+    count = sum(1 for name in this_area["nodes"] if name.startswith(node_prefix))
+    if count > 0 and node_prefix in this_area["nodes"]:
+        this_area["nodes"][f"{node_prefix} 1"] = this_area["nodes"].pop(node_prefix)
+
+    if count == 0:
+        return node_prefix
+
+    return f"{node_prefix} {count + 1}"
+
+
 def decode_all_worlds(root: Path, out_path: Path):
     for area_path in world_names.keys():
         level_name = os.path.splitext(os.path.split(area_path)[1])[0]
@@ -3468,4 +3518,4 @@ def decode_all_worlds(root: Path, out_path: Path):
 
 if __name__ == '__main__':
     # decode_all_worlds(Path("E:/DreadExtract"), Path(sys.argv[1]))
-    decode_world(Path("E:/DreadExtract"), "s040_aqua", Path(sys.argv[1]))
+    decode_world(Path("E:/DreadExtract"), "s080_shipyard", Path(sys.argv[1]))
