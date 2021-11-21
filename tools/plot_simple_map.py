@@ -34,6 +34,7 @@ bmscc: typing.Optional[Bmscc] = None
 brsa: typing.Optional[Brsa] = None
 brfld: typing.Optional[Brfld] = None
 brfld_path: str = None
+events: dict[str, str] = {}
 
 _polygon_override = {
     ("s010_cave", "collision_camera_010"): [
@@ -79,6 +80,8 @@ _polygon_override = {
 _camera_skip = {
     ("s010_cave", "collision_camera_900"),
     ("s010_cave", "collision_camera_999"),
+    ("s020_magma", "collision_camera_063_Stage_001"),
+    ("s020_magma", "collision_camera_063_Stage_002"),
     ("s040_aqua", "collision_camera_001_B"),
     ("s050_forest", "collision_camera_019_B"),
     ("s050_forest", "collision_camera_024_B"),
@@ -117,6 +120,9 @@ _weakness_table_for_def = {
 
     # These doors are going to be event or whatever it is
     'doorheat': (None, None),
+
+    # These are the entirely different kind of door
+    'dooremmy': (None, None),
 }
 
 _ELEVATOR_USABLE = {
@@ -3107,6 +3113,13 @@ _usable_component_as_event_node = {
 }
 
 
+def create_event(layer_name: str, actor_name: str) -> int:
+    level_name = os.path.splitext(os.path.split(brfld_path)[1])[0]
+    short_name = f"{level_name}:{layer_name}:{actor_name}"
+    events[short_name] = f"{world_names[brfld_path]} - {actor_name}"
+    return list(events.keys()).index(short_name)
+
+
 class NodeDefinition(typing.NamedTuple):
     name: str
     data: dict[str, typing.Any]
@@ -3124,6 +3137,7 @@ class ActorDetails:
         self.is_pickup = "actors/items" in actor.oActorDefLink
         self.is_elevator = "USABLE" in actor.pComponents and actor.pComponents.USABLE["@type"] in _ELEVATOR_USABLE
         self.is_usable = "USABLE" in actor.pComponents
+        self.is_breakable_blob = "BREAKABLESCENARIO" in actor.pComponents
 
     def create_node_template(
             self, node_type: str,
@@ -3167,11 +3181,18 @@ class ActorDetails:
             result["keep_name_when_vanilla"] = True
             result["editable"] = True
 
+        elif node_type == "event":
+            result["event_index"] = None
+
         if existing_data is not None and self.actor.sName in existing_data:
             old_node_data = existing_data[self.actor.sName]
             node_name = old_node_data.name
             result["heal"] = old_node_data.data["heal"]
+            result["description"] = old_node_data.data["description"]
             result["connections"] = old_node_data.data["connections"]
+            for extra_key in old_node_data.data["extra"]:
+                if extra_key not in result["extra"]:
+                    result["extra"][extra_key] = old_node_data.data["extra"][extra_key]
         else:
             node_name = default_name
             result["connections"] = {}
@@ -3321,10 +3342,13 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         if abs(x1) > 59999 or abs(y1) > 59999 or abs(x2) > 59999 or abs(y2) > 59999:
             continue
 
-        if (target_level, entry.name) in _camera_skip:
+        if entry.name not in cams:
             continue
 
-        if entry.name not in cams:
+        area_name = area_names[entry.name]
+
+        if (target_level, entry.name) in _camera_skip:
+            world["areas"].pop(area_name, None)
             continue
 
         assert len(entry.data.polys) == 1
@@ -3335,7 +3359,6 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         raw_vertices = _polygon_override.get((target_level, entry.name), raw_vertices)
         vertices = numpy.array(raw_vertices)
 
-        area_name = area_names[entry.name]
         all_rooms[area_name] = Polygon(vertices)
         if only_update_existing_areas and area_name in world["areas"]:
             continue
@@ -3383,7 +3406,8 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
 
     for actor in brfld.actors_for_layer("default").values():
         details = all_default_details[actor.sName]
-        if not any([details.is_door, details.is_pickup, details.is_elevator, details.is_usable]):
+        if not any([details.is_door, details.is_pickup, details.is_elevator, details.is_usable,
+                    details.is_breakable_blob]):
             continue
 
         # if others := [name for name, details in all_default_details.items() if p.distance(details.position) < 3]:
@@ -3465,14 +3489,30 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             # FIXME: event nodes with _usable_component_as_event_node
 
             definition = details.create_node_template(
-                "generic",
+                "event" if usable_type in _usable_component_as_event_node else "generic",
                 _build_node_name_with_prefix(node_prefix, this_area),
                 node_data_for_area.get(room_name),
             )
+            if usable_type in _usable_component_as_event_node:
+                definition.data["event_index"] = create_event("default", actor.sName)
             if usable_type in {"CLifeRechargeComponent", "CTotalRechargeComponent"}:
                 definition.data["heal"] = True
 
             add_node(room_name, _fix_nodes_with_prefix(definition, node_prefix, this_area))
+
+        elif details.is_breakable_blob:
+            if len(details.rooms) != 1:
+                print("breakable blob in multiple rooms?", actor.sName, details.rooms)
+                continue
+
+            room_name = details.rooms[0]
+            definition = details.create_node_template(
+                "event",
+                f"Breakable ({actor.sName})",
+                node_data_for_area.get(room_name),
+            )
+            definition.data["event_index"] = create_event("default", actor.sName)
+            add_node(room_name, definition)
 
     # Add start points
     # Since these include the "platforms for usable", we do this after everything else so we have a chance of
@@ -3487,7 +3527,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             continue
 
         if details.is_usable:
-            print(f"Skipping start point {actor.sName} as it's also usable")
+            # print(f"Skipping start point {actor.sName} as it's also usable")
             continue
 
         room_name = details.rooms[0]
@@ -3523,6 +3563,36 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         definition.data["extra"]["start_point_actor_name"] = actor.sName
         definition.data["extra"]["start_point_actor_def"] = actor.oActorDefLink
         add_node(room_name, _fix_nodes_with_prefix(definition, "Start Point", this_area))
+
+    try:
+        breakables = brfld.actors_for_layer("breakables")
+    except KeyError:
+        breakables = {}
+
+    for actor in breakables.values():
+        if "TILEGROUP" not in actor.pComponents:
+            continue
+
+        details = ActorDetails(actor, all_rooms)
+        if len(details.rooms) != 1:
+            print("TILEGROUP multiple rooms?", actor.sName, details.rooms)
+            continue
+
+        room_name = details.rooms[0]
+        this_area = world["areas"][room_name]
+
+        tile_types = set()
+        for grid_tile in actor.pComponents.TILEGROUP.aGridTiles:
+            tile_types.add(grid_tile.eTileType)
+        tile_types = " ".join(sorted(tile_types))
+
+        node_prefix = f"Tile Group ({tile_types})"
+        definition = details.create_node_template(
+            "generic",
+            _build_node_name_with_prefix(node_prefix, this_area),
+            node_data_for_area.get(room_name),
+        )
+        add_node(room_name, _fix_nodes_with_prefix(definition, node_prefix, this_area))
 
     for area_name, area in world["areas"].items():
         if not area["nodes"]:
@@ -3588,11 +3658,30 @@ def _fix_nodes_with_prefix(definition: NodeDefinition, node_prefix: str, this_ar
 
 
 def decode_all_worlds(root: Path, out_path: Path):
+    header_path = out_path.joinpath("header.json")
+    with header_path.open() as f:
+        header = json.load(f)
+
+    for event in header["resource_database"]["events"]:
+        events[event["short_name"]] = event["long_name"]
+
     for area_path in world_names.keys():
         level_name = os.path.splitext(os.path.split(area_path)[1])[0]
         decode_world(root, level_name, out_path)
 
+    header["resource_database"]["events"] = [
+        {
+            "index": i,
+            "long_name": long_name,
+            "short_name": short_name
+        }
+        for i, (short_name, long_name) in enumerate(events.items())
+    ]
+
+    with header_path.open("w") as f:
+        json.dump(header, f, indent=4)
+
 
 if __name__ == '__main__':
     decode_all_worlds(Path("E:/DreadExtract"), Path(sys.argv[1]))
-    # decode_world(Path("E:/DreadExtract"), "s080_shipyard", Path(sys.argv[1]))
+    # decode_world(Path("E:/DreadExtract"), "s010_cave", Path(sys.argv[1]))
