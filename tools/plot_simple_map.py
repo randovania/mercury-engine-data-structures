@@ -1,4 +1,3 @@
-import copy
 import json
 import os
 import sys
@@ -35,7 +34,6 @@ bmscc: typing.Optional[Bmscc] = None
 brsa: typing.Optional[Brsa] = None
 brfld: typing.Optional[Brfld] = None
 brfld_path: str = None
-
 
 _polygon_override = {
     ("s010_cave", "collision_camera_010"): [
@@ -3105,8 +3103,13 @@ class ActorDetails:
         self.is_pickup = "actors/items" in actor.oActorDefLink
         self.is_elevator = "USABLE" in actor.pComponents and actor.pComponents.USABLE["@type"] in _ELEVATOR_USABLE
 
-    def create_node_template(self, node_type: str) -> dict[str, typing.Any]:
-        return {
+    def create_node_template(
+            self, node_type: str,
+            default_name: str,
+            existing_data: typing.Optional[dict[str, NodeDefinition]]
+    ) -> NodeDefinition:
+
+        result = {
             "node_type": node_type,
             "heal": False,
             "coordinates": {
@@ -3120,6 +3123,25 @@ class ActorDetails:
                 "actor_def": self.actor.oActorDefLink,
             },
         }
+
+        if node_type == "dock":
+            result["destination"] = {
+                "world_name": None,
+                "area_name": None,
+                "node_name": None,
+            }
+            result["dock_type"] = 2
+            result["dock_weakness_index"] = 1
+
+        if existing_data is not None and self.actor.sName in existing_data:
+            old_node_data = existing_data[self.actor.sName]
+            node_name = old_node_data.name
+            result["heal"] = old_node_data.data["heal"]
+            result["connections"] = old_node_data.data["connections"]
+        else:
+            node_name = default_name
+
+        return NodeDefinition(node_name, result)
 
 
 def _find_room_orientation(world: dict, room_a: str, room_b: str):
@@ -3143,10 +3165,9 @@ def get_def_link_for_entity(actor_ref: str) -> typing.Optional[str]:
 
 def create_door_nodes_for_actor(
         details: ActorDetails,
-        node_data_for_area: dict[str, dict[str, tuple[str, dict]]],
+        node_data_for_area: dict[str, dict[str, NodeDefinition]],
         world: dict
 ) -> list[NodeDefinition]:
-    doors: list[NodeDefinition] = []
     actor = details.actor
 
     extra = {}
@@ -3171,39 +3192,18 @@ def create_door_nodes_for_actor(
         else:
             print(f"no weakness for {details.actor_def} without shields")
 
-    node_name = f"Door ({actor.sName})"
-    door_template = details.create_node_template("dock")
-    door_template["extra"].update(extra)
-    door_template["destination"] = {
-        "world_name": world["name"],
-        "area_name": None,
-        "node_name": None,
-    }
-    door_template["dock_type"] = 2
-    door_template["dock_weakness_index"] = 1
-
-    node_names = [
-        node_data_for_area[room_name][actor.sName][0]
-        if actor.sName in node_data_for_area.get(room_name, {}) else
-        node_name
-        for i, room_name in enumerate(details.rooms)
+    doors: list[NodeDefinition] = [
+        details.create_node_template("dock", f"Door ({actor.sName})", node_data_for_area.get(room_name))
+        for room_name in details.rooms
     ]
-    for i, room_name in enumerate(details.rooms):
-        door = copy.deepcopy(door_template)
-        door["destination"]["area_name"] = details.rooms[(i + 1) % 2]
-        door["destination"]["node_name"] = node_names[(i + 1) % 2]
+    for i, definition in enumerate(doors):
+        definition.data["extra"].update(extra)
+        definition.data["destination"]["world_name"] = world["name"]
+        definition.data["destination"]["area_name"] = details.rooms[(i + 1) % 2]
+        definition.data["destination"]["node_name"] = doors[(i + 1) % 2].name
         if custom_weakness[i] is not None:
-            door["dock_type"] = 0
-            door["dock_weakness_index"] = custom_weakness[i]
-
-        if actor.sName in node_data_for_area.get(room_name, {}):
-            old_node_data = node_data_for_area[room_name][actor.sName]
-            door["heal"] = old_node_data[1]["heal"]
-            door["connections"] = old_node_data[1]["connections"]
-        else:
-            door["connections"] = {}
-
-        doors.append(NodeDefinition(node_names[i], door))
+            definition.data["dock_type"] = 0
+            definition.data["dock_weakness_index"] = custom_weakness[i]
 
     return doors
 
@@ -3263,14 +3263,17 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         entry.name: f"{entry.name} ({world_names[brfld_path][0]})"
         for entry in bmscc.raw.layers[0].entries
     }
-    node_data_for_area: dict[str, dict[str, tuple[str, dict]]] = {}
+    node_data_for_area: dict[str, dict[str, NodeDefinition]] = {}
     for area_name, area_data in world["areas"].items():
         if "asset_id" in area_data["extra"]:
             area_names[area_data["extra"]["asset_id"]] = area_name
             node_data_for_area[area_name] = {}
             for node_name, node_data in area_data["nodes"].items():
                 if "actor_name" in node_data["extra"]:
-                    node_data_for_area[area_name][node_data["extra"]["actor_name"]] = node_name, node_data
+                    node_data_for_area[area_name][node_data["extra"]["actor_name"]] = NodeDefinition(
+                        node_name,
+                        node_data,
+                    )
 
     for entry in bmscc.raw.layers[0].entries:
         assert entry.type == "POLYCOLLECTION2D"
@@ -3294,10 +3297,10 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         vertices = numpy.array(raw_vertices)
 
         area_name = area_names[entry.name]
+        all_rooms[area_name] = Polygon(vertices)
         if only_update_existing_areas and area_name in world["areas"]:
             continue
 
-        all_rooms[area_name] = Polygon(vertices)
         world["areas"][area_name] = {
             "default_node": None,
             "valid_starting_location": False,
@@ -3355,6 +3358,15 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                 else:
                     node_name, heal, connections = f"Pickup ({actor.sName})", False, {}
 
+                add_node(room_name, NodeDefinition(
+                    node_name,
+                    {
+                        **details.create_node_template("pickup"),
+                        "pickup_index": pickup_index,
+                        "major_location": "tank" not in details.actor_def,
+                        "connections": connections,
+                    }
+                ))
                 world["areas"][room_name]["nodes"][node_name] = {
                     "node_type": "pickup",
                     "heal": heal,
@@ -3372,6 +3384,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                     "major_location": "tank" not in details.actor_def,
                     "connections": connections,
                 }
+
             if len(details.rooms) != 1:
                 print("wrong item!", actor.sName, details.rooms)
             pickup_index += 1
