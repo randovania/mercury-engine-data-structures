@@ -86,6 +86,7 @@ _camera_skip = {
     ("s050_forest", "collision_camera_025_C"),
     ("s080_shipyard", "collision_camera_009_C"),
     ("s080_shipyard", "collision_camera_015_B"),
+    ("s080_shipyard", "collision_camera_1000 (H)"),
     ("s090_skybase", "collision_camera_005"),
     ("s090_skybase", "collision_camera_900"),
 }
@@ -3231,6 +3232,12 @@ def create_door_nodes_for_actor(
     return doors
 
 
+def get_actor_name_for_node(node: dict) -> str:
+    for variable in ["actor_name", "start_point_actor_name"]:
+        if variable in node["extra"]:
+            return node["extra"][variable]
+
+
 def decode_world(root: Path, target_level: str, out_path: Path, only_update_existing_areas: bool = True,
                  skip_existing_actors: bool = True):
     global pickup_index, bmscc, brsa, brfld, brfld_path
@@ -3294,11 +3301,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             area_names[area_data["extra"]["asset_id"]] = area_name
             node_data_for_area[area_name] = {}
             for node_name, node_data in area_data["nodes"].items():
-                if "actor_name" in node_data["extra"]:
-                    node_data_for_area[area_name][node_data["extra"]["actor_name"]] = NodeDefinition(
-                        node_name,
-                        node_data,
-                    )
+                node_data_for_area[area_name][get_actor_name_for_node(node_data)] = NodeDefinition(node_name, node_data)
 
     for entry in bmscc.raw.layers[0].entries:
         assert entry.type == "POLYCOLLECTION2D"
@@ -3349,10 +3352,16 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
     actor_to_node: dict[str, NodeDefinition] = {}
 
     def add_node(target_area: str, node_def: NodeDefinition):
+        new_actor = get_actor_name_for_node(node_def.data)
+        for existing_name, existing_node in world["areas"][target_area]["nodes"].items():
+            if existing_name == node_def.name:
+                continue
+            if get_actor_name_for_node(existing_node) == new_actor:
+                raise ValueError(f"New node {node_def.name} with actor {new_actor} conflicts "
+                                 f"with existing node {existing_name}")
+
         world["areas"][target_area]["nodes"][node_def.name] = node_def.data
-        actor_name = node_def.data["extra"].get("actor_name")
-        if actor_name is not None:
-            actor_to_node[node_def.data["extra"]["actor_name"]] = node_def
+        actor_to_node[get_actor_name_for_node(node_def.data)] = node_def
 
     for actor in brfld.actors_for_layer("default").values():
         details = all_default_details[actor.sName]
@@ -3442,7 +3451,8 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             )
             if usable_type in {"CLifeRechargeComponent", "CTotalRechargeComponent"}:
                 definition.data["heal"] = True
-            add_node(room_name, definition)
+
+            add_node(room_name, _fix_nodes_with_prefix(definition, node_prefix, this_area))
 
     # Add start points
     # Since these include the "platforms for usable", we do this after everything else so we have a chance of
@@ -3487,7 +3497,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
 
         definition.data["extra"]["start_point_actor_name"] = actor.sName
         definition.data["extra"]["start_point_actor_def"] = actor.oActorDefLink
-        add_node(room_name, definition)
+        add_node(room_name, _fix_nodes_with_prefix(definition, "Start Point", this_area))
 
     for area_name, area in world["areas"].items():
         if not area["nodes"]:
@@ -3509,29 +3519,42 @@ def _get_area_name_from_actors_in_existing_db(out_path: Path) -> dict[str, dict[
     area_name_by_world_and_actor = {}
 
     for world_name in world_names.values():
-        with out_path.joinpath(f"{world_name}.json").open() as f:
-            area_name_by_world_and_actor[world_name] = {}
-            try:
+        try:
+            with out_path.joinpath(f"{world_name}.json").open() as f:
+                area_name_by_world_and_actor[world_name] = {}
                 for area_name, area_data in json.load(f)["areas"].items():
                     for node_data in area_data["nodes"].values():
                         for variable in ["actor_name", "start_point_actor_name"]:
                             if variable in node_data["extra"]:
                                 area_name_by_world_and_actor[world_name][node_data["extra"][variable]] = area_name
-            except FileNotFoundError:
-                area_name_by_world_and_actor[world_name] = {}
+        except FileNotFoundError:
+            area_name_by_world_and_actor[world_name] = {}
 
     return area_name_by_world_and_actor
 
 
 def _build_node_name_with_prefix(node_prefix: str, this_area: dict) -> str:
     count = sum(1 for name in this_area["nodes"] if name.startswith(node_prefix))
-    if count > 0 and node_prefix in this_area["nodes"]:
-        this_area["nodes"][f"{node_prefix} 1"] = this_area["nodes"].pop(node_prefix)
 
     if count == 0:
         return node_prefix
 
     return f"{node_prefix} {count + 1}"
+
+
+def _fix_nodes_with_prefix(definition: NodeDefinition, node_prefix: str, this_area: dict) -> NodeDefinition:
+    if not definition.name.startswith(node_prefix):
+        return definition
+
+    count = sum(1 for name in this_area["nodes"] if name.startswith(node_prefix))
+    self_is_present = definition.name in this_area["nodes"]
+
+    if count == 0 or (count == 1 and self_is_present):
+        if self_is_present:
+            this_area["nodes"].pop(definition.name)
+        return NodeDefinition(node_prefix, definition.data)
+
+    return definition
 
 
 def decode_all_worlds(root: Path, out_path: Path):
