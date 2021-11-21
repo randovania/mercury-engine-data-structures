@@ -3,9 +3,11 @@ import hashlib
 import json
 import os
 import pprint
+import sys
 import typing
 from pathlib import Path
 
+import construct
 import numpy
 
 from mercury_engine_data_structures import dread_data
@@ -3079,7 +3081,19 @@ _rooms_for_actors = {
         'weightactivatedplatform_total_000': ['collision_camera_001 (I)']}}
 
 
-def decode_world(root: Path, target_level: str):
+class ActorDetails:
+    def __init__(self, actor: construct.Container):
+        self.actor = actor
+        self.actor_def = os.path.splitext(os.path.split(actor.oActorDefLink)[1])[0]
+        self.is_door = "LIFE" in actor.pComponents and "CDoorLifeComponent" == actor.pComponents.LIFE["@type"]
+        self.is_door = self.is_door or "SENSORDOOR" in actor.pComponents or self.actor_def == "dooremmy"
+        self.is_start_point = "STARTPOINT" in actor.pComponents and "dooremmy" not in self.actor_def
+        self.is_pickup = "actors/items" in actor.oActorDefLink
+        self.is_elevator = "USABLE" in actor.pComponents and actor.pComponents.USABLE["@type"] in _ELEVATOR_USABLE
+
+
+def decode_world(root: Path, target_level: str, out_path: Path, only_update_existing_areas: bool = True,
+                 skip_existing_actors: bool = True):
     global pickup_index
     all_names = dread_data.all_asset_id_to_name()
     game = Game.DREAD
@@ -3089,7 +3103,7 @@ def decode_world(root: Path, target_level: str):
     bmscc: Bmscc = None
     brsa: Brsa = None
     brfld: Brfld = None
-    brfld_path: str
+    brfld_path: str = None
 
     for asset_id, name in all_names.items():
         if target_level not in name:
@@ -3128,35 +3142,33 @@ def decode_world(root: Path, target_level: str):
     def rand_color(s):
         return [x / 300.0 for x in hashlib.md5(bytes(str(sorted(s)), 'ascii')).digest()[0:3]]
 
-
     handles = []
     rooms = {}
-    world: dict[str, typing.Any] = {
-        "name": world_names[brfld_path],
-        "extra": {
-            "asset_id": brfld_path,
-        },
-        "areas": {}
-    }
 
     try:
-        with open(f"{world['name']}.json") as f:
-            reference: dict = json.load(f)["areas"]
+        with out_path.joinpath(f"{world_names[brfld_path]}.json").open() as f:
+            world: dict = json.load(f)
     except FileNotFoundError:
-        reference = {}
+        world: dict = {
+            "name": world_names[brfld_path],
+            "extra": {
+                "asset_id": brfld_path,
+            },
+            "areas": {}
+        }
 
     area_names = {
         entry.name: f"{entry.name} ({world_names[brfld_path][0]})"
         for entry in bmscc.raw.layers[0].entries
     }
-    node_data_for_area = {}
-    for area_name, area_data in reference.items():
+    node_data_for_area: dict[str, dict[str, tuple[str, dict]]] = {}
+    for area_name, area_data in world["areas"].items():
         if "asset_id" in area_data["extra"]:
             area_names[area_data["extra"]["asset_id"]] = area_name
             node_data_for_area[area_name] = {}
             for node_name, node_data in area_data["nodes"].items():
                 if "actor_name" in node_data["extra"]:
-                    node_data_for_area[area_name][node_data["extra"]["actor_name"]] = node_name, node_data["connections"]
+                    node_data_for_area[area_name][node_data["extra"]["actor_name"]] = node_name, node_data
 
     plt.figure(1, figsize=(20, 10))
     plt.title(target_level)
@@ -3183,11 +3195,15 @@ def decode_world(root: Path, target_level: str):
         vertices = numpy.array(raw_vertices)
         c = [0.2, 0.7, 0.6]
 
+        area_name = area_names.get(entry.name, f"{entry.name} ({world_names[brfld_path][0]})")
+        if only_update_existing_areas and area_name not in world["areas"]:
+            continue
+
         patch = mtPolygon(vertices, linewidth=1, edgecolor=c, facecolor=(c[0], c[1], c[2], 0.1))
         plt.gca().add_patch(patch)
         plt.text((x1 + x2) / 2, (y1 + y2) / 2, entry.name[17:], color=c, ha='center', size='x-small')
         handles.append(patch)
-        area_name = area_names.get(entry.name, f"{entry.name} ({world_names[brfld_path][0]})")
+
         rooms[area_name] = Polygon(vertices)
         world["areas"][area_name] = {
             "default_node": None,
@@ -3233,17 +3249,18 @@ def decode_world(root: Path, target_level: str):
         if a is not None:
             return a.oActorDefLink
 
-    for actor in brfld.actors_for_layer("default").values():
-        actor_def = os.path.splitext(os.path.split(actor.oActorDefLink)[1])[0]
-        is_door = "LIFE" in actor.pComponents and "CDoorLifeComponent" == actor.pComponents.LIFE["@type"]
-        is_start_point = "STARTPOINT" in actor.pComponents and "dooremmy" not in actor_def
-        is_pickup = "actors/items" in actor.oActorDefLink
-        is_elevator = "USABLE" in actor.pComponents and actor.pComponents.USABLE["@type"] in _ELEVATOR_USABLE
+    all_default_details = {
+        actor.sName: ActorDetails(actor)
+        for actor in brfld.actors_for_layer("default").values()
+    }
 
-        if not any([is_door, is_start_point, is_pickup, is_elevator]):
+    for actor in brfld.actors_for_layer("default").values():
+        details = all_default_details[actor.sName]
+        if not any([details.is_door, details.is_start_point, details.is_pickup, details.is_elevator]):
             continue
 
-        handles_by_label[actor_def], = plt.plot(actor.vPos[0], actor.vPos[1], "o", color=rand_color(actor_def))
+        handles_by_label[details.actor_def], = plt.plot(actor.vPos[0], actor.vPos[1], "o",
+                                                        color=rand_color(details.actor_def))
 
         p = Point(actor.vPos)
         # if others := [name for name, other in actor_positions.items() if p.distance(other) < 3]:
@@ -3252,34 +3269,37 @@ def decode_world(root: Path, target_level: str):
         actor_positions[actor.sName] = p
         rooms_for_actor: list[str] = [name for name, pol in rooms.items() if pol.contains(p)]
 
-        va = "bottom" if is_door else "top"
+        va = "bottom" if details.is_door else "top"
         plt.annotate(actor.sName, actor.vPos[:2], fontsize='xx-small', ha='center', va=va)
 
-        if is_door:
-            if is_start_point:
+        if details.is_door:
+            if details.is_start_point:
                 print(f"{actor.sName} is a door and start point")
             extra = {
                 "actor_name": actor.sName,
                 "actor_def": actor.oActorDefLink,
-                "left_shield_entity": actor.pComponents.LIFE.wpLeftDoorShieldEntity,
-                "left_shield_def": get_def_link_for_entity(actor.pComponents.LIFE.wpLeftDoorShieldEntity),
-                "right_shield_entity": actor.pComponents.LIFE.wpRightDoorShieldEntity,
-                "right_shield_def": get_def_link_for_entity(actor.pComponents.LIFE.wpRightDoorShieldEntity),
             }
+            if "LIFE" in actor.pComponents:
+                extra.update({
+                    "left_shield_entity": actor.pComponents.LIFE.wpLeftDoorShieldEntity,
+                    "left_shield_def": get_def_link_for_entity(actor.pComponents.LIFE.wpLeftDoorShieldEntity),
+                    "right_shield_entity": actor.pComponents.LIFE.wpRightDoorShieldEntity,
+                    "right_shield_def": get_def_link_for_entity(actor.pComponents.LIFE.wpRightDoorShieldEntity),
+                })
 
             if len(rooms_for_actor) == 2:
-                simple = {"def": actor_def,
-                          "left": extra["left_shield_def"],
-                          "right": extra["right_shield_def"]}
+                simple = {"def": details.actor_def,
+                          "left": extra.get("left_shield_def"),
+                          "right": extra.get("right_shield_def")}
 
                 left_room, right_room = _find_room_orientation(*rooms_for_actor)
                 custom_weakness = [None, None]
 
                 if simple["left"] == simple["right"] and simple["left"] is None:
-                    if actor_def in _weakness_table_for_def:
-                        custom_weakness[left_room], custom_weakness[right_room] = _weakness_table_for_def[actor_def]
+                    if details.actor_def in _weakness_table_for_def:
+                        custom_weakness[left_room], custom_weakness[right_room] = _weakness_table_for_def[details.actor_def]
                     else:
-                        print(f"no weakness for {actor_def} without shields")
+                        print(f"no weakness for {details.actor_def} without shields")
 
                 node_name = f"Door ({actor.sName})"
                 door_template = {
@@ -3290,69 +3310,80 @@ def decode_world(root: Path, target_level: str):
                         "y": actor.vPos[1],
                         "z": actor.vPos[2],
                     },
+                    "description": "",
                     "extra": extra,
-                    "dock_index": None,
-                    "connected_area_name": None,
-                    "connected_dock_index": None,
+                    "destination": {
+                        "world_name": world["name"],
+                        "area_name": None,
+                        "node_name": None,
+                    },
                     "dock_type": 2,
                     "dock_weakness_index": 1,
                 }
 
                 doors: list[tuple[str, dict]] = []
+                node_names = [
+                    node_data_for_area[room_name][actor.sName][0]
+                    if actor.sName in node_data_for_area.get(room_name, {}) else
+                    node_name
+                    for i, room_name in enumerate(rooms_for_actor)
+                ]
 
                 for i, room_name in enumerate(rooms_for_actor):
-                    door = copy.copy(door_template)
-                    door["dock_index"] = count_docks(room_name)
-                    door["connected_area_name"] = rooms_for_actor[(i + 1) % 2]
-                    door["connected_dock_index"] = count_docks(rooms_for_actor[(i + 1) % 2])
+                    door = copy.deepcopy(door_template)
+                    door["destination"]["area_name"] = rooms_for_actor[(i + 1) % 2]
+                    door["destination"]["node_name"] = node_names[(i + 1) % 2]
                     if custom_weakness[i] is not None:
                         door["dock_type"] = 0
                         door["dock_weakness_index"] = custom_weakness[i]
 
                     if actor.sName in node_data_for_area.get(room_name, {}):
                         old_node_data = node_data_for_area[room_name][actor.sName]
-                        door["connections"] = old_node_data[1]
-                        doors.append((old_node_data[0], door))
+                        door["heal"] = old_node_data[1]["heal"]
+                        door["connections"] = old_node_data[1]["connections"]
                     else:
                         door["connections"] = {}
-                        doors.append((node_name, door))
+                    doors.append((node_names[i], door))
 
                 for i, room_name in enumerate(rooms_for_actor):
                     world["areas"][room_name]["nodes"][doors[i][0]] = doors[i][1]
 
             elif len(rooms_for_actor) > 2:
                 print("multiple rooms for door!", actor.sName, rooms_for_actor)
-        elif is_pickup:
-            if is_start_point:
+
+        elif details.is_pickup:
+            if details.is_start_point:
                 print(f"{actor.sName} is a pickup and start point")
 
             for room_name in rooms_for_actor:
                 if actor.sName in node_data_for_area.get(room_name, {}):
-                    node_name, connections = node_data_for_area[room_name][actor.sName]
+                    node_name, old_node_data = node_data_for_area[room_name][actor.sName]
+                    heal, connections = old_node_data["heal"], old_node_data["connections"]
                 else:
-                    node_name, connections = f"Pickup ({actor.sName})", {}
+                    node_name, heal, connections = f"Pickup ({actor.sName})", False, {}
 
                 world["areas"][room_name]["nodes"][node_name] = {
                     "node_type": "pickup",
-                    "heal": False,
+                    "heal": heal,
                     "coordinates": {
                         "x": actor.vPos[0],
                         "y": actor.vPos[1],
                         "z": actor.vPos[2],
                     },
+                    "description": "",
                     "extra": {
                         "actor_name": actor.sName,
                         "actor_def": actor.oActorDefLink,
                     },
                     "pickup_index": pickup_index,
-                    "major_location": "tank" not in actor_def,
+                    "major_location": "tank" not in details.actor_def,
                     "connections": connections,
                 }
             if len(rooms_for_actor) != 1:
                 print("wrong item!", actor.sName, rooms_for_actor)
             pickup_index += 1
 
-        elif is_elevator:
+        elif details.is_elevator:
             if len(rooms_for_actor) != 1:
                 print("elevator for multiple rooms?", actor.sName, rooms_for_actor)
                 continue
@@ -3361,23 +3392,25 @@ def decode_world(root: Path, target_level: str):
             this_area = world["areas"][rooms_for_actor[0]]
 
             if actor.sName in node_data_for_area.get(room_name, {}):
-                node_name, connections = node_data_for_area[room_name][actor.sName]
+                node_name, old_node_data = node_data_for_area[room_name][actor.sName]
+                heal, connections = old_node_data["heal"], old_node_data["connections"]
             else:
-                node_name, connections = f"Elevator ({actor.sName})", {}
+                node_name, heal, connections = f"Elevator ({actor.sName})", False, {}
 
-            if is_start_point:
+            if details.is_start_point:
                 this_area["valid_starting_location"] = True
                 if this_area["default_node"] is None:
                     this_area["default_node"] = node_name
 
             world["areas"][room_name]["nodes"][node_name] = {
                 "node_type": "teleporter",
-                "heal": False,
+                "heal": heal,
                 "coordinates": {
                     "x": actor.vPos[0],
                     "y": actor.vPos[1],
                     "z": actor.vPos[2],
                 },
+                "description": "",
                 "extra": {
                     "actor_name": actor.sName,
                     "actor_def": actor.oActorDefLink,
@@ -3394,7 +3427,7 @@ def decode_world(root: Path, target_level: str):
                 "connections": connections
             }
 
-        elif is_start_point:
+        elif details.is_start_point:
             if len(rooms_for_actor) != 1:
                 print("start point for multiple rooms?", actor.sName, rooms_for_actor)
                 continue
@@ -3402,41 +3435,38 @@ def decode_world(root: Path, target_level: str):
             this_area = world["areas"][rooms_for_actor[0]]
 
             if actor.sName in node_data_for_area.get(rooms_for_actor[0], {}):
-                node_name, connections = node_data_for_area[rooms_for_actor[0]][actor.sName]
+                node_name, node_data = node_data_for_area[rooms_for_actor[0]][actor.sName]
             else:
                 start_count = sum(1 for name in this_area["nodes"] if name.startswith("Start Point"))
                 node_name = f"Start Point {start_count + 1}"
-                connections = {}
+                node_data = {
+                    "node_type": "generic",
+                    "heal": False,
+                    "coordinates": None,
+                    "description": "",
+                    "extra": {
+                        "actor_name": actor.sName,
+                    },
+                    "connections": {},
+                }
 
-            if this_area["default_node"] is None or actor_def == "startpoint":
+            if this_area["default_node"] is None or details.actor_def == "startpoint":
                 this_area["default_node"] = node_name
 
-            if actor_def == "startpoint":
+            if details.actor_def == "startpoint":
                 this_area["valid_starting_location"] = True
 
-            extra = {}
-            if "SMARTOBJECT" in actor.pComponents and "sUsableEntity" in actor.pComponents.SMARTOBJECT:
-                extra["usable_entity"] = actor.pComponents.SMARTOBJECT.sUsableEntity
-
-            this_area["nodes"][node_name] = {
-                "node_type": "generic",
-                "heal": False,
-                "coordinates": {
-                    "x": actor.vPos[0],
-                    "y": actor.vPos[1],
-                    "z": actor.vPos[2],
-                },
-                "extra": {
-                    "actor_name": actor.sName,
-                    "actor_def": actor.oActorDefLink,
-                    **extra,
-                },
-                "connections": connections,
+            node_data["coordinates"] = {
+                "x": actor.vPos[0],
+                "y": actor.vPos[1],
+                "z": actor.vPos[2],
             }
 
-        # else:
-        #     plt.annotate(actor.sName, actor.vPos[:2], fontsize='xx-small', ha='center')
-        #     plt.plot(actor.vPos[0], actor.vPos[1], "o", color=item_color)
+            node_data["extra"]["actor_def"] = actor.oActorDefLink
+            if "SMARTOBJECT" in actor.pComponents and "sUsableEntity" in actor.pComponents.SMARTOBJECT:
+                node_data["extra"]["usable_entity"] = actor.pComponents.SMARTOBJECT.sUsableEntity
+
+            this_area["nodes"][node_name] = node_data
 
     handles_by_label = {
         key: value
@@ -3449,6 +3479,7 @@ def decode_world(root: Path, target_level: str):
                 "node_type": "generic",
                 "heal": False,
                 "coordinates": None,
+                "description": "",
                 "extra": {},
                 "connections": {},
             }
@@ -3458,16 +3489,16 @@ def decode_world(root: Path, target_level: str):
     # plt.savefig(f"{target_level}.png", dpi=200, bbox_inches='tight')
     plt.close()
 
-    with open(f"{world['name']}.json", "w") as f:
+    with out_path.joinpath(f"{world_names[brfld_path]}.json").open("w") as f:
         json.dump(world, f, indent=4)
 
 
-def decode_all_worlds(root: Path):
+def decode_all_worlds(root: Path, out_path: Path):
     for area_path in world_names.keys():
         level_name = os.path.splitext(os.path.split(area_path)[1])[0]
-        decode_world(root, level_name)
+        decode_world(root, level_name, out_path)
 
 
 if __name__ == '__main__':
-    decode_all_worlds(Path("E:/DreadExtract"))
-    # decode_world(Path("E:/DreadExtract"), "s010_cave")
+    # decode_all_worlds(Path("E:/DreadExtract"), Path(sys.argv[1]))
+    decode_world(Path("E:/DreadExtract"), "s010_cave", Path(sys.argv[1]))
