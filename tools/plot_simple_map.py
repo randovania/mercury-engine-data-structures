@@ -3152,6 +3152,7 @@ class ActorDetails:
             result["connections"] = old_node_data.data["connections"]
         else:
             node_name = default_name
+            result["connections"] = {}
 
         return NodeDefinition(node_name, result)
 
@@ -3337,7 +3338,9 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
 
     def add_node(target_area: str, node_def: NodeDefinition):
         world["areas"][target_area]["nodes"][node_def.name] = node_def.data
-        actor_to_node[node_def.data["extra"]["actor_name"]] = node_def
+        actor_name = node_def.data["extra"].get("actor_name")
+        if actor_name is not None:
+            actor_to_node[node_def.data["extra"]["actor_name"]] = node_def
 
     for actor in brfld.actors_for_layer("default").values():
         details = all_default_details[actor.sName]
@@ -3419,16 +3422,26 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         definition = details.create_node_template("generic", f"Start Point {start_count + 1}",
                                                   node_data_for_area.get(room_name))
 
+        other_actor = None
+        if "SMARTOBJECT" in actor.pComponents and "sUsableEntity" in actor.pComponents.SMARTOBJECT:
+            other_actor = actor_to_node.get(actor.pComponents.SMARTOBJECT.sUsableEntity)
+            definition.data["extra"]["usable_entity"] = actor.pComponents.SMARTOBJECT.sUsableEntity
+
+        if other_actor is not None:
+            this_area["nodes"].pop(definition.name, None)
+            definition = other_actor
+        else:
+            definition.data["extra"].pop("actor_name")
+            definition.data["extra"].pop("actor_def")
+
         if this_area["default_node"] is None or details.actor_def == "startpoint":
             this_area["default_node"] = definition.name
 
         if details.actor_def == "startpoint":
             this_area["valid_starting_location"] = True
 
-        definition.data["extra"]["actor_def"] = actor.oActorDefLink
-        if "SMARTOBJECT" in actor.pComponents and "sUsableEntity" in actor.pComponents.SMARTOBJECT:
-            definition.data["extra"]["usable_entity"] = actor.pComponents.SMARTOBJECT.sUsableEntity
-
+        definition.data["extra"]["start_point_actor_name"] = actor.sName
+        definition.data["extra"]["start_point_actor_def"] = actor.oActorDefLink
         add_node(room_name, definition)
 
     for area_name, area in world["areas"].items():
