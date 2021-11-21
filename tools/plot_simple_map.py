@@ -3109,7 +3109,7 @@ class ActorDetails:
             existing_data: typing.Optional[dict[str, NodeDefinition]]
     ) -> NodeDefinition:
 
-        result = {
+        result: dict = {
             "node_type": node_type,
             "heal": False,
             "coordinates": {
@@ -3132,6 +3132,18 @@ class ActorDetails:
             }
             result["dock_type"] = 2
             result["dock_weakness_index"] = 1
+
+        elif node_type == "pickup":
+            result["pickup_index"] = None
+            result["major_location"] = None
+
+        elif node_type == "teleporter":
+            result["destination"] = {
+                "world_name": None,
+                "area_name": None,
+            }
+            result["keep_name_when_vanilla"] = True
+            result["editable"] = True
 
         if existing_data is not None and self.actor.sName in existing_data:
             old_node_data = existing_data[self.actor.sName]
@@ -3352,38 +3364,13 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                 print(f"{actor.sName} is a pickup and start point")
 
             for room_name in details.rooms:
-                if actor.sName in node_data_for_area.get(room_name, {}):
-                    node_name, old_node_data = node_data_for_area[room_name][actor.sName]
-                    heal, connections = old_node_data["heal"], old_node_data["connections"]
-                else:
-                    node_name, heal, connections = f"Pickup ({actor.sName})", False, {}
-
-                add_node(room_name, NodeDefinition(
-                    node_name,
-                    {
-                        **details.create_node_template("pickup"),
-                        "pickup_index": pickup_index,
-                        "major_location": "tank" not in details.actor_def,
-                        "connections": connections,
-                    }
-                ))
-                world["areas"][room_name]["nodes"][node_name] = {
-                    "node_type": "pickup",
-                    "heal": heal,
-                    "coordinates": {
-                        "x": actor.vPos[0],
-                        "y": actor.vPos[1],
-                        "z": actor.vPos[2],
-                    },
-                    "description": "",
-                    "extra": {
-                        "actor_name": actor.sName,
-                        "actor_def": actor.oActorDefLink,
-                    },
+                definition = details.create_node_template("pickup", f"Pickup ({actor.sName})",
+                                                          node_data_for_area.get(room_name))
+                definition.data.update({
                     "pickup_index": pickup_index,
                     "major_location": "tank" not in details.actor_def,
-                    "connections": connections,
-                }
+                })
+                add_node(room_name, definition)
 
             if len(details.rooms) != 1:
                 print("wrong item!", actor.sName, details.rooms)
@@ -3397,42 +3384,24 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             room_name = details.rooms[0]
             this_area = world["areas"][details.rooms[0]]
 
-            if actor.sName in node_data_for_area.get(room_name, {}):
-                node_name, old_node_data = node_data_for_area[room_name][actor.sName]
-                heal, connections = old_node_data["heal"], old_node_data["connections"]
-            else:
-                node_name, heal, connections = f"Elevator ({actor.sName})", False, {}
-
-            if details.is_start_point:
-                this_area["valid_starting_location"] = True
-                if this_area["default_node"] is None:
-                    this_area["default_node"] = node_name
-
-            world["areas"][room_name]["nodes"][node_name] = {
-                "node_type": "teleporter",
-                "heal": heal,
-                "coordinates": {
-                    "x": actor.vPos[0],
-                    "y": actor.vPos[1],
-                    "z": actor.vPos[2],
-                },
-                "description": "",
-                "extra": {
-                    "actor_name": actor.sName,
-                    "actor_def": actor.oActorDefLink,
-                    "elevator_component": actor.pComponents.USABLE["@type"],
-                    "target_spawn_point": actor.pComponents.USABLE.sTargetSpawnPoint,
-                },
-
+            definition = details.create_node_template("teleporter", f"Elevator ({actor.sName})",
+                                                      node_data_for_area.get(room_name))
+            definition.data["extra"].update({
+                "elevator_component": actor.pComponents.USABLE["@type"],
+                "target_spawn_point": actor.pComponents.USABLE.sTargetSpawnPoint,
+            })
+            definition.data.update({
                 "destination": {
                     "world_name": id_to_name[actor.pComponents.USABLE.sScenarioName],
                     "area_name": _rooms_for_actors[actor.pComponents.USABLE.sScenarioName][
                         actor.pComponents.USABLE.sTargetSpawnPoint][0],
-                },
-                "keep_name_when_vanilla": True,
-                "editable": True,
-                "connections": connections
-            }
+                }
+            })
+            add_node(room_name, definition)
+            if details.is_start_point:
+                this_area["valid_starting_location"] = True
+                if this_area["default_node"] is None:
+                    this_area["default_node"] = definition.name
 
     for actor in brfld.actors_for_layer("default").values():
         details = all_default_details[actor.sName]
@@ -3443,41 +3412,24 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             print("start point for multiple rooms?", actor.sName, details.rooms)
             continue
 
-        this_area = world["areas"][details.rooms[0]]
+        room_name = details.rooms[0]
+        this_area = world["areas"][room_name]
 
-        if actor.sName in node_data_for_area.get(details.rooms[0], {}):
-            node_name, node_data = node_data_for_area[details.rooms[0]][actor.sName]
-        else:
-            start_count = sum(1 for name in this_area["nodes"] if name.startswith("Start Point"))
-            node_name = f"Start Point {start_count + 1}"
-            node_data = {
-                "node_type": "generic",
-                "heal": False,
-                "coordinates": None,
-                "description": "",
-                "extra": {
-                    "actor_name": actor.sName,
-                },
-                "connections": {},
-            }
+        start_count = sum(1 for name in this_area["nodes"] if name.startswith("Start Point"))
+        definition = details.create_node_template("generic", f"Start Point {start_count + 1}",
+                                                  node_data_for_area.get(room_name))
 
         if this_area["default_node"] is None or details.actor_def == "startpoint":
-            this_area["default_node"] = node_name
+            this_area["default_node"] = definition.name
 
         if details.actor_def == "startpoint":
             this_area["valid_starting_location"] = True
 
-        node_data["coordinates"] = {
-            "x": actor.vPos[0],
-            "y": actor.vPos[1],
-            "z": actor.vPos[2],
-        }
-
-        node_data["extra"]["actor_def"] = actor.oActorDefLink
+        definition.data["extra"]["actor_def"] = actor.oActorDefLink
         if "SMARTOBJECT" in actor.pComponents and "sUsableEntity" in actor.pComponents.SMARTOBJECT:
-            node_data["extra"]["usable_entity"] = actor.pComponents.SMARTOBJECT.sUsableEntity
+            definition.data["extra"]["usable_entity"] = actor.pComponents.SMARTOBJECT.sUsableEntity
 
-        this_area["nodes"][node_name] = node_data
+        add_node(room_name, definition)
 
     for area_name, area in world["areas"].items():
         if not area["nodes"]:
@@ -3503,4 +3455,4 @@ def decode_all_worlds(root: Path, out_path: Path):
 
 if __name__ == '__main__':
     # decode_all_worlds(Path("E:/DreadExtract"), Path(sys.argv[1]))
-    decode_world(Path("E:/DreadExtract"), "s090_skybase", Path(sys.argv[1]))
+    decode_world(Path("E:/DreadExtract"), "s040_aqua", Path(sys.argv[1]))
