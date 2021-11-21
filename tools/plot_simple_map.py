@@ -3093,6 +3093,17 @@ _usable_component_to_node_name = {
     "CAmmoRechargeComponent": "Ammo Recharge",
     "CMapAcquisitionComponent": "Map Station",
     "CTotalRechargeComponent": "Total Recharge",
+
+    "CElevatorCommanderUsableComponent": "Raven Beak Elevator",
+
+    "CWaterPlatformUsableComponent": "Water Device",
+    "CThermalDeviceComponent": "Thermal Device",
+    "CElectricGeneratorComponent": "Electric Generator",
+}
+_usable_component_as_event_node = {
+    "CWaterPlatformUsableComponent",
+    "CThermalDeviceComponent",
+    "CElectricGeneratorComponent",
 }
 
 
@@ -3349,7 +3360,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         actor.sName: ActorDetails(actor, all_rooms)
         for actor in brfld.actors_for_layer("default").values()
     }
-    actor_to_node: dict[str, NodeDefinition] = {}
+    actor_to_area: dict[str, str] = {}
 
     def add_node(target_area: str, node_def: NodeDefinition):
         new_actor = get_actor_name_for_node(node_def.data)
@@ -3358,10 +3369,17 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                 continue
             if get_actor_name_for_node(existing_node) == new_actor:
                 raise ValueError(f"New node {node_def.name} with actor {new_actor} conflicts "
-                                 f"with existing node {existing_name}")
+                                 f"with existing node {existing_name} in {target_area}")
 
         world["areas"][target_area]["nodes"][node_def.name] = node_def.data
-        actor_to_node[get_actor_name_for_node(node_def.data)] = node_def
+        actor_to_area[get_actor_name_for_node(node_def.data)] = target_area
+
+    def get_node_def_for_actor(actor_name: str) -> typing.Optional[NodeDefinition]:
+        actor_area = actor_to_area.get(actor_name)
+        if actor_area is not None:
+            for existing_name, existing_node in world["areas"][actor_area]["nodes"].items():
+                if get_actor_name_for_node(existing_node) == actor_name:
+                    return NodeDefinition(existing_name, existing_node)
 
     for actor in brfld.actors_for_layer("default").values():
         details = all_default_details[actor.sName]
@@ -3444,6 +3462,8 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             this_area = world["areas"][room_name]
             node_prefix = _usable_component_to_node_name[usable_type]
 
+            # FIXME: event nodes with _usable_component_as_event_node
+
             definition = details.create_node_template(
                 "generic",
                 _build_node_name_with_prefix(node_prefix, this_area),
@@ -3466,6 +3486,10 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             print("start point for multiple rooms?", actor.sName, details.rooms)
             continue
 
+        if details.is_usable:
+            print(f"Skipping start point {actor.sName} as it's also usable")
+            continue
+
         room_name = details.rooms[0]
         this_area = world["areas"][room_name]
 
@@ -3477,10 +3501,11 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
 
         other_actor = None
         if "SMARTOBJECT" in actor.pComponents and "sUsableEntity" in actor.pComponents.SMARTOBJECT:
-            other_actor = actor_to_node.get(actor.pComponents.SMARTOBJECT.sUsableEntity)
+            other_actor = get_node_def_for_actor(actor.pComponents.SMARTOBJECT.sUsableEntity)
             definition.data["extra"]["usable_entity"] = actor.pComponents.SMARTOBJECT.sUsableEntity
 
         if other_actor is not None:
+            this_area["nodes"].pop(other_actor.name)
             this_area["nodes"].pop(definition.name, None)
             if this_area["default_node"] == definition.name:
                 this_area["default_node"] = None
@@ -3546,13 +3571,18 @@ def _fix_nodes_with_prefix(definition: NodeDefinition, node_prefix: str, this_ar
     if not definition.name.startswith(node_prefix):
         return definition
 
+    this_area["nodes"].pop(definition.name, None)
     count = sum(1 for name in this_area["nodes"] if name.startswith(node_prefix))
-    self_is_present = definition.name in this_area["nodes"]
 
-    if count == 0 or (count == 1 and self_is_present):
-        if self_is_present:
-            this_area["nodes"].pop(definition.name)
+    if count == 0:
         return NodeDefinition(node_prefix, definition.data)
+
+    elif node_prefix in this_area["nodes"]:
+        not_numbered_renamed = f"{node_prefix} 1"
+        if not_numbered_renamed in this_area["nodes"]:
+            raise ValueError(f"Expected area to not have a {not_numbered_renamed}")
+
+        this_area["nodes"][not_numbered_renamed] = this_area["nodes"].pop(node_prefix)
 
     return definition
 
@@ -3564,5 +3594,5 @@ def decode_all_worlds(root: Path, out_path: Path):
 
 
 if __name__ == '__main__':
-    # decode_all_worlds(Path("E:/DreadExtract"), Path(sys.argv[1]))
-    decode_world(Path("E:/DreadExtract"), "s080_shipyard", Path(sys.argv[1]))
+    decode_all_worlds(Path("E:/DreadExtract"), Path(sys.argv[1]))
+    # decode_world(Path("E:/DreadExtract"), "s080_shipyard", Path(sys.argv[1]))
