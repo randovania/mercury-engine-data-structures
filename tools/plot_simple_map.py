@@ -46,7 +46,7 @@ _polygon_override = {
         [-1200.0, -6200.0]
     ],
     ("s010_cave", "collision_camera_023"): [
-        [24900.0, 5100.0], [17800.0, 5100.0], [17800.0, 3500.0], [24900.0, 3500.0]
+        [24900.0, 5100.0], [17800.0, 5100.0], [17800.0, 3400.0], [24900.0, 3400.0]
     ],
     ("s010_cave", "collision_camera_048"): [
         [800.0, 3900.0],
@@ -176,11 +176,11 @@ _rooms_for_actors = {
         'Door028': ['collision_camera_008 (A)', 'collision_camera_009 (A)'],
         'Door029 (CG-CL,OP)': ['collision_camera_021 (A)', 'collision_camera_065 (A)'],
         'Door030 (PW-PW)': ['collision_camera_050 (A)', 'collision_camera_065 (A)'],
-        'Door032 (CG-CG)': ['collision_camera_022 (A)'],
+        'Door032 (CG-CG)': ['collision_camera_022 (A)', 'collision_camera_023 (A)'],
         'Door033 (PW-PW)': ['collision_camera_066 (A)', 'collision_camera_067 (A)'],
         'Door034 (PW-PW)': ['collision_camera_025 (A)', 'collision_camera_066 (A)'],
         'Door035 (PW-PW)': ['collision_camera_024 (A)', 'collision_camera_025 (A)'],
-        'Door036 (PW-PW)': ['collision_camera_024 (A)'],
+        'Door036 (PW-PW)': ['collision_camera_023 (A)', 'collision_camera_024 (A)'],
         'Door037 (CG-CG)': ['collision_camera_023_B (A)', 'collision_camera_024 (A)'],
         'Door038 (PW-PW)': ['collision_camera_004 (A)', 'collision_camera_063 (A)'],
         'Door038 (PW-PW)_000': ['collision_camera_004 (A)', 'collision_camera_072 (A)'],
@@ -196,7 +196,7 @@ _rooms_for_actors = {
         'Door054': ['collision_camera_011 (A)', 'collision_camera_055 (A)'],
         'Door055': ['collision_camera_026 (A)', 'collision_camera_028 (A)'],
         'Door055 (PW-PW)': ['collision_camera_003 (A)', 'collision_camera_016 (A)'],
-        'Door056': ['collision_camera_028 (A)'],
+        'Door056': ['collision_camera_011 (A)', 'collision_camera_028 (A)'],
         'Door056 (CU)': ['collision_camera_064 (A)', 'collision_camera_074 (A)'],
         'Door057': ['collision_camera_026 (A)', 'collision_camera_029 (A)'],
         'Door057 (TH)': ['collision_camera_065 (A)', 'collision_camera_070 (A)'],
@@ -218,9 +218,9 @@ _rooms_for_actors = {
         'Door070': ['collision_camera_080 (A)', 'collision_camera_081 (A)'],
         'Door070_missileShield': ['collision_camera_080 (A)', 'collision_camera_081 (A)'],
         'Door073': ['collision_camera_081 (A)', 'collision_camera_085 (A)'],
-        'Door074': ['collision_camera_085 (A)'],
+        'Door074': ['collision_camera_085 (A)', 'collision_camera_056 (A)'],
         'Door075': ['collision_camera_081 (A)', 'collision_camera_082 (A)'],
-        'Door076': ['collision_camera_082 (A)'],
+        'Door076': ['collision_camera_082 (A)', 'collision_camera_056 (A)'],
         'Door077': ['collision_camera_082 (A)', 'collision_camera_091 (A)'],
         'Door078': ['collision_camera_086 (A)', 'collision_camera_091 (A)'],
         'DoorEmmy01': ['collision_camera_054 (A)', 'collision_camera_061 (A)'],
@@ -2149,7 +2149,7 @@ _rooms_for_actors = {
                     'door_shield_plasma_003': ['collision_camera_021 (G)', 'collision_camera_022 (G)'],
                     'door_shield_plasma_004': ['collision_camera_021 (G)', 'collision_camera_022 (G)'],
                     'doorchargecharge_000': ['collision_camera_018 (G)', 'collision_camera_020 (G)'],
-                    'doorchargecharge_001': ['collision_camera_019 (G)'],
+                    'doorchargecharge_001': ['collision_camera_016 (G)', 'collision_camera_019 (G)'],
                     'doorclosedcharge': ['collision_camera_024 (G)', 'collision_camera_039 (G)'],
                     'doorclosedpower_000': ['collision_camera_033 (G)', 'collision_camera_034 (G)'],
                     'doorclosedpower_001': ['collision_camera_009 (G)', 'collision_camera_010 (G)'],
@@ -2316,7 +2316,7 @@ _rooms_for_actors = {
                     'trigger_camera_25_C': ['collision_camera_025_B (G)'],
                     'trigger_camera_ZoomIn_off': ['collision_camera_008 (G)'],
                     'trigger_camera_ZoomIn_on': ['collision_camera_007 (G)'],
-                    'tunnelframe': ['collision_camera_019 (G)'],
+                    'tunnelframe': ['collision_camera_016 (G)', 'collision_camera_019 (G)'],
                     'wagontrain_quarantine_000': ['collision_camera_037 (G)'],
                     'wagontrain_quarantine_000_platform': ['collision_camera_037 (G)'],
                     'wagontrain_quarantine_with_cutscene_000': ['collision_camera_037 (G)'],
@@ -2343,8 +2343,7 @@ _rooms_for_actors = {
                         'GateTrigger': ['collision_camera_011 (E)'],
                         'SP_Checkpoint_ChozoWarriorX': ['collision_camera_007 (E)'],
                         'SP_Checkpoint_Dead_ChozoWarriorX': ['collision_camera_004 (E)'],
-                        'SP_Checkpoint_PlasmaBeam': ['collision_camera_003 (E)',
-                                                     'collision_camera_MBL_B (E)'],
+                        'SP_Checkpoint_PlasmaBeam': ['collision_camera_003 (E)'],
                         'SP_Checkpoint_ProfessorX': ['collision_camera_001 (E)'],
                         'SP_PlasmaBeam': ['collision_camera_006 (E)'],
                         'StartPoint0': ['collision_camera_001 (E)'],
@@ -2361,7 +2360,7 @@ _rooms_for_actors = {
                         'ammorecharge_000': ['collision_camera_003 (E)'],
                         'ammorecharge_000_platform': ['collision_camera_003 (E)'],
                         'chozoastro': ['collision_camera_005 (E)'],
-                        'db_reg_qt_001': ['collision_camera_003 (E)', 'collision_camera_MBL_B (E)'],
+                        'db_reg_qt_001': ['collision_camera_003 (E)'],
                         'door_shield_plasma_000': ['collision_camera_002 (E)',
                                                    'collision_camera_003 (E)'],
                         'door_shield_plasma_001': [],
@@ -2370,11 +2369,11 @@ _rooms_for_actors = {
                         'door_shield_plasma_004': ['collision_camera_002 (E)',
                                                    'collision_camera_003 (E)'],
                         'door_shield_plasma_005': [],
-                        'doorpowerclosed_000': [],
+                        'doorpowerclosed_000': ['collision_camera_003 (E)', 'collision_camera_006 (E)'],
                         'doorpowerpower_000': ['collision_camera_002 (E)', 'collision_camera_003 (E)'],
                         'doorpowerpower_001': ['collision_camera_003 (E)', 'collision_camera_004 (E)'],
                         'doorpowerpower_002': ['collision_camera_003 (E)', 'collision_camera_005 (E)'],
-                        'doorpowerpower_003': [],
+                        'doorpowerpower_003': ['collision_camera_003 (E)', 'collision_camera_006 (E)'],
                         'doorpowerpower_004': ['collision_camera_001 (E)', 'collision_camera_012 (E)'],
                         'doorpowerpower_005': ['collision_camera_004 (E)', 'collision_camera_007 (E)'],
                         'doorpowerpower_006': ['collision_camera_005 (E)', 'collision_camera_007 (E)'],
@@ -2503,7 +2502,7 @@ _rooms_for_actors = {
                       'doorpowerpower_011': ['collision_camera_012 (F)', 'collision_camera_016 (F)'],
                       'doorpowerpower_012': ['collision_camera_012 (F)', 'collision_camera_015 (F)'],
                       'doorpowerpower_013': ['collision_camera_012 (F)', 'collision_camera_015 (F)'],
-                      'doorpowerpower_014': ['collision_camera_026 (F)'],
+                      'doorpowerpower_014': ['collision_camera_026 (F)', 'collision_camera_027 (F)'],
                       'doorpowerpower_015': ['collision_camera_021 (F)', 'collision_camera_033 (F)'],
                       'doorpowerpower_016': ['collision_camera_003 (F)', 'collision_camera_021 (F)'],
                       'doorpowerpower_017': ['collision_camera_032 (F)', 'collision_camera_033 (F)'],
@@ -2561,7 +2560,7 @@ _rooms_for_actors = {
                       'env_frozen_gen_001': ['collision_camera_018 (F)'],
                       'ev_chozowall': ['collision_camera_040 (F)'],
                       'ev_entercu_cv_001': ['collision_camera_034 (F)', 'collision_camera_038_A (F)'],
-                      'ev_gatesealed_sanc_000': ['collision_camera_014 (F)'],
+                      'ev_gatesealed_sanc_000': ['collision_camera_012 (F)', 'collision_camera_014 (F)'],
                       'ev_ph2drain_activator': ['collision_camera_038_A (F)'],
                       'ev_ph2drain_platform': ['collision_camera_038_A (F)'],
                       'fan_reg_000': ['collision_camera_006 (F)'],
@@ -2656,6 +2655,8 @@ _rooms_for_actors = {
                       'spacejump_marker_000': ['collision_camera_012 (F)'],
                       'spacejump_marker_001': ['collision_camera_012 (F)'],
                       'spacejump_marker_002': ['collision_camera_012 (F)'],
+                      'tunnelframe': ['collision_camera_031 (F)', 'collision_camera_034 (F)'],
+                      'tunnelframe_000': ['collision_camera_034 (F)', 'collision_camera_038_A (F)'],
                       'teleporter_000': ['collision_camera_007 (F)'],
                       'teleporter_000_platform': ['collision_camera_007 (F)'],
                       'totalrechargestation_000': ['collision_camera_002 (F)'],
@@ -3102,9 +3103,9 @@ _usable_component_to_node_name = {
 
     "CElevatorCommanderUsableComponent": "Raven Beak Elevator",
 
-    "CWaterPlatformUsableComponent": "Water Device",
-    "CThermalDeviceComponent": "Thermal Device",
-    "CElectricGeneratorComponent": "Electric Generator",
+    "CWaterPlatformUsableComponent": "Event - Water Device",
+    "CThermalDeviceComponent": "Event - Thermal Device",
+    "CElectricGeneratorComponent": "Event - Electric Generator",
 }
 _usable_component_as_event_node = {
     "CWaterPlatformUsableComponent",
@@ -3127,10 +3128,17 @@ class NodeDefinition(typing.NamedTuple):
 
 class ActorDetails:
     def __init__(self, actor: construct.Container, all_rooms: dict[str, Polygon]):
+        level_name = os.path.splitext(os.path.split(brfld_path)[1])[0]
         self.actor = actor
         self.actor_def = os.path.splitext(os.path.split(actor.oActorDefLink)[1])[0]
         self.position = Point(actor.vPos)
-        self.rooms: list[str] = [name for name, pol in all_rooms.items() if pol.contains(self.position)]
+        try:
+            self.rooms = [room for room in _rooms_for_actors[level_name][actor.sName] if room in all_rooms]
+        except KeyError:
+            self.rooms = []
+        if not self.rooms:
+            self.rooms: list[str] = [name for name, pol in all_rooms.items() if pol.contains(self.position)]
+
         self.is_door = "LIFE" in actor.pComponents and "CDoorLifeComponent" == actor.pComponents.LIFE["@type"]
         self.is_door = self.is_door or "SENSORDOOR" in actor.pComponents or self.actor_def == "dooremmy"
         self.is_start_point = "STARTPOINT" in actor.pComponents and "dooremmy" not in self.actor_def
@@ -3404,8 +3412,11 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                 if get_actor_name_for_node(existing_node) == actor_name:
                     return NodeDefinition(existing_name, existing_node)
 
-    for actor in brfld.actors_for_layer("default").values():
-        details = all_default_details[actor.sName]
+    for actor in brfld.all_actors():
+        if actor.sName in all_default_details:
+            details = all_default_details[actor.sName]
+        else:
+            details = ActorDetails(actor, all_rooms)
         if not any([details.is_door, details.is_pickup, details.is_elevator, details.is_usable,
                     details.is_breakable_blob]):
             continue
@@ -3422,8 +3433,9 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                 for i, room_name in enumerate(details.rooms):
                     add_node(room_name, doors[i])
 
-            elif len(details.rooms) > 2:
-                print("multiple rooms for door!", actor.sName, details.rooms)
+            else:
+                if "trap_thermal_" not in actor.sName:
+                    print("multiple rooms for door!", actor.sName, details.position, details.rooms)
 
         elif details.is_pickup:
             if details.is_start_point:
@@ -3486,8 +3498,6 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             this_area = world["areas"][room_name]
             node_prefix = _usable_component_to_node_name[usable_type]
 
-            # FIXME: event nodes with _usable_component_as_event_node
-
             definition = details.create_node_template(
                 "event" if usable_type in _usable_component_as_event_node else "generic",
                 _build_node_name_with_prefix(node_prefix, this_area),
@@ -3508,7 +3518,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             room_name = details.rooms[0]
             definition = details.create_node_template(
                 "event",
-                f"Breakable ({actor.sName})",
+                f"Event - Breakable ({actor.sName})",
                 node_data_for_area.get(room_name),
             )
             definition.data["event_index"] = create_event("default", actor.sName)
@@ -3595,7 +3605,10 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         add_node(room_name, _fix_nodes_with_prefix(definition, node_prefix, this_area))
 
     for area_name, area in world["areas"].items():
-        if not area["nodes"]:
+        if area["nodes"]:
+            if "Placeholder" in area["nodes"] and len(area["nodes"]) > 1:
+                area["nodes"].pop("Placeholder")
+        else:
             area["nodes"]["Placeholder"] = {
                 "node_type": "generic",
                 "heal": False,
