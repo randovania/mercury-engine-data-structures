@@ -11,7 +11,6 @@ from mercury_engine_data_structures.formats.base_resource import AssetId, BaseRe
 from mercury_engine_data_structures.formats.pkg import PKGHeader, Pkg
 from mercury_engine_data_structures.game_check import Game
 
-
 T = typing.TypeVar("T")
 
 
@@ -149,9 +148,32 @@ class PkgEditor:
 
         return format_class.parse(data, target_game=self.target_game)
 
+    def add_new_asset(self, asset_id: NameOrAssetId, new_data: typing.Union[bytes, BaseResource],
+                      in_pkgs: typing.Iterator[str]):
+        """
+        Adds an asset that doesn't already exists.
+        """
+        if self.does_asset_exists(asset_id):
+            raise ValueError(f"{asset_id} already exists")
+
+        self._modified_resources[resolve_asset_id(asset_id)] = b""
+        self.replace_asset(asset_id, new_data)
+        for pkg_name in in_pkgs:
+            self.ensure_present(asset_id, pkg_name)
+
     def replace_asset(self, asset_id: NameOrAssetId, new_data: typing.Union[bytes, BaseResource]):
+        """
+        Replaces an existing asset.
+        See `add_new_asset` for new assets.
+        """
+
+        # Test if the asset exists
+        if not self.does_asset_exists(asset_id):
+            raise ValueError(f"Unknown asset: {asset_id}")
+
         if not isinstance(new_data, bytes):
             new_data = new_data.build()
+
         self._modified_resources[resolve_asset_id(asset_id)] = new_data
 
     def delete_asset(self, asset_id: NameOrAssetId):
