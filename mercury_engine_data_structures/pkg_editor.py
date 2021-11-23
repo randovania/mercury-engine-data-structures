@@ -50,19 +50,22 @@ class PkgEditor:
         self._modified_resources = {}
         self._in_memory_pkgs = {}
 
-        self.files = {
-            pkg_path.relative_to(root).as_posix(): pkg_path
+        self.all_pkgs = [
+            pkg_path.relative_to(root).as_posix()
             for pkg_path in all_pkgs
-        }
+        ]
         self._update_headers()
+
+    def path_to_pkg(self, pkg_name: str) -> Path:
+        return self.root.joinpath(pkg_name)
 
     def _update_headers(self):
         self.headers = {}
         self._ensured_asset_ids = {}
         self._files_for_asset_id = {}
 
-        for name, pkg_path in self.files.items():
-            with pkg_path.open("rb") as f:
+        for name in self.all_pkgs:
+            with self.path_to_pkg(name).open("rb") as f:
                 self.headers[name] = PKGHeader.parse_stream(f, target_game=self.target_game)
 
             self._ensured_asset_ids[name] = set()
@@ -124,7 +127,7 @@ class PkgEditor:
 
             entry = _find_entry_for_asset_id(asset_id, header)
             if entry is not None:
-                return _read_file_with_entry(self.files[name], entry)
+                return _read_file_with_entry(self.path_to_pkg(name), entry)
 
         raise ValueError(f"Unknown asset_id: {asset_id:0x}")
 
@@ -185,12 +188,49 @@ class PkgEditor:
             raise ValueError(f"Unknown pkg_name: {pkg_name}")
 
         if pkg_name not in self._in_memory_pkgs:
-            with self.files[pkg_name].open("rb") as f:
+            with self.path_to_pkg(pkg_name).open("rb") as f:
                 self._in_memory_pkgs[pkg_name] = Pkg.parse_stream(f, target_game=self.target_game)
 
         return self._in_memory_pkgs[pkg_name]
 
-    def save_modified_pkgs(self):
+    def load_and_modify_pkgs_in_ram(self):
+        modified_pkgs = set()
+        for asset_id in self._modified_resources.keys():
+            modified_pkgs.update(self._files_for_asset_id[asset_id])
+
+        # Ensure all pkgs we'll modify is in memory already.
+        # We'll need to read these files anyway to modify, so do it early to speedup
+        # the get_raw_assets for _ensured_asset_ids.
+        for pkg_name in modified_pkgs:
+            self.get_pkg(pkg_name)
+
+        # Read all asset ids we need to copy somewhere else
+        asset_ids_to_copy = {}
+        for asset_ids in self._ensured_asset_ids.values():
+            for asset_id in asset_ids:
+                if asset_id not in asset_ids_to_copy:
+                    asset_ids_to_copy[asset_id] = self.get_raw_asset(asset_id)
+
+        for pkg_name in modified_pkgs:
+            pkg = self._in_memory_pkgs.pop(pkg_name)
+
+            for asset_id, data in self._modified_resources.items():
+                if pkg_name in self._files_for_asset_id[asset_id]:
+                    if data is None:
+                        pkg.remove_asset(asset_id)
+                    else:
+                        pkg.replace_asset(asset_id, data)
+
+            # Add the files that were ensured to be present in this pkg
+            for asset_id in self._ensured_asset_ids[pkg_name]:
+                pkg.add_asset(asset_id, asset_ids_to_copy[asset_id])
+
+        return modified_pkgs
+
+    def save_modified_pkgs(self, output_path: Optional[Path] = None):
+        if output_path is None:
+            output_path = self.root
+
         modified_pkgs = set()
         for asset_id in self._modified_resources.keys():
             modified_pkgs.update(self._files_for_asset_id[asset_id])
@@ -223,7 +263,7 @@ class PkgEditor:
                 pkg.add_asset(asset_id, asset_ids_to_copy[asset_id])
 
             # Write the data
-            with self.files[pkg_name].open("wb") as f:
+            with output_path.joinpath(pkg_name).open("wb") as f:
                 pkg.build_stream(f)
 
         self._modified_resources = {}
