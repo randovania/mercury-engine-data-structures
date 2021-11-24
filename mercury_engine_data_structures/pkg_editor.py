@@ -156,10 +156,10 @@ class PkgEditor:
         if self.does_asset_exists(asset_id):
             raise ValueError(f"{asset_id} already exists")
 
-        self._modified_resources[resolve_asset_id(asset_id)] = b""
+        self._files_for_asset_id[resolve_asset_id(asset_id)] = set()
         self.replace_asset(asset_id, new_data)
         for pkg_name in in_pkgs:
-            self.ensure_present(asset_id, pkg_name)
+            self.ensure_present(pkg_name, asset_id)
 
     def replace_asset(self, asset_id: NameOrAssetId, new_data: typing.Union[bytes, BaseResource]):
         """
@@ -285,6 +285,7 @@ class PkgEditor:
                 pkg.add_asset(asset_id, asset_ids_to_copy[asset_id])
 
             # Write the data
+            output_path.joinpath(pkg_name).parent.mkdir(parents=True, exist_ok=True)
             with output_path.joinpath(pkg_name).open("wb") as f:
                 pkg.build_stream(f)
 
