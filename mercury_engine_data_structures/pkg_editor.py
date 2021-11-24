@@ -1,3 +1,5 @@
+import copy
+import logging
 import os.path
 import os.path
 import typing
@@ -7,11 +9,13 @@ from typing import Dict, Optional, Iterator, Set
 import construct
 
 from mercury_engine_data_structures import formats, dread_data
+from mercury_engine_data_structures.formats import Toc
 from mercury_engine_data_structures.formats.base_resource import AssetId, BaseResource, NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.formats.pkg import PKGHeader, Pkg
 from mercury_engine_data_structures.game_check import Game
 
 T = typing.TypeVar("T")
+logger = logging.getLogger(__name__)
 
 
 def _find_entry_for_asset_id(asset_id: AssetId, pkg_header):
@@ -36,10 +40,11 @@ class PkgEditor:
     """
     files: Dict[str, Path]
     headers: Dict[str, construct.Container]
-    _files_for_asset_id: Dict[AssetId, Set[str]]
+    _files_for_asset_id: Dict[AssetId, Set[Optional[str]]]
     _ensured_asset_ids: Dict[str, Set[AssetId]]
     _modified_resources: Dict[AssetId, Optional[bytes]]
     _in_memory_pkgs: Dict[str, Pkg]
+    _toc: Toc
 
     def __init__(self, root: Path, target_game: Game = Game.DREAD):
         all_pkgs = root.rglob("*.pkg")
@@ -58,10 +63,18 @@ class PkgEditor:
     def path_to_pkg(self, pkg_name: str) -> Path:
         return self.root.joinpath(pkg_name)
 
+    def _add_pkg_name_for_asset_id(self, asset_id: AssetId, pkg_name: Optional[str]):
+        self._files_for_asset_id[asset_id] = self._files_for_asset_id.get(asset_id, set())
+        self._files_for_asset_id[asset_id].add(pkg_name)
+
     def _update_headers(self):
         self.headers = {}
         self._ensured_asset_ids = {}
         self._files_for_asset_id = {}
+        self._name_for_asset_id = copy.copy(dread_data.all_asset_id_to_name())
+
+        self._toc = Toc.parse(self.root.joinpath(Toc.system_files_name()).read_bytes(),
+                              target_game=self.target_game)
 
         for name in self.all_pkgs:
             with self.path_to_pkg(name).open("rb") as f:
@@ -69,8 +82,14 @@ class PkgEditor:
 
             self._ensured_asset_ids[name] = set()
             for entry in self.headers[name].file_entries:
-                self._files_for_asset_id[entry.asset_id] = self._files_for_asset_id.get(entry.asset_id, set())
-                self._files_for_asset_id[entry.asset_id].add(name)
+                self._add_pkg_name_for_asset_id(entry.asset_id, name)
+
+        for f in self.root.rglob("*"):
+            name = f.relative_to(self.root).as_posix()
+            asset_id = resolve_asset_id(name)
+            self._name_for_asset_id[asset_id] = name
+            if self._toc.get_size_for(asset_id) is not None:
+                self._add_pkg_name_for_asset_id(asset_id, None)
 
     def all_asset_ids(self) -> Iterator[AssetId]:
         """
@@ -83,12 +102,12 @@ class PkgEditor:
         Returns an iterator of all known names of the present asset ids.
         """
         for asset_id in self.all_asset_ids():
-            name = dread_data.name_for_asset_id(asset_id)
-            if name is not None:
-                yield name
+            yield self._name_for_asset_id[asset_id]
 
     def find_pkgs(self, asset_id: NameOrAssetId) -> Iterator[str]:
-        yield from self._files_for_asset_id[resolve_asset_id(asset_id)]
+        for pkg_name in self._files_for_asset_id[resolve_asset_id(asset_id)]:
+            if pkg_name is not None:
+                yield pkg_name
 
     def does_asset_exists(self, asset_id: NameOrAssetId) -> bool:
         """
@@ -128,6 +147,10 @@ class PkgEditor:
             if entry is not None:
                 return _read_file_with_entry(self.path_to_pkg(name), entry)
 
+        if in_pkg is None and asset_id in self._name_for_asset_id:
+            name = self._name_for_asset_id[asset_id]
+            return self.root.joinpath(name).read_bytes()
+
         raise ValueError(f"Unknown asset_id: {asset_id:0x}")
 
     def get_parsed_asset(self, name: str, *, in_pkg: Optional[str] = None,
@@ -148,15 +171,22 @@ class PkgEditor:
 
         return format_class.parse(data, target_game=self.target_game)
 
-    def add_new_asset(self, asset_id: NameOrAssetId, new_data: typing.Union[bytes, BaseResource],
+    def add_new_asset(self, name: str, new_data: typing.Union[bytes, BaseResource],
                       in_pkgs: typing.Iterator[str]):
         """
         Adds an asset that doesn't already exists.
         """
+        asset_id = resolve_asset_id(name)
         if self.does_asset_exists(asset_id):
-            raise ValueError(f"{asset_id} already exists")
+            raise ValueError(f"{name} already exists")
 
-        self._files_for_asset_id[resolve_asset_id(asset_id)] = set()
+        in_pkgs = list(in_pkgs)
+        files_set = set()
+        if not in_pkgs:
+            files_set.add(None)
+
+        self._name_for_asset_id[asset_id] = name
+        self._files_for_asset_id[asset_id] = files_set
         self.replace_asset(asset_id, new_data)
         for pkg_name in in_pkgs:
             self.ensure_present(pkg_name, asset_id)
@@ -182,6 +212,10 @@ class PkgEditor:
             raise ValueError(f"Unknown asset: {asset_id}")
 
         asset_id = resolve_asset_id(asset_id)
+
+        if None in self._files_for_asset_id[asset_id]:
+            raise ValueError("Not allowed to remove unpacked files")
+
         self._modified_resources[asset_id] = None
 
         # If this asset id was previously ensured, remove that
@@ -215,40 +249,6 @@ class PkgEditor:
 
         return self._in_memory_pkgs[pkg_name]
 
-    def load_and_modify_pkgs_in_ram(self):
-        modified_pkgs = set()
-        for asset_id in self._modified_resources.keys():
-            modified_pkgs.update(self._files_for_asset_id[asset_id])
-
-        # Ensure all pkgs we'll modify is in memory already.
-        # We'll need to read these files anyway to modify, so do it early to speedup
-        # the get_raw_assets for _ensured_asset_ids.
-        for pkg_name in modified_pkgs:
-            self.get_pkg(pkg_name)
-
-        # Read all asset ids we need to copy somewhere else
-        asset_ids_to_copy = {}
-        for asset_ids in self._ensured_asset_ids.values():
-            for asset_id in asset_ids:
-                if asset_id not in asset_ids_to_copy:
-                    asset_ids_to_copy[asset_id] = self.get_raw_asset(asset_id)
-
-        for pkg_name in modified_pkgs:
-            pkg = self._in_memory_pkgs.pop(pkg_name)
-
-            for asset_id, data in self._modified_resources.items():
-                if pkg_name in self._files_for_asset_id[asset_id]:
-                    if data is None:
-                        pkg.remove_asset(asset_id)
-                    else:
-                        pkg.replace_asset(asset_id, data)
-
-            # Add the files that were ensured to be present in this pkg
-            for asset_id in self._ensured_asset_ids[pkg_name]:
-                pkg.add_asset(asset_id, asset_ids_to_copy[asset_id])
-
-        return modified_pkgs
-
     def save_modified_pkgs(self, output_path: Optional[Path] = None):
         if output_path is None:
             output_path = self.root
@@ -257,6 +257,9 @@ class PkgEditor:
         for asset_id in self._modified_resources.keys():
             modified_pkgs.update(self._files_for_asset_id[asset_id])
 
+        if None in modified_pkgs:
+            modified_pkgs.remove(None)
+
         # Ensure all pkgs we'll modify is in memory already.
         # We'll need to read these files anyway to modify, so do it early to speedup
         # the get_raw_assets for _ensured_asset_ids.
@@ -270,7 +273,24 @@ class PkgEditor:
                 if asset_id not in asset_ids_to_copy:
                     asset_ids_to_copy[asset_id] = self.get_raw_asset(asset_id)
 
+        # Update the toc for the modified (and new) files
+        for asset_id, data in self._modified_resources.items():
+            if data is not None:
+                self._toc.add_file(asset_id, len(data))
+                if None in self._files_for_asset_id[asset_id]:
+                    path = self._name_for_asset_id[asset_id]
+                    logger.info("Writing to %s with %d bytes", path, len(data))
+                    output_path.joinpath(path).write_bytes(data)
+            else:
+                self._toc.remove_file(asset_id)
+
+        # Update the Toc's own entry and then write
+        self._toc.add_file(Toc.system_files_name(), len(self._toc.build()))
+        output_path.joinpath(Toc.system_files_name()).write_bytes(self._toc.build())
+
+        # Update the PKGs
         for pkg_name in modified_pkgs:
+            logger.info("Updating %s", pkg_name)
             pkg = self._in_memory_pkgs.pop(pkg_name)
 
             for asset_id, data in self._modified_resources.items():
@@ -285,8 +305,10 @@ class PkgEditor:
                 pkg.add_asset(asset_id, asset_ids_to_copy[asset_id])
 
             # Write the data
-            output_path.joinpath(pkg_name).parent.mkdir(parents=True, exist_ok=True)
-            with output_path.joinpath(pkg_name).open("wb") as f:
+            out_pkg_path = output_path.joinpath(pkg_name)
+            logger.info("Writing %s", out_pkg_path)
+            out_pkg_path.parent.mkdir(parents=True, exist_ok=True)
+            with out_pkg_path.open("wb") as f:
                 pkg.build_stream(f)
 
         self._modified_resources = {}
