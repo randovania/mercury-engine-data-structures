@@ -1,4 +1,5 @@
 import copy
+import json
 import logging
 import os.path
 import os.path
@@ -75,6 +76,13 @@ class PkgEditor:
 
         self._toc = Toc.parse(self.root.joinpath(Toc.system_files_name()).read_bytes(),
                               target_game=self.target_game)
+        custom_names = self.root.joinpath("custom_names.json")
+        if custom_names.is_file():
+            with custom_names.open() as f:
+                self._name_for_asset_id.update({
+                    asset_id: name
+                    for name, asset_id in json.load(f)
+                })
 
         for name in self.all_pkgs:
             with self.path_to_pkg(name).open("rb") as f:
@@ -312,6 +320,18 @@ class PkgEditor:
             out_pkg_path.parent.mkdir(parents=True, exist_ok=True)
             with out_pkg_path.open("wb") as f:
                 pkg.build_stream(f)
+
+        custom_names = output_path.joinpath("custom_names.json")
+        with custom_names.open("w") as f:
+            json.dump(
+                {
+                    name: asset_id
+                    for asset_id, name in self._name_for_asset_id.items()
+                    if asset_id not in dread_data.all_asset_id_to_name()
+                },
+                f,
+                indent=4,
+            )
 
         self._modified_resources = {}
         self._update_headers()
