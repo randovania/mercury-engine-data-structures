@@ -286,7 +286,9 @@ class PkgEditor:
 
         # Update the Toc's own entry and then write
         self._toc.add_file(Toc.system_files_name(), len(self._toc.build()))
-        output_path.joinpath(Toc.system_files_name()).write_bytes(self._toc.build())
+        toc_path = output_path.joinpath(Toc.system_files_name())
+        toc_path.parent.mkdir(parents=True, exist_ok=True)
+        toc_path.write_bytes(self._toc.build())
 
         # Update the PKGs
         for pkg_name in modified_pkgs:
