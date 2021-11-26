@@ -3172,10 +3172,11 @@ class ActorDetails:
             "description": "",
             "extra": {
                 "actor_name": self.actor.sName,
-                "actor_layer": self.actor_layer,
                 "actor_def": self.actor.oActorDefLink,
             },
         }
+        if self.actor_layer != "default":
+            result["extra"]["actor_layer"] = self.actor_layer
 
         if node_type == "dock":
             result["destination"] = {
@@ -3555,6 +3556,10 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         room_name = details.rooms[0]
         this_area = world["areas"][room_name]
 
+        if layer_name != "default" and actor.sName not in node_data_for_area.get(room_name, {}):
+            # Skipping start points from other layers for now
+            continue
+
         definition = details.create_node_template(
             "generic",
             _build_node_name_with_prefix("Start Point", this_area),
@@ -3574,18 +3579,24 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             definition = other_actor
         else:
             definition.data["extra"].pop("actor_name")
-            definition.data["extra"].pop("actor_layer")
+            definition.data["extra"].pop("actor_layer", None)
             definition.data["extra"].pop("actor_def")
 
-        if this_area["default_node"] is None or details.actor_def == "startpoint":
+        if this_area["default_node"] is None:
             this_area["default_node"] = definition.name
+        elif details.actor_def == "startpoint":
+
+            default_node_data = this_area["nodes"][this_area["default_node"]]
+            if "startpoint" not in default_node_data["extra"].get("start_point_actor_def", ""):
+                this_area["default_node"] = definition.name
 
         if details.actor_def == "startpoint":
             this_area["valid_starting_location"] = True
 
         definition.data["extra"]["start_point_actor_name"] = actor.sName
-        definition.data["extra"]["start_point_actor_layer"] = layer_name
         definition.data["extra"]["start_point_actor_def"] = actor.oActorDefLink
+        if layer_name != "default":
+            definition.data["extra"]["start_point_actor_layer"] = layer_name
         add_node(room_name, _fix_nodes_with_prefix(definition, "Start Point", this_area))
 
     for layer_name, actor_name, actor in brfld.all_actors():
@@ -3677,6 +3688,8 @@ def _fix_nodes_with_prefix(definition: NodeDefinition, node_prefix: str, this_ar
             raise ValueError(f"Expected area to not have a {not_numbered_renamed}")
 
         this_area["nodes"][not_numbered_renamed] = this_area["nodes"].pop(node_prefix)
+        if this_area["default_node"] == node_prefix:
+            this_area["default_node"] = not_numbered_renamed
 
     return definition
 
@@ -3700,5 +3713,5 @@ def decode_all_worlds(root: Path, out_path: Path):
 
 
 if __name__ == '__main__':
-    # decode_all_worlds(Path("F:/DreadExtract"), Path(sys.argv[1]))
-    decode_world(Path("F:/DreadExtract"), "s080_shipyard", Path(sys.argv[1]))
+    decode_all_worlds(Path("F:/DreadExtract"), Path(sys.argv[1]))
+    # decode_world(Path("F:/DreadExtract"), "s080_shipyard", Path(sys.argv[1]))
