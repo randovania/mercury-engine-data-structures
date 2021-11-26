@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Iterator, Tuple
 
 import construct
 
@@ -19,9 +19,10 @@ class Brfld(BaseResource):
     def all_layers(self) -> Iterator[str]:
         yield from self.raw.Root.pScenario.rEntitiesLayer.dctSublayers.keys()
 
-    def all_actors(self):
-        for sublayer in self.raw.Root.pScenario.rEntitiesLayer.dctSublayers.values():
-            yield from sublayer.dctActors.values()
+    def all_actors(self) -> Iterator[Tuple[str, str, construct.Container]]:
+        for layer_name, sublayer in self.raw.Root.pScenario.rEntitiesLayer.dctSublayers.items():
+            for actor_name, actor in sublayer.dctActors.items():
+                yield layer_name, actor_name, actor
 
     def follow_link(self, link: str):
         if link != '{EMPTY}':
@@ -29,3 +30,6 @@ class Brfld(BaseResource):
             for part in link.split(":"):
                 result = result[part]
             return result
+
+    def link_for_actor(self, layer_name: str, actor_name: str) -> str:
+        return ":".join(["Root", "pScenario", "rEntitiesLayer", "dctSublayers", layer_name, "dctActors", actor_name])
