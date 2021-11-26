@@ -3134,10 +3134,11 @@ class NodeDefinition(typing.NamedTuple):
 
 
 class ActorDetails:
-    def __init__(self, actor: construct.Container, all_rooms: dict[str, Polygon]):
+    def __init__(self, layer_name: str, actor: construct.Container, all_rooms: dict[str, Polygon]):
         level_name = os.path.splitext(os.path.split(brfld_path)[1])[0]
         self.actor = actor
         self.actor_def = os.path.splitext(os.path.split(actor.oActorDefLink)[1])[0]
+        self.actor_layer = layer_name
         self.position = Point(actor.vPos)
         try:
             self.rooms = [room for room in _rooms_for_actors[level_name][actor.sName] if room in all_rooms]
@@ -3157,7 +3158,7 @@ class ActorDetails:
     def create_node_template(
             self, node_type: str,
             default_name: str,
-            existing_data: typing.Optional[dict[str, NodeDefinition]]
+            existing_data: typing.Optional[dict[str, NodeDefinition]],
     ) -> NodeDefinition:
 
         result: dict = {
@@ -3171,6 +3172,7 @@ class ActorDetails:
             "description": "",
             "extra": {
                 "actor_name": self.actor.sName,
+                "actor_layer": self.actor_layer,
                 "actor_def": self.actor.oActorDefLink,
             },
         }
@@ -3400,9 +3402,9 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             "nodes": {},
         }
 
-    all_default_details: dict[str, ActorDetails] = {
-        actor.sName: ActorDetails(actor, all_rooms)
-        for actor in brfld.actors_for_layer("default").values()
+    all_default_details: dict[tuple[str, str], ActorDetails] = {
+        (layer_name, actor.sName): ActorDetails(layer_name, actor, all_rooms)
+        for layer_name, _, actor in brfld.all_actors()
     }
     actor_to_area: dict[str, str] = {}
 
@@ -3425,11 +3427,8 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                 if get_actor_name_for_node(existing_node) == actor_name:
                     return NodeDefinition(existing_name, existing_node)
 
-    for actor in brfld.all_actors():
-        if actor.sName in all_default_details:
-            details = all_default_details[actor.sName]
-        else:
-            details = ActorDetails(actor, all_rooms)
+    for layer_name, actor_name, actor in brfld.all_actors():
+        details = all_default_details[(layer_name, actor.sName)]
         if not any([details.is_door, details.is_pickup, details.is_elevator, details.is_usable,
                     details.is_breakable_blob]):
             continue
@@ -3540,8 +3539,8 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
     # Add start points
     # Since these include the "platforms for usable", we do this after everything else so we have a chance of
     # merging this node into the existing one.
-    for actor in brfld.actors_for_layer("default").values():
-        details = all_default_details[actor.sName]
+    for layer_name, actor_name, actor in brfld.all_actors():
+        details = all_default_details[(layer_name, actor.sName)]
         if not details.is_start_point:
             continue
 
@@ -3575,6 +3574,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             definition = other_actor
         else:
             definition.data["extra"].pop("actor_name")
+            definition.data["extra"].pop("actor_layer")
             definition.data["extra"].pop("actor_def")
 
         if this_area["default_node"] is None or details.actor_def == "startpoint":
@@ -3584,19 +3584,16 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             this_area["valid_starting_location"] = True
 
         definition.data["extra"]["start_point_actor_name"] = actor.sName
+        definition.data["extra"]["start_point_actor_layer"] = layer_name
         definition.data["extra"]["start_point_actor_def"] = actor.oActorDefLink
         add_node(room_name, _fix_nodes_with_prefix(definition, "Start Point", this_area))
 
-    try:
-        breakables = brfld.actors_for_layer("breakables")
-    except KeyError:
-        breakables = {}
-
-    for actor in breakables.values():
+    for layer_name, actor_name, actor in brfld.all_actors():
         if "TILEGROUP" not in actor.pComponents:
             continue
 
-        details = ActorDetails(actor, all_rooms)
+        details = ActorDetails(layer_name, actor, all_rooms)
+
         if len(details.rooms) != 1:
             print("TILEGROUP multiple rooms?", actor.sName, details.rooms)
             continue
@@ -3703,5 +3700,5 @@ def decode_all_worlds(root: Path, out_path: Path):
 
 
 if __name__ == '__main__':
-    decode_all_worlds(Path("F:/DreadExtract"), Path(sys.argv[1]))
-    # decode_world(Path("F:/DreadExtract"), "s010_cave", Path(sys.argv[1]))
+    # decode_all_worlds(Path("F:/DreadExtract"), Path(sys.argv[1]))
+    decode_world(Path("F:/DreadExtract"), "s080_shipyard", Path(sys.argv[1]))
