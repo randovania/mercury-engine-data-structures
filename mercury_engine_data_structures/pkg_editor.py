@@ -61,7 +61,7 @@ class PkgEditor:
         ]
         self._update_headers()
 
-    def path_to_pkg(self, pkg_name: str) -> Path:
+    def path_for_pkg(self, pkg_name: str) -> Path:
         return self.root.joinpath(pkg_name)
 
     def _add_pkg_name_for_asset_id(self, asset_id: AssetId, pkg_name: Optional[str]):
@@ -85,7 +85,7 @@ class PkgEditor:
                 })
 
         for name in self.all_pkgs:
-            with self.path_to_pkg(name).open("rb") as f:
+            with self.path_for_pkg(name).open("rb") as f:
                 self.headers[name] = PKGHeader.parse_stream(f, target_game=self.target_game)
 
             self._ensured_asset_ids[name] = set()
@@ -133,12 +133,13 @@ class PkgEditor:
         Gets the bytes data for the given asset name/id, optionally restricting from which pkg.
         :raises ValueError if the asset doesn't exist.
         """
+        original_name = asset_id
         asset_id = resolve_asset_id(asset_id)
 
         if asset_id in self._modified_resources:
             result = self._modified_resources[asset_id]
             if result is None:
-                raise ValueError(f"Unknown asset_id: {asset_id:0x}")
+                raise ValueError(f"Deleted asset_id: {original_name}")
             else:
                 return result
 
@@ -153,13 +154,14 @@ class PkgEditor:
 
             entry = _find_entry_for_asset_id(asset_id, header)
             if entry is not None:
-                return _read_file_with_entry(self.path_to_pkg(name), entry)
+                logger.info("Reading asset %s from pkg %s", str(original_name), name)
+                return _read_file_with_entry(self.path_for_pkg(name), entry)
 
         if in_pkg is None and asset_id in self._name_for_asset_id:
             name = self._name_for_asset_id[asset_id]
             return self.root.joinpath(name).read_bytes()
 
-        raise ValueError(f"Unknown asset_id: {asset_id:0x}")
+        raise ValueError(f"Unknown asset_id: {original_name}")
 
     def get_parsed_asset(self, name: str, *, in_pkg: Optional[str] = None,
                          type_hint: typing.Type[T] = BaseResource) -> T:
@@ -210,6 +212,7 @@ class PkgEditor:
             raise ValueError(f"Unknown asset: {asset_id}")
 
         if not isinstance(new_data, bytes):
+            logger.debug("Encoding %s", str(asset_id))
             new_data = new_data.build()
 
         self._modified_resources[resolve_asset_id(asset_id)] = new_data
@@ -252,7 +255,8 @@ class PkgEditor:
             raise ValueError(f"Unknown pkg_name: {pkg_name}")
 
         if pkg_name not in self._in_memory_pkgs:
-            with self.path_to_pkg(pkg_name).open("rb") as f:
+            logger.info("Reading %s", pkg_name)
+            with self.path_for_pkg(pkg_name).open("rb") as f:
                 self._in_memory_pkgs[pkg_name] = Pkg.parse_stream(f, target_game=self.target_game)
 
         return self._in_memory_pkgs[pkg_name]
