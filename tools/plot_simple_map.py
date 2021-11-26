@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import sys
@@ -34,7 +35,7 @@ bmscc: typing.Optional[Bmscc] = None
 brsa: typing.Optional[Brsa] = None
 brfld: typing.Optional[Brfld] = None
 brfld_path: str = None
-events: dict[str, str] = {}
+events: dict[str, dict] = {}
 
 _polygon_override = {
     ("s010_cave", "collision_camera_010"): [
@@ -94,13 +95,13 @@ _camera_skip = {
     ("s090_skybase", "collision_camera_900"),
 }
 dock_weakness = {
-    "frame": 0,
-    "closed": 1,
-    "power": 2,
-    "charge": 3,
-    "presence": 9,
-    "grapple": 10,
-    "phase_shift": 11,
+    "frame": "Access Open",
+    "closed": "Access Closed",
+    "power": "Power Beam Door",
+    "charge": "Charge Beam Door",
+    "presence": "Sensor Lock Door",
+    "grapple": "Grapple Beam Door",
+    "phase_shift": "Phase Shift Door",
 }
 _weakness_table_for_def = {
     'doorframe': (dock_weakness["frame"], dock_weakness["frame"]),
@@ -122,7 +123,10 @@ _weakness_table_for_def = {
     'doorheat': (None, None),
 
     # These are the entirely different kind of door
-    'dooremmy': (None, None),
+    'dooremmy': ("EMMI Door", "EMMI Door"),
+}
+_dock_type_for_weakness = {
+    "EMMI Door": "other",
 }
 
 _ELEVATOR_USABLE = {
@@ -3114,11 +3118,14 @@ _usable_component_as_event_node = {
 }
 
 
-def create_event(layer_name: str, actor_name: str) -> int:
+def create_event(layer_name: str, actor_name: str) -> str:
     level_name = os.path.splitext(os.path.split(brfld_path)[1])[0]
     short_name = f"{level_name}:{layer_name}:{actor_name}"
-    events[short_name] = f"{world_names[brfld_path]} - {actor_name}"
-    return list(events.keys()).index(short_name)
+    events[short_name] = {
+        "long_name": f"{world_names[brfld_path]} - {actor_name}",
+        "extra": {},
+    }
+    return short_name
 
 
 class NodeDefinition(typing.NamedTuple):
@@ -3174,8 +3181,8 @@ class ActorDetails:
                 "area_name": None,
                 "node_name": None,
             }
-            result["dock_type"] = 2
-            result["dock_weakness_index"] = 1
+            result["dock_type"] = "other"
+            result["dock_weakness"] = "Not Determined"
 
         elif node_type == "pickup":
             result["pickup_index"] = None
@@ -3190,17 +3197,23 @@ class ActorDetails:
             result["editable"] = True
 
         elif node_type == "event":
-            result["event_index"] = None
+            result["event_name"] = None
 
         if existing_data is not None and self.actor.sName in existing_data:
             old_node_data = existing_data[self.actor.sName]
             node_name = old_node_data.name
-            result["heal"] = old_node_data.data["heal"]
-            result["description"] = old_node_data.data["description"]
-            result["connections"] = old_node_data.data["connections"]
-            for extra_key in old_node_data.data["extra"]:
-                if extra_key not in result["extra"]:
-                    result["extra"][extra_key] = old_node_data.data["extra"][extra_key]
+            if node_type == "generic" and old_node_data.data["node_type"] != "generic":
+                new_result = copy.deepcopy(old_node_data.data)
+                new_result["coordinates"] = result["coordinates"]
+                new_result["extra"].update(result["extra"])
+                result = new_result
+            else:
+                result["heal"] = old_node_data.data["heal"]
+                result["description"] = old_node_data.data["description"]
+                result["connections"] = old_node_data.data["connections"]
+                for extra_key in old_node_data.data["extra"]:
+                    if extra_key not in result["extra"]:
+                        result["extra"][extra_key] = old_node_data.data["extra"][extra_key]
         else:
             node_name = default_name
             result["connections"] = {}
@@ -3266,8 +3279,8 @@ def create_door_nodes_for_actor(
         definition.data["destination"]["area_name"] = details.rooms[(i + 1) % 2]
         definition.data["destination"]["node_name"] = doors[(i + 1) % 2].name
         if custom_weakness[i] is not None:
-            definition.data["dock_type"] = 0
-            definition.data["dock_weakness_index"] = custom_weakness[i]
+            definition.data["dock_type"] = _dock_type_for_weakness.get(custom_weakness[i], "door")
+            definition.data["dock_weakness"] = custom_weakness[i]
 
     return doors
 
@@ -3434,7 +3447,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                     add_node(room_name, doors[i])
 
             else:
-                if "trap_thermal_" not in actor.sName:
+                if all(x not in actor.sName for x in ["doorshutter", "trap_thermal_"]):
                     print("multiple rooms for door!", actor.sName, details.position, details.rooms)
 
         elif details.is_pickup:
@@ -3504,7 +3517,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                 node_data_for_area.get(room_name),
             )
             if usable_type in _usable_component_as_event_node:
-                definition.data["event_index"] = create_event("default", actor.sName)
+                definition.data["event_name"] = create_event("default", actor.sName)
             if usable_type in {"CLifeRechargeComponent", "CTotalRechargeComponent"}:
                 definition.data["heal"] = True
 
@@ -3521,7 +3534,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                 f"Event - Breakable ({actor.sName})",
                 node_data_for_area.get(room_name),
             )
-            definition.data["event_index"] = create_event("default", actor.sName)
+            definition.data["event_name"] = create_event("default", actor.sName)
             add_node(room_name, definition)
 
     # Add start points
@@ -3594,14 +3607,15 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         tile_types = set()
         for grid_tile in actor.pComponents.TILEGROUP.aGridTiles:
             tile_types.add(grid_tile.eTileType)
-        tile_types = " ".join(sorted(tile_types))
+        group_name = " ".join(sorted(tile_types))
 
-        node_prefix = f"Tile Group ({tile_types})"
+        node_prefix = f"Tile Group ({group_name})"
         definition = details.create_node_template(
-            "generic",
+            "configurable_node",
             _build_node_name_with_prefix(node_prefix, this_area),
             node_data_for_area.get(room_name),
         )
+        definition.data["extra"]["tile_types"] = sorted(tile_types)
         add_node(room_name, _fix_nodes_with_prefix(definition, node_prefix, this_area))
 
     for area_name, area in world["areas"].items():
@@ -3675,26 +3689,19 @@ def decode_all_worlds(root: Path, out_path: Path):
     with header_path.open() as f:
         header = json.load(f)
 
-    for event in header["resource_database"]["events"]:
-        events[event["short_name"]] = event["long_name"]
+    events.clear()
+    events.update(header["resource_database"]["events"])
 
     for area_path in world_names.keys():
         level_name = os.path.splitext(os.path.split(area_path)[1])[0]
         decode_world(root, level_name, out_path)
 
-    header["resource_database"]["events"] = [
-        {
-            "index": i,
-            "long_name": long_name,
-            "short_name": short_name
-        }
-        for i, (short_name, long_name) in enumerate(events.items())
-    ]
+    header["resource_database"]["events"] = events
 
     with header_path.open("w") as f:
         json.dump(header, f, indent=4)
 
 
 if __name__ == '__main__':
-    decode_all_worlds(Path("E:/DreadExtract"), Path(sys.argv[1]))
-    # decode_world(Path("E:/DreadExtract"), "s010_cave", Path(sys.argv[1]))
+    decode_all_worlds(Path("F:/DreadExtract"), Path(sys.argv[1]))
+    # decode_world(Path("F:/DreadExtract"), "s010_cave", Path(sys.argv[1]))
