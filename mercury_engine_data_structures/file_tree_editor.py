@@ -31,7 +31,7 @@ def _read_file_with_entry(path: Path, entry):
         return f.read(entry.end_offset - entry.start_offset)
 
 
-class PkgEditor:
+class FileTreeEditor:
     """
     Manages efficiently reading all PKGs in the game and writing out modifications to a new path.
 

@@ -11,7 +11,7 @@ from typing import Optional
 from mercury_engine_data_structures import formats
 from mercury_engine_data_structures.construct_extensions.json import convert_to_raw_python
 from mercury_engine_data_structures.game_check import Game
-from mercury_engine_data_structures.pkg_editor import PkgEditor
+from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 
 
 def game_argument_type(s: str) -> Game:
@@ -138,7 +138,7 @@ def find_pkg_for(args):
     asset_id: int = args.asset_id
     asset_name: str = args.asset_name
 
-    pkg_editor = PkgEditor(root)
+    pkg_editor = FileTreeEditor(root)
     if asset_id is not None:
         items = list(pkg_editor.find_pkgs(asset_id))
     else:
