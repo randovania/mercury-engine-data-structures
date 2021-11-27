@@ -39,7 +39,6 @@ class PkgEditor:
     _ensured_asset_ids: mapping of pkg name to assets we'll copy into it when saving
     _modified_resources: mapping of asset id to bytes. When saving, these asset ids are replaced
     """
-    files: Dict[str, Path]
     headers: Dict[str, construct.Container]
     _files_for_asset_id: Dict[AssetId, Set[Optional[str]]]
     _ensured_asset_ids: Dict[str, Set[AssetId]]
@@ -48,17 +47,11 @@ class PkgEditor:
     _toc: Toc
 
     def __init__(self, root: Path, target_game: Game = Game.DREAD):
-        all_pkgs = root.rglob("*.pkg")
-
         self.root = root
         self.target_game = target_game
         self._modified_resources = {}
         self._in_memory_pkgs = {}
 
-        self.all_pkgs = [
-            pkg_path.relative_to(root).as_posix()
-            for pkg_path in all_pkgs
-        ]
         self._update_headers()
 
     def path_for_pkg(self, pkg_name: str) -> Path:
@@ -69,6 +62,7 @@ class PkgEditor:
         self._files_for_asset_id[asset_id].add(pkg_name)
 
     def _update_headers(self):
+        self.all_pkgs = []
         self.headers = {}
         self._ensured_asset_ids = {}
         self._files_for_asset_id = {}
@@ -84,20 +78,28 @@ class PkgEditor:
                     for name, asset_id in json.load(f)
                 })
 
-        for name in self.all_pkgs:
-            with self.path_for_pkg(name).open("rb") as f:
-                self.headers[name] = PKGHeader.parse_stream(f, target_game=self.target_game)
-
-            self._ensured_asset_ids[name] = set()
-            for entry in self.headers[name].file_entries:
-                self._add_pkg_name_for_asset_id(entry.asset_id, name)
-
         for f in self.root.rglob("*"):
             name = f.relative_to(self.root).as_posix()
             asset_id = resolve_asset_id(name)
             self._name_for_asset_id[asset_id] = name
-            if self._toc.get_size_for(asset_id) is not None:
+
+            if f.suffix == ".pkg":
+                self.all_pkgs.append(name)
+
+            if self._toc.get_size_for(asset_id) is None:
+                logger.debug("Skipping extracted file %s as it does not have a TOC entry", name)
+            else:
                 self._add_pkg_name_for_asset_id(asset_id, None)
+
+        for name in self.all_pkgs:
+            with self.path_for_pkg(name).open("rb") as f:
+                self.headers[name] = PKGHeader.parse_stream(f, target_game=self.target_game)
+
+            for entry in self.headers[name].file_entries:
+                if self._toc.get_size_for(entry.asset_id) is None:
+                    logger.warning("File with asset id 0x%016x in pkg %s does not have an entry in the TOC",
+                                   entry.asset_id, name)
+                self._add_pkg_name_for_asset_id(entry.asset_id, name)
 
     def all_asset_ids(self) -> Iterator[AssetId]:
         """
