@@ -3623,6 +3623,8 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             node_data_for_area.get(room_name),
         )
         definition.data["extra"]["tile_types"] = sorted(tile_types)
+        if "WEIGHT" in tile_types:
+            definition.data["node_type"] = "generic"
         add_node(room_name, _fix_nodes_with_prefix(definition, node_prefix, this_area))
 
     for area_name, area in world["areas"].items():
