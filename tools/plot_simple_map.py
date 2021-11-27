@@ -775,7 +775,7 @@ _rooms_for_actors = {
         'fxsmokepipesyellowadorn01_013': ['collision_camera_016 (A)'],
         'fxsmokepipesyellowadorn01_014': ['collision_camera_016 (A)'],
         'fxsmokepipesyellowadorn01_015': ['collision_camera_016 (A)'],
-        'grapplepulloff1x2_001': ['collision_camera_081 (A)', 'collision_camera_085 (A)'],
+        'grapplepulloff1x2_001': ['collision_camera_081 (A)'],
         'grapplepulloff1x2_002': ['collision_camera_030 (A)'],
         'grappleswingpoint_000': ['collision_camera_089 (A)'],
         'heatroomfx_001_01': ['collision_camera_026 (A)'],
@@ -2392,8 +2392,7 @@ _rooms_for_actors = {
                                                  'collision_camera_002 (E)'],
                         'ev_quarantine_roomlights_001': ['collision_camera_000 (E)'],
                         'fan_reg_000': ['collision_camera_008 (E)'],
-                        'grapplepulloff1x2_000': ['collision_camera_007 (E)',
-                                                  'collision_camera_009 (E)'],
+                        'grapplepulloff1x2_000': ['collision_camera_009 (E)'],
                         'item_energytank_000': ['collision_camera_003 (E)'],
                         'item_missiletank_000': ['collision_camera_010 (E)'],
                         'item_missiletank_002': ['collision_camera_008 (E)'],
@@ -3153,7 +3152,7 @@ class ActorDetails:
         self.is_pickup = "actors/items" in actor.oActorDefLink
         self.is_elevator = "USABLE" in actor.pComponents and actor.pComponents.USABLE["@type"] in _ELEVATOR_USABLE
         self.is_usable = "USABLE" in actor.pComponents
-        self.is_breakable_blob = "BREAKABLESCENARIO" in actor.pComponents
+        self.is_breakable_blob = "BREAKABLESCENARIO" in actor.pComponents or "grapplepulloff" in self.actor_def
 
     def create_node_template(
             self, node_type: str,
