@@ -79,6 +79,9 @@ class FileTreeEditor:
                 })
 
         for f in self.root.rglob("*"):
+            if not f.is_file():
+                continue
+
             name = f.relative_to(self.root).as_posix()
             asset_id = resolve_asset_id(name)
             self._name_for_asset_id[asset_id] = name
@@ -87,13 +90,17 @@ class FileTreeEditor:
                 self.all_pkgs.append(name)
 
             if self._toc.get_size_for(asset_id) is None:
-                logger.debug("Skipping extracted file %s as it does not have a TOC entry", name)
+                # Vanilla has a bunch of files inside `textures/` that are missing from the toc
+                if not name.startswith("textures/"):
+                    logger.debug("Skipping extracted file %s as it does not have a TOC entry", name)
             else:
                 self._add_pkg_name_for_asset_id(asset_id, None)
 
         for name in self.all_pkgs:
             with self.path_for_pkg(name).open("rb") as f:
                 self.headers[name] = PKGHeader.parse_stream(f, target_game=self.target_game)
+
+            self._ensured_asset_ids[name] = set()
 
             for entry in self.headers[name].file_entries:
                 if self._toc.get_size_for(entry.asset_id) is None:
