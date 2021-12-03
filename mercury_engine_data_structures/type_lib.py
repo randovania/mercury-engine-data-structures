@@ -1,6 +1,9 @@
 import collections
 import dataclasses
+import enum
 import functools
+import importlib
+import typing
 from enum import Enum
 from typing import Optional, Dict, Type, Set
 
@@ -10,7 +13,7 @@ from mercury_engine_data_structures import dread_data
 @dataclasses.dataclass(frozen=True)
 class BaseType:
     name: str
-    
+
     @property
     def kind(self) -> "TypeKind":
         raise NotImplementedError()
@@ -18,6 +21,11 @@ class BaseType:
     @classmethod
     def from_json(cls, name: str, data: dict) -> "BaseType":
         raise NotImplementedError()
+
+    @property
+    def name_as_python_identifier(self) -> str:
+        return self.name.replace("::", "_").replace(" ", "_").replace("<", "_").replace(
+            ">", "_").replace(",", "_").replace("*", "Ptr")
 
 
 class TypeKind(Enum):
@@ -104,6 +112,10 @@ class EnumType(BaseType):
     @classmethod
     def from_json(cls, name: str, data: dict) -> "EnumType":
         return cls(name, data["values"])
+
+    def enum_class(self) -> typing.Type[enum.IntEnum]:
+        return getattr(importlib.import_module("mercury_engine_data_structures.formats.dread_types"),
+                       self.name_as_python_identifier)
 
 
 @dataclasses.dataclass(frozen=True)

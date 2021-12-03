@@ -108,8 +108,8 @@ class TypeExporter:
         return f'Object({field_var}{fields_def})'
 
     def _export_type(self, type_name: str):
-        type_variable = _type_name_to_python_identifier(type_name)
         type_data = self.all_types[type_name]
+        type_variable = type_data.name_as_python_identifier
 
         if isinstance(type_data, type_lib.PrimitiveType):
             type_variable = primitive_to_construct[type_data.primitive_kind]
