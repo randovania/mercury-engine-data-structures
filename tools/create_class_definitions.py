@@ -1,19 +1,8 @@
 import collections
 import copy
-import json
 from pathlib import Path
 
-import construct
-
-dread_types_path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "dread_types.json")
-dread_types = json.loads(dread_types_path.read_text())
-
-type_lib_path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "type_lib.py")
-type_lib_source = type_lib_path.read_text().replace("from mercury_engine_data_structures import dread_data", ""
-                                                    ).replace("dread_data.get_raw_types()", "dread_types")
-
-type_lib = construct.Container(dread_types=dread_types)
-exec(compile(type_lib_source, type_lib_path, "exec"), type_lib)
+from mercury_engine_data_structures import type_lib
 
 primitive_to_construct = {
     type_lib.PrimitiveKind.VECTOR_2: "common_types.CVector2D",
