@@ -1,138 +1,15 @@
-import re
-
 import construct
 from construct.core import (
-    Array, Byte, Bytes, Computed, Const, Construct, ExprAdapter,
-    Flag, Float32l, FocusedSeq, GreedyRange, Hex, If, IfThenElse,
-    Int16ul, Int32ul, Optional, Peek,
-    PrefixedArray, StopIf, Struct, Switch,
+    Array, Byte, Const, Construct, Flag, Float32l, Hex, Int16ul, Int32ul, PrefixedArray, Struct, Switch,
 )
-from construct.debug import Probe
 
-from mercury_engine_data_structures import common_types, dread_data, type_lib
+from mercury_engine_data_structures import common_types, type_lib
 from mercury_engine_data_structures.common_types import Float, StrId, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource, dread_types
-from mercury_engine_data_structures.formats.property_enum import PropertyEnum, PropertyEnumUnsafe
+from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
-
-component_keys = [
-    "ABILITY",
-    "ACTIVATABLE_BY_PROJECTILE",
-    "ACTIVATABLE",
-    "AI",
-    "AIM",
-    "AIMCAMERAVISIBLEONLY",
-    "AINAVIGATION",
-    "AISMARTOBJECT",
-    "ALTERNATIVE_ACTION_PLAYER",
-    "ANIMATION",
-    "AREAFX",
-    "ATTACK",
-    "AUDIO",
-    "BILLBOARD",
-    "BONETOCONSTANT",
-    "BREAKABLESCENARIO",
-    "BTOBSERVER",
-    "CAMERARAIL",
-    "CENTRALUNIT",
-    "CHAIN_REACTION_ACTION_SWITCHER",
-    "CHANGE_STAGE_NAVMESH_ITEM",
-    "CHOZOMBIEFXCOMPONENT",
-    "COLLISION",
-    "COLLISION MATERIAL CACHE",
-    "CONTROLLER",
-    "COOLDOWNFAN",
-    "CUBEMAP",
-    "CUTSCENE",
-    "DAMAGE",
-    "DOOREMMYFX",
-    "DROP",
-    "ELECTRICREACTION",
-    "ELECTRIFYING",
-    "EMMYVALVE",
-    "ENHANCEWEAKSPOT",
-    "ESCAPE_SEQUENCE_EXPLOSION",
-    "EVENTPROP",
-    "EVENTSCENARIO",
-    "FACTION",
-    "FIRE",
-    "FLOATING_PROP_ACTING",
-    "FOOTSTEP",
-    "FORCED_MOVEMENT_AREA",
-    "FROZEN",
-    "FUSIBLEBOX",
-    "FX",
-    "GRAB",
-    "GRAPPLEPOINT",
-    "GUN",
-    "HEATABLESHIELD",
-    "HECATHONPLANKTONFX",
-    "INPUT",
-    "INVENTORY",
-    "LA_TRIGGER",
-    "LANDMARK",
-    "LIFE",
-    "LIGHTING",
-    "LISTENER",
-    "LOGICCAMERA",
-    "LOGICPATH",
-    "LOGICSHAPE",
-    "LOOKATPLAYER",
-    "MAGMA_KRAID_PISTON_PLATFORM",
-    "MAGMA_KRAID_SCENARIO_CONTROLLER",
-    "MAGMA_KRAID_SPIKE",
-    "MAGNET_SLIDING_BLOCK_RAIL",
-    "MAGNET_SLIDING_BLOCK",
-    "MAGNET_SURFACE",
-    "MAGNETHUSK",
-    "MATERIALFX",
-    "MELEE",
-    "MODELINSTANCE",
-    "MODELUPDATER",
-    "MORPH_BALL_LAUNCHER_EXIT",
-    "MORPH_BALL_LAUNCHER",
-    "MOVEMENT",
-    "MULTI_LOCK_ON_BLOCK",
-    "NAVMESHITEM",
-    "NOZZLE",
-    "OMNILIGHT",
-    "PICKABLE",
-    "POSITIONALSOUND",
-    "RINKAUNIT",
-    "ROTATIONAL",
-    "RUMBLE",
-    "SCORPIUSFX",
-    "SCRIPT",
-    "SEGMENTLIGHT",
-    "SENSORDOOR",
-    "SHOCKWAVE",
-    "SHOCKWAVEPOOL",
-    "SHOT",
-    "SIMULATION",
-    "SLIDLEOUTSPAWNPOINT",
-    "SMARTOBJECT",
-    "SONAR_TARGET",
-    "SPAWNGROUP",
-    "SPAWNPOINT",
-    "SPECIALENERGY",
-    "SPOTLIGHT",
-    "STARTPOINT",
-    "THERMALREACTION",
-    "TILEGROUP",
-    "TIMELINECOMPONENT",
-    "TRIGGER",
-    "TUNNEL_TRAP",
-    "USABLE",
-    "VIDEOMANAGER",
-    "WEIGHT_ACTIVABLE_PROP",
-    "WORLDGRAPH",
-    "WTCHANGE",
-    "XPARASITEDROP",
-    "ZIPLINE_RAIL",
-]
-component_keys.extend([s + "COMPONENT" for s in component_keys])
 
 Char = construct.PaddedString(1, 'ascii')
 
@@ -210,7 +87,7 @@ def Dependencies():
             "id2" / StrId,
             "unk2" / make_vector(Struct(
                 "id" / StrId,
-                "unk1" / Byte, 
+                "unk1" / Byte,
                 "unk2" / Array(4, Int32ul)
             )),
         ),
@@ -227,8 +104,9 @@ def Dependencies():
             if type_lib.is_child_of(this.type, component_type):
                 return component_type
         return None
-    
+
     return Switch(component_type, component_dependencies)
+
 
 Component = Struct(
     type=StrId,
@@ -278,7 +156,7 @@ CCharClass = Struct(
     unk_7=Byte,
 
     components=make_dict(Component),
-    
+
     binaries=make_vector(StrId),
     sources=make_vector(StrId >> Byte),
 )
@@ -291,7 +169,7 @@ CActorDef = Struct(
     unk_4=StrId,
 
     components=make_dict(Component),
-    
+
     binaries=make_vector(StrId),
     sources=make_vector(StrId >> Byte),
 )
