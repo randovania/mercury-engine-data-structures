@@ -69,7 +69,7 @@ class TypeExporter:
                 key = "NONE"
             enum_definition += f'    {key} = {value}\n'
 
-        code = f"{enum_definition}\n\nconstruct_{type_variable} = construct.Enum(construct.Int32ul, {type_variable})"
+        code = f"{enum_definition}\n\nconstruct_{type_variable} = StrictEnum({type_variable})"
 
         return "construct_" + type_variable, code
 
@@ -181,6 +181,7 @@ from mercury_engine_data_structures import common_types
 from mercury_engine_data_structures.object import Object
 from mercury_engine_data_structures.pointer_set import PointerSet
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum, PropertyEnumUnsafe
+from mercury_engine_data_structures.construct_extensions.enum import StrictEnum
 
 """
         seen_types_with_pointer = set()
