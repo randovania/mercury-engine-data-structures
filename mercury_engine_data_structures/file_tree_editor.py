@@ -191,7 +191,7 @@ class FileTreeEditor:
         return format_class.parse(data, target_game=self.target_game)
 
     def add_new_asset(self, name: str, new_data: typing.Union[bytes, BaseResource],
-                      in_pkgs: typing.Iterator[str]):
+                      in_pkgs: typing.Iterable[str]):
         """
         Adds an asset that doesn't already exists.
         """
@@ -206,7 +206,7 @@ class FileTreeEditor:
 
         self._name_for_asset_id[asset_id] = name
         self._files_for_asset_id[asset_id] = files_set
-        self.replace_asset(asset_id, new_data)
+        self.replace_asset(name, new_data)
         for pkg_name in in_pkgs:
             self.ensure_present(pkg_name, asset_id)
 
