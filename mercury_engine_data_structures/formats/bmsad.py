@@ -180,7 +180,7 @@ property_types = {
 }
 #
 BMSAD = Struct(
-    magic=Const("MSAD", construct.PaddedString(4, "ascii")),
+    _magic=Const(b"MSAD"),
     version=Const(0x0200000F, Hex(Int32ul)),
 
     # # gameeditor::CGameModelRoot

@@ -9,7 +9,7 @@ from mercury_engine_data_structures.game_check import Game
 VectorArray = Array(3, Float32l)
 
 BMSSD = Struct(
-    magic=Const(b"MSSD"),
+    _magic=Const(b"MSSD"),
     unk1=Int32ul,
     part_info=PrefixedArray(
         Int32ul,

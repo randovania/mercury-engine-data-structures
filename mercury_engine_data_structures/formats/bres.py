@@ -3,8 +3,6 @@ import construct
 from mercury_engine_data_structures.formats import BaseResource, game_model_root
 from mercury_engine_data_structures.game_check import Game
 
-# Root stuff
-
 BRES = game_model_root.create('CEnvironmentSoundPresets', 0x02020001)
 
 

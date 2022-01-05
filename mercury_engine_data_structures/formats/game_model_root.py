@@ -6,8 +6,8 @@ from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 
 def create(name: str, magic_number: int):
     return construct.Struct(
-        magic=construct.Const(name, PropertyEnum),
-        magic_number=construct.Const(magic_number, construct.Hex(construct.Int32ul)),
+        _magic=construct.Const(name, PropertyEnum),
+        _magic_number=construct.Const(magic_number, construct.Hex(construct.Int32ul)),
 
         # gameeditor::CGameModelRoot
         root_type=construct.Const('Root', PropertyEnum),

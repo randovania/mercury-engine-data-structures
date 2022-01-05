@@ -72,8 +72,8 @@ CollisionLayer = Struct(
 )
 
 BMSCC = Struct(
-    magic=Const(0x4443534D, Hex(UInt)),
-    version=Const(0x00100001, Hex(UInt)),
+    _magic=Const(b"MSCD"),
+    _version=Const(0x00100001, Hex(UInt)),
     layers=make_vector(CollisionLayer),
     _eof=Terminated,
 )
