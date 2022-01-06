@@ -75,7 +75,7 @@ class FileTreeEditor:
             with custom_names.open() as f:
                 self._name_for_asset_id.update({
                     asset_id: name
-                    for name, asset_id in json.load(f)
+                    for name, asset_id in json.load(f).items()
                 })
 
         for f in self.root.rglob("*"):
