@@ -1,6 +1,7 @@
 from typing import Type
 
 from mercury_engine_data_structures.formats.base_resource import BaseResource, AssetType
+from mercury_engine_data_structures.formats.bmbls import Bmbls
 from mercury_engine_data_structures.formats.bmsad import Bmsad
 from mercury_engine_data_structures.formats.bmscc import Bmscc
 from mercury_engine_data_structures.formats.bmssd import Bmssd
@@ -14,6 +15,7 @@ from mercury_engine_data_structures.formats.toc import Toc
 
 ALL_FORMATS = {
     "PKG": Pkg,
+    "BMBLS": Bmbls,
     "BMSSD": Bmssd,
     "BMSAD": Bmsad,
     "BRFLD": Brfld,
