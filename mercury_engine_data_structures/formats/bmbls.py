@@ -1,10 +1,9 @@
 import construct
 
-from mercury_engine_data_structures.formats import BaseResource, game_model_root
+from mercury_engine_data_structures.formats import BaseResource, standard_format
 from mercury_engine_data_structures.game_check import Game
-from mercury_engine_data_structures.formats.dread_types import base_animation_CBlendSpaceResource
 
-BMBLS = game_model_root.create('base::animation::CBlendSpaceResource', 0x02020001, base_animation_CBlendSpaceResource)
+BMBLS = standard_format.create('base::animation::CBlendSpaceResource', 0x02020001)
 
 
 class Bmbls(BaseResource):

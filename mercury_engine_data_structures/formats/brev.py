@@ -1,9 +1,9 @@
 import construct
 
-from mercury_engine_data_structures.formats import BaseResource, game_model_root
+from mercury_engine_data_structures.formats import BaseResource, standard_format
 from mercury_engine_data_structures.game_check import Game
 
-BREV = game_model_root.create('CEnvironmentVisualPresets', 0x02020004)
+BREV = standard_format.game_model('CEnvironmentVisualPresets', 0x02020004)
 
 
 class Brev(BaseResource):

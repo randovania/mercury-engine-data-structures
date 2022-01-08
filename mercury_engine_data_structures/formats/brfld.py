@@ -2,10 +2,10 @@ from typing import Iterator, Tuple
 
 import construct
 
-from mercury_engine_data_structures.formats import BaseResource, game_model_root
+from mercury_engine_data_structures.formats import BaseResource, standard_format
 from mercury_engine_data_structures.game_check import Game
 
-BRFLD = game_model_root.create('CScenario', 0x02000031)
+BRFLD = standard_format.game_model('CScenario', 0x02000031)
 
 
 class Brfld(BaseResource):
