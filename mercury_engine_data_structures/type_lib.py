@@ -6,9 +6,9 @@ import importlib
 import typing
 from enum import Enum
 from typing import Optional, Dict, Type, Set
+import construct
 
 from mercury_engine_data_structures import dread_data
-
 
 @dataclasses.dataclass(frozen=True)
 class BaseType:
@@ -26,6 +26,11 @@ class BaseType:
     def name_as_python_identifier(self) -> str:
         return self.name.replace("::", "_").replace(" ", "_").replace("<", "_").replace(
             ">", "_").replace(",", "_").replace("*", "Ptr")
+    
+    @property
+    def construct(self) -> construct.Construct:
+        from mercury_engine_data_structures.formats import dread_types
+        return getattr(dread_types, self.name_as_python_identifier)
 
 
 class TypeKind(Enum):
