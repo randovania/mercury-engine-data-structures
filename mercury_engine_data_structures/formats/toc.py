@@ -7,12 +7,13 @@ from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.formats.base_resource import NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.game_check import Game
 
-TOC = construct.Struct(
+TOC_Raw = construct.Struct(
     files=common_types.make_dict(
         value=construct.Int32ul,
         key=construct.Hex(construct.Int64ul),
     ),
 )
+TOC = TOC_Raw.compile()
 
 
 class Toc(BaseResource):

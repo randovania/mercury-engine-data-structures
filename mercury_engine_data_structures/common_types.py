@@ -62,12 +62,42 @@ class DictAdapter(Adapter):
             for type_, item in obj.items()
         )
 
+    def _emitparse(self, code):
+        fname = f"parse_dict_adapter_{code.allocateId()}"
+        block = f"""
+            def {fname}(io, this):
+                obj = {self.subcon._compileparse(code)}
+                result = Container()
+                for item in obj:
+                    result[item.key] = item.value
+                if len(result) != len(obj):
+                    raise ConstructError("Duplicated keys found in object")
+                return result
+        """
+        code.append(block)
+        return f"{fname}(io, this)"
+
+    def _emitbuild(self, code):
+        fname = f"build_dict_adapter_{code.allocateId()}"
+        block = f"""
+            def {fname}(original_obj, io, this):
+                obj = ListContainer(
+                    Container(key=type_, value=item)
+                    for type_, item in original_obj.items()
+                )
+                return {self.subcon._compilebuild(code)}
+        """
+        code.append(block)
+        return f"{fname}(obj, io, this)"
+
 
 class DictElement(construct.Construct):
     def __init__(self, field, key=StrId):
         super().__init__()
         self.field = field
         self.key = key
+
+        assert not self.key.flagbuildnone
 
     def _parse(self, stream, context, path):
         context = construct.Container(
@@ -110,6 +140,42 @@ class DictElement(construct.Construct):
         value = self.field._sizeof(context, f"{path} -> {key}")
         return key + value
 
+    def _emitparse(self, code):
+        fname = f"parse_dict_element_{code.allocateId()}"
+        block = f"""
+            def {fname}(io, this):
+                result = Container()
+                this = Container(_ = this, _params = this['_params'], _root = None, _parsing = True, _building = False, _sizing = False, _subcons = None, _io = io, _index = this.get('_index', None))
+                this['_root'] = this['_'].get('_root', this)
+                result['key'] = this['key'] = {self.key._compileparse(code)}
+                result['value'] = this['value'] = {self.field._compileparse(code)}
+                return result
+        """
+        code.append(block)
+        return f"{fname}(io, this)"
+
+    def _emitbuild(self, code):
+        fname = f"build_dict_element_{code.allocateId()}"
+        block = f"""
+            def {fname}(obj, io, this):
+                this = Container(_ = this, _params = this['_params'], _root = None, _parsing = False, _building = True, _sizing = False, _subcons = None, _io = io, _index = this.get('_index', None))
+                this['_root'] = this['_'].get('_root', this)
+
+                objdict = obj
+                
+                obj = objdict["key"]
+                this['key'] = obj
+                this['key'] = {self.key._compilebuild(code)}
+                
+                {f'obj = objdict.get("value", None)' if self.field.flagbuildnone else f'obj = objdict["value"]'}
+                this['value'] = obj
+                this['value'] = {self.field._compilebuild(code)}
+
+                return this
+        """
+        code.append(block)
+        return f"{fname}(obj, io, this)"
+
 
 def make_dict(value: construct.Construct, key=StrId):
     return DictAdapter(make_vector(DictElement(value, key)))
@@ -121,9 +187,7 @@ def make_vector(value: construct.Construct):
         value,
     )
     arr.name = "items"
-
-    def get_len(ctx):
-        return len(ctx['items'])
+    get_len = construct.len_(construct.this.items)
 
     return construct.FocusedSeq(
         "items",
