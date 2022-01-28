@@ -124,7 +124,8 @@ class TypeExporter:
 
         elif isinstance(type_data, type_lib.FlagsetType):
             reference = self.ensure_exported_type(type_data.enum)
-            self._type_definition_code += f'\n\n{type_variable} = {reference}'
+            flags = f'construct.FlagsEnum(construct.Int32ul, {reference}.enum_class)'
+            self._type_definition_code += f'\n\n{type_variable} = {flags}'
 
         elif isinstance(type_data, type_lib.TypedefType):
             reference = self.ensure_exported_type(type_data.alias)
