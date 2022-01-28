@@ -1,3 +1,4 @@
+from typing import Dict
 from construct.core import Struct, Construct, Const
 
 from mercury_engine_data_structures.common_types import make_dict
@@ -18,7 +19,7 @@ class Txt(BaseResource):
         return TXT
 
     @property
-    def strings(self) -> dict[str, str]:
+    def strings(self) -> Dict[str, str]:
         return self._raw.strings
     
     @strings.setter
