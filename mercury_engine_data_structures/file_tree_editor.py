@@ -301,7 +301,9 @@ class FileTreeEditor:
                 if None in self._files_for_asset_id[asset_id]:
                     path = self._name_for_asset_id[asset_id]
                     logger.info("Writing to %s with %d bytes", path, len(data))
-                    output_path.joinpath(path).write_bytes(data)
+                    target_path = output_path.joinpath(path)
+                    target_path.parent.mkdir(parents=True, exist_ok=True)
+                    target_path.write_bytes(data)
             else:
                 self._toc.remove_file(asset_id)
 
