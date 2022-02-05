@@ -151,6 +151,7 @@ class Pkg(BaseResource):
         for file in self.raw.files:
             if file.asset_id == asset_id:
                 return file.data
+        return None
 
     def replace_asset(self, asset_id: NameOrAssetId, new_file: bytes):
         asset_id = resolve_asset_id(asset_id)

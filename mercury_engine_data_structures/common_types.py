@@ -143,9 +143,10 @@ class DictElement(construct.Construct):
     def _emitparse(self, code):
         fname = f"parse_dict_element_{code.allocateId()}"
         block = f"""
-            def {fname}(io, this):
+            def {fname}(io, this) -> Container:
                 result = Container()
-                this = Container(_ = this, _params = this['_params'], _root = None, _parsing = True, _building = False, _sizing = False, _subcons = None, _io = io, _index = this.get('_index', None))
+                this = Container(_=this, _params=this['_params'], _root=None, _parsing=True, _building=False,
+                                 _sizing=False, _subcons=None, _io=io, _index=this.get('_index', None))
                 this['_root'] = this['_'].get('_root', this)
                 result['key'] = this['key'] = {self.key._compileparse(code)}
                 result['value'] = this['value'] = {self.field._compileparse(code)}
@@ -158,7 +159,8 @@ class DictElement(construct.Construct):
         fname = f"build_dict_element_{code.allocateId()}"
         block = f"""
             def {fname}(obj, io, this):
-                this = Container(_ = this, _params = this['_params'], _root = None, _parsing = False, _building = True, _sizing = False, _subcons = None, _io = io, _index = this.get('_index', None))
+                this = Container(_ = this, _params = this['_params'], _root = None, _parsing = False, _building = True,
+                                 _sizing = False, _subcons = None, _io = io, _index = this.get('_index', None))
                 this['_root'] = this['_'].get('_root', this)
 
                 objdict = obj
