@@ -38,7 +38,7 @@ class Brfld(BaseResource):
         yield from self.raw.Root.pScenario.rEntitiesLayer.dctActorGroups.keys()
 
     def get_actor_group(self, group_name: str) -> List[str]:
-        return self.raw.Root.pScenario.rEntitiesLayer[group_name]
+        return self.raw.Root.pScenario.rEntitiesLayer.dctActorGroups[group_name]
 
     def is_actor_in_group(self, group_name: str, actor_name: str, layer_name: str = "default") -> bool:
         return self.link_for_actor(actor_name, layer_name) in self.get_actor_group(group_name)
