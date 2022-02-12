@@ -1,4 +1,4 @@
-from typing import Iterator, Tuple
+from typing import Iterator, Tuple, List
 
 import construct
 
@@ -31,5 +31,26 @@ class Brfld(BaseResource):
                 result = result[part]
             return result
 
-    def link_for_actor(self, layer_name: str, actor_name: str) -> str:
+    def link_for_actor(self, actor_name: str, layer_name: str = "default") -> str:
         return ":".join(["Root", "pScenario", "rEntitiesLayer", "dctSublayers", layer_name, "dctActors", actor_name])
+
+    def all_actor_groups(self) -> Iterator[str]:
+        yield from self.raw.Root.pScenario.rEntitiesLayer.dctActorGroups.keys()
+
+    def get_actor_group(self, group_name: str) -> List[str]:
+        return self.raw.Root.pScenario.rEntitiesLayer[group_name]
+
+    def is_actor_in_group(self, group_name: str, actor_name: str, layer_name: str = "default") -> bool:
+        return self.link_for_actor(actor_name, layer_name) in self.get_actor_group(group_name)
+
+    def add_actor_to_group(self, group_name: str, actor_name: str, layer_name: str = "default"):
+        group = self.get_actor_group(group_name)
+        actor_link = self.link_for_actor(actor_name, layer_name)
+        if actor_link not in group:
+            group.append(actor_link)
+
+    def remove_actor_from_group(self, group_name: str, actor_name: str, layer_name: str = "default"):
+        group = self.get_actor_group(group_name)
+        actor_link = self.link_for_actor(actor_name, layer_name)
+        if actor_link in group:
+            group.remove(actor_link)
