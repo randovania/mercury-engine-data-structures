@@ -21250,29 +21250,24 @@
         "target": "game::logic::collision::CCollider"
     },
     "base::global::TRntString128": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "primitive",
+        "primitive_kind": "string"
     },
     "base::global::TRntString256": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "primitive",
+        "primitive_kind": "string"
     },
     "base::global::TRntString32": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "primitive",
+        "primitive_kind": "string"
     },
     "base::global::TRntString512": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "primitive",
+        "primitive_kind": "string"
     },
     "base::global::TRntString64": {
-        "kind": "struct",
-        "parent": null,
-        "fields": {}
+        "kind": "primitive",
+        "primitive_kind": "string"
     },
     "base::global::timeline::CEvent": {
         "kind": "struct",
