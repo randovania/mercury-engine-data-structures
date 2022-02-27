@@ -1,4 +1,5 @@
 import copy
+import enum
 import json
 import logging
 import os.path
@@ -17,6 +18,18 @@ from mercury_engine_data_structures.game_check import Game
 
 T = typing.TypeVar("T")
 logger = logging.getLogger(__name__)
+
+
+class OutputFormat(enum.Enum):
+    """
+    How the modifications are saved to the output dir.
+
+    PKG: as modified pkg files, able to be ran on an unmodified executable.
+    ROMFS: just the modified assets directly. Requires a modified executable to prioritize romfs before pkg.
+    """
+
+    PKG = enum.auto()
+    ROMFS = enum.auto()
 
 
 def _find_entry_for_asset_id(asset_id: AssetId, pkg_header):
@@ -270,40 +283,42 @@ class FileTreeEditor:
 
         return self._in_memory_pkgs[pkg_name]
 
-    def save_modified_pkgs(self, output_path: Optional[Path] = None):
-        if output_path is None:
-            output_path = self.root
-
+    def save_modifications(self, output_path: Path, output_format: OutputFormat):
+        replacements = []
         modified_pkgs = set()
-        for asset_id in self._modified_resources.keys():
-            modified_pkgs.update(self._files_for_asset_id[asset_id])
-
-        if None in modified_pkgs:
-            modified_pkgs.remove(None)
-
-        # Ensure all pkgs we'll modify is in memory already.
-        # We'll need to read these files anyway to modify, so do it early to speedup
-        # the get_raw_assets for _ensured_asset_ids.
-        for pkg_name in modified_pkgs:
-            self.get_pkg(pkg_name)
-
-        # Read all asset ids we need to copy somewhere else
         asset_ids_to_copy = {}
-        for asset_ids in self._ensured_asset_ids.values():
-            for asset_id in asset_ids:
-                if asset_id not in asset_ids_to_copy:
-                    asset_ids_to_copy[asset_id] = self.get_raw_asset(asset_id)
+
+        if output_format == OutputFormat.PKG:
+            for asset_id in self._modified_resources.keys():
+                modified_pkgs.update(self._files_for_asset_id[asset_id])
+
+            if None in modified_pkgs:
+                modified_pkgs.remove(None)
+
+            # Ensure all pkgs we'll modify is in memory already.
+            # We'll need to read these files anyway to modify, so do it early to speedup
+            # the get_raw_assets for _ensured_asset_ids.
+            for pkg_name in modified_pkgs:
+                self.get_pkg(pkg_name)
+
+            # Read all asset ids we need to copy somewhere else
+            for asset_ids in self._ensured_asset_ids.values():
+                for asset_id in asset_ids:
+                    if asset_id not in asset_ids_to_copy:
+                        asset_ids_to_copy[asset_id] = self.get_raw_asset(asset_id)
 
         # Update the toc for the modified (and new) files
         for asset_id, data in self._modified_resources.items():
             if data is not None:
                 self._toc.add_file(asset_id, len(data))
-                if None in self._files_for_asset_id[asset_id]:
+                if None in self._files_for_asset_id[asset_id] or output_format == OutputFormat.ROMFS:
                     path = self._name_for_asset_id[asset_id]
                     logger.info("Writing to %s with %d bytes", path, len(data))
                     target_path = output_path.joinpath(path)
                     target_path.parent.mkdir(parents=True, exist_ok=True)
                     target_path.write_bytes(data)
+                    if self._files_for_asset_id[asset_id] - {None}:
+                        replacements.append(path)
             else:
                 self._toc.remove_file(asset_id)
 
@@ -312,6 +327,12 @@ class FileTreeEditor:
         toc_path = output_path.joinpath(Toc.system_files_name())
         toc_path.parent.mkdir(parents=True, exist_ok=True)
         toc_path.write_bytes(self._toc.build())
+
+        if output_format == OutputFormat.ROMFS:
+            output_path.joinpath("replacements.txt").write_bytes("".join(
+                f"{replacement}\n"
+                for replacement in replacements
+            ).encode("utf-8"))
 
         # Update the PKGs
         for pkg_name in modified_pkgs:
