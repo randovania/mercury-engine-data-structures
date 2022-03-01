@@ -44,6 +44,11 @@ def _read_file_with_entry(path: Path, entry):
         return f.read(entry.end_offset - entry.start_offset)
 
 
+def _write_to_path(output: Path, data: bytes):
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_bytes(data)
+
+
 class FileTreeEditor:
     """
     Manages efficiently reading all PKGs in the game and writing out modifications to a new path.
@@ -288,51 +293,60 @@ class FileTreeEditor:
         modified_pkgs = set()
         asset_ids_to_copy = {}
 
-        if output_format == OutputFormat.PKG:
-            for asset_id in self._modified_resources.keys():
-                modified_pkgs.update(self._files_for_asset_id[asset_id])
+        for asset_id in self._modified_resources.keys():
+            modified_pkgs.update(self._files_for_asset_id[asset_id])
 
-            if None in modified_pkgs:
-                modified_pkgs.remove(None)
+        if None in modified_pkgs:
+            modified_pkgs.remove(None)
 
-            # Ensure all pkgs we'll modify is in memory already.
-            # We'll need to read these files anyway to modify, so do it early to speedup
-            # the get_raw_assets for _ensured_asset_ids.
-            for pkg_name in modified_pkgs:
-                self.get_pkg(pkg_name)
+        # Ensure all pkgs we'll modify is in memory already.
+        # We'll need to read these files anyway to modify, so do it early to speedup
+        # the get_raw_assets for _ensured_asset_ids.
+        for pkg_name in modified_pkgs:
+            self.get_pkg(pkg_name)
 
-            # Read all asset ids we need to copy somewhere else
-            for asset_ids in self._ensured_asset_ids.values():
-                for asset_id in asset_ids:
-                    if asset_id not in asset_ids_to_copy:
-                        asset_ids_to_copy[asset_id] = self.get_raw_asset(asset_id)
+        # Read all asset ids we need to copy somewhere else
+        for asset_ids in self._ensured_asset_ids.values():
+            for asset_id in asset_ids:
+                if asset_id not in asset_ids_to_copy:
+                    asset_ids_to_copy[asset_id] = self.get_raw_asset(asset_id)
 
         # Update the toc for the modified (and new) files
+        logger.debug("Writing modified files")
         for asset_id, data in self._modified_resources.items():
             if data is not None:
                 self._toc.add_file(asset_id, len(data))
                 if None in self._files_for_asset_id[asset_id] or output_format == OutputFormat.ROMFS:
                     path = self._name_for_asset_id[asset_id]
                     logger.info("Writing to %s with %d bytes", path, len(data))
-                    target_path = output_path.joinpath(path)
-                    target_path.parent.mkdir(parents=True, exist_ok=True)
-                    target_path.write_bytes(data)
+                    _write_to_path(output_path.joinpath(path), data)
                     if self._files_for_asset_id[asset_id] - {None}:
                         replacements.append(path)
+                        if output_format == OutputFormat.ROMFS and asset_id in asset_ids_to_copy:
+                            del asset_ids_to_copy[asset_id]
             else:
                 self._toc.remove_file(asset_id)
 
         # Update the Toc's own entry and then write
+        logger.debug("Updating the system/files.toc")
         self._toc.add_file(Toc.system_files_name(), len(self._toc.build()))
-        toc_path = output_path.joinpath(Toc.system_files_name())
-        toc_path.parent.mkdir(parents=True, exist_ok=True)
-        toc_path.write_bytes(self._toc.build())
+        _write_to_path(output_path.joinpath(Toc.system_files_name()),
+                       self._toc.build())
 
         if output_format == OutputFormat.ROMFS:
+            logger.debug("Copying to romfs the ensured files")
+            for asset_id, data in asset_ids_to_copy.items():
+                path = output_path.joinpath(self._name_for_asset_id[asset_id])
+                logger.info("Writing to %s with %d bytes", path, len(data))
+                _write_to_path(output_path.joinpath(path), data)
+
             output_path.joinpath("replacements.txt").write_bytes("".join(
                 f"{replacement}\n"
                 for replacement in replacements
             ).encode("utf-8"))
+
+            # Clear modified_pkgs so we don't write any new pkg
+            modified_pkgs.clear()
 
         # Update the PKGs
         for pkg_name in modified_pkgs:
