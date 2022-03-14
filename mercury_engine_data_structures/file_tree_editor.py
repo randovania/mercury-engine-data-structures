@@ -340,10 +340,11 @@ class FileTreeEditor:
                 logger.info("Writing to %s with %d bytes", path, len(data))
                 _write_to_path(output_path.joinpath(path), data)
 
-            output_path.joinpath("replacements.txt").write_bytes("".join(
-                f"{replacement}\n"
-                for replacement in replacements
-            ).encode("utf-8"))
+            # dread_depackager format
+            replacement_json = json.dumps({
+                "replacements": replacements
+            }, indent=4)
+            output_path.joinpath("replacements.json").write_text(replacement_json, "utf-8")
 
             # Clear modified_pkgs so we don't write any new pkg
             modified_pkgs.clear()
