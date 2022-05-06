@@ -1,4 +1,5 @@
 from typing import Optional
+
 import construct
 
 from mercury_engine_data_structures import type_lib
@@ -20,6 +21,7 @@ def create(name: str, version: int, root_name: Optional[str] = None):
 
         _end=construct.Terminated,
     )
+
 
 def game_model(name: str, version: int):
     return create(name, version, "gameeditor::CGameModelRoot")
