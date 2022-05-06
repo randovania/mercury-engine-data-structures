@@ -10,11 +10,14 @@ class Bmmap(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
         return BMMAP
-    
+
     @property
     def items(self) -> Container:
         return self.raw.Root.mapItems
-    
+
     @property
     def ability_labels(self) -> Container:
         return self.raw.Root.mapAbilityLabels
+
+    def get_category(self, name: str) -> Container:
+        return self.raw.Root[name]
