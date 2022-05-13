@@ -1,106 +1,56 @@
+import typing
 from typing import Dict, Union, Type
 
 import construct
-from construct import Construct, Probe, Struct, Adapter
-from construct.core import FocusedSeq, Byte, If, IfThenElse, Optional, Peek
 
-import mercury_engine_data_structures.dread_data
-from mercury_engine_data_structures.common_types import make_vector
-from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, ForceQuit
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 
 
-def ConfirmType(name: str):
-    def check(ctx):
-        return ctx[f"{name}_type"] != name
+class Object(construct.Construct):
+    def __init__(self, fields: Dict[str, Union[construct.Construct, Type[construct.Construct]]]):
+        super().__init__()
+        self.fields = fields
 
-    return construct.If(
-        check,
-        ErrorWithMessage(
-            lambda ctx: f"Expected {name}, got {ctx[f'{name}_type']} ("
-                        f"{mercury_engine_data_structures.dread_data.all_property_id_to_name().get(ctx[f'{name}_type'])}) "
-                        "without assigned type"
-        ),
-    )
+    def _parse(self, stream, context, path) -> typing.Union[construct.Container, construct.ListContainer]:
+        field_count = construct.Int32ul._parsereport(stream, context, path)
 
-
-def _has_duplicated_keys(obj):
-    seen = set()
-    for item in obj:
-        if item.type in seen:
-            return True
-        seen.add(item.type)
-    return False
-
-
-class ObjectAdapter(Adapter):
-    def _decode(self, obj: construct.ListContainer, context, path):
-        if _has_duplicated_keys(obj):
-            return obj
-
+        array_response = False
         result = construct.Container()
-        for item in obj:
-            if item.type in result:
-                raise construct.ConstructError(f"Type {item.type} found twice in object", path)
-            result[item.type] = item.item
+
+        for i in range(field_count):
+            field_path = f"{path}.field_{i}"
+            field_type = PropertyEnum._parsereport(stream, context, field_path)
+            try:
+                field_construct = self.fields[field_type]
+            except KeyError:
+                raise construct.ExplicitError(f"Type {field_type} not known, valid types are {list(self.fields)}.",
+                                              path=field_path)
+
+            field_value = field_construct._parsereport(stream, context, field_path)
+            if array_response or field_type in result:
+                if not array_response:
+                    result = construct.ListContainer(
+                        construct.Container(type=name, item=value)
+                        for name, value in result.items()
+                    )
+                    array_response = True
+                result.append(construct.Container(type=field_type, item=field_value))
+            else:
+                result[field_type] = field_value
 
         return result
 
-    def _encode(self, obj: construct.Container, context, path):
-        if isinstance(obj, construct.ListContainer):
-            return obj
-        return construct.ListContainer(
-            construct.Container(
-                type=type_,
-                item=item
-            )
-            for type_, item in obj.items()
-        )
+    def _build(self, obj: typing.Union[construct.Container, construct.ListContainer], stream, context, path):
+        construct.Int32ul._build(len(obj), stream, context, path)
 
+        if isinstance(obj, list):
+            def list_iter():
+                for it in obj:
+                    yield it["type"], it["item"]
+        else:
+            list_iter = obj.items
 
-def Object(fields: Dict[str, Union[Construct, Type[Construct]]], *,
-           debug=False) -> Construct:
-    all_types = list(fields)
-
-    fields = {
-        name: FocusedSeq(
-            name,
-            "next_field" / Optional(Peek(PropertyEnum)),
-            "remaining" / Optional(Peek(Byte)),
-            name / IfThenElse(
-                construct.this._parsing,
-                If(lambda this: this.remaining is not None and (this.next_field is None or this.next_field not in fields.keys()), conn),
-                Optional(conn)
-            )
-        )
-        for name, conn in fields.items()
-    }
-    for type_name in all_types:
-        if type_name not in mercury_engine_data_structures.dread_data.all_name_to_property_id():
-            raise ValueError(f"Unknown type name: {type_name}, not in hashes database")
-
-    switch = construct.Switch(
-        construct.this.type,
-        fields,
-        ErrorWithMessage(
-            lambda ctx: f"Type {ctx.type} not known, valid types are {all_types}."
-        )
-    )
-    switch.name = "item"
-    r = ObjectAdapter(make_vector(
-        Struct(
-            "type" / PropertyEnum,
-            switch,
-        )
-    ))
-    if debug:
-        r.name = "fields"
-        r = construct.FocusedSeq(
-            "fields",
-            r,
-            "next_enum" / PropertyEnum,
-            "probe" / Probe(lookahead=0x8),
-            ForceQuit(),
-        )
-
-    return r
+        for i, (field_type, field_value) in enumerate(list_iter()):
+            field_path = f"{path}.field_{i}"
+            PropertyEnum._build(field_type, stream, context, field_path)
+            self.fields[field_type]._build(field_value, stream, context, field_path)
