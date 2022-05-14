@@ -5,7 +5,7 @@ import construct
 from mercury_engine_data_structures.formats import BaseResource, standard_format
 from mercury_engine_data_structures.game_check import Game
 
-BRFLD = standard_format.game_model('CScenario', 0x02000031)
+BRFLD = standard_format.game_model('CScenario', 0x02000031).compile()
 
 
 class Brfld(BaseResource):
