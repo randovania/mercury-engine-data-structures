@@ -149,6 +149,8 @@ class TypeExporter:
         else:
             raise ValueError(f"Unknown type_data: {type_data}")
 
+        self._type_definition_code += f"\n{type_variable}.name = {repr(type_name)}"
+
         self._exported_types[type_name] = type_variable
 
     def ensure_exported_type(self, type_name: str) -> str:
