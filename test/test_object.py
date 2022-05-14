@@ -39,3 +39,13 @@ def test_build_object(sample_object):
 def test_parse_object(sample_object):
     result = TestClass.parse(sample_object[1])
     assert result == sample_object[0]
+
+
+def test_compile_build_object(sample_object):
+    result = TestClass.compile().build(sample_object[0])
+    assert result == sample_object[1]
+
+
+def test_compile_parse_object(sample_object):
+    result = TestClass.compile().parse(sample_object[1])
+    assert result == sample_object[0]

@@ -56,6 +56,58 @@ class PointerAdapter(Adapter):
             ptr=obj,
         )
 
+    def _emitparse(self, code):
+        if self._single_type:
+            code.parsercache[id(self)] = f"({self.subcon._compileparse(code)}).ptr"
+            return code.parsercache[id(self)]
+
+        fname = f"parse_object_{code.allocateId()}"
+        code.parsercache[id(self)] = f"{fname}(io, this)"
+
+        block = f"""
+            import mercury_engine_data_structures.dread_data
+            def {fname}(io, this):
+                obj = {self.subcon._compileparse(code)}
+                if obj.ptr is None:
+                    return None
+                obj.ptr["@type"] = mercury_engine_data_structures.dread_data.all_property_id_to_name()[obj.type]
+                return obj.ptr
+        """
+        code.append(block)
+
+        return code.parsercache[id(self)]
+
+    def _emitbuild(self, code):
+        void_id = mercury_engine_data_structures.dread_data.all_name_to_property_id()["void"]
+        fname = f"build_object_{code.allocateId()}"
+
+        # PointerSet is used recursively, so break the infinite loop by prefilling the cache
+        code.buildercache[id(self)] = f"{fname}(obj, io, this)"
+
+        block = f"""
+            def {fname}(the_obj, io, this):
+                if the_obj is None:
+                    obj = Container(type={void_id}, ptr=None)
+                    return {self.subcon._compilebuild(code)}
+        """
+
+        if self._single_type:
+            type_id = list(self.types.keys())[1]
+            block += f"""
+                obj = Container(type={type_id}, ptr=the_obj)
+                return {self.subcon._compilebuild(code)}
+        """
+        else:
+            block += f"""
+                ptr = Container(**the_obj)
+                type_id = mercury_engine_data_structures.dread_data.all_name_to_property_id()[ptr.pop("@type")]
+                obj = Container(type=type_id, ptr=ptr)
+                return {self.subcon._compilebuild(code)}
+        """
+
+        code.append(block)
+        return code.buildercache[id(self)]
+
 
 class PointerSet:
     types: Dict[int, Union[Construct, Type[Construct]]]
@@ -85,7 +137,8 @@ class PointerSet:
                 construct.this.type,
                 self.types,
                 ErrorWithMessage(
-                    lambda ctx: f"Property {ctx.type} ({mercury_engine_data_structures.dread_data.all_property_id_to_name().get(ctx.type)}) "
-                                "without assigned type"),
+                    lambda
+                        ctx: f"Property {ctx.type} ({mercury_engine_data_structures.dread_data.all_property_id_to_name().get(ctx.type)}) "
+                             "without assigned type"),
             )
         ), self.types)
