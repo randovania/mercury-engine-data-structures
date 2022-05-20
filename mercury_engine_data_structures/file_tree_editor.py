@@ -347,7 +347,8 @@ class FileTreeEditor:
             output_path.joinpath("replacements.json").write_text(replacement_json, "utf-8")
 
             # Clear modified_pkgs so we don't write any new pkg
-            modified_pkgs.clear()
+            # We keep system.pkg because .bmmaps don't read properly with exlaunch and it's only 4MB
+            modified_pkgs = list(filter(lambda pkg: pkg == "packs/system/system.pkg", modified_pkgs))
 
         # Update the PKGs
         for pkg_name in modified_pkgs:
