@@ -66,7 +66,7 @@ PKGHeader = Struct(
     header_size=Int32ul,
     data_section_size=Int32ul,
     file_entries=PrefixedArray(Int32ul, FileEntry),
-)
+).compile()
 
 PKG = Struct(
     _header_size=Skip(1, Int32ul),
