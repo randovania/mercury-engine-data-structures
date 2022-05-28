@@ -96,10 +96,7 @@ class FileTreeEditor:
                     for name, asset_id in json.load(f).items()
                 })
 
-        for f in self.root.rglob("*"):
-            if not f.is_file():
-                continue
-
+        for f in self.root.rglob("*.*"):
             name = f.relative_to(self.root).as_posix()
             asset_id = resolve_asset_id(name)
             self._name_for_asset_id[asset_id] = name
