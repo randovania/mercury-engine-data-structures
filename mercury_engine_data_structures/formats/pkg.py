@@ -4,13 +4,10 @@ from typing import Optional
 
 import construct
 from construct import (
-    Struct, PrefixedArray, Int64ul, Int32ul, Hex, Construct, Computed, Array, Tell,
-    Aligned, FocusedSeq, Rebuild, Seek, Pointer, Prefixed, GreedyBytes,
-)
+    Struct, PrefixedArray, Int64ul, Int32ul, Hex, Construct, )
 
 from mercury_engine_data_structures import dread_data
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
-from mercury_engine_data_structures.construct_extensions.misc import Skip
 from mercury_engine_data_structures.formats.base_resource import BaseResource, NameOrAssetId, resolve_asset_id, AssetId
 from mercury_engine_data_structures.game_check import Game
 
@@ -76,7 +73,8 @@ class PkgConstruct(construct.Construct):
     def __init__(self):
         super().__init__()
         self.int_size = typing.cast(construct.FormatField, Int32ul)
-        self.file_headers_type = PrefixedArray(self.int_size, FileEntry)
+        self.file_entry_size = FileEntry.sizeof()
+        self.file_headers_type = PrefixedArray(self.int_size, FileEntry).compile()
 
     def _parse(self, stream, context, path) -> construct.Container:
         # Skip over header size and data section size
@@ -106,7 +104,7 @@ class PkgConstruct(construct.Construct):
         construct.stream_seek(stream, 2 * self.int_size.length, 1, path)
 
         # Skip over file headers
-        construct.stream_seek(stream, len(obj.files) * FileEntry._sizeof(context, path), 1, path)
+        construct.stream_seek(stream, len(obj.files) * self.file_entry_size, 1, path)
 
         # Align to 128 bytes
         AlignTo(128)._build(None, stream, context, path)
