@@ -15,3 +15,18 @@ Construct type definitions for Mercury Engine
 ```python
 # TODO
 ```
+
+## Colors for Text
+
+Metroid dread uses the following annotations in text to change color:
+
+| Code | Color       |              | 
+|------|-------------|--------------|
+| {c0} | White       | (Default)    |
+| {c1} | Yellow      |              | 	
+| {c2} | Red         |              | 
+| {c3} | Pink        |              | 
+| {c4} | Green       |              | 
+| {c5} | Blue        |              | 
+| {c6} | UI Active   | (Light blue) | 
+| {c7} | UI Inactive | (Dim blue)   |
