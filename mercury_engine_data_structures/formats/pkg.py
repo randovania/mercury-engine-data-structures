@@ -68,54 +68,83 @@ PKGHeader = Struct(
     file_entries=PrefixedArray(Int32ul, FileEntry),
 ).compile()
 
-PKG = Struct(
-    _header_size=Skip(1, Int32ul),
 
-    _data_section_size_address=Tell,
-    _data_section_size=Skip(1, Int32ul),
+class PkgConstruct(construct.Construct):
+    int_size: construct.FormatField
+    file_headers_type: construct.Construct
 
-    _num_files=Rebuild(Int32ul, construct.len_(construct.this.files)),
-    _start_headers=Tell,
-    _skip_headers=Seek(lambda ctx: ctx._num_files * FileEntry.sizeof(), 1),
+    def __init__(self):
+        super().__init__()
+        self.int_size = typing.cast(construct.FormatField, Int32ul)
+        self.file_headers_type = PrefixedArray(self.int_size, FileEntry)
 
-    _align=AlignTo(128),
-    _files_start=Tell,
-    _update_header_size=Pointer(
-        0x0,
-        Rebuild(Int32ul, lambda ctx: ctx._files_start - Int32ul.sizeof()),
-    ),
-    files=Array(
-        construct.this._num_files,
-        Aligned(8, FocusedSeq(
-            "item",
-            _resource_index=Computed(lambda ctx: ctx["_index"]),
+    def _parse(self, stream, context, path) -> construct.Container:
+        # Skip over header size and data section size
+        construct.stream_seek(stream, 2 * self.int_size.length, 1, path)
 
-            actual_start_offset=Tell,
-            start_offset=Pointer(header_field("start_offset"),
-                                 Rebuild(Int32ul, lambda ctx: ctx.actual_start_offset)),
-            end_offset=Pointer(header_field("end_offset"),
-                               Rebuild(Int32ul, lambda ctx: ctx.start_offset + len(ctx.item.data))),
-            item_size=Computed(lambda ctx: ctx.end_offset - ctx.start_offset),
+        # Get the file headers
+        file_headers = self.file_headers_type._parsereport(stream, context, path)
 
-            item=Struct(
-                asset_id=Pointer(header_field("asset_id"), Construct_AssetId),
-                asset_name=Computed(lambda ctx: dread_data.name_for_asset_id(ctx.asset_id)),
-                data=Prefixed(
-                    Rebuild(
-                        Computed(lambda ctx: ctx._.item_size),
-                        construct.len_(construct.this.data),
-                    ),
-                    GreedyBytes,
-                ),
-            ),
-        )),
-    ),
-    _files_end=Tell,
-    _update_data_section_size=Pointer(
-        lambda ctx: ctx._data_section_size_address,
-        Rebuild(Int32ul, lambda ctx: ctx._files_end - ctx._files_start),
-    ),
-)
+        # Align to 128 bytes
+        AlignTo(128)._parsereport(stream, context, path)
+
+        files = construct.ListContainer()
+        for i, header in enumerate(file_headers):
+            file_path = f"{path} -> file {i}"
+            construct.stream_seek(stream, header.start_offset, 0, file_path)
+            files.append(construct.Container(
+                asset_id=header.asset_id,
+                data=construct.stream_read(stream, header.end_offset - header.start_offset, file_path)
+            ))
+
+        return construct.Container(files=files)
+
+    def _build(self, obj: construct.Container, stream, context, path):
+        header_start = construct.stream_tell(stream, path)
+
+        # Skip over header size and data section size for now
+        construct.stream_seek(stream, 2 * self.int_size.length, 1, path)
+
+        # Skip over file headers
+        construct.stream_seek(stream, len(obj.files) * FileEntry._sizeof(context, path), 1, path)
+
+        # Align to 128 bytes
+        AlignTo(128)._build(None, stream, context, path)
+
+        header_end = construct.stream_tell(stream, path)
+
+        file_headers = []
+        for i, file in enumerate(obj.files):
+            field_path = f"{path}.field_{i}"
+            start_offset = construct.stream_tell(stream, path)
+            construct.stream_write(stream, file.data, len(file.data), field_path)
+            end_offset = construct.stream_tell(stream, path)
+            file_headers.append(construct.Container(
+                asset_id=file.asset_id,
+                start_offset=start_offset,
+                end_offset=end_offset,
+            ))
+            # Align to 8 bytes
+            pad = -(end_offset - start_offset) % 8
+            construct.stream_write(stream, b"\x00" * pad, pad, path)
+
+        files_end = construct.stream_tell(stream, path)
+
+        # Update Headers
+        construct.stream_seek(stream, header_start, 0, path)
+
+        # Header Size
+        self.int_size._build(header_end - header_start - 4, stream, context, path)
+        # Data Section Size
+        self.int_size._build(files_end - header_end, stream, context, path)
+        # File Entries
+        self.file_headers_type._build(file_headers, stream, context, path)
+
+        # Return to the end
+        construct.stream_seek(stream, files_end, 0, path)
+
+
+PKG = PkgConstruct()
 
 
 @dataclasses.dataclass(frozen=True)
