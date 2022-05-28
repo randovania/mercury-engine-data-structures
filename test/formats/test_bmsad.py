@@ -2,7 +2,7 @@ import pytest
 
 from mercury_engine_data_structures.formats.bmsad import BMSAD
 from mercury_engine_data_structures.game_check import Game
-from test.test_lib import parse_and_build_compare
+from test.test_lib import parse_and_build_compare, parse_build_compare_editor
 
 all_bmsad = [
     "actors/characters/armadigger/charclasses/armadigger.bmsad",
@@ -905,9 +905,9 @@ all_bmsad = [
 
 
 @pytest.mark.parametrize("bmsad_path", all_bmsad)
-def test_compare_dread_all(dread_path, bmsad_path):
-    parse_and_build_compare(
-        BMSAD, Game.DREAD, dread_path.joinpath(bmsad_path)
+def test_compare_dread_all(dread_file_tree, bmsad_path):
+    parse_build_compare_editor(
+        BMSAD, dread_file_tree, bmsad_path
     )
 
 
