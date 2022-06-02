@@ -12,7 +12,7 @@ def create(name: str, version: int, root_name: Optional[str] = None):
 
     root = type_lib.get_type(root_name).construct
 
-    return construct.Struct(
+    result = construct.Struct(
         _class_crc=construct.Const(name, PropertyEnum),
         _version=construct.Const(version, construct.Hex(construct.Int32ul)),
 
@@ -21,6 +21,8 @@ def create(name: str, version: int, root_name: Optional[str] = None):
 
         _end=construct.Terminated,
     )
+    result.name = name
+    return result
 
 
 def game_model(name: str, version: int):
