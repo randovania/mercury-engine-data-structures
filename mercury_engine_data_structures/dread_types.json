@@ -18599,6 +18599,10 @@
             "Invalid": 2147483647
         }
     },
+    "base::global::CRntVector<EMapTutoType>": {
+        "kind": "vector",
+        "value_type": "EMapTutoType"
+    },
     "EMarkerType": {
         "kind": "enum",
         "values": {
@@ -19437,6 +19441,14 @@
         "kind": "struct",
         "parent": "GUI::CDisplayObjectContainer",
         "fields": {}
+    },
+    "GUI::CMissionLog::TMissionLogEntries": {
+        "kind": "typedef",
+        "alias": "base::global::CRntVector<CGlobalEventManager::SMissionLogEntry>"
+    },
+    "base::global::CRntVector<CGlobalEventManager::SMissionLogEntry>": {
+        "kind": "vector",
+        "value_type": "CGlobalEventManager::SMissionLogEntry"
     },
     "GUI::CModel3D": {
         "kind": "struct",
@@ -24440,5 +24452,52 @@
     "unsigned_short": {
         "kind": "primitive",
         "primitive_kind": "uint16"
+    },
+    "base::global::CRntVector<CMinimapManager::SAreaIconInfo>": {
+        "kind": "vector",
+        "value_type": "CMinimapManager::SAreaIconInfo"
+    },
+    "CMinimapManager::TGlobalMapIcons": {
+        "kind": "dictionary",
+        "key_type": "base::global::CStrId",
+        "value_type": "base::global::CRntVector<CMinimapManager::SAreaIconInfo>"
+    },
+    "TEnabledOccluderCollidersMap": {
+        "kind": "dictionary",
+        "key_type": "base::global::CStrId",
+        "value_type": "base::global::CRntVector<base::global::CName>"
+    },
+    "base::global::CRntVector<base::global::CName>": {
+        "kind": "vector",
+        "value_type": "base::global::CName"
+    },
+    "base::global::CRntSmallDictionary<base::global::CStrId, bool>": {
+        "kind": "dictionary",
+        "key_type": "base::global::CStrId",
+        "value_type": "bool"
+    },
+    "base::global::CRntVector<CBreakableTileGroupComponent::SMinimapTileState>": {
+        "kind": "vector",
+        "value_type": "CBreakableTileGroupComponent::SMinimapTileState"
+    },
+    "CBreakableTileGroupComponent::TActorTileStatesMap": {
+        "kind": "dictionary",
+        "key_type": "base::global::CStrId",
+        "value_type": "base::global::CRntVector<CBreakableTileGroupComponent::SMinimapTileState>"
+    },
+    "minimapGrid::TMinimapVisMap": {
+        "kind": "dictionary",
+        "key_type": "unsigned",
+        "value_type": "base::global::TRntString512"
+    },
+    "base::global::CRntSmallDictionary<base::global::CStrId, base::spatial::CAABox2D>": {
+        "kind": "dictionary",
+        "key_type": "base::global::CStrId",
+        "value_type": "base::spatial::CAABox2D"
+    },
+    "CMinimapManager::TCustomMarkerDataMap": {
+        "kind": "dictionary",
+        "key_type": "unsigned",
+        "value_type": "CMinimapManager::SMarkerData"
     }
 }

@@ -904,6 +904,7 @@ all_bmsad = [
 ]
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize("bmsad_path", all_bmsad)
 def test_compare_dread_all(dread_file_tree, bmsad_path):
     parse_build_compare_editor(
@@ -914,5 +915,5 @@ def test_compare_dread_all(dread_file_tree, bmsad_path):
 def test_compare_dread(dread_path):
     parse_and_build_compare(
         BMSAD, Game.DREAD,
-        dread_path.joinpath("actors/items/itemsphere_plasmabeam/charclasses/itemsphere_plasmabeam.bmsad"), True
+        dread_path.joinpath("actors/items/itemsphere_plasmabeam/charclasses/itemsphere_plasmabeam.bmsad"),
     )

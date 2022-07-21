@@ -4,6 +4,8 @@ import typing
 from pathlib import Path
 from typing import Dict, Optional
 
+from mercury_engine_data_structures.crc import crc64
+
 
 @functools.lru_cache()
 def get_raw_types() -> Dict[str, typing.Any]:
@@ -31,11 +33,20 @@ def name_for_asset_id(asset_id: int) -> Optional[str]:
     return all_asset_id_to_name().get(asset_id)
 
 
+class CrcDict(dict):
+    def __getitem__(self, __k):
+        try:
+            return super().__getitem__(__k)
+        except:
+            return crc64(__k)
+
 @functools.lru_cache()
 def all_name_to_property_id() -> Dict[str, int]:
     path = Path(__file__).parent.joinpath("property_names.json")
+    names = CrcDict()
     with path.open() as names_file:
-        return json.load(names_file)
+        names.update(json.load(names_file))
+    return names
 
 
 @functools.lru_cache()

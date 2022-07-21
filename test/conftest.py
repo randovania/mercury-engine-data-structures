@@ -26,3 +26,6 @@ def dread_path():
 def dread_file_tree(dread_path):
     return FileTreeEditor(dread_path)
 
+@pytest.fixture(scope="session")
+def dread_save_path():
+    return Path(get_env_or_skip("DREAD_SAVE_PATH"))

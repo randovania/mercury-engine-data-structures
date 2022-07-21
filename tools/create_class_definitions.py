@@ -27,7 +27,7 @@ primitive_to_construct = {
     type_lib.PrimitiveKind.UINT_16: "construct.Int16ul",
     type_lib.PrimitiveKind.UINT_64: "construct.Int64ul",
     type_lib.PrimitiveKind.BYTES: "construct.Prefixed(construct.Int32ul, construct.GreedyBytes)",
-    type_lib.PrimitiveKind.PROPERTY: "PropertyEnum",
+    type_lib.PrimitiveKind.PROPERTY: "PropertyEnumUnsafe",
 }
 
 
@@ -112,7 +112,9 @@ class TypeExporter:
         type_variable = type_data.name_as_python_identifier
 
         if isinstance(type_data, type_lib.PrimitiveType):
-            type_variable = primitive_to_construct[type_data.primitive_kind]
+            primitive = primitive_to_construct[type_data.primitive_kind]
+            self._type_definition_code += f'\n\n{type_variable} = {primitive}'
+            type_variable = primitive
 
         elif isinstance(type_data, type_lib.StructType):
             type_code = self._export_struct_type(type_variable, type_name)
@@ -222,6 +224,21 @@ from mercury_engine_data_structures.construct_extensions.enum import StrictEnum
             for child in sorted(self.children_for(type_name)):
                 code += f'{self.pointer_to_type(type_name)}.add_option("{child}", {self.ensure_exported_type(child)})\n'
             code += "\n"
+        
+        crntfile_types = [
+            type_name for type_name, type in self.all_types.items()
+            if type_name != "base::global::CRntFile" and (
+                # (type.kind in {type_lib.TypeKind.PRIMITIVE, type_lib.TypeKind.DICTIONARY, type_lib.TypeKind.TYPEDEF})
+                # or type_name in {"base::global::CRntVector<base::global::CStrId>"}
+                True
+            )
+        ]
+        for type_name in crntfile_types:
+            code += '{}.add_option("{}", {})\n'.format(
+                self.pointer_to_type("base::global::CRntFile"),
+                type_name,
+                self.ensure_exported_type(type_name),
+            )
 
         return code
 
