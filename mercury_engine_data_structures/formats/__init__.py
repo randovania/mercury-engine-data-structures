@@ -17,13 +17,17 @@ from mercury_engine_data_structures.formats.ini import Ini
 from mercury_engine_data_structures.formats.pkg import Pkg
 from mercury_engine_data_structures.formats.toc import Toc
 from mercury_engine_data_structures.formats.txt import Txt
+from mercury_engine_data_structures.formats.gui_files import Bmscp, Bmssk, Bmsss
 
 ALL_FORMATS = {
     "PKG": Pkg,
     "BMBLS": Bmbls,
     "BMMAP": Bmmap,
     "BMMDEF": Bmmdef,
+    "BMSCP": Bmscp,
     "BMSSD": Bmssd,
+    "BMSSK": Bmssk,
+    "BMSSS": Bmsss,
     "BMSAD": Bmsad,
     "BRFLD": Brfld,
     "BMSCC": Bmscc,
