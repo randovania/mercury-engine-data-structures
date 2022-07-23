@@ -6,11 +6,18 @@ from mercury_engine_data_structures import type_lib
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 
 
-def create(name: str, version: int, root_name: Optional[str] = None):
+def create(name: str, version: int, root_name: Optional[str] = None, explicit_root: bool = False):
     if root_name is None:
         root_name = name
 
-    root = type_lib.get_type(root_name).construct
+    if explicit_root:
+        root = construct.FocusedSeq(
+            "root",
+            "type" / construct.Rebuild(PropertyEnum, name),
+            "root" / type_lib.GetTypeConstruct(lambda this: this._.type)
+        )
+    else:
+        root = type_lib.get_type(root_name).construct
 
     result = construct.Struct(
         _class_crc=construct.Const(name, PropertyEnum),

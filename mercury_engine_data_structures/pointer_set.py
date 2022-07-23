@@ -5,7 +5,7 @@ import copy
 from typing import Dict, Union, Type
 
 import construct
-from construct import Construct, Struct, Hex, Int64ul, Switch, Adapter
+from construct import Construct, Container, ListContainer, Struct, Hex, Int64ul, Switch, Adapter
 
 import mercury_engine_data_structures.dread_data
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
@@ -35,8 +35,18 @@ class PointerAdapter(Adapter):
 
         ret = construct.Container()
         ret["@type"] = mercury_engine_data_structures.dread_data.all_property_id_to_name()[obj.type]
-        for key, value in obj.ptr.items():
-            ret[key] = value
+        
+        if isinstance(obj.ptr, ListContainer):
+            try:
+                obj.ptr = Container({field.type: field.item for field in obj.ptr})
+            except AttributeError:
+                pass
+
+        if isinstance(obj.ptr, Container):
+            for key, value in obj.ptr.items():
+                ret[key] = value
+        else:
+            ret["@value"] = obj.ptr
         return ret
 
     def _encode(self, obj: construct.Container, context, path):
@@ -50,6 +60,9 @@ class PointerAdapter(Adapter):
             obj = copy.copy(obj)
             type_name: str = obj.pop("@type")
             type_id = mercury_engine_data_structures.dread_data.all_name_to_property_id()[type_name]
+
+        if "@value" in obj:
+            obj = obj["@value"]
 
         return construct.Container(
             type=type_id,
