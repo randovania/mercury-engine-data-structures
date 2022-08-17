@@ -9,7 +9,7 @@ from typing import Optional, Dict, Type, Set
 import construct
 
 from mercury_engine_data_structures import dread_data
-from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
+# from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 
 @dataclasses.dataclass(frozen=True)
 class BaseType:
@@ -234,7 +234,8 @@ def GetTypeConstruct(keyfunc, follow_typedef: bool = True) -> construct.Construc
         "switch" / construct.Switch(
             lambda this: this.type,
             all_constructs(),
-            ErrorWithMessage(lambda this: f"Unknown type: {this.type}", construct.SwitchError)
+            construct.Error()
+            # ErrorWithMessage(lambda this: f"Unknown type: {this.type}", construct.SwitchError)
         )
     )
 
