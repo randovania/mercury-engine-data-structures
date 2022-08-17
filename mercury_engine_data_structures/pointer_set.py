@@ -61,7 +61,7 @@ class PointerAdapter(Adapter):
             type_name: str = obj.pop("@type")
             type_id = mercury_engine_data_structures.dread_data.all_name_to_property_id()[type_name]
 
-        if "@value" in obj:
+        if obj is not None and "@value" in obj:
             obj = obj["@value"]
 
         return construct.Container(
