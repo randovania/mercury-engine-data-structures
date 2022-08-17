@@ -187,6 +187,10 @@ from mercury_engine_data_structures.formats.property_enum import PropertyEnum, P
 from mercury_engine_data_structures.construct_extensions.enum import StrictEnum
 
 """
+        code += 'primitive_to_construct = {\n'
+        code += "".join('    "{}": {},\n'.format(k.value, v) for k, v in primitive_to_construct.items())
+        code += "}\n\n"
+
         seen_types_with_pointer = set()
         while unchecked_types := self._types_with_pointer - seen_types_with_pointer:
             for type_name in sorted(unchecked_types):
