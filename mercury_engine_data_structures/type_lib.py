@@ -234,7 +234,7 @@ def GetTypeConstruct(keyfunc, follow_typedef: bool = True) -> construct.Construc
         "switch" / construct.Switch(
             lambda this: this.type,
             all_constructs(),
-            construct.Error()
+            construct.Error
             # ErrorWithMessage(lambda this: f"Unknown type: {this.type}", construct.SwitchError)
         )
     )
