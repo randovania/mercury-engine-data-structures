@@ -11,6 +11,14 @@ class Game(Enum):
     SAMUS_RETURNS = 10
     DREAD = 11
 
+    def __eq__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value == other.value
+        elif isinstance(other, int):
+            return self.value == other
+        else:
+            return False
+
     def __ge__(self, other):
         if self.__class__ is other.__class__:
             return self.value >= other.value
