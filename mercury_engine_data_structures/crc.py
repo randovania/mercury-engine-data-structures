@@ -126,7 +126,7 @@ _crc64_constants = [
 ]
 
 
-def _algorithm(data: typing.Union[bytes, str], constants: list[int], checksum: int) -> int:
+def _algorithm(data: typing.Union[bytes, str], constants: typing.List[int], checksum: int) -> int:
     if isinstance(data, str):
         data = data.encode("utf-8")
 
