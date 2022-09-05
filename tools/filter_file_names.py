@@ -2,7 +2,7 @@ import argparse
 import json
 from pathlib import Path
 
-from mercury_engine_data_structures import cli
+from mercury_engine_data_structures import cli, crc
 from mercury_engine_data_structures.formats import Toc
 from mercury_engine_data_structures.game_check import Game
 
@@ -10,6 +10,7 @@ from mercury_engine_data_structures.game_check import Game
 def main():
     parser = argparse.ArgumentParser()
     cli.add_game_argument(parser)
+    parser.add_argument("--possible-new-paths", type=Path)
     parser.add_argument("toc_file", type=Path)
     args = parser.parse_args()
 
@@ -28,9 +29,16 @@ def main():
         args.game,
     )
     all_asset_id = set(toc.get_all_asset_id())
-    print(toc)
 
     known_names: dict[str, int] = json.loads(path.read_text())
+
+    if args.possible_new_paths:
+        with args.possible_new_paths.open() as f:
+            for line in f:
+                assert isinstance(line, str)
+                name = line.strip()
+                known_names[name] = crc.crc32(name)
+
     filtered_names = {
         name: value
         for name, value in known_names.items()
@@ -39,6 +47,7 @@ def main():
     path.write_text(json.dumps(
         filtered_names,
         indent=4,
+        sort_keys=True,
     ))
 
 
