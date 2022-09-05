@@ -84,8 +84,9 @@ class PkgConstruct(construct.Construct):
         # Get the file headers
         file_headers = self.file_headers_type._parsereport(stream, context, path)
 
-        # Align to 128 bytes
-        AlignTo(128)._parsereport(stream, context, path)
+        if get_current_game(context) == Game.DREAD:
+            # Align to 128 bytes
+            AlignTo(128)._parsereport(stream, context, path)
 
         files = construct.ListContainer()
         for i, header in enumerate(file_headers):
@@ -109,8 +110,9 @@ class PkgConstruct(construct.Construct):
         # Skip over file headers
         construct.stream_seek(stream, len(obj.files) * file_entry_size, 1, path)
 
-        # Align to 128 bytes
-        AlignTo(128)._build(None, stream, context, path)
+        if get_current_game(context) == Game.DREAD:
+            # Align to 128 bytes
+            AlignTo(128)._build(None, stream, context, path)
 
         header_end = construct.stream_tell(stream, path)
 
