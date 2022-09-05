@@ -50,6 +50,9 @@ def main():
         sort_keys=True,
     ))
 
+    print(f"Paths in toc: {len(all_asset_id)}")
+    print(f"Known paths: {len(filtered_names)}")
+
 
 if __name__ == '__main__':
     main()
