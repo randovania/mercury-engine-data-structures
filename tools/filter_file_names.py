@@ -51,6 +51,7 @@ def main():
         indent=4,
         sort_keys=True,
     ))
+    asset_ids_with_names = set(filtered_names.values())
 
     print(f"Paths in toc: {len(all_asset_id)}")
     print(f"Known paths: {len(filtered_names)}")
@@ -59,17 +60,22 @@ def main():
     from mercury_engine_data_structures.formats import Pkg
     for pkg_path in game_root.rglob("*.pkg"):
         with pkg_path.open("rb") as f:
+            # print(f"\n\n=== {pkg_path.relative_to(game_root)}")
             pkg = Pkg.parse_stream(f, target_game=args.game)
             missing_ids = 0
             known_ids = 0
+            files = []
             for asset in pkg.all_assets:
-                if asset.asset_id in all_asset_id:
+                files.append(asset.asset_name)
+                if asset.asset_id in asset_ids_with_names:
                     known_ids += 1
                 else:
                     missing_ids += 1
 
+            # print("\n".join(files))
+
             if missing_ids:
-                print(f"{pkg_path}: {known_ids} known ids, {missing_ids} missing ids")
+                print(f"{pkg_path.relative_to(game_root)}: {known_ids} known ids, {missing_ids} missing ids")
 
 
 if __name__ == '__main__':
