@@ -1,11 +1,57 @@
 import argparse
 import json
+import os.path
 import traceback
 from pathlib import Path
+from typing import Optional
 
 from mercury_engine_data_structures import cli, crc
 from mercury_engine_data_structures.formats import Toc
 from mercury_engine_data_structures.game_check import Game
+
+_SR_EXTENSIONS = [
+    ".bccam",
+    ".bclgt",
+    ".bcmdl",
+    ".bcmdl",
+    ".bcptl",
+    ".bcskla",
+    ".bctex",
+    ".bctex",
+    ".bcut",
+    ".bcwav",
+    ".bcwav",
+    ".bcwav",
+    ".bcwav",
+    ".bgph",
+    ".bmsad",
+    ".bmsad",
+    ".bmsbk",
+    ".bmscc",
+    ".bmscd",
+    ".bmscu",
+    ".bmscu",
+    ".bmsel",
+    ".bmsem",
+    ".bmses",
+    ".bmsev",
+    ".bmsld",
+    ".bmsmd",
+    ".bmsmsd",
+    ".bmsnav",
+    ".bmsnd",
+    ".bmssa",
+    ".bmssd",
+    ".bmssd",
+    ".bmssd",
+    ".bmssd",
+    ".bmssd",
+    ".bmssd",
+    ".bmssv",
+    ".bmssv",
+    ".lua",
+    ".lc",
+]
 
 
 def main():
@@ -39,7 +85,14 @@ def main():
             for line in f:
                 assert isinstance(line, str)
                 name = line.strip()
-                known_names[name] = crc.crc32(name)
+                new_names = [name]
+
+                head = os.path.splitext(name)[0]
+                new_names.extend(head + ext for ext in _SR_EXTENSIONS)
+
+                for new_name in new_names:
+                    if new_name not in known_names:
+                        known_names[new_name] = crc.crc32(new_name)
 
     filtered_names = {
         name: value
