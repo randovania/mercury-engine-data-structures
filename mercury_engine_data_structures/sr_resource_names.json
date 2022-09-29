@@ -2177,6 +2177,7 @@
     "actors/items/powerup_gravitysuit/scripts/powerup_gravitysuit.lc": 454177328,
     "actors/items/powerup_highjumpboots/models/powerup_highjumpboots.bcmdl": 1726758724,
     "actors/items/powerup_icebeam/models/powerup_icebeam.bcmdl": 3786676898,
+    "actors/items/powerup_icebeam/scripts/powerup_icebeam.lc": 2497194782,
     "actors/items/powerup_morphball/models/powerup_morphball.bcmdl": 1145598069,
     "actors/items/powerup_plasmabeam/charclasses/powerup_plasmabeam.bmsad": 2352639610,
     "actors/items/powerup_plasmabeam/models/powerup_plasmabeam.bcmdl": 1573683957,
