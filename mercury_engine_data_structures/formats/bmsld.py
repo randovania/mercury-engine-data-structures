@@ -30,7 +30,7 @@ BMSLD = Struct(
         name=CString("utf-8"),
         unk1=Hex(Int32ul),
         unk_array=make_vector(Struct(
-            unk=Int32ul
+            unk=Hex(Int32ul),
         )),
         unk2=Hex(Int32ul),
         unk3=Hex(Int32ul),
@@ -43,7 +43,7 @@ BMSLD = Struct(
         name=CString("utf-8"),
         unk1=Hex(Int32ul),
         unk_array=make_vector(Struct(
-            unk=Int32ul
+            unk=Hex(Int32ul),
         )),
         unk2=Hex(Int32ul),
         unk3=Hex(Int32ul),
@@ -58,7 +58,7 @@ BMSLD = Struct(
         name=CString("utf-8"),
         unk1=Hex(Int32ul),
         unk_array=make_vector(Struct(
-            unk=Int32ul
+            unk=Hex(Int32ul),
         )),
         unk2=Hex(Int32ul),
         unk3=Hex(Int32ul),
@@ -69,7 +69,7 @@ BMSLD = Struct(
         name=CString("utf-8"),
         unk1=Hex(Int32ul),
         unk_array=make_vector(Struct(
-            unk=Int32ul
+            unk=Hex(Int32ul),
         )),
         unk2=Hex(Int32ul),
         unk3=Hex(Int32ul),
