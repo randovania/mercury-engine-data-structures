@@ -8271,6 +8271,7 @@
     "system/scripts/enemies.lc": 301228139,
     "system/scripts/fxcallbacks.lc": 3965719661,
     "system/scripts/husks.lc": 1186775185,
+    "system/scripts/husksdefs.lc": 446861774,
     "system/scripts/init.lc": 245781567,
     "system/scripts/logiccallbacks.lc": 3293880067,
     "system/scripts/savegame.lc": 1405601443,
