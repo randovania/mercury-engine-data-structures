@@ -5,12 +5,13 @@ import construct
 from mercury_engine_data_structures import common_types
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.formats.base_resource import NameOrAssetId, resolve_asset_id
+from mercury_engine_data_structures.formats.pkg import Construct_AssetId
 from mercury_engine_data_structures.game_check import Game
 
 TOC_Raw = construct.Struct(
     files=common_types.make_dict(
         value=construct.Int32ul,
-        key=construct.Hex(construct.Int64ul),
+        key=Construct_AssetId,
     ),
 )
 TOC = TOC_Raw.compile()

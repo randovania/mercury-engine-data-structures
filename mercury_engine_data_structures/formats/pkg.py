@@ -1,17 +1,19 @@
+from __future__ import annotations
+
 import dataclasses
 import typing
 from typing import Optional
 
 import construct
 from construct import (
-    Struct, PrefixedArray, Int64ul, Int32ul, Hex, Construct, )
+    Struct, PrefixedArray, Int64ul, Int32ul, Hex, Construct, IfThenElse, )
 
-from mercury_engine_data_structures import dread_data
+from mercury_engine_data_structures import dread_data, samus_returns_data
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
 from mercury_engine_data_structures.formats.base_resource import BaseResource, NameOrAssetId, resolve_asset_id, AssetId
-from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.game_check import Game, get_current_game
 
-Construct_AssetId = Hex(Int64ul)
+Construct_AssetId = Hex(IfThenElse(construct.this._params.target_game == Game.SAMUS_RETURNS.value, Int32ul, Int64ul))
 
 
 def offset_for(con: Struct, name: str):
@@ -73,7 +75,6 @@ class PkgConstruct(construct.Construct):
     def __init__(self):
         super().__init__()
         self.int_size = typing.cast(construct.FormatField, Int32ul)
-        self.file_entry_size = FileEntry.sizeof()
         self.file_headers_type = PrefixedArray(self.int_size, FileEntry).compile()
 
     def _parse(self, stream, context, path) -> construct.Container:
@@ -83,8 +84,9 @@ class PkgConstruct(construct.Construct):
         # Get the file headers
         file_headers = self.file_headers_type._parsereport(stream, context, path)
 
-        # Align to 128 bytes
-        AlignTo(128)._parsereport(stream, context, path)
+        if get_current_game(context) == Game.DREAD:
+            # Align to 128 bytes
+            AlignTo(128)._parsereport(stream, context, path)
 
         files = construct.ListContainer()
         for i, header in enumerate(file_headers):
@@ -98,16 +100,19 @@ class PkgConstruct(construct.Construct):
         return construct.Container(files=files)
 
     def _build(self, obj: construct.Container, stream, context, path):
+        file_entry_size = FileEntry.sizeof(target_game=get_current_game(context))
+
         header_start = construct.stream_tell(stream, path)
 
         # Skip over header size and data section size for now
         construct.stream_seek(stream, 2 * self.int_size.length, 1, path)
 
         # Skip over file headers
-        construct.stream_seek(stream, len(obj.files) * self.file_entry_size, 1, path)
+        construct.stream_seek(stream, len(obj.files) * file_entry_size, 1, path)
 
-        # Align to 128 bytes
-        AlignTo(128)._build(None, stream, context, path)
+        if get_current_game(context) == Game.DREAD:
+            # Align to 128 bytes
+            AlignTo(128)._build(None, stream, context, path)
 
         header_end = construct.stream_tell(stream, path)
 
@@ -147,12 +152,18 @@ PKG = PkgConstruct()
 
 @dataclasses.dataclass(frozen=True)
 class PkgFile:
+    game: Game
     asset_id: AssetId
     data: bytes
 
     @property
     def asset_name(self) -> Optional[str]:
-        return dread_data.name_for_asset_id(self.asset_id)
+        if self.game == Game.DREAD:
+            return dread_data.name_for_asset_id(self.asset_id)
+        elif self.game == Game.SAMUS_RETURNS:
+            return samus_returns_data.name_for_asset_id(self.asset_id)
+        else:
+            return None
 
 
 class Pkg(BaseResource):
@@ -161,7 +172,7 @@ class Pkg(BaseResource):
         return PKG
 
     @classmethod
-    def parse_stream(cls, stream: typing.BinaryIO, target_game: Game) -> "Pkg":
+    def parse_stream(cls, stream: typing.BinaryIO, target_game: Game) -> Pkg:
         return cls(cls.construct_class(target_game).parse_stream(stream, target_game=target_game),
                    target_game)
 
@@ -171,7 +182,7 @@ class Pkg(BaseResource):
     @property
     def all_assets(self) -> typing.Iterator[PkgFile]:
         for file in self.raw.files:
-            yield PkgFile(file.asset_id, file.data)
+            yield PkgFile(self.target_game, file.asset_id, file.data)
 
     def get_asset(self, asset_id: NameOrAssetId) -> Optional[bytes]:
         asset_id = resolve_asset_id(asset_id)
