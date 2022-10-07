@@ -1,5 +1,5 @@
 import construct
-from construct import Construct, Struct, Const, Int32ul, Hex, Bytes, CString
+from construct import Construct, Struct, Const, Int32ul, Hex, Bytes, CString, Float32l
 
 from mercury_engine_data_structures.common_types import make_vector
 from mercury_engine_data_structures.formats import BaseResource
@@ -15,7 +15,7 @@ BMSLD = Struct(
     unk3=Int32ul,
     unk4=Int32ul,
 
-    objects=make_vector(Struct(
+    objects_a=make_vector(Struct(
         name=CString("utf-8"),
         unk1=Hex(Int32ul),
         unk2=Hex(Int32ul),
@@ -25,57 +25,15 @@ BMSLD = Struct(
         unk6=Hex(Int32ul),
     )),
 
-    second_count=Int32ul,
-    object=Struct(
+    object_b=make_vector(Struct(
         name=CString("utf-8"),
-        unk1=Hex(Int32ul),
-        unk_array=make_vector(Struct(
-            unk=Hex(Int32ul),
+        unk01=Hex(Int32ul),
+        unk02=make_vector(Struct(
+            x=Float32l,
+            y=Float32l,
+            z=Float32l,
         )),
-        unk2=Hex(Int32ul),
-        unk3=Hex(Int32ul),
-        unk4=Hex(Int32ul),
-        unk5=Hex(Int32ul),
-        unk6=Hex(Int32ul),
-        unk7=Hex(Int32ul),
-    ),
-    object2=Struct(
-        name=CString("utf-8"),
-        unk1=Hex(Int32ul),
-        unk_array=make_vector(Struct(
-            unk=Hex(Int32ul),
-        )),
-        unk2=Hex(Int32ul),
-        unk3=Hex(Int32ul),
-        unk4=Hex(Int32ul),
-        unk5=Hex(Int32ul),
-        unk6=Hex(Int32ul),
-        unk7=Hex(Int32ul),
-        unk8=Hex(Int32ul),
-        unk9=Hex(Int32ul),
-    ),
-    object3=Struct(
-        name=CString("utf-8"),
-        unk1=Hex(Int32ul),
-        unk_array=make_vector(Struct(
-            unk=Hex(Int32ul),
-        )),
-        unk2=Hex(Int32ul),
-        unk3=Hex(Int32ul),
-        unk4=Hex(Int32ul),
-        unk5=Hex(Int32ul),
-    ),
-    object4=Struct(
-        name=CString("utf-8"),
-        unk1=Hex(Int32ul),
-        unk_array=make_vector(Struct(
-            unk=Hex(Int32ul),
-        )),
-        unk2=Hex(Int32ul),
-        unk3=Hex(Int32ul),
-        unk4=Hex(Int32ul),
-        unk5=Hex(Int32ul),
-    ),
+    )),
 
     rest=construct.Bytes(0x100),
 )
