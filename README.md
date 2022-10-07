@@ -2,10 +2,10 @@
 Construct type definitions for Mercury Engine
 
 | Format   | Samus Returns (Read) | Samus Returns (Write) | Dread (Read) | Dread (Write) |
-| -------- | -------------------- | --------------------- | ------------ | ------------- |
-| PKG      | &cross;              | &cross;               | &check;      | &check;       |
+| -------- |----------------------| --------------------- | ------------ | ------------- |
+| PKG      | &check;              | &check;               | &check;      | &check;       |
 | BMSSD    | &cross;              | &cross;               | &check;      | &check;       |
-| BRFLD    | &cross;              | &cross;               | &check;      | &check;       |
+| BRFLD    | Missing              | Missing               | &check;      | &check;       |
 | BMSCC    | &cross;              | &cross;               | &check;      | &check;       |
 | BRSA     | &cross;              | &cross;               | &check;      | &check;       |
 
@@ -18,7 +18,7 @@ Construct type definitions for Mercury Engine
 
 ## Colors for Text
 
-Metroid dread uses the following annotations in text to change color:
+Metroid Dread uses the following annotations in text to change color:
 
 | Code | Color       |              | 
 |------|-------------|--------------|
