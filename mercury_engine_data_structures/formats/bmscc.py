@@ -1,5 +1,6 @@
 import construct
-from construct import Construct, Struct, Const, Hex, Int16ul, Switch, Array, Rebuild, Flag, Terminated
+from construct import Construct, IfThenElse, Struct, Const, Hex, Int16ul, Int8ul, Switch, Array, Rebuild, Flag, Terminated
+from mercury_engine_data_structures import game_check
 
 from mercury_engine_data_structures.common_types import UInt, make_vector, StrId, Float
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, OptionalValue
@@ -55,7 +56,11 @@ CollisionEntry = Struct(
     prop1=StrId,
     prop2=StrId,
     prop3=StrId,
-    flag=Int16ul,
+    flag=IfThenElse(
+        game_check.current_game_at_most(Game.SAMUS_RETURNS),
+        Int8ul,
+        Int16ul,
+    ),
     type=StrId,
     data=Switch(
         construct.this.type,
@@ -73,7 +78,11 @@ CollisionLayer = Struct(
 
 BMSCC = Struct(
     _magic=Const(b"MSCD"),
-    _version=Const(0x00100001, Hex(UInt)),
+    _version=IfThenElse(
+        game_check.current_game_at_most(Game.SAMUS_RETURNS),
+        Const(0x000D0001, Hex(UInt)),
+        Const(0x00100001, Hex(UInt)),
+    ),
     layers=make_vector(CollisionLayer),
     _eof=Terminated,
 )
