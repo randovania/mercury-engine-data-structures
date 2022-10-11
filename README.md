@@ -6,6 +6,7 @@ Construct type definitions for Mercury Engine
 | PKG      | &check;              | &check;               | &check;      | &check;       |
 | BMSSD    | &cross;              | &cross;               | &check;      | &check;       |
 | BRFLD    | Missing              | Missing               | &check;      | &check;       |
+| BMSLD    | &cross;              | &cross;               | Missing      | Missing       |
 | BMSCC    | &check;              | &check;               | &check;      | &check;       |
 | BRSA     | Missing              | Missing               | &check;      | &check;       |
 
