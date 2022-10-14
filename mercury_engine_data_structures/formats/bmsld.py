@@ -1,7 +1,7 @@
 import construct
 from construct import Array, Construct, Struct, Const, Int32ul, Int8ul, Hex, CString, Float32l, Flag, Int16ul
 
-from mercury_engine_data_structures.common_types import make_vector, StrId, UInt, Float
+from mercury_engine_data_structures.common_types import make_vector, StrId, UInt, Float, make_dict
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.formats.bmscc import CollisionPoly, CollisionPoint
@@ -38,25 +38,31 @@ Components = {
         command=StrId,
         arguments=make_vector(FunctionArgument),
     ),
+    "MODELUPDATER": Struct(
+        command=StrId,
+        arguments=make_vector(FunctionArgument),
+    ),
 }
 
 ProperActor = Struct(
-    unk01=StrId,
+    type=StrId,
 
-    unk02=Hex(Int32ul),
-    unk03=Hex(Int32ul),
-    unk04=Hex(Int32ul),
+    x=Float,
+    y=Float,
+    z=Float,
     unk05=Hex(Int32ul),
     unk06=Hex(Int32ul),
     unk07=Hex(Int32ul),
 
     components=make_vector(Struct(
         component_type=StrId,
-        data=construct.Switch(
-            construct.this.component_type,
-            Components,
-            ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx.component_type}", construct.SwitchError),
-        ),
+        command=StrId,
+        arguments=make_vector(FunctionArgument),
+        # data=construct.Switch(
+        #     construct.this.component_type,
+        #     Components,
+        #     ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx.component_type}", construct.SwitchError),
+        # ),
     )),
 )
 
@@ -176,31 +182,27 @@ BMSLD = Struct(
         unk14=Hex(Int32ul),
     )),
 
-    objects_f=make_vector(Struct(
-        name=StrId,
-        actor=ProperActor,
-    )),
+    actors=make_dict(ProperActor)[18],
 
-    unk5=Int32ul,
-    objects_g=make_vector(Struct(
-        name=StrId,
-        actor=ProperActor,
-    )),
+    count=Int32ul,
+    name=StrId,
+    actor=Struct(
+        type=StrId,
 
-    objects_h=make_vector(Struct(
-        name=StrId,
-        actor=ProperActor,
-    )),
+        x=Float,
+        y=Float,
+        z=Float,
+        unk05=Hex(Int32ul),
+        unk06=Hex(Int32ul),
+        unk07=Hex(Int32ul),
 
-    objects_i=make_vector(Struct(
-        name=StrId,
-        actor=ProperActor,
-    )),
-
-    objects_j=make_vector(Struct(
-        name=StrId,
-        actor=ProperActor,
-    )),
+        component_count=Int32ul,
+        components=Struct(
+            component_type=StrId,
+            command=StrId,
+            # arguments=make_vector(FunctionArgument),
+        ),
+    ),
 
     rest=construct.Bytes(0x100),
 )
