@@ -184,27 +184,12 @@ BMSLD = Struct(
 
     actors=make_dict(ProperActor)[18],
 
-    count=Int32ul,
-    name=StrId,
-    actor=Struct(
-        type=StrId,
+    sub_areas=make_vector(Struct(
+        name=StrId,
+        names=make_vector(StrId),
+    )),
 
-        x=Float,
-        y=Float,
-        z=Float,
-        unk05=Hex(Int32ul),
-        unk06=Hex(Int32ul),
-        unk07=Hex(Int32ul),
-
-        component_count=Int32ul,
-        components=Struct(
-            component_type=StrId,
-            command=StrId,
-            # arguments=make_vector(FunctionArgument),
-        ),
-    ),
-
-    rest=construct.Bytes(0x100),
+    rest=construct.GreedyBytes,
 )
 
 
