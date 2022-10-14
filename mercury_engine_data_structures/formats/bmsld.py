@@ -118,9 +118,7 @@ BMSLD = Struct(
         )
     )),
 
-    objects_count=Int32ul,
-
-    objects_e_1=Struct(
+    objects_e=make_vector(Struct(
         name=StrId,
         unk01=StrId,
         unk02=Hex(Int32ul),
@@ -137,10 +135,9 @@ BMSLD = Struct(
         # unk12=Hex(Int8ul),
         unk13=StrId,
         unk14=Hex(Int32ul),
-        unk15=Hex(Int32ul),
-    ),
+    )),
 
-    objects_e_2=Struct(
+    objects_f=make_vector(Struct(
         name=StrId,
         unk01=StrId,
 
@@ -156,18 +153,18 @@ BMSLD = Struct(
             data=construct.Switch(
                 construct.this.component_type,
                 {
-                    "ABOSS": Struct(
-                        unk12=Hex(Int32ul),
-                        unk13=Hex(Int32ul),
-                    ),
                     "TRIGGER": Struct(
                         command=StrId,
                         arguments=make_vector(FunctionArgument),
                     ),
                 },
+                ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx.component_type}", construct.SwitchError),
             ),
         )),
-    ),
+    )),
+
+    unk=Int32ul,
+    objects_count=Int32ul,
 
     rest=construct.Bytes(0x100),
 )
