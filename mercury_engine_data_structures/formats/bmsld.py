@@ -1,8 +1,10 @@
 import construct
-from construct import Array, Construct, Struct, Const, Int32ul, Int8ul, Hex, CString, Float32l
+from construct import Array, Construct, Struct, Const, Int32ul, Int8ul, Hex, CString, Float32l, Flag
 
-from mercury_engine_data_structures.common_types import make_vector
+from mercury_engine_data_structures.common_types import make_vector, StrId, UInt, Float
+from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource
+from mercury_engine_data_structures.formats.bmscc import CollisionPoly, CollisionPoint
 from mercury_engine_data_structures.game_check import Game
 
 BMSLD = Struct(
@@ -15,7 +17,7 @@ BMSLD = Struct(
     unk4=Int32ul,
 
     objects_a=make_vector(Struct(
-        name=CString("utf-8"),
+        name=StrId,
         unk1=Hex(Int32ul),
         unk2=Hex(Int32ul),
         unk3=Hex(Int32ul),
@@ -25,7 +27,7 @@ BMSLD = Struct(
     )),
 
     object_b=make_vector(Struct(
-        name=CString("utf-8"),
+        name=StrId,
         unk01=Hex(Int32ul),
         unk02=make_vector(Struct(
             x=Float32l,
@@ -35,7 +37,7 @@ BMSLD = Struct(
     )),
 
     object_c=make_vector(Struct(
-        name=CString("utf-8"),
+        name=StrId,
         unk01=Hex(Int32ul),
         unk02=Float32l,
         unk03=Float32l,
@@ -58,6 +60,47 @@ BMSLD = Struct(
             y=Float32l,
         )),
         unk14=Hex(Int8ul),
+    )),
+
+    objects_d=make_vector(Struct(
+        name=StrId,
+        object_type=StrId,
+        data=construct.Switch(
+            construct.this.object_type,
+            {
+                "CIRCLE": Struct(
+                    value1=Float,
+                    value2=Float,
+                    value3=Float,
+                    size=Float,
+                ),
+                "CAPSULE2D": Struct(
+                    value1=Float,
+                    value2=Float,
+                    value3=Float,
+                    value4=Float,
+                    value5=Float,
+                ),
+                "POLYCOLLECTION2D": Struct(
+                    unknown1=UInt,
+                    unknown2=UInt,
+                    unknown3=UInt,
+                    polys=make_vector(Struct(
+                        num_points=UInt,
+                        unk=Float,
+                        points=Array(construct.this.num_points, Struct(x=Hex(UInt), y=Hex(UInt), material_attribute=Hex(UInt))),
+                        loop=Flag,
+                        boundings=Array(4, Float),
+                    )),
+                    total_boundings=Array(4, Float),
+                    something=Flag,
+                    check=construct.If(construct.this.something, ErrorWithMessage(
+                        lambda ctx: "flag is enabled, but not supported",
+                    ))
+                    # binary_search_trees=OptionalValue(make_vector(BinarySearchTree)),
+                ),
+            }
+        )
     )),
 
     objects_count=Int32ul,
