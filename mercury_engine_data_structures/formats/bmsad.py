@@ -1,9 +1,10 @@
 import construct
 from construct.core import (
-    Array, Byte, Const, Construct, Flag, Float32l, Hex, Int16ul, Int32ul, PrefixedArray, Struct, Switch,
+    Array, Byte, Const, Construct, Flag, Float32l, Hex, Int16ul, Int32ul, PrefixedArray, Struct, Switch, IfThenElse
 )
 
 from mercury_engine_data_structures import common_types, type_lib
+from mercury_engine_data_structures import game_check
 from mercury_engine_data_structures.common_types import Float, StrId, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
@@ -181,7 +182,11 @@ property_types = {
 #
 BMSAD = Struct(
     _magic=Const(b"MSAD"),
-    version=Const(0x0200000F, Hex(Int32ul)),
+    version=IfThenElse(
+        game_check.current_game_at_most(Game.SAMUS_RETURNS),
+        Const(0x002C0001, Hex(Int32ul)),
+        Const(0x0200000F, Hex(Int32ul)),
+    ),
 
     # # gameeditor::CGameModelRoot
     # root_type=construct.Const('Root', PropertyEnum),
