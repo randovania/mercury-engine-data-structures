@@ -21,6 +21,45 @@ FunctionArgument = Struct(
     )
 )
 
+Components = {
+    "TRIGGER": Struct(
+        command=StrId,
+        arguments=make_vector(FunctionArgument),
+    ),
+    "SPAWNGROUP": Struct(
+        command=StrId,
+        arguments=make_vector(FunctionArgument),
+    ),
+    "SPAWNPOINT": Struct(
+        command=StrId,
+        arguments=make_vector(FunctionArgument),
+    ),
+    "STARTPOINT": Struct(
+        command=StrId,
+        arguments=make_vector(FunctionArgument),
+    ),
+}
+
+ProperActor = Struct(
+    unk01=StrId,
+
+    unk02=Hex(Int32ul),
+    unk03=Hex(Int32ul),
+    unk04=Hex(Int32ul),
+    unk05=Hex(Int32ul),
+    unk06=Hex(Int32ul),
+    unk07=Hex(Int32ul),
+
+    components=make_vector(Struct(
+        component_type=StrId,
+        data=construct.Switch(
+            construct.this.component_type,
+            Components,
+            ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx.component_type}", construct.SwitchError),
+        ),
+    )),
+)
+
 BMSLD = Struct(
     _magic=Const(b"MSLD"),
     version=Const(0x00140001, Hex(Int32ul)),
@@ -139,32 +178,29 @@ BMSLD = Struct(
 
     objects_f=make_vector(Struct(
         name=StrId,
-        unk01=StrId,
-
-        unk02=Hex(Int32ul),
-        unk03=Hex(Int32ul),
-        unk04=Hex(Int32ul),
-        unk05=Hex(Int32ul),
-        unk06=Hex(Int32ul),
-        unk07=Hex(Int32ul),
-
-        components=make_vector(Struct(
-            component_type=StrId,
-            data=construct.Switch(
-                construct.this.component_type,
-                {
-                    "TRIGGER": Struct(
-                        command=StrId,
-                        arguments=make_vector(FunctionArgument),
-                    ),
-                },
-                ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx.component_type}", construct.SwitchError),
-            ),
-        )),
+        actor=ProperActor,
     )),
 
-    unk=Int32ul,
-    objects_count=Int32ul,
+    unk5=Int32ul,
+    objects_g=make_vector(Struct(
+        name=StrId,
+        actor=ProperActor,
+    )),
+
+    objects_h=make_vector(Struct(
+        name=StrId,
+        actor=ProperActor,
+    )),
+
+    objects_i=make_vector(Struct(
+        name=StrId,
+        actor=ProperActor,
+    )),
+
+    objects_j=make_vector(Struct(
+        name=StrId,
+        actor=ProperActor,
+    )),
 
     rest=construct.Bytes(0x100),
 )
