@@ -1,10 +1,9 @@
 import construct
-from construct import Array, Construct, Struct, Const, Int32ul, Int8ul, Hex, CString, Float32l, Flag, Int16ul
+from construct import Array, Construct, Struct, Const, Int32ul, Hex, Float32l, Flag
 
 from mercury_engine_data_structures.common_types import make_vector, StrId, UInt, Float, make_dict
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource
-from mercury_engine_data_structures.formats.bmscc import CollisionPoly, CollisionPoint
 from mercury_engine_data_structures.game_check import Game
 
 FunctionArgument = Struct(
@@ -66,6 +65,47 @@ ProperActor = Struct(
     )),
 )
 
+CollisionObject = Struct(
+    object_type=StrId,
+    data=construct.Switch(
+        construct.this.object_type,
+        {
+            "CIRCLE": Struct(
+                value1=Float,
+                value2=Float,
+                value3=Float,
+                size=Float,
+            ),
+            "CAPSULE2D": Struct(
+                value1=Float,
+                value2=Float,
+                value3=Float,
+                value4=Float,
+                value5=Float,
+            ),
+            "POLYCOLLECTION2D": Struct(
+                unknown1=UInt,
+                unknown2=UInt,
+                unknown3=UInt,
+                polys=make_vector(Struct(
+                    num_points=UInt,
+                    unk=Float,
+                    points=Array(construct.this.num_points,
+                                 Struct(x=Hex(UInt), y=Hex(UInt), material_attribute=Hex(UInt))),
+                    loop=Flag,
+                    boundings=Array(4, Float),
+                )),
+                total_boundings=Array(4, Float),
+                something=Flag,
+                check=construct.If(construct.this.something, ErrorWithMessage(
+                    lambda ctx: "flag is enabled, but not supported",
+                ))
+                # binary_search_trees=OptionalValue(make_vector(BinarySearchTree)),
+            ),
+        }
+    )
+)
+
 BMSLD = Struct(
     _magic=Const(b"MSLD"),
     version=Const(0x00140001, Hex(Int32ul)),
@@ -95,73 +135,9 @@ BMSLD = Struct(
         )),
     )),
 
-    object_c=make_vector(Struct(
-        name=StrId,
-        unk01=Hex(Int32ul),
-        unk02=Float32l,
-        unk03=Float32l,
-        unk04=Float32l,
-        unk05=Hex(Int32ul),
-        unk06=Hex(Int32ul),
-        unk07=Hex(Int32ul),
-        unk08=Hex(Int32ul),
-        unk09=Hex(Int8ul),
-        count_for_unk12=construct.Rebuild(Int32ul, construct.len_(construct.this.unk12)),
-        unk10=Hex(Int8ul),
-        unk11=Hex(Int32ul),
-        unk12=Array(construct.this.count_for_unk12, Struct(
-            x=Float32l,
-            y=Float32l,
-            z=Int32ul,
-        )),
-        unk13=Array(4, Struct(
-            x=Float32l,
-            y=Float32l,
-        )),
-        unk14=Hex(Int8ul),
-    )),
+    objects_c=make_dict(CollisionObject),
 
-    objects_d=make_vector(Struct(
-        name=StrId,
-        object_type=StrId,
-        data=construct.Switch(
-            construct.this.object_type,
-            {
-                "CIRCLE": Struct(
-                    value1=Float,
-                    value2=Float,
-                    value3=Float,
-                    size=Float,
-                ),
-                "CAPSULE2D": Struct(
-                    value1=Float,
-                    value2=Float,
-                    value3=Float,
-                    value4=Float,
-                    value5=Float,
-                ),
-                "POLYCOLLECTION2D": Struct(
-                    unknown1=UInt,
-                    unknown2=UInt,
-                    unknown3=UInt,
-                    polys=make_vector(Struct(
-                        num_points=UInt,
-                        unk=Float,
-                        points=Array(construct.this.num_points,
-                                     Struct(x=Hex(UInt), y=Hex(UInt), material_attribute=Hex(UInt))),
-                        loop=Flag,
-                        boundings=Array(4, Float),
-                    )),
-                    total_boundings=Array(4, Float),
-                    something=Flag,
-                    check=construct.If(construct.this.something, ErrorWithMessage(
-                        lambda ctx: "flag is enabled, but not supported",
-                    ))
-                    # binary_search_trees=OptionalValue(make_vector(BinarySearchTree)),
-                ),
-            }
-        )
-    )),
+    objects_d=make_dict(CollisionObject),
 
     objects_e=make_vector(Struct(
         name=StrId,
@@ -177,7 +153,6 @@ BMSLD = Struct(
         unk10=Float,
         unk11=Hex(Int32ul),
 
-        # unk12=Hex(Int8ul),
         unk13=StrId,
         unk14=Hex(Int32ul),
     )),
