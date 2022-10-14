@@ -1,10 +1,71 @@
 import construct
-from construct import Construct, Struct, Const, Int32ul, Hex, Bytes, CString, Float32l
+from construct import Array, Construct, Struct, Const, Int32ul, Int16ul, Int8ul, Hex, CString, Float32l
 
 from mercury_engine_data_structures.common_types import make_vector
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
+type_body=construct.Switch(
+    construct.this.object_type,
+    {
+        0x0400: Struct(
+            unk12=Array(4, Struct(
+                x=Float32l,
+                y=Float32l,
+                z=Int32ul,
+            )),
+        ),
+        0x0600: Struct(
+            unk12=Array(6, Struct(
+                x=Float32l,
+                y=Float32l,
+                z=Int32ul,
+            )),
+        ),
+        0x0800: Struct(
+            unk12=Array(8, Struct(
+                x=Float32l,
+                y=Float32l,
+                z=Int32ul,
+            )),
+        ),
+        0x0A00: Struct(
+            unk12=Array(10, Struct(
+                x=Float32l,
+                y=Float32l,
+                z=Int32ul,
+            )),
+        ),
+        0x0C00: Struct(
+            unk12=Array(12, Struct(
+                x=Float32l,
+                y=Float32l,
+                z=Int32ul,
+            )),
+        ),
+        0x0E00: Struct(
+            unk12=Array(14, Struct(
+                x=Float32l,
+                y=Float32l,
+                z=Int32ul,
+            )),
+        ),
+        0x1400: Struct(
+            unk12=Array(20, Struct(
+                x=Float32l,
+                y=Float32l,
+                z=Int32ul,
+            )),
+        ),
+        0x1C00: Struct(
+            unk12=Array(28, Struct(
+                x=Float32l,
+                y=Float32l,
+                z=Int32ul,
+            )),
+        ),
+    }
+)
 
 BMSLD = Struct(
     _magic=Const(b"MSLD"),
@@ -35,8 +96,7 @@ BMSLD = Struct(
         )),
     )),
 
-    objects_count=Int32ul,
-    object_1=Struct(
+    object_c=make_vector(Struct(
         name=CString("utf-8"),
         unk01=Hex(Int32ul),
         unk02=Float32l,
@@ -46,31 +106,18 @@ BMSLD = Struct(
         unk06=Hex(Int32ul),
         unk07=Hex(Int32ul),
         unk08=Hex(Int32ul),
-        unk09=Hex(Int32ul),
+        object_type=Hex(Int16ul),
         unk10=Hex(Int32ul),
         unk11=Hex(Int32ul),
-        unk12=Hex(Int32ul),
-        unk13=Hex(Int32ul),
-        unk14=Hex(Int32ul),
-        unk15=Hex(Int32ul),
-        unk16=Hex(Int32ul),
-        unk17=Hex(Int32ul),
-        unk18=Hex(Int32ul),
-        unk19=Hex(Int32ul),
-        unk20=Hex(Int32ul),
-        unk21=Hex(Int32ul),
-        unk22=Hex(Int32ul),
-        unk23=Hex(Int32ul),
-        unk24=Hex(Int32ul),
-        unk25=Hex(Int32ul),
-        unk26=Hex(Int32ul),
-        unk27=Hex(Int32ul),
-        unk28=Hex(Int32ul),
-        unk29=Hex(Int32ul),
-        unk30=Hex(Int32ul),
-        unk31=Hex(Int32ul),
-    ),
+        unk12=type_body,
+        unk13=Array(4, Struct(
+            x=Float32l,
+            y=Float32l,
+        )),
+        unk14=Hex(Int8ul),
+    )),
 
+    objects_count=Int32ul,
     rest=construct.Bytes(0x100),
 )
 
