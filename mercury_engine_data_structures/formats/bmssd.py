@@ -59,13 +59,15 @@ BMSSD = Struct(
             )
         )
     ),
-    # # strings_a might only be used for Dread. If so, use an if statement?
-    strings_a=PrefixedArray(
+    # # strings_a might only be used for Dread. If SR is checked for, just use an Int32ul instead. Variable name should be fine for both?
+    strings_a=IfThenElse(
+        game_check.current_game_at_most(Game.SAMUS_RETURNS),
         Int32ul,
-        CString("utf-8"),
+        PrefixedArray(
+            Int32ul,
+            CString("utf-8"),
+        ),
     ),
-    # # for SR only, temporary? unnecessary?
-    # unk2=Int32ul,
     unk_structs_a=IfThenElse(
         game_check.current_game_at_most(Game.SAMUS_RETURNS),
         PrefixedArray(
