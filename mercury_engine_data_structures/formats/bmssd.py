@@ -58,13 +58,9 @@ BMSSD = Struct(
             )
         )
     ),
-    strings_a=IfThenElse(
-        game_check.current_game_at_most(Game.SAMUS_RETURNS),
+    strings_a=PrefixedArray(
         Int32ul,
-        PrefixedArray(
-            Int32ul,
-            CString("utf-8"),
-        ),
+        CString("utf-8"),
     ),
     unk_structs_a=IfThenElse(
         game_check.current_game_at_most(Game.SAMUS_RETURNS),
@@ -108,13 +104,9 @@ BMSSD = Struct(
             )
         )
     ),
-    strings_b=IfThenElse(
-        game_check.current_game_at_most(Game.SAMUS_RETURNS),
+    strings_b=PrefixedArray(
         Int32ul,
-        PrefixedArray(
-            Int32ul,
-            CString("utf-8"),
-        ),
+        CString("utf-8"),
     ),
     unk_structs_b=IfThenElse(
         game_check.current_game_at_most(Game.SAMUS_RETURNS),
