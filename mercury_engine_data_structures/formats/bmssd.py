@@ -110,78 +110,48 @@ BMSSD = Struct(
     ),
     strings_b=IfThenElse(
         game_check.current_game_at_most(Game.SAMUS_RETURNS),
-        PrefixedArray(
-            Int32ul,
-            Struct(
-                str1=CString("utf-8"),
-                char2=Byte,
-                char3=Byte,
-                char4=Byte,
-                int5=Int32ul,
-                float6=VectorArray,
-                int7=Int8ul,
-            )
-        ),
+        Int32ul,
         PrefixedArray(
             Int32ul,
             CString("utf-8"),
         ),
     ),
-    # unk3=Int32ul,
-    # unk4=Int32ul,
-    # strings_b=Struct(
-    #     str1=CString("utf-8"),
-    #     char2=Byte,
-    #     char3=Byte,
-    #     char4=Byte,
-    #     int5=Int32ul,
-    #     float6=VectorArray,
-    #     int7=Int8ul,
-    # )[14],
-    # unk_structs_b=Struct(
-    #     str1=CString("utf-8"),
-    #     char2=Byte,
-    #     char3=Byte,
-    #     char4=Byte,
-    #     int5=Int32ul,
-    #     int6=Int32ul,
-    #     int7=Int32ul,
-    #     char8=Byte,
-    #     char9=Byte,
-    #     int10=Int32ul,
-    #     # str11=PaddedString(16, "utf-8"),
-    #     int12=Int32ul,
-    #     float13=VectorArray,
-    #     int11=Int8ul,
-    #     float14=VectorArray,
-    #     float15=VectorArray,
-    #     int16=Hex(Int32ul),
-    #     float17=VectorArray,
-    #     elems=PrefixedArray(
-    #         Int32ul,
-    #         Struct(
-    #             float1=VectorArray,
-    #             float2=VectorArray,
-    #             float3=VectorArray,
-    #         )
-    #     ),
-    #     int18=Hex(Int32ul),
-    #     int19=Int16ul,
-    # )[1],
-    # unk_structs_b=PrefixedArray(
-    #     Int32ul,
-    #     Struct(
-    #         str1=CString("utf-8"),
-    #         int2=Int32ul,
-    #         struct4=PrefixedArray(
-    #             Int32ul,
-    #             Struct(
-    #                 int1=Int32ul,
-    #                 long3=PrefixedArray(Int32ul, Int64ul),
-    #             )
-    #         )
-    #     )
-    # ),
+    unk_structs_b=IfThenElse(
+        game_check.current_game_at_most(Game.SAMUS_RETURNS),
+        PrefixedArray(
+            Int32ul,
+            Struct(
+                str1=CString("utf-8"),
+                int2=Int32ul,
+                struct3=PrefixedArray(
+                    Int32ul,
+                    Struct(
+                        int4=Int32ul,
+                        struct5=PrefixedArray(
+                            Int32ul,
+                            Struct(
+                                int6=Int32ul,
+                            )
+                        )
+                    )
+                )
+            )
+        ),
+        PrefixedArray(
+            Int32ul,
+            Struct(
+                str1=CString("utf-8"),
+                int2=Int32ul,
+                struct4=PrefixedArray(
+                    Int32ul,
+                    Struct(
+                        int1=Int32ul,
+                        long3=PrefixedArray(Int32ul, Int64ul),
+                    )
+                )
+            )
+        )
+    ),
     rest=construct.GreedyBytes,
 )
 
