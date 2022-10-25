@@ -4,7 +4,8 @@ Construct type definitions for Mercury Engine
 | Format   | Samus Returns (Read) | Samus Returns (Write) | Dread (Read) | Dread (Write) |
 | -------- |----------------------| --------------------- | ------------ | ------------- |
 | PKG      | &check;              | &check;               | &check;      | &check;       |
-| BMSSD    | &cross;              | &cross;               | &check;      | &check;       |
+| BMSAD    | &cross;              | &cross;               | &check;      | &check;       |
+| BMSSD    | &check;              | &check;               | &check;      | &check;       |
 | BRFLD    | Missing              | Missing               | &check;      | &check;       |
 | BMSLD    | &check;              | &check;               | Missing      | Missing       |
 | BMSCC    | &check;              | &check;               | &check;      | &check;       |
