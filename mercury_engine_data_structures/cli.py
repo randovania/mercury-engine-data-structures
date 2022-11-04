@@ -45,6 +45,7 @@ def create_parser():
     add_game_argument(decode)
     decode.add_argument("--format", help="Hint the format of the file. Defaults to extension.")
     decode.add_argument("--re-encode", help="Re-encode afterwards and compares to the original.", action="store_true")
+    decode.add_argument("--dump-to", help="Write to the given path a json encoded contents of the file", type=Path)
     decode.add_argument("input_path", type=Path, help="Path to the file")
 
     replace_pkg_file = subparser.add_parser("replace-in-pkg")
@@ -96,7 +97,11 @@ def do_decode(args):
 
     raw = input_path.read_bytes()
     decoded_resource = resource_class.parse(raw, target_game=game)
-    print(decoded_resource.raw)
+
+    if args.dump_to:
+        dump_to(args.dump_to, decoded_resource.raw)
+    else:
+        print(decoded_resource.raw)
 
     if re_encode:
         encoded = decoded_resource.build()
