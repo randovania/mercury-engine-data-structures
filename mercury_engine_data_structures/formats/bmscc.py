@@ -1,9 +1,10 @@
 import construct
-from construct import Construct, IfThenElse, Struct, Const, Hex, Int16ul, Int8ul, Switch, Array, Rebuild, Flag, Terminated
+from construct import Construct, IfThenElse, Struct, Const, Hex, Int16ul, Int8ul, Switch, Array, Rebuild, Flag, \
+    Terminated
 from mercury_engine_data_structures import game_check
 
 from mercury_engine_data_structures.common_types import UInt, make_vector, StrId, Float
-from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, OptionalValue
+from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, OptionalValue, ForceQuit
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
@@ -13,12 +14,24 @@ CollisionPoint = Struct(
     material_attribute=UInt,
 )
 
-CollisionPoly = Struct(
+CollisionPolySR = Struct(
+    num_points=Rebuild(UInt, construct.len_(construct.this.points)),
+    unk4=Hex(construct.Byte),
+    unk5=Hex(UInt),
+    points=Array(construct.this.num_points, CollisionPoint),
+    boundings=Array(4, Float),
+)
+CollisionPolyDread = Struct(
     num_points=Rebuild(UInt, construct.len_(construct.this.points)),
     unk=Float,
     points=Array(construct.this.num_points, CollisionPoint),
     loop=Flag,
     boundings=Array(4, Float),
+)
+CollisionPoly = IfThenElse(
+    game_check.current_game_at_most(Game.SAMUS_RETURNS),
+    CollisionPolySR,
+    CollisionPolyDread,
 )
 
 BinarySearchTree = Struct(
