@@ -8,7 +8,6 @@ from pathlib import Path
 import numpy
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
-import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon as mtPolygon
 
 
@@ -68,7 +67,7 @@ def _get_area_name_from_actors_in_existing_db(out_path: Path) -> dict[str, dict[
     return area_name_by_world_and_actor
 
 
-def decode_world(root: Path, target_level: str, out_path: Path, only_update_existing_areas: bool = True,
+def decode_world(root: Path, target_level: str, out_path: Path, only_update_existing_areas: bool = False,
                  skip_existing_actors: bool = True):
     global pickup_index, bmscc, bmsld, bmsld_path
     all_names = samus_returns_data.all_asset_id_to_name()
@@ -117,8 +116,11 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         return [x / 300.0 for x in hashlib.md5(bytes(str(sorted(s)), 'ascii')).digest()[0:3]]
 
     handles = []
+    import matplotlib.pyplot as plt
     plt.figure(1, figsize=(20, 10))
     plt.title(target_level)
+
+    # Parse Camera Groups
 
     for entry in bmscc.raw.layers[0].entries:
         assert entry.type == "POLYCOLLECTION2D"
@@ -167,15 +169,34 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             "nodes": {},
         }
 
-    # handles_by_label = {}
-    # handles_by_label = {
-    #     key: value
-    #     for key, value in sorted(handles_by_label.items(), key=lambda it: it[0])
-    # }
-    # plt.legend(handles_by_label.values(), handles_by_label.keys())
+    # Parse Actors
+    actors_by_name = {}
+    for i, actor_list in enumerate(bmsld.raw.actors):
+        print(f"=== List {i}")
+        for name, actor in actor_list.items():
+            actor_type: str = actor.type
+            if any(actor_type.startswith(prefix) for prefix in ["powerup_", "item_", "itemsphere_"]):
+                plt.annotate(name, [actor.x, actor.y], fontsize='xx-small', ha='center')
+                plt.plot(actor.x, actor.y, "o", color=[1.0, 0.7, 0.6])
 
-    # plt.savefig(f"{target_level}.png", dpi=200, bbox_inches='tight')
-    # plt.close()
+                # plt.text(actor.x, actor.y, name, color=[1.0, 0.7, 0.6], ha='center', size='small')
+                # print(name, actor.type, actor.x, actor.y)
+
+            if actor_type in {"elevator", "weightactivatedplatform"}:
+                print(name)
+                print(actor)
+
+    handles_by_label = {}
+    handles_by_label = {
+        key: value
+        for key, value in sorted(handles_by_label.items(), key=lambda it: it[0])
+    }
+    plt.legend(handles_by_label.values(), handles_by_label.keys())
+
+    plt.plot()
+    plt.savefig(f"{target_level}.png", dpi=200, bbox_inches='tight')
+    plt.show()
+    plt.close()
 
     print(f"Writing updated {world_names[bmsld_path]}")
     with out_path.joinpath(f"{world_names[bmsld_path]}.json").open("w") as f:
