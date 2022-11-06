@@ -120,6 +120,7 @@ class ActorDetails:
                 "z": self.actor.z,
             },
             "description": "",
+            "layers": ["default"],
             "extra": {
                 "actor_name": self.name,
                 "actor_type": self.actor.type,
@@ -129,13 +130,15 @@ class ActorDetails:
             result["extra"]["actor_layer"] = self.actor_layer
 
         if node_type == "dock":
-            result["destination"] = {
+            result["dock_type"] = "other"
+            result["default_connection"] = {
                 "world_name": None,
                 "area_name": None,
                 "node_name": None,
             }
-            result["dock_type"] = "other"
-            result["dock_weakness"] = "Not Determined"
+            result["default_dock_weakness"] = "Not Determined"
+            result["override_default_open_requirement"] = None
+            result["override_default_lock_requirement"] = None
 
         elif node_type == "pickup":
             result["pickup_index"] = None
@@ -395,6 +398,10 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             pickup_index += 1
 
         elif details.is_usable:
+            print("=====================")
+            print(name)
+            print(details.actor)
+
             if len(details.rooms) != 1:
                 print("usable multiple rooms?", details.name, details.rooms)
                 continue
@@ -406,7 +413,6 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
                 node_data_for_area.get(room_name),
             )
             add_node(room_name, definition)
-
         else:
             raise ValueError("What kind of actor is this?!")
 
