@@ -20,7 +20,7 @@ world_names = {
     'maps/levels/c10_samus/s000_surface/s000_surface.bmsld': "Surface - East",
     'maps/levels/c10_samus/s010_area1/s010_area1.bmsld': "Area 1",
     'maps/levels/c10_samus/s020_area2/s020_area2.bmsld': "Area 2 - Exterior",
-    'maps/levels/c10_samus/s025_area2b/s050_area2b.bmsld': "Area 2 - Interior",
+    'maps/levels/c10_samus/s025_area2b/s025_area2b.bmsld': "Area 2 - Interior",
     'maps/levels/c10_samus/s028_area2c/s028_area2c.bmsld': "Area 2 - Entrance",
     'maps/levels/c10_samus/s030_area3/s030_area3.bmsld': "Area 3 - Exterior",
     'maps/levels/c10_samus/s033_area3b/s033_area3b.bmsld': "Area 3 - Interior (Lower)",
