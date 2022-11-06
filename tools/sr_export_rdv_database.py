@@ -1,10 +1,13 @@
 import argparse
+import copy
 import hashlib
 import json
 import os
+import re
 import typing
 from pathlib import Path
 
+import construct
 import numpy
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
@@ -47,6 +50,101 @@ bmsld_path: str = None
 events: dict[str, dict] = {}
 
 _camera_skip = {}
+
+
+class NodeDefinition(typing.NamedTuple):
+    name: str
+    data: dict[str, typing.Any]
+
+
+class ActorDetails:
+    actor_type: str
+
+    def __init__(self, name: str, actor: construct.Container, all_rooms: dict[str, Polygon],
+                 layer_name: str = "default"):
+        self.name = name
+        self.actor = actor
+        self.actor_type = actor.type
+        self.actor_layer = layer_name
+        self.position = Point([actor.x, actor.y])
+        self.rooms: list[str] = [name for name, pol in all_rooms.items() if pol.contains(self.position)]
+
+        self.is_door = self.actor_type.startswith("door")
+        # self.is_start_point = "STARTPOINT" in actor.pComponents and "dooremmy" not in self.actor_type
+        self.is_pickup = any(self.actor_type.startswith(prefix) for prefix in ["powerup_", "item_", "itemsphere_"])
+        self.is_usable = self.actor_type == "weightactivatedplatform"
+
+    def create_node_template(
+            self, node_type: str,
+            default_name: str,
+            existing_data: typing.Optional[dict[str, NodeDefinition]],
+    ) -> NodeDefinition:
+
+        result: dict = {
+            "node_type": node_type,
+            "heal": False,
+            "coordinates": {
+                "x": self.actor.x,
+                "y": self.actor.y,
+                "z": self.actor.z,
+            },
+            "description": "",
+            "extra": {
+                "actor_name": self.name,
+                "actor_type": self.actor.type,
+            },
+        }
+        if self.actor_layer != "default":
+            result["extra"]["actor_layer"] = self.actor_layer
+
+        if node_type == "dock":
+            result["destination"] = {
+                "world_name": None,
+                "area_name": None,
+                "node_name": None,
+            }
+            result["dock_type"] = "other"
+            result["dock_weakness"] = "Not Determined"
+
+        elif node_type == "pickup":
+            result["pickup_index"] = None
+            result["major_location"] = None
+
+        elif node_type == "teleporter":
+            result["destination"] = {
+                "world_name": None,
+                "area_name": None,
+            }
+            result["keep_name_when_vanilla"] = True
+            result["editable"] = True
+
+        elif node_type == "event":
+            result["event_name"] = None
+
+        if existing_data is not None and self.name in existing_data:
+            old_node_data = existing_data[self.name]
+            node_name = old_node_data.name
+            if node_type == "generic" and old_node_data.data["node_type"] != "generic":
+                new_result = copy.deepcopy(old_node_data.data)
+                new_result["coordinates"] = result["coordinates"]
+                new_result["extra"].update(result["extra"])
+                result = new_result
+            else:
+                result["heal"] = old_node_data.data["heal"]
+                result["description"] = old_node_data.data["description"]
+                result["connections"] = old_node_data.data["connections"]
+                for extra_key in old_node_data.data["extra"]:
+                    if extra_key not in result["extra"]:
+                        result["extra"][extra_key] = old_node_data.data["extra"][extra_key]
+        else:
+            node_name = default_name
+            result["connections"] = {}
+
+        return NodeDefinition(node_name, result)
+
+
+def current_world_file_name():
+    return re.sub(r'[^a-zA-Z0-9\- ]', r'', world_names[bmsld_path]) + ".json"
 
 
 def _get_area_name_from_actors_in_existing_db(out_path: Path) -> dict[str, dict[str, str]]:
@@ -96,7 +194,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
     area_name_by_world_and_actor = _get_area_name_from_actors_in_existing_db(out_path)
 
     try:
-        with out_path.joinpath(f"{world_names[bmsld_path]}.json").open() as f:
+        with out_path.joinpath(current_world_file_name()).open() as f:
             world: dict = json.load(f)
     except FileNotFoundError:
         world: dict = {
@@ -124,23 +222,17 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
 
     for entry in bmscc.raw.layers[0].entries:
         assert entry.type == "POLYCOLLECTION2D"
-
         x1, y1, x2, y2 = entry.data.total_boundings
         if abs(x1) > 59999 or abs(y1) > 59999 or abs(x2) > 59999 or abs(y2) > 59999:
             continue
 
         area_name = area_names[entry.name]
-
         if (target_level, entry.name) in _camera_skip:
             world["areas"].pop(area_name, None)
             continue
 
         assert len(entry.data.polys) == 1
-        raw_vertices = []
-        for v in entry.data.polys[0].points:
-            raw_vertices.append((v.x, v.y))
-
-        # raw_vertices = _polygon_override.get((target_level, entry.name), raw_vertices)
+        raw_vertices = [(v.x, v.y) for v in entry.data.polys[0].points]
         vertices = numpy.array(raw_vertices)
 
         c = [0.2, 0.7, 0.6]
@@ -170,21 +262,24 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         }
 
     # Parse Actors
-    actors_by_name = {}
+    all_default_details: dict[str, ActorDetails] = {}
+
     for i, actor_list in enumerate(bmsld.raw.actors):
         print(f"=== List {i}")
         for name, actor in actor_list.items():
-            actor_type: str = actor.type
-            if any(actor_type.startswith(prefix) for prefix in ["powerup_", "item_", "itemsphere_"]):
+            all_default_details[name] = ActorDetails(name, actor, all_rooms)
+
+            d = all_default_details[name]
+            if d.is_pickup or d.is_door or d.is_usable:
                 plt.annotate(name, [actor.x, actor.y], fontsize='xx-small', ha='center')
-                plt.plot(actor.x, actor.y, "o", color=[1.0, 0.7, 0.6])
+                plt.plot(actor.x, actor.y, "o", color=rand_color(d.actor_type))
 
                 # plt.text(actor.x, actor.y, name, color=[1.0, 0.7, 0.6], ha='center', size='small')
                 # print(name, actor.type, actor.x, actor.y)
 
-            if actor_type in {"elevator", "weightactivatedplatform"}:
-                print(name)
-                print(actor)
+            # if actor_type in {"elevator", "weightactivatedplatform"}:
+            #     print(name)
+            #     print(actor)
 
     handles_by_label = {}
     handles_by_label = {
@@ -195,11 +290,11 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
 
     plt.plot()
     plt.savefig(f"{target_level}.png", dpi=200, bbox_inches='tight')
-    plt.show()
+    # plt.show()
     plt.close()
 
-    print(f"Writing updated {world_names[bmsld_path]}")
-    with out_path.joinpath(f"{world_names[bmsld_path]}.json").open("w") as f:
+    print(f"Writing updated {current_world_file_name()}")
+    with out_path.joinpath(current_world_file_name()).open("w") as f:
         json.dump(world, f, indent=4)
 
 
@@ -214,6 +309,8 @@ def decode_all_worlds(root: Path, out_path: Path):
     for area_path in world_names.keys():
         level_name = os.path.splitext(os.path.split(area_path)[1])[0]
         decode_world(root, level_name, out_path)
+        if current_world_file_name() not in header["worlds"]:
+            header["worlds"].append(current_world_file_name())
 
     header["resource_database"]["events"] = events
 
