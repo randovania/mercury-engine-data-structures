@@ -242,12 +242,12 @@ def create_door_nodes_for_actor(
     ]
     for i, definition in enumerate(doors):
         definition.data["extra"].update(extra)
-        definition.data["destination"]["world_name"] = world["name"]
-        definition.data["destination"]["area_name"] = details.rooms[(i + 1) % 2]
-        definition.data["destination"]["node_name"] = doors[(i + 1) % 2].name
+        definition.data["default_connection"]["world_name"] = world["name"]
+        definition.data["default_connection"]["area_name"] = details.rooms[(i + 1) % 2]
+        definition.data["default_connection"]["node_name"] = doors[(i + 1) % 2].name
         if custom_weakness[i] is not None:
             definition.data["dock_type"] = "door"
-            definition.data["dock_weakness"] = custom_weakness[i]
+            definition.data["default_dock_weakness"] = custom_weakness[i]
 
     return doors
 
