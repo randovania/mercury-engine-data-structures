@@ -9,10 +9,9 @@ from pathlib import Path
 
 import construct
 import numpy
+from matplotlib.patches import Polygon as mtPolygon
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
-from matplotlib.patches import Polygon as mtPolygon
-
 
 from mercury_engine_data_structures import samus_returns_data
 from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
@@ -49,7 +48,24 @@ bmsld: typing.Optional[Bmsld] = None
 bmsld_path: str = None
 events: dict[str, dict] = {}
 
-_camera_skip = {}
+_camera_skip = {
+    ("s010_area1", "collision_camera_016_B"),
+    ("s010_area1", "collision_camera_018_B"),
+    ("s010_area1", "collision_camera_023_B"),
+}
+dock_weakness = {
+    "closed": "Access Closed",
+    "power": "Power Beam Door",
+    "charge": "Charge Beam Door",
+}
+_weakness_table_for_def = {
+    'doorchargecharge': (dock_weakness["charge"], dock_weakness["charge"]),
+    'doorclosedcharge': (dock_weakness["closed"], dock_weakness["charge"]),
+    'doorpowerpower': (dock_weakness["power"], dock_weakness["power"]),
+    'doorclosedpower': (dock_weakness["closed"], dock_weakness["power"]),
+    'doorpowerclosed': (dock_weakness["power"], dock_weakness["closed"]),
+    'doorchargeclosed': (dock_weakness["charge"], dock_weakness["closed"]),
+}
 
 
 class NodeDefinition(typing.NamedTuple):
@@ -143,8 +159,25 @@ class ActorDetails:
         return NodeDefinition(node_name, result)
 
 
+def _find_room_orientation(world: dict, room_a: str, room_b: str):
+    a_bounds = world["areas"][room_a]["extra"]["total_boundings"]
+    b_bounds = world["areas"][room_b]["extra"]["total_boundings"]
+    a_cx = (a_bounds["x1"] + a_bounds["x2"]) / 2
+    b_cx = (b_bounds["x1"] + b_bounds["x2"]) / 2
+    if a_cx < b_cx:
+        return 0, 1
+    elif a_cx > b_cx:
+        return 1, 0
+    else:
+        raise ValueError(f"{room_a} and {room_b} are aligned")
+
+
 def current_world_file_name():
     return re.sub(r'[^a-zA-Z0-9\- ]', r'', world_names[bmsld_path]) + ".json"
+
+
+def get_actor_name_for_node(node: dict) -> str:
+    return node["extra"]["actor_name"]
 
 
 def _get_area_name_from_actors_in_existing_db(out_path: Path) -> dict[str, dict[str, str]]:
@@ -163,6 +196,60 @@ def _get_area_name_from_actors_in_existing_db(out_path: Path) -> dict[str, dict[
             area_name_by_world_and_actor[world_name] = {}
 
     return area_name_by_world_and_actor
+
+
+def _get_existing_node_data(world: dict, area_names: dict[str, str]) -> dict[str, dict[str, NodeDefinition]]:
+    node_data_for_area: dict[str, dict[str, NodeDefinition]] = {}
+    for area_name, area_data in world["areas"].items():
+        if "asset_id" in area_data["extra"]:
+            area_names[area_data["extra"]["asset_id"]] = area_name
+            node_data_for_area[area_name] = {}
+            for node_name, node_data in area_data["nodes"].items():
+                node_data_for_area[area_name][get_actor_name_for_node(node_data)] = NodeDefinition(node_name, node_data)
+    return node_data_for_area
+
+
+def create_door_nodes_for_actor(
+        details: ActorDetails,
+        node_data_for_area: dict[str, dict[str, NodeDefinition]],
+        world: dict
+) -> list[NodeDefinition]:
+    extra = {}
+    # if "LIFE" in actor.pComponents:
+    #     extra = {
+    #         "left_shield_entity": actor.pComponents.LIFE.wpLeftDoorShieldEntity,
+    #         "left_shield_def": get_def_link_for_entity(actor.pComponents.LIFE.wpLeftDoorShieldEntity),
+    #         "right_shield_entity": actor.pComponents.LIFE.wpRightDoorShieldEntity,
+    #         "right_shield_def": get_def_link_for_entity(actor.pComponents.LIFE.wpRightDoorShieldEntity),
+    #     }
+
+    simple = {"def": details.actor_type,
+              "left": extra.get("left_shield_def"),
+              "right": extra.get("right_shield_def")}
+
+    left_room, right_room = _find_room_orientation(world, *details.rooms)
+
+    custom_weakness = [None, None]
+    if simple["left"] == simple["right"] and simple["left"] is None:
+        if details.actor_type in _weakness_table_for_def:
+            custom_weakness[left_room], custom_weakness[right_room] = _weakness_table_for_def[details.actor_type]
+        else:
+            print(f"no weakness for {details.actor_type} without shields")
+
+    doors: list[NodeDefinition] = [
+        details.create_node_template("dock", f"Door ({details.name})", node_data_for_area.get(room_name))
+        for room_name in details.rooms
+    ]
+    for i, definition in enumerate(doors):
+        definition.data["extra"].update(extra)
+        definition.data["destination"]["world_name"] = world["name"]
+        definition.data["destination"]["area_name"] = details.rooms[(i + 1) % 2]
+        definition.data["destination"]["node_name"] = doors[(i + 1) % 2].name
+        if custom_weakness[i] is not None:
+            definition.data["dock_type"] = "door"
+            definition.data["dock_weakness"] = custom_weakness[i]
+
+    return doors
 
 
 def decode_world(root: Path, target_level: str, out_path: Path, only_update_existing_areas: bool = False,
@@ -205,10 +292,12 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             "areas": {}
         }
 
+    world_unique_id = Path(bmsld_path).stem.split("_")[1]
     area_names = {
-        entry.name: f"{entry.name} ({world_names[bmsld_path][0]})"
+        entry.name: f"{entry.name} ({world_unique_id})"
         for entry in bmscc.raw.layers[0].entries
     }
+    node_data_for_area = _get_existing_node_data(world, area_names)
 
     def rand_color(s):
         return [x / 300.0 for x in hashlib.md5(bytes(str(sorted(s)), 'ascii')).digest()[0:3]]
@@ -262,24 +351,68 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         }
 
     # Parse Actors
-    all_default_details: dict[str, ActorDetails] = {}
+    all_default_details: dict[str, ActorDetails] = {
+        name: ActorDetails(name, actor, all_rooms)
+        for actor_list in bmsld.raw.actors
+        for name, actor in actor_list.items()
+    }
 
-    for i, actor_list in enumerate(bmsld.raw.actors):
-        print(f"=== List {i}")
-        for name, actor in actor_list.items():
-            all_default_details[name] = ActorDetails(name, actor, all_rooms)
+    def add_node(target_area: str, node_def: NodeDefinition):
+        new_actor = get_actor_name_for_node(node_def.data)
+        for existing_name, existing_node in world["areas"][target_area]["nodes"].items():
+            if existing_name == node_def.name:
+                continue
+            if get_actor_name_for_node(existing_node) == new_actor:
+                raise ValueError(f"New node {node_def.name} with actor {new_actor} conflicts "
+                                 f"with existing node {existing_name} in {target_area}")
 
-            d = all_default_details[name]
-            if d.is_pickup or d.is_door or d.is_usable:
-                plt.annotate(name, [actor.x, actor.y], fontsize='xx-small', ha='center')
-                plt.plot(actor.x, actor.y, "o", color=rand_color(d.actor_type))
+        world["areas"][target_area]["nodes"][node_def.name] = node_def.data
 
-                # plt.text(actor.x, actor.y, name, color=[1.0, 0.7, 0.6], ha='center', size='small')
-                # print(name, actor.type, actor.x, actor.y)
+    for name, details in all_default_details.items():
+        if not any([details.is_door, details.is_pickup, details.is_usable]):
+            continue
 
-            # if actor_type in {"elevator", "weightactivatedplatform"}:
-            #     print(name)
-            #     print(actor)
+        plt.annotate(name, [details.position.x, details.position.y], fontsize='xx-small', ha='center')
+        plt.plot(details.position.x, details.position.y, "o", color=rand_color(details.actor_type))
+
+        if details.is_door:
+            if len(details.rooms) == 2:
+                doors = create_door_nodes_for_actor(details, node_data_for_area, world)
+                for i, room_name in enumerate(details.rooms):
+                    add_node(room_name, doors[i])
+
+            else:
+                print("multiple rooms for door!", name, details.position, details.rooms)
+
+        elif details.is_pickup:
+            for room_name in details.rooms:
+                definition = details.create_node_template("pickup", f"Pickup ({name})",
+                                                          node_data_for_area.get(room_name))
+                definition.data.update({
+                    "pickup_index": pickup_index,
+                    "major_location": "tank" not in details.actor_type,
+                })
+                add_node(room_name, definition)
+
+            if len(details.rooms) != 1:
+                print("pickup in multiple rooms!", details.name, details.rooms)
+            pickup_index += 1
+
+        elif details.is_usable:
+            if len(details.rooms) != 1:
+                print("usable multiple rooms?", details.name, details.rooms)
+                continue
+
+            room_name = details.rooms[0]
+            definition = details.create_node_template(
+                "generic",
+                f"Usable ({name})",
+                node_data_for_area.get(room_name),
+            )
+            add_node(room_name, definition)
+
+        else:
+            raise ValueError("What kind of actor is this?!")
 
     handles_by_label = {}
     handles_by_label = {
