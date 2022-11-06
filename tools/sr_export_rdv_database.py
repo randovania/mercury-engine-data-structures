@@ -48,6 +48,18 @@ bmsld: typing.Optional[Bmsld] = None
 bmsld_path: str = None
 events: dict[str, dict] = {}
 
+_polygon_override = {
+    # Example
+    # ("s010_area1", "collision_camera_016_B"): [
+    #     [24900.0, 5100.0], [17800.0, 5100.0], [17800.0, 3400.0], [24900.0, 3400.0]
+    # ],
+}
+_rooms_for_actors = {
+    "s010_area1": {
+        # Example:
+        # "Door002": ['collision_camera_000 (area1)', 'collision_camera_003 (area1)'],
+    }
+}
 _camera_skip = {
     ("s010_area1", "collision_camera_016_B"),
     ("s010_area1", "collision_camera_018_B"),
@@ -76,14 +88,17 @@ class NodeDefinition(typing.NamedTuple):
 class ActorDetails:
     actor_type: str
 
-    def __init__(self, name: str, actor: construct.Container, all_rooms: dict[str, Polygon],
+    def __init__(self, name: str, actor: construct.Container, level_name: str, all_rooms: dict[str, Polygon],
                  layer_name: str = "default"):
         self.name = name
         self.actor = actor
         self.actor_type = actor.type
         self.actor_layer = layer_name
         self.position = Point([actor.x, actor.y])
-        self.rooms: list[str] = [name for name, pol in all_rooms.items() if pol.contains(self.position)]
+        try:
+            self.rooms = [room for room in _rooms_for_actors[level_name][name] if room in all_rooms]
+        except KeyError:
+            self.rooms: list[str] = [name for name, pol in all_rooms.items() if pol.contains(self.position)]
 
         self.is_door = self.actor_type.startswith("door")
         # self.is_start_point = "STARTPOINT" in actor.pComponents and "dooremmy" not in self.actor_type
@@ -321,7 +336,8 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             continue
 
         assert len(entry.data.polys) == 1
-        raw_vertices = [(v.x, v.y) for v in entry.data.polys[0].points]
+        raw_vertices = _polygon_override.get((target_level, entry.name),
+                                             [(v.x, v.y) for v in entry.data.polys[0].points])
         vertices = numpy.array(raw_vertices)
 
         c = [0.2, 0.7, 0.6]
@@ -352,7 +368,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
 
     # Parse Actors
     all_default_details: dict[str, ActorDetails] = {
-        name: ActorDetails(name, actor, all_rooms)
+        name: ActorDetails(name, actor, target_level, all_rooms)
         for actor_list in bmsld.raw.actors
         for name, actor in actor_list.items()
     }
