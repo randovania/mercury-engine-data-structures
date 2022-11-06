@@ -195,24 +195,6 @@ def get_actor_name_for_node(node: dict) -> str:
     return node["extra"]["actor_name"]
 
 
-def _get_area_name_from_actors_in_existing_db(out_path: Path) -> dict[str, dict[str, str]]:
-    area_name_by_world_and_actor = {}
-
-    for world_name in world_names.values():
-        try:
-            with out_path.joinpath(f"{world_name}.json").open() as f:
-                area_name_by_world_and_actor[world_name] = {}
-                for area_name, area_data in json.load(f)["areas"].items():
-                    for node_data in area_data["nodes"].values():
-                        for variable in ["actor_name", "start_point_actor_name"]:
-                            if variable in node_data["extra"]:
-                                area_name_by_world_and_actor[world_name][node_data["extra"][variable]] = area_name
-        except FileNotFoundError:
-            area_name_by_world_and_actor[world_name] = {}
-
-    return area_name_by_world_and_actor
-
-
 def _get_existing_node_data(world: dict, area_names: dict[str, str]) -> dict[str, dict[str, NodeDefinition]]:
     node_data_for_area: dict[str, dict[str, NodeDefinition]] = {}
     for area_name, area_data in world["areas"].items():
@@ -292,8 +274,6 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         raise ValueError("DATA IS NONE")
 
     all_rooms = {}
-
-    area_name_by_world_and_actor = _get_area_name_from_actors_in_existing_db(out_path)
 
     try:
         with out_path.joinpath(current_world_file_name()).open() as f:
