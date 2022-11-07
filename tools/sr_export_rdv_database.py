@@ -326,7 +326,7 @@ class ActorDetails:
         except KeyError:
             self.rooms: list[str] = [name for name, pol in all_rooms.items() if pol.contains(self.position)]
 
-        self.is_door = self.actor_type.startswith("door")
+        self.is_door = self.actor_type.startswith("door") and self.actor_type not in {"doorshieldmissile", "doorshieldsupermissile", "doorshieldpowerbomb", "doorwave", "doorspazerbeam", "doorcreature" }
         # self.is_start_point = "STARTPOINT" in actor.pComponents and "dooremmy" not in self.actor_type
         self.is_pickup = any(self.actor_type.startswith(prefix) for prefix in ["powerup_", "item_", "itemsphere_"])
         self.is_usable = self.actor_type == "weightactivatedplatform"
