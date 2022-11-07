@@ -197,6 +197,7 @@ _camera_skip = {
     ("s000_surface", "collision_camera_003_B"),
     ("s000_surface", "collision_camera_005"),
     ("s000_surface", "collision_camera_011_B"),
+    ("s000_surface", "collision_camera_017"),
     ("s000_surface", "collision_camera_025"),
     ("s000_surface", "collision_camera_026"),
     ("s010_area1", "collision_camera_016_B"),
