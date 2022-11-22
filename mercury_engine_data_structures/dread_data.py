@@ -38,6 +38,8 @@ class CrcDict(dict):
         try:
             return super().__getitem__(__k)
         except:
+            if isinstance(__k, int):
+                return __k
             return crc64(__k)
 
 @functools.lru_cache()

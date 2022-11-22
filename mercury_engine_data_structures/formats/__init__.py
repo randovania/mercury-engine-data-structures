@@ -8,6 +8,7 @@ from mercury_engine_data_structures.formats.bmsad import Bmsad
 from mercury_engine_data_structures.formats.bmscc import Bmscc
 from mercury_engine_data_structures.formats.bmscu import Bmscu
 from mercury_engine_data_structures.formats.bmssd import Bmssd
+from mercury_engine_data_structures.formats.bmssv import Bmssv
 from mercury_engine_data_structures.formats.brem import Brem
 from mercury_engine_data_structures.formats.bres import Bres
 from mercury_engine_data_structures.formats.brev import Brev
@@ -28,6 +29,7 @@ ALL_FORMATS = {
     "BMSSD": Bmssd,
     "BMSSK": Bmssk,
     "BMSSS": Bmsss,
+    "BMSSV": Bmssv,
     "BMSAD": Bmsad,
     "BRFLD": Brfld,
     "BMSCC": Bmscc,

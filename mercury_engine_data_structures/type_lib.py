@@ -282,6 +282,9 @@ def get_all_children_for(type_name: str) -> Set[str]:
     """
     result = set()
 
+    if type_name == "base::reflection::CTypedValue":
+        return set(all_types().keys())
+
     types_to_check = {type_name}
     while types_to_check:
         next_type = types_to_check.pop()
