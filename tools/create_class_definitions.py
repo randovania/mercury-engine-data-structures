@@ -124,7 +124,7 @@ class TypeExporter:
 
         elif isinstance(type_data, type_lib.FlagsetType):
             reference = self.ensure_exported_type(type_data.enum)
-            flags = f'construct.FlagsEnum(construct.Int32ul, {reference}.enum_class)'
+            flags = f'BitMaskEnum({reference}.enum_class)'
             self._type_definition_code += f'\n\n{type_variable} = {flags}'
 
         elif isinstance(type_data, type_lib.TypedefType):
@@ -184,7 +184,7 @@ from mercury_engine_data_structures import common_types
 from mercury_engine_data_structures.object import Object
 from mercury_engine_data_structures.pointer_set import PointerSet
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum, PropertyEnumUnsafe
-from mercury_engine_data_structures.construct_extensions.enum import StrictEnum
+from mercury_engine_data_structures.construct_extensions.enum import StrictEnum, BitMaskEnum
 
 """
         code += 'primitive_to_construct = {\n'

@@ -17,3 +17,10 @@ class StrictEnum(construct.Adapter):
             obj = getattr(self.enum_class, obj)
 
         return obj.value
+
+
+def BitMaskEnum(enum_type: typing.Type[enum.IntEnum]):
+    flags = {}
+    for enumentry in enum_type:
+        flags[enumentry.name] = 2 ** enumentry.value
+    return construct.FlagsEnum(construct.Int32ul, **flags)
