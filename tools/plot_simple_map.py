@@ -3299,7 +3299,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
     all_names = dread_data.all_asset_id_to_name()
     game = Game.DREAD
 
-    pkg_editor = FileTreeEditor(root)
+    pkg_editor = FileTreeEditor(root, Game.DREAD)
 
     for asset_id, name in all_names.items():
         if target_level not in name:

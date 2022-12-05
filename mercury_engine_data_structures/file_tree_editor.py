@@ -64,7 +64,7 @@ class FileTreeEditor:
     _in_memory_pkgs: Dict[str, Pkg]
     _toc: Toc
 
-    def __init__(self, root: Path, target_game: Game = Game.DREAD):
+    def __init__(self, root: Path, target_game: Game):
         self.root = root
         self.target_game = target_game
         self._modified_resources = {}

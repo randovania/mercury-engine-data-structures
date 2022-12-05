@@ -56,6 +56,7 @@ def create_parser():
     replace_pkg_file.add_argument("asset_path", type=Path, help="Path to the updated asset")
 
     find_pkg = subparser.add_parser("find-pkg-for")
+    add_game_argument(find_pkg)
     find_pkg.add_argument("--root", type=Path, required=True, help="Path to the PKG files")
     group = find_pkg.add_mutually_exclusive_group(required=True)
     group.add_argument("--asset-name", type=str, help="Asset name to find")
@@ -143,7 +144,7 @@ def find_pkg_for(args):
     asset_id: int = args.asset_id
     asset_name: str = args.asset_name
 
-    pkg_editor = FileTreeEditor(root)
+    pkg_editor = FileTreeEditor(root, args.game)
     if asset_id is not None:
         items = list(pkg_editor.find_pkgs(asset_id))
     else:

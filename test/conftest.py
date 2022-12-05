@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
+from mercury_engine_data_structures.game_check import Game
 
 
 def get_env_or_skip(env_name):
@@ -24,5 +25,5 @@ def dread_path():
 
 @pytest.fixture(scope="session")
 def dread_file_tree(dread_path):
-    return FileTreeEditor(dread_path)
+    return FileTreeEditor(dread_path, Game.DREAD)
 
