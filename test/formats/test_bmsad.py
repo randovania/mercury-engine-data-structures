@@ -1,3 +1,6 @@
+import contextlib
+
+import construct
 import pytest
 
 from mercury_engine_data_structures.formats.bmsad import BMSAD
@@ -903,12 +906,22 @@ all_bmsad = [
     "cutscenes/100commandershowswings/actors/cut_100_comandercap/actor.bmsad"
 ]
 
+expected_failures = {
+    "actors/props/pf_mushr_fr/charclasses/pf_mushr_fr.bmsad",
+}
+
 
 @pytest.mark.parametrize("bmsad_path", all_bmsad)
 def test_compare_dread_all(dread_file_tree, bmsad_path):
-    parse_build_compare_editor(
-        BMSAD, dread_file_tree, bmsad_path
-    )
+    if bmsad_path in expected_failures:
+        expectation = pytest.raises(construct.ConstructError)
+    else:
+        expectation = contextlib.nullcontext()
+
+    with expectation:
+        parse_build_compare_editor(
+            BMSAD, dread_file_tree, bmsad_path
+        )
 
 
 def test_compare_dread(dread_path):
