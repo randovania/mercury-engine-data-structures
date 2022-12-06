@@ -27,15 +27,15 @@ class Toc(BaseResource):
         return "system/files.toc"
 
     def get_size_for(self, asset_id: NameOrAssetId) -> Optional[int]:
-        asset_id = resolve_asset_id(asset_id)
+        asset_id = resolve_asset_id(asset_id, self.target_game)
         return self.raw.files.get(asset_id)
 
     def add_file(self, asset_id: NameOrAssetId, file_size: int):
-        asset_id = resolve_asset_id(asset_id)
+        asset_id = resolve_asset_id(asset_id, self.target_game)
         self.raw.files[asset_id] = file_size
 
     def remove_file(self, asset_id: NameOrAssetId):
-        resolved_asset_id = resolve_asset_id(asset_id)
+        resolved_asset_id = resolve_asset_id(asset_id, self.target_game)
         if resolved_asset_id not in self.raw.files:
             raise ValueError(f"Unknown asset_id: {asset_id}")
 

@@ -6,6 +6,8 @@ from typing import Any, Callable
 
 from construct.core import IfThenElse
 
+from mercury_engine_data_structures import crc
+
 
 class Game(Enum):
     SAMUS_RETURNS = 10
@@ -38,6 +40,16 @@ class Game(Enum):
         if self.__class__ is other.__class__:
             return self.value < other.value
         return NotImplemented
+
+    def hash_asset(self, msg: str) -> int:
+        if self == Game.SAMUS_RETURNS:
+            func = crc.crc32
+        elif self == Game.DREAD:
+            func = crc.crc64
+        else:
+            raise ValueError(f"Unsupported game: {self}")
+
+        return func(msg)
 
 
 def get_current_game(ctx):

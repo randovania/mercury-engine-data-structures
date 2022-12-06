@@ -60,13 +60,14 @@ def main():
     parser.add_argument("--possible-new-paths", type=Path)
     parser.add_argument("game_root", type=Path)
     args = parser.parse_args()
+    game: Game = args.game
 
-    if args.game == Game.SAMUS_RETURNS:
+    if game == Game.SAMUS_RETURNS:
         short_game = "sr"
-    elif args.game == Game.DREAD:
+    elif game == Game.DREAD:
         short_game = "dread"
     else:
-        raise ValueError(f"unsupported game {args.game}")
+        raise ValueError(f"unsupported game {game}")
 
     path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures",
                                               f"{short_game}_resource_names.json")
@@ -74,7 +75,7 @@ def main():
     game_root: Path = args.game_root
     toc = Toc.parse(
         game_root.joinpath(Toc.system_files_name()).read_bytes(),
-        args.game,
+        game,
     )
     all_asset_id = set(toc.get_all_asset_id())
 
@@ -92,7 +93,7 @@ def main():
 
                 for new_name in new_names:
                     if new_name not in known_names:
-                        known_names[new_name] = crc.crc32(new_name)
+                        known_names[new_name] = game.hash_asset(new_name)
 
     filtered_names = {
         name: value

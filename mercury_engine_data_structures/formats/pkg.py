@@ -185,14 +185,14 @@ class Pkg(BaseResource):
             yield PkgFile(self.target_game, file.asset_id, file.data)
 
     def get_asset(self, asset_id: NameOrAssetId) -> Optional[bytes]:
-        asset_id = resolve_asset_id(asset_id)
+        asset_id = resolve_asset_id(asset_id, self.target_game)
         for file in self.raw.files:
             if file.asset_id == asset_id:
                 return file.data
         return None
 
     def replace_asset(self, asset_id: NameOrAssetId, new_file: bytes):
-        asset_id = resolve_asset_id(asset_id)
+        asset_id = resolve_asset_id(asset_id, self.target_game)
 
         for file in self.raw.files:
             if file.asset_id == asset_id:
@@ -202,7 +202,7 @@ class Pkg(BaseResource):
         raise ValueError(f"Unknown asset id: {asset_id}")
 
     def add_asset(self, asset_id: NameOrAssetId, new_file: bytes):
-        asset_id = resolve_asset_id(asset_id)
+        asset_id = resolve_asset_id(asset_id, self.target_game)
 
         if self.get_asset(asset_id) is not None:
             raise ValueError(f"Asset id already exists: {asset_id}")
@@ -213,7 +213,7 @@ class Pkg(BaseResource):
         ))
 
     def remove_asset(self, asset_id: NameOrAssetId):
-        asset_id = resolve_asset_id(asset_id)
+        asset_id = resolve_asset_id(asset_id, self.target_game)
 
         for file in self.raw.files:
             if file.asset_id == asset_id:

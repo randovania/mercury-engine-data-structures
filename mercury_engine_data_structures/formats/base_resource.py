@@ -2,7 +2,6 @@ import typing
 
 from construct import Construct, Container
 
-from mercury_engine_data_structures import crc
 from mercury_engine_data_structures.game_check import Game
 
 
@@ -36,7 +35,7 @@ AssetId = int
 NameOrAssetId = typing.Union[str, AssetId]
 
 
-def resolve_asset_id(value: NameOrAssetId) -> AssetId:
+def resolve_asset_id(value: NameOrAssetId, game: Game) -> AssetId:
     if isinstance(value, str):
-        return crc.crc64(value)
+        return game.hash_asset(value)
     return value

@@ -10,7 +10,7 @@ from typing import Dict, Optional, Iterator, Set
 
 import construct
 
-from mercury_engine_data_structures import formats, dread_data
+from mercury_engine_data_structures import formats, dread_data, samus_returns_data
 from mercury_engine_data_structures.formats import Toc
 from mercury_engine_data_structures.formats.base_resource import AssetId, BaseResource, NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.formats.pkg import PKGHeader, Pkg
@@ -49,6 +49,15 @@ def _write_to_path(output: Path, data: bytes):
     output.write_bytes(data)
 
 
+def _all_asset_id_for_game(game: Game):
+    if game == Game.DREAD:
+        return dread_data.all_asset_id_to_name()
+    elif game == Game.SAMUS_RETURNS:
+        return samus_returns_data.all_asset_id_to_name()
+    else:
+        raise ValueError(f"Unsupported game {game}")
+
+
 class FileTreeEditor:
     """
     Manages efficiently reading all PKGs in the game and writing out modifications to a new path.
@@ -84,7 +93,7 @@ class FileTreeEditor:
         self.headers = {}
         self._ensured_asset_ids = {}
         self._files_for_asset_id = {}
-        self._name_for_asset_id = copy.copy(dread_data.all_asset_id_to_name())
+        self._name_for_asset_id = copy.copy(_all_asset_id_for_game(self.target_game))
 
         self._toc = Toc.parse(self.root.joinpath(Toc.system_files_name()).read_bytes(),
                               target_game=self.target_game)
@@ -98,7 +107,7 @@ class FileTreeEditor:
 
         for f in self.root.rglob("*.*"):
             name = f.relative_to(self.root).as_posix()
-            asset_id = resolve_asset_id(name)
+            asset_id = resolve_asset_id(name, self.target_game)
             self._name_for_asset_id[asset_id] = name
 
             if f.suffix == ".pkg":
@@ -137,7 +146,7 @@ class FileTreeEditor:
             yield self._name_for_asset_id[asset_id]
 
     def find_pkgs(self, asset_id: NameOrAssetId) -> Iterator[str]:
-        for pkg_name in self._files_for_asset_id[resolve_asset_id(asset_id)]:
+        for pkg_name in self._files_for_asset_id[resolve_asset_id(asset_id, self.target_game)]:
             if pkg_name is not None:
                 yield pkg_name
 
@@ -145,7 +154,7 @@ class FileTreeEditor:
         """
         Checks if a given asset id exists.
         """
-        asset_id = resolve_asset_id(asset_id)
+        asset_id = resolve_asset_id(asset_id, self.target_game)
 
         if asset_id in self._modified_resources:
             return self._modified_resources[asset_id] is not None
@@ -158,7 +167,7 @@ class FileTreeEditor:
         :raises ValueError if the asset doesn't exist.
         """
         original_name = asset_id
-        asset_id = resolve_asset_id(asset_id)
+        asset_id = resolve_asset_id(asset_id, self.target_game)
 
         if asset_id in self._modified_resources:
             result = self._modified_resources[asset_id]
@@ -210,7 +219,7 @@ class FileTreeEditor:
         """
         Adds an asset that doesn't already exists.
         """
-        asset_id = resolve_asset_id(name)
+        asset_id = resolve_asset_id(name, self.target_game)
         if self.does_asset_exists(asset_id):
             raise ValueError(f"{name} already exists")
 
@@ -239,14 +248,14 @@ class FileTreeEditor:
             logger.debug("Encoding %s", str(asset_id))
             new_data = new_data.build()
 
-        self._modified_resources[resolve_asset_id(asset_id)] = new_data
+        self._modified_resources[resolve_asset_id(asset_id, self.target_game)] = new_data
 
     def delete_asset(self, asset_id: NameOrAssetId):
         # Test if the asset exists
         if not self.does_asset_exists(asset_id):
             raise ValueError(f"Unknown asset: {asset_id}")
 
-        asset_id = resolve_asset_id(asset_id)
+        asset_id = resolve_asset_id(asset_id, self.target_game)
 
         if None in self._files_for_asset_id[asset_id]:
             raise ValueError("Not allowed to remove unpacked files")
@@ -270,7 +279,7 @@ class FileTreeEditor:
             raise ValueError(f"Unknown asset: {asset_id}")
 
         # If the pkg already has the given asset, do nothing
-        asset_id = resolve_asset_id(asset_id)
+        asset_id = resolve_asset_id(asset_id, self.target_game)
         if pkg_name not in self._files_for_asset_id[asset_id]:
             self._ensured_asset_ids[pkg_name].add(asset_id)
 
@@ -376,7 +385,7 @@ class FileTreeEditor:
                 {
                     name: asset_id
                     for asset_id, name in self._name_for_asset_id.items()
-                    if asset_id not in dread_data.all_asset_id_to_name()
+                    if asset_id not in _all_asset_id_for_game(self.target_game)
                 },
                 f,
                 indent=4,
