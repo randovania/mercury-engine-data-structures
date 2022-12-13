@@ -3619,7 +3619,6 @@
     "actors/items/powerup_bomb/charclasses/powerup_bomb.bmsad": 1496749093,
     "actors/items/powerup_bomb/models/powerup_bomb.bcmdl": 69289606,
     "actors/items/powerup_bomb/models/textures/powerup_bomb.bctex": 337478601,
-    "actors/items/powerup_bomb/models/textures/powerup_bomb_inner.bctex": 1866000888,
     "actors/items/powerup_bomb/scripts/powerup_bomb.lc": 2162094756,
     "actors/items/powerup_chargebeam/charclasses/powerup_chargebeam.bmsad": 3898502736,
     "actors/items/powerup_chargebeam/models/powerup_chargebeam.bcmdl": 4115519874,
