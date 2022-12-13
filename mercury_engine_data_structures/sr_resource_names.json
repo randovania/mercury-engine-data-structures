@@ -3642,7 +3642,6 @@
     "actors/items/powerup_gravitysuit/models/powerup_gravitysuit.bcmdl": 3281841410,
     "actors/items/powerup_gravitysuit/models/textures/cubemetroids.bctex": 831191381,
     "actors/items/powerup_gravitysuit/models/textures/itemgravitysuit_d.bctex": 3325674585,
-    "actors/items/powerup_gravitysuit/models/textures/itemspherecoat.bctex": 1113736501,
     "actors/items/powerup_gravitysuit/scripts/powerup_gravitysuit.lc": 454177328,
     "actors/items/powerup_highjumpboots/charclasses/powerup_highjumpboots.bmsad": 2975008034,
     "actors/items/powerup_highjumpboots/models/powerup_highjumpboots.bcmdl": 1726758724,
