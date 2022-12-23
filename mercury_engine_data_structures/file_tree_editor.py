@@ -324,6 +324,10 @@ class FileTreeEditor:
                 self._toc.add_file(asset_id, len(data))
                 if None in self._files_for_asset_id[asset_id] or output_format == OutputFormat.ROMFS:
                     path = self._name_for_asset_id[asset_id]
+                    if path.endswith(".bmmap"):
+                        if None in self._files_for_asset_id[asset_id]:
+                            logger.warning("Requested that %s be written to romfs", path)
+                        continue
                     logger.info("Writing to %s with %d bytes", path, len(data))
                     _write_to_path(output_path.joinpath(path), data)
                     if self._files_for_asset_id[asset_id] - {None}:
