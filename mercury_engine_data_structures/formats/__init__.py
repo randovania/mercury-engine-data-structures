@@ -10,6 +10,7 @@ from mercury_engine_data_structures.formats.bmscu import Bmscu
 from mercury_engine_data_structures.formats.bmsld import Bmsld
 from mercury_engine_data_structures.formats.bmslgroup import Bmslgroup
 from mercury_engine_data_structures.formats.bmssd import Bmssd
+from mercury_engine_data_structures.formats.bmtre import Bmtre
 from mercury_engine_data_structures.formats.brem import Brem
 from mercury_engine_data_structures.formats.bres import Bres
 from mercury_engine_data_structures.formats.brev import Brev
@@ -37,6 +38,7 @@ ALL_FORMATS = {
     "BMSCU": Bmscu,
     "BMSLD": Bmsld,
     "BMSLGROUP": Bmslgroup,
+    "BMTRE": Bmtre,
     "BRSA": Brsa,
     "BREM": Brem,
     "BRES": Bres,
