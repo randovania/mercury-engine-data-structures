@@ -79,41 +79,40 @@ class Bmtre(BaseResource):
 
     # private func to pretty-print a behaviortree element
     def _pretty_print_behavior(self, behavior: Container, depth: int) -> None:
-        match behavior.type:
-            # Repeats the behavior of its child regardless of success or failure
-            case "behaviortree::CRepeat":
-                self._pretty_print_line(f"Repeat behavior:", depth)
-                self._pretty_print_behavior(behavior.children[0], depth+1)
-            
-            # if the first child returns success, runs the second child. otherwise runs the third child. 
-            case "behaviortree::CIf":
-                self._pretty_print_line(f"If:", depth)
-                self._pretty_print_behavior(behavior.children[0], depth+1)
-                self._pretty_print_line("Then:", depth)
-                self._pretty_print_behavior(behavior.children[1], depth+1)
-                self._pretty_print_line("Else:", depth)
-                self._pretty_print_behavior(behavior.children[2], depth+1)
-            
-            # runs children in sequence until one fails, then returns to parent
-            case "behaviortree::CSequence":
-                self._pretty_print_line("Sequence:", depth)
-                for child in behavior.children:
-                    self._pretty_print_behavior(child, depth+1)
-            
-            # runs children in sequence until one succeeds, then returns to parent
-            case "behaviortree::CSelector":
-                self._pretty_print_line("Selector:", depth)
-                for child in behavior.children:
-                    self._pretty_print_behavior(child, depth+1)
-            
-            # runs *all* children in parallel until all succeed or one fails. if one fails, it terminates all other children and returns to parent
-            case "behaviortree::CParallel":
-                self._pretty_print_line("Parallel:", depth)
-                for child in behavior.children:
-                    self._pretty_print_behavior(child, depth+1)
+        # Repeats the behavior of its child regardless of success or failure
+        if behavior.type == "behaviortree::CRepeat":
+            self._pretty_print_line(f"Repeat behavior:", depth)
+            self._pretty_print_behavior(behavior.children[0], depth+1)
+        
+        # if the first child returns success, runs the second child. otherwise runs the third child. 
+        elif behavior.type ==  "behaviortree::CIf":
+            self._pretty_print_line(f"If:", depth)
+            self._pretty_print_behavior(behavior.children[0], depth+1)
+            self._pretty_print_line("Then:", depth)
+            self._pretty_print_behavior(behavior.children[1], depth+1)
+            self._pretty_print_line("Else:", depth)
+            self._pretty_print_behavior(behavior.children[2], depth+1)
+        
+        # runs children in sequence until one fails, then returns to parent
+        elif behavior.type ==  "behaviortree::CSequence":
+            self._pretty_print_line("Sequence:", depth)
+            for child in behavior.children:
+                self._pretty_print_behavior(child, depth+1)
+        
+        # runs children in sequence until one succeeds, then returns to parent
+        elif behavior.type ==  "behaviortree::CSelector":
+            self._pretty_print_line("Selector:", depth)
+            for child in behavior.children:
+                self._pretty_print_behavior(child, depth+1)
+        
+        # runs *all* children in parallel until all succeed or one fails. if one fails, it terminates all other children and returns to parent
+        elif behavior.type ==  "behaviortree::CParallel":
+            self._pretty_print_line("Parallel:", depth)
+            for child in behavior.children:
+                self._pretty_print_behavior(child, depth+1)
 
-            case _:
-                self._pretty_print_line(self._type_and_args_string(behavior), depth)
+        else:
+            self._pretty_print_line(self._type_and_args_string(behavior), depth)
 
     # pretty-prints the tree in a more human-readable format
     def print_tree(self) -> None:
