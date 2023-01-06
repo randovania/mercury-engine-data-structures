@@ -1,10 +1,12 @@
 from typing import Iterator, Tuple, List
+import logging
 
 import construct
 
 from mercury_engine_data_structures.formats import BaseResource, standard_format
 from mercury_engine_data_structures.game_check import Game
 
+logger = logging.getLogger(__name__)
 BRFLD = standard_format.game_model('CScenario', 0x02000031).compile()
 
 
@@ -54,3 +56,16 @@ class Brfld(BaseResource):
         actor_link = self.link_for_actor(actor_name, layer_name)
         if actor_link in group:
             group.remove(actor_link)
+
+    def add_actor_to_entity_groups(self, collision_camera_name: str, actor_name: str, layer_name: str = "default"):
+        """
+        adds an actor to all entity groups starting with "eg_" + collision_camera_name
+        
+        param collision_camera_name: name of the collision camera group (prefix "eg_" is added to find the entity groups)
+        param actor_name: name of the actor to add to the group
+        param layer_name: name of the layer the actor belongs to
+        """
+        collision_camera_groups = [group for group in self.all_actor_groups() if group.startswith(f"eg_{collision_camera_name}")]
+        for group in collision_camera_groups:
+            logger.debug("Add actor %s to group %s", actor_name, group)
+            self.add_actor_to_group(group, actor_name, layer_name)
