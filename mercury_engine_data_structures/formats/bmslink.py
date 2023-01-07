@@ -1,7 +1,7 @@
 import construct
 
 from construct import Construct, Container, ListContainer
-from construct.core import (PrefixedArray, Byte, Const, Flag, Hex, Int32ul, LazyBound, Struct, )
+from construct.core import (PrefixedArray, Byte, Const, Flag, Hex, If, Int32ul, LazyBound, Struct, )
 
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.common_types import StrId, Float
@@ -15,7 +15,10 @@ UnkStruct = Struct(
     unk5 = StrId,
     unk6 = Float,
     unk7 = Byte,
-    unk8 = StrId,
+    unk8 = construct.core.If(
+        construct.this.unk5 != "Portal",
+        StrId,
+    ),
     children = PrefixedArray(Int32ul, LazyBound(lambda: UnkStruct))
 )
 
