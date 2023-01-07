@@ -1,7 +1,7 @@
 import construct
 
 from construct import Construct, Container, ListContainer
-from construct.core import (PrefixedArray, Byte, Const, Flag, Hex, Int32ul, Struct, )
+from construct.core import (PrefixedArray, Byte, Const, Flag, Hex, Int32ul, LazyBound, Struct, )
 
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.common_types import StrId, Float
@@ -16,8 +16,7 @@ UnkStruct = Struct(
     unk6 = Float,
     unk7 = Byte,
     unk8 = StrId,
-    unk9 = Int32ul,
-    
+    children = PrefixedArray(Int32ul, LazyBound(lambda: UnkStruct))
 )
 
 Item = Struct(
@@ -36,14 +35,11 @@ Item = Struct(
     unk11 = Byte,
     unk12 = Float,
     unk13 = UnkStruct,
-    unk14 = UnkStruct,
-    unk15 = UnkStruct,
 )
 
 LocationStruct = Struct(
     name = StrId,
-    itemCount = Int32ul,
-    items = Item
+    items = PrefixedArray(Int32ul, Item)
 )
 
 BMSLINK = Struct(
