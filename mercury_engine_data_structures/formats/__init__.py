@@ -1,6 +1,7 @@
 from typing import Type
 
 from mercury_engine_data_structures.formats.base_resource import BaseResource, AssetType
+from mercury_engine_data_structures.formats.bldef import Bldef
 from mercury_engine_data_structures.formats.bmbls import Bmbls
 from mercury_engine_data_structures.formats.bmmap import Bmmap
 from mercury_engine_data_structures.formats.bmmdef import Bmmdef
@@ -22,6 +23,7 @@ from mercury_engine_data_structures.formats.gui_files import Bmscp, Bmssk, Bmsss
 
 ALL_FORMATS = {
     "PKG": Pkg,
+    "BLDEF": Bldef,
     "BMBLS": Bmbls,
     "BMMAP": Bmmap,
     "BMMDEF": Bmmdef,
