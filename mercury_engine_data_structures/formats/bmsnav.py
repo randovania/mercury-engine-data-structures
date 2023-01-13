@@ -9,17 +9,17 @@ from mercury_engine_data_structures.common_types import make_vector, make_dict, 
 
 ### A ton of barely-understood structs :]
 
-# a connection from a cell's direction to another cell's
-cell_connection = Struct(
-    initial_direction = Int32ul, # 0-4, up-right-down-left typically. i.e. cell(0.0, 0.0).direction(1) = cell(100.0, 0.0)
-    destination_cell = Int32ul,
+# a connection from a geo's direction to another geo's
+geo_connection = Struct(
+    initial_direction = Int32ul, # 0-4, up-right-down-left typically. i.e. geo(0.0, 0.0).direction(1) = geo(100.0, 0.0)
+    destination_geo = Int32ul,
     destination_direction = Int32ul  # see initial_direction
 )
 
-# a list of connections for a cell (essentially, the allowed directions of travel)
-cell_connections = Struct(
+# a list of connections for a geo (essentially, the allowed directions of travel)
+geo_connections = Struct(
     directions = PrefixedArray(Int32ul, Int32ul),
-    connections = PrefixedArray(Int32ul, cell_connection),
+    connections = PrefixedArray(Int32ul, geo_connection),
 )
 
 # idk
@@ -64,8 +64,8 @@ Traversal = Struct(
     unk14 = Flag,
     unk15 = Float,
     unk16 = Float,
-    _unk17 = PrefixedArray(Int32ul, Int32ul), # i think this is cells?
-    _unk18 = PrefixedArray(Int32ul, CVector2D), # these might also be cells but i just used vectors since its easier
+    _unk17 = PrefixedArray(Int32ul, Int32ul), # i think this is geos?
+    _unk18 = PrefixedArray(Int32ul, CVector2D), # these might also be geos but i just used vectors since its easier
     _unk19 = PrefixedArray(Int32ul, CVector2D),
     _unk20 = PrefixedArray(Int32ul, CVector2D),
     unk21 = Flag,
@@ -110,18 +110,18 @@ Actor_unk1_param = Struct(
 Actor = Struct(
     unk0 = Byte,
     unk1 = PrefixedArray(Int32ul, Actor_unk1_param),
-    unk2 = Byte, # these three are either 00 00 FF or XX 00 YY, where the actor is in tile group XX as the YYth entry
+    unk2 = Byte, # these three are either 00 00 FF or XX 00 YY, where the actor is TILEGROUP.uGroupId XX as TILEGROUP.aGridTiles[YY]
     unk3 = Byte,
     unk4 = Byte,
     coordinates = CVector2D,
-    cells = PrefixedArray(Int32ul, Int32ul),
+    geos = PrefixedArray(Int32ul, Int32ul),
 )
 
 BMSNAV = Struct(
     _magic = Const(b'MNAV'),
     version = Const(0x00030002, Hex(Int32ul)),
-    navmesh_cells = make_vector(CVector2D), # giant list of all of the navmesh cells in the scenario. referenced by index all over the rest of the format. 
-    cell_connections = PrefixedArray(Int32ul, cell_connections), # maybe mapping the cell connections?
+    aNavmeshGeos = make_vector(CVector2D), # giant list of all of the navmesh geos in the scenario. referenced by index all over the rest of the format. 
+    geo_connections = PrefixedArray(Int32ul, geo_connections), # maybe mapping the geo connections?
     unk1 = PrefixedArray(Int32ul, Struct1), # seems like these contain bounding boxes of some sort
     navigable_paths = make_dict(NavigablePath), # contains additional paths for certain enemies (ie chozo soldiers)
     emmy_zones = make_dict(EmmyZone), # references "LS_EmmyZone"
