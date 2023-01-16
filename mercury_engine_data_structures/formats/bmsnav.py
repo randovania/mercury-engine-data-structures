@@ -117,19 +117,38 @@ Actor = Struct(
     geos = PrefixedArray(Int32ul, Int32ul),
 )
 
+IntIntStruct = Struct(
+    unk1 = Int32ul,
+    unk2 = Int32ul,
+)
+
+Struct3 = Struct(
+    unk1 = Int32ul,
+    unk2 = Int32ul,
+    unk3 = Int32ul,
+    pos = CVector2D,
+    unk4 = PrefixedArray(Int32ul, IntIntStruct), # seems to be a geo and an enum
+)
+
+Struct2 = Struct(
+    unk0 = Int32ul,
+    unk1 = PrefixedArray(Int32ul, Struct3),
+)
+
+
 BMSNAV = Struct(
     _magic = Const(b'MNAV'),
     version = Const(0x00030002, Hex(Int32ul)),
-    aNavmeshGeos = make_vector(CVector2D), # giant list of all of the navmesh geos in the scenario. referenced by index all over the rest of the format. 
+    aNavmeshGeos = PrefixedArray(Int32ul, CVector2D), # giant list of all of the navmesh geos in the scenario. referenced by index all over the rest of the format. 
     geo_connections = PrefixedArray(Int32ul, geo_connections), # maybe mapping the geo connections?
-    unk1 = PrefixedArray(Int32ul, Struct1), # seems like these contain bounding boxes of some sort
+    unk1 = PrefixedArray(Int32ul, Struct1), # seems like these contain bounding boxes of some sort, antidote thought maybe octants
     navigable_paths = make_dict(NavigablePath), # contains additional paths for certain enemies (ie chozo soldiers)
-    emmy_zones = make_dict(EmmyZone), # references "LS_EmmyZone"
+    emmy_zones = make_dict(EmmyZone), # references "LS_EmmyZone" and maybe other logicshapes
     unk_arr = PrefixedArray(Int32ul, Int32ul), # i suspect this is an array but not used anywhere.
     emmy_actions = make_dict(EmmyTraversals), # seems to contain additional emmi navigation methods, and links to bmslink.
     props = make_dict(Prop), # seems to change emmi animations around specific props (ie water button)
-    actors = make_dict(Actor) # info on actors' navmeshes
-    # there's more stuff at the end that i havent finished yet :upside_down:
+    actors = make_dict(Actor), # info on actors' navmeshes
+    unk2 = PrefixedArray(Int32ul, Struct2) # idk on this one
 )
 
 class Bmsnav(BaseResource):
