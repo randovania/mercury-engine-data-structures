@@ -1,6 +1,6 @@
 import construct
 from construct import Construct, IfThenElse, Struct, Const, Hex, Int16ul, Int8ul, Switch, Array, Rebuild, Flag, \
-    Terminated
+    Terminated, GreedyBytes
 from mercury_engine_data_structures import game_check
 
 from mercury_engine_data_structures.common_types import UInt, make_vector, StrId, Float, CVector2D
@@ -102,7 +102,7 @@ BMSCC = Struct(
         Const(0x00100001, Hex(UInt)),
     ),
     layers=make_vector(CollisionLayer),
-    #_eof=Terminated,
+    eof=GreedyBytes,
 )
 
 
