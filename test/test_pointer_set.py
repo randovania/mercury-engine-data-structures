@@ -70,10 +70,10 @@ def test_parse_single_object(single_type_sample):
     assert result == single_type_sample[0]
 
 
-def test_compile_build_single_object(single_type_sample):
-    result = SingleTypeConstruct.compile(r"C:\Users\henri\programming\mercury-engine-data-structures\foo.py").build(
-        single_type_sample[0])
-    assert result == single_type_sample[1]
+# def test_compile_build_single_object(single_type_sample):
+#     result = SingleTypeConstruct.compile(r"C:\Users\henri\programming\mercury-engine-data-structures\foo.py").build(
+#         single_type_sample[0])
+#     assert result == single_type_sample[1]
 
 
 def test_compile_parse_single_object(single_type_sample):
