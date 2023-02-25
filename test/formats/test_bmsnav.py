@@ -15,6 +15,6 @@ all_bmsnav = [
 ]
 
 
-@pytest.mark.parametrize("bmsas_path", all_bmsnav)
-def test_bmsas(dread_file_tree, bmsas_path):
-    parse_build_compare_editor(BMSNAV, dread_file_tree, bmsas_path)
+@pytest.mark.parametrize("bmsnav_path", all_bmsnav)
+def test_bmsnav(dread_file_tree, bmsnav_path):
+    parse_build_compare_editor(BMSNAV, dread_file_tree, bmsnav_path)
