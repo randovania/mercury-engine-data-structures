@@ -1,9 +1,9 @@
 import construct
 from construct import Construct, IfThenElse, Struct, Const, Hex, Int16ul, Int8ul, Switch, Array, Rebuild, Flag, \
-    Terminated
+    Terminated, GreedyBytes
 from mercury_engine_data_structures import game_check
 
-from mercury_engine_data_structures.common_types import UInt, make_vector, StrId, Float
+from mercury_engine_data_structures.common_types import UInt, make_vector, StrId, Float, CVector2D
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, OptionalValue, ForceQuit
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
@@ -41,6 +41,11 @@ BinarySearchTree = Struct(
 )
 
 _collision_formats = {
+    "AABOX2D": Struct(
+        unknown1=UInt,
+        min=CVector2D,
+        max=CVector2D,
+    ),
     "CIRCLE": Struct(
         value1=Float,
         value2=Float,
@@ -97,7 +102,7 @@ BMSCC = Struct(
         Const(0x00100001, Hex(UInt)),
     ),
     layers=make_vector(CollisionLayer),
-    _eof=Terminated,
+    eof=GreedyBytes,
 )
 
 
