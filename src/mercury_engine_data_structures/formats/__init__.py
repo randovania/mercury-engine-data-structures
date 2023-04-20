@@ -22,6 +22,7 @@ from mercury_engine_data_structures.formats.brev import Brev
 from mercury_engine_data_structures.formats.brfld import Brfld
 from mercury_engine_data_structures.formats.brsa import Brsa
 from mercury_engine_data_structures.formats.bsmat import Bsmat
+from mercury_engine_data_structures.formats.btunda import Btunda
 from mercury_engine_data_structures.formats.gui_files import Bmscp, Bmssk, Bmsss
 from mercury_engine_data_structures.formats.ini import Ini
 from mercury_engine_data_structures.formats.pkg import Pkg
@@ -55,6 +56,7 @@ ALL_FORMATS = {
     "BRES": Bres,
     "BREV": Brev,
     "BSMAT": Bsmat,
+    "BTUNDA": Btunda,
     "TOC": Toc,
     "TXT": Txt,
     "INI": Ini,
