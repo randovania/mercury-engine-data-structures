@@ -1,12 +1,22 @@
 import construct
 
-from construct import Container, ListContainer
+from construct import Container
+from enum import Enum
 from mercury_engine_data_structures.formats import BaseResource, standard_format
 from mercury_engine_data_structures.game_check import Game
 
 # btunda has different file versions between launch version and latest release
-VERSION__1_0_0 = 0x02000077
-VERSION__2_1_0 = 0x02000080
+class BtundaVersion(Enum):
+    V1_0_0 = 0x02000077
+    V2_1_0 = 0x02000080
+
+    @classmethod
+    def get_version(cls, version: str) -> BtundaVersion:
+        if version == "1.0.0":
+            return BtundaVersion.V1_0_0
+        if version == "2.1.0":
+            return BtundaVersion.V2_1_0
+        raise ValueError(f"Version {version} is not a valid version!")
 
 class Btunda(BaseResource):
     """
@@ -36,10 +46,4 @@ class Btunda(BaseResource):
             return parsed
     
     def get_tunable(self, tunable: str) -> Container:
-        hashTunables: Container = self.raw.Root.hashTunables
-        if tunable not in hashTunables:
-            raise ValueError(f"Tunable {tunable} not in Btunda -> Root -> hashTunables")
-        if tunable == "CTunableBossRushManager":
-            raise ValueError(f"CTunableBossRushmanager is not safe for use in 1.0.0!")
-
-        return hashTunables[tunable]
+        return self.raw.Root.hashTunables[tunable]
