@@ -20,6 +20,7 @@ from mercury_engine_data_structures.formats.bres import Bres
 from mercury_engine_data_structures.formats.brev import Brev
 from mercury_engine_data_structures.formats.brfld import Brfld
 from mercury_engine_data_structures.formats.brsa import Brsa
+from mercury_engine_data_structures.formats.bsmat import Bsmat
 from mercury_engine_data_structures.formats.ini import Ini
 from mercury_engine_data_structures.formats.pkg import Pkg
 from mercury_engine_data_structures.formats.toc import Toc
@@ -51,6 +52,7 @@ ALL_FORMATS = {
     "BREM": Brem,
     "BRES": Bres,
     "BREV": Brev,
+    "BSMAT": Bsmat,
     "TOC": Toc,
     "TXT": Txt,
     "INI": Ini,

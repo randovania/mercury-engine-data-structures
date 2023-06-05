@@ -4,9 +4,10 @@ import typing
 import construct
 from construct import Adapter
 
-from mercury_engine_data_structures.construct_extensions.strings import CStringRobust
+from mercury_engine_data_structures.construct_extensions.strings import CStringRobust, PaddedStringRobust
 
 StrId = CStringRobust("utf-8")
+Char = PaddedStringRobust(1, "utf-8")
 Int: construct.FormatField = typing.cast(construct.FormatField, construct.Int32sl)
 UInt: construct.FormatField = typing.cast(construct.FormatField, construct.Int32ul)
 Float: construct.FormatField = typing.cast(construct.FormatField, construct.Float32l)
