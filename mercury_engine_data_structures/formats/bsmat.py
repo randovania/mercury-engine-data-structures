@@ -1,7 +1,7 @@
 import construct
 from construct import Construct
 from construct.core import (
-    Array, Byte, Const, Construct, Enum, GreedyBytes, Hex, Int32sl, Int32ul, PrefixedArray, Struct, Switch
+    Array, Byte, Const, Construct, Enum, Flag, Hex, Int32sl, Int32ul, PrefixedArray, Struct, Switch
 )
 
 from mercury_engine_data_structures.common_types import Char, Float, StrId
@@ -135,7 +135,7 @@ tile_wrap_mode = Enum(
 # seems to be a combo of Blend and BlendOp
 # ie "Blend source dest && BlendOp operation"
 blend_state = Struct(
-    enabled = Byte,
+    enabled = Flag,
     operation = blend_op,
     source = blend_mode,
     dest = blend_mode
@@ -144,7 +144,7 @@ blend_state = Struct(
 # Stencil test
 # https://docs.unity3d.com/Manual/SL-Stencil.html
 stencil_test = Struct(
-    enabled = Byte,
+    enabled = Flag,
     mask = Int32ul,
     ref = Int32ul,
     fail = stencil_op,
@@ -157,7 +157,7 @@ stencil_test = Struct(
 # alpha test, seems to be deprecated/not exist in HLSL
 # https://docs.unity3d.com/Manual/SL-AlphaTest.html
 alpha_test = Struct(
-    enabled=Byte,
+    enabled=Flag,
     function=compare_mode,
     ref=Float
 )
@@ -238,6 +238,8 @@ BSMAT = Struct(
 
     # important stuff here!
     shader_stages = PrefixedArray(Int32ul, shader_stage),
+
+    _end = construct.Terminated
 )
 
 class Bsmat(BaseResource):
