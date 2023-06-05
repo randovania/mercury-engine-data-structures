@@ -5,14 +5,12 @@ from construct.core import (
 
 from mercury_engine_data_structures import common_types, type_lib
 from mercury_engine_data_structures import game_check
-from mercury_engine_data_structures.common_types import Float, StrId, make_dict, make_vector
+from mercury_engine_data_structures.common_types import Char, Float, StrId, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource, dread_types
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
-
-Char = construct.PaddedString(1, 'ascii')
 
 FunctionArgument = Struct(
     type=Char,
