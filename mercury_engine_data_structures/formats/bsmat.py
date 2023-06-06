@@ -1,5 +1,4 @@
 import construct
-from construct import Construct
 from construct.core import (
     Array, Byte, Const, Construct, Enum, Flag, Hex, Int32sl, Int32ul, PrefixedArray, Struct, Switch
 )
@@ -8,7 +7,7 @@ from mercury_engine_data_structures.common_types import Char, Float, StrId
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
-# these seem to be using Unity ShaderLab, or at least the gist I borrowed this from matches up
+# these seem to be using Unity ShaderLab, or at least the gist I borrowed this from uses similar teminology
 # source for most binary info: https://gist.github.com/KillzXGaming/9817455559544cb3613f99184aa3ed68
 
 # === ENUMS ===
@@ -78,7 +77,6 @@ stencil_op = Enum(
     INVALID=0xffffffff
 )
 
-# idk
 compare_mode = Enum(
     Int32ul,
     CMPMODE_ALWAYS=0,
@@ -93,7 +91,6 @@ compare_mode = Enum(
     CMPMODE_INVALID=0xffffffff
 )
 
-# idk either
 fill_mode = Enum(
     Int32ul,
     SOLID=0,
@@ -115,7 +112,7 @@ filter_mode = Enum(
     FILTER_NEAREST=0,
     FILTER_LINEAR=1,
     FILTER_NEAREST_MIP_NEAREST=2,
-    FILTER_NEAREST_MP_LINEAR=3,
+    FILTER_NEAREST_MIP_LINEAR=3,
     FILTER_LINEAR_MIP_NEAREST=4,
     FILTER_LINEAR_MIP_LINEAR=5,
     FILTER_INVALID=0xffffffff
@@ -173,7 +170,7 @@ depth_state = Struct(
 # uniform params, stuff like "vConstant0" or "fAlbedoEmissiveMultiplier"
 uniform_param = Struct(
     name=StrId,
-    type=Char, # more correctly, a char (f/i/u). but i cant seem to find a FormatField for it. 
+    type=Char,
     value=Switch(
         construct.this.type,
         {
