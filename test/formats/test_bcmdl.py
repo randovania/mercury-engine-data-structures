@@ -3,7 +3,7 @@ import contextlib
 import construct
 import pytest
 
-from mercury_engine_data_structures.formats.bcmdl import BCMDL
+from mercury_engine_data_structures.formats.bcmdl import BCMDL, Bcmdl
 from mercury_engine_data_structures.game_check import Game
 from test.test_lib import parse_and_build_compare, parse_build_compare_editor
 
@@ -5541,3 +5541,28 @@ def test_can_parse(dread_file_tree, bcmdl_path):
 @pytest.mark.parametrize("bcmdl_path", ALL_BCMDL_NO_TOC9)
 def test_compare_dread_all(dread_file_tree, bcmdl_path):
     parse_build_compare_editor(BCMDL, dread_file_tree, bcmdl_path)
+
+def test_change_material(dread_file_tree):
+    model = dread_file_tree.get_parsed_asset("actors/props/doorshieldsupermissile/models/doorshieldsupermissile.bcmdl", 
+                                             type_hint=Bcmdl)
+
+    # ensure replacing it with the exact length works
+    replace = "actors/props/doorshieldsupermissile/models/imats/doorshieldsupermissile_mp_opaque_69.bsmat"
+    model.change_material_path("mp_opaque_01", replace)
+    encoded = BCMDL.build(model.raw, target_game=dread_file_tree.target_game)
+
+    assert encoded[0x5845:0x58A0] == (b"actors/props/doorshieldsupermissile/models/imats/" 
+                                      b"doorshieldsupermissile_mp_opaque_69.bsmat\0")
+
+    # ensure replacing it with a shorter length works
+    replace = "actors/props/doorshieldsupermiss/models/imats/doorshieldsupermiss_mp_opaque_01.bsmat"
+    model.change_material_path("mp_opaque_01", replace)
+    encoded2 = BCMDL.build(model.raw, target_game=dread_file_tree.target_game)
+
+    assert encoded2[0x5845:0x58A0] == (b"actors/props/doorshieldsupermiss/models/imats/"
+                                       b"doorshieldsupermiss_mp_opaque_01.bsmat\0\0\0\0\0\0\0")
+    
+    long_path = "actors/props/doorshieldsupermissile/models/imats/doorshieldsupermissile_mp_opaque_420.bsmat"
+    expectation = pytest.raises(ValueError)
+    with expectation:
+        model.change_material_path("mp_opaque_01", long_path)

@@ -5367,7 +5367,6 @@ all_bsmat = [
 	"actors/items/item_ammo/imats/item_ammo.bsmat",
 ]
 
-@pytest.mark.skip("Temp")
 @pytest.mark.parametrize("bsmat_path", all_bsmat)
 def test_compare_dread_all(dread_file_tree, bsmat_path):
     parse_build_compare_editor(BSMAT, dread_file_tree, bsmat_path)

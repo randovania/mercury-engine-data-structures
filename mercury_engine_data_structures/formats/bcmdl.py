@@ -584,7 +584,7 @@ class Bcmdl(BaseResource):
     def change_material_path(self, mat_name: str, new_path: str) -> None:
         for mat in self.raw.materials:
             if mat.name == mat_name:
-                if len(new_path) < len(mat.path):
+                if len(new_path) <= len(mat.path):
                     mat.path = new_path
                     return
                 else:
