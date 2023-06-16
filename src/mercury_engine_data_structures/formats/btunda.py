@@ -7,20 +7,24 @@ from mercury_engine_data_structures.game_check import Game
 
 # btunda has different file versions between launch version and latest release
 class BtundaVersion(Enum):
-    V1_0_0 = 0x02000077
-    V2_1_0 = 0x02000080
+    V1_0_0 = ("1.0.0", 0x02000077)
+    V2_1_0 = ("2.1.0", 0x02000080)
+
+    def __init__(self, string: str, number: int):
+        self.as_string = string
+        self.as_number = number
 
     @classmethod
-    def get_version(cls, version: str) -> BtundaVersion:
-        if version == "1.0.0":
-            return BtundaVersion.V1_0_0
-        if version == "2.1.0":
-            return BtundaVersion.V2_1_0
-        raise ValueError(f"Version {version} is not a valid version!")
+    def get_version(cls, version: str) -> int:
+        for el in cls:
+            if version == el.as_string:
+                return el.as_number
+        
+        raise ValueError(f"Version {version} is not a valid Btunda version!")
 
 class Btunda(BaseResource):
     """
-    /!\\ /!\\ /!\\ READ THIS WHEN USING!!! /!\\ /!\\ /!\\\n
+    /!\\ /!\\ /!\\ READ THIS WHEN USING!!! /!\\ /!\\ /!\\
     
     This format has TWO VERSIONS between 1.0.0 and 2.1.0!
 
@@ -37,12 +41,14 @@ class Btunda(BaseResource):
         # attempt to parse with 1.0.0 version
         # if it throws an exception, parse with 2.1.0 version
         try:
-            parsed = cls(Btunda.construct_class(target_game, VERSION__1_0_0).parse(data, target_game=target_game),
+            parsed = cls(Btunda.construct_class(target_game, BtundaVersion.V1_0_0.as_number).parse(data, target_game=target_game),
                    target_game)
+            parsed.version_str = BtundaVersion.V1_0_0.as_string
             return parsed
         except:
-            parsed = cls(Btunda.construct_class(target_game, VERSION__2_1_0).parse(data, target_game=target_game),
+            parsed = cls(Btunda.construct_class(target_game, BtundaVersion.V2_1_0.as_number).parse(data, target_game=target_game),
                    target_game)
+            parsed.version_str = BtundaVersion.V2_1_0.as_string
             return parsed
     
     def get_tunable(self, tunable: str) -> Container:
