@@ -15712,7 +15712,7 @@
         "parent": "base::tunable::CTunable",
         "fields": {
             "bEachBombImpulsesPlayer": "bool",
-	        "bEasyModeEnemyProjectileOneHit": "bool",
+            "bEasyModeEnemyProjectileOneHit": "bool",
             "fVariaSuitDamageMult": "float",
             "fGravitySuitDamageMult": "float",
             "fHyperSuitDamageMult": "float",
