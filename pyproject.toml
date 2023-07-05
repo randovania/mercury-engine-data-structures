@@ -7,6 +7,37 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "mercury-engine-data-structures"
+description = "Construct file definitions for the Mercury Engine, the in-house game engine from MercurySteam"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+requires-python = ">=3.8"
+dynamic = ["version"]
+
+dependencies = [
+    "construct>=2.10.0"
+]
+
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.urls]
+Homepage = "https://github.com/randovania/open-prime-rando"
+
+# Entry Points for PyInstaller
+[project.entry-points.pyinstaller40]
+hook-dirs = "mercury_engine_data_structures.__pyinstaller:get_hook_dirs"
+
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
 write_to = "mercury_engine_data_structures/version.py"
