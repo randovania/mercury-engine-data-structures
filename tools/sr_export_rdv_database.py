@@ -15,7 +15,7 @@ from shapely.geometry.polygon import Polygon
 
 from mercury_engine_data_structures import samus_returns_data
 from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
-from mercury_engine_data_structures.formats import Bmsld, Bmscc
+from mercury_engine_data_structures.formats import Bmscc, Bmsld
 from mercury_engine_data_structures.game_check import Game
 
 world_names = {
@@ -394,7 +394,10 @@ class ActorDetails:
         except KeyError:
             self.rooms: list[str] = [name for name, pol in all_rooms.items() if pol.contains(self.position)]
 
-        self.is_door = self.actor_type.startswith("door") and self.actor_type not in {"doorshieldmissile", "doorshieldsupermissile", "doorshieldpowerbomb", "doorwave", "doorspazerbeam", "doorcreature" }
+        self.is_door = self.actor_type.startswith("door") and self.actor_type not in {
+            "doorshieldmissile", "doorshieldsupermissile", "doorshieldpowerbomb",
+            "doorwave", "doorspazerbeam", "doorcreature"
+        }
         # self.is_start_point = "STARTPOINT" in actor.pComponents and "dooremmy" not in self.actor_type
         self.is_pickup = any(self.actor_type.startswith(prefix) for prefix in ["powerup_", "item_", "itemsphere_"])
         self.is_usable = self.actor_type == "weightactivatedplatform"
@@ -548,6 +551,7 @@ def create_door_nodes_for_actor(
 
 def decode_world(root: Path, target_level: str, out_path: Path, only_update_existing_areas: bool = False,
                  skip_existing_actors: bool = True):
+    # ruff: noqa: C901
     global pickup_index, bmscc, bmsld, bmsld_path
     all_names = samus_returns_data.all_asset_id_to_name()
     game = Game.SAMUS_RETURNS

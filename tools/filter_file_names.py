@@ -1,11 +1,9 @@
 import argparse
 import json
 import os.path
-import traceback
 from pathlib import Path
-from typing import Optional
 
-from mercury_engine_data_structures import cli, crc
+from mercury_engine_data_structures import cli
 from mercury_engine_data_structures.formats import Toc
 from mercury_engine_data_structures.game_check import Game
 

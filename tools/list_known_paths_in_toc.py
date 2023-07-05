@@ -1,9 +1,9 @@
 import argparse
 from pathlib import Path
 
-from mercury_engine_data_structures import cli, samus_returns_data, dread_data
+from mercury_engine_data_structures import cli, dread_data, samus_returns_data
 from mercury_engine_data_structures.formats import Toc
-from mercury_engine_data_structures.formats.pkg import PKGHeader, FileEntry
+from mercury_engine_data_structures.formats.pkg import PKGHeader
 from mercury_engine_data_structures.game_check import Game
 
 

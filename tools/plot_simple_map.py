@@ -11,9 +11,9 @@ from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 
 from mercury_engine_data_structures import dread_data
+from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 from mercury_engine_data_structures.formats import Bmscc, Brfld, Brsa
 from mercury_engine_data_structures.game_check import Game
-from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 
 world_names = {
     'maps/levels/c10_samus/s010_cave/s010_cave.brfld': "Artaria",
@@ -3294,7 +3294,8 @@ def get_actor_name_for_node(node: dict) -> str:
 
 
 def decode_world(root: Path, target_level: str, out_path: Path, only_update_existing_areas: bool = True,
-                 skip_existing_actors: bool = True):
+                 skip_existing_actors: bool = True):  # ruff: noqa: C901
+
     global pickup_index, bmscc, brsa, brfld, brfld_path
     all_names = dread_data.all_asset_id_to_name()
     game = Game.DREAD
