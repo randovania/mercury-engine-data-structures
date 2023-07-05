@@ -42,6 +42,18 @@ hook-dirs = "mercury_engine_data_structures.__pyinstaller:get_hook_dirs"
 local_scheme = "no-local-version"
 write_to = "src/mercury_engine_data_structures/version.py"
 
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [
+    "tests",
+]
+# asyncio_mode = "auto"
+xfail_strict = true
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+]
+
 [tool.ruff]
 line-length = 120
 select = ["E", "F", "W", "C90", "I", "UP"]
