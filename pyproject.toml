@@ -41,3 +41,19 @@ hook-dirs = "mercury_engine_data_structures.__pyinstaller:get_hook_dirs"
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
 write_to = "src/mercury_engine_data_structures/version.py"
+
+[tool.ruff]
+line-length = 120
+select = ["E", "F", "W", "C90", "I", "UP"]
+src = ["src"]
+extend-exclude = [
+    "src/mercury_engine_data_structures/formats/dread_types.py"
+]
+
+# Version to target for generated code.
+target-version = "py310"
+
+[tool.ruff.mccabe]
+# Flag errors (`C901`) whenever the complexity level exceeds 25.
+# Defaults to 10, but we're being very flexible right now
+max-complexity = 25
