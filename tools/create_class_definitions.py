@@ -227,7 +227,8 @@ from mercury_engine_data_structures.construct_extensions.enum import StrictEnum,
 
 
 def main():
-    output_path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "formats", "dread_types.py")
+    output_path = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures",
+                                                     "formats", "dread_types.py")
 
     all_types: dict[str, type_lib.BaseType] = copy.copy(type_lib.all_types())
 

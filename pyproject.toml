@@ -40,4 +40,4 @@ hook-dirs = "mercury_engine_data_structures.__pyinstaller:get_hook_dirs"
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
-write_to = "mercury_engine_data_structures/version.py"
+write_to = "src/mercury_engine_data_structures/version.py"
