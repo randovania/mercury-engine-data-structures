@@ -63,7 +63,7 @@ extend-exclude = [
 ]
 
 # Version to target for generated code.
-target-version = "py310"
+target-version = "py38"
 
 [tool.ruff.mccabe]
 # Flag errors (`C901`) whenever the complexity level exceeds 25.
