@@ -1,6 +1,7 @@
+from test.test_lib import parse_and_build_compare, parse_and_build_compare_parsed
+
 from mercury_engine_data_structures.formats.gui_files import BMSCP, BMSSK, BMSSS
 from mercury_engine_data_structures.game_check import Game
-from test.test_lib import parse_and_build_compare, parse_and_build_compare_parsed
 
 
 def test_compare_bmscp_dread(dread_path):

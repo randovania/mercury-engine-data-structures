@@ -1,8 +1,9 @@
+from test.test_lib import parse_and_build_compare
+
 from construct import Container, ListContainer
 
 from mercury_engine_data_structures.formats.pkg import PKG, Pkg
 from mercury_engine_data_structures.game_check import Game
-from test.test_lib import parse_and_build_compare
 
 _EMPTY_DREAD_PKG = (b'|\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
                     b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'

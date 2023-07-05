@@ -1,11 +1,11 @@
 import contextlib
+from test.test_lib import parse_and_build_compare, parse_build_compare_editor
 
 import construct
 import pytest
 
 from mercury_engine_data_structures.formats.bmsad import BMSAD
 from mercury_engine_data_structures.game_check import Game
-from test.test_lib import parse_and_build_compare, parse_build_compare_editor
 
 all_bmsad = [
     "actors/characters/armadigger/charclasses/armadigger.bmsad",

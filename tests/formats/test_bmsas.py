@@ -1,6 +1,8 @@
-import pytest
-from mercury_engine_data_structures.formats.bmsas import BMSAS
 from test.test_lib import parse_build_compare_editor
+
+import pytest
+
+from mercury_engine_data_structures.formats.bmsas import BMSAS
 
 all_bmsas = [
     "actors/characters/armadigger/charclasses/armadigger.bmsas",

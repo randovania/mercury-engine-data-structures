@@ -1,6 +1,8 @@
-import pytest
-from mercury_engine_data_structures.formats.bmsnav import BMSNAV
 from test.test_lib import parse_build_compare_editor
+
+import pytest
+
+from mercury_engine_data_structures.formats.bmsnav import BMSNAV
 
 all_bmsnav = [
     "maps/levels/c10_samus/s010_cave/s010_cave.bmsnav",
