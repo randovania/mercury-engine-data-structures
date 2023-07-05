@@ -1,6 +1,18 @@
 import construct
 from construct.core import (
-    Array, Byte, Const, Construct, Container, Enum, Flag, Hex, Int32sl, Int32ul, PrefixedArray, Struct, Switch
+    Array,
+    Byte,
+    Const,
+    Construct,
+    Container,
+    Enum,
+    Flag,
+    Hex,
+    Int32sl,
+    Int32ul,
+    PrefixedArray,
+    Struct,
+    Switch,
 )
 
 from mercury_engine_data_structures.common_types import Char, Float, StrId
@@ -203,7 +215,7 @@ sampler_param = Struct(
 )
 
 shader_stage = Struct(
-    # there was a Int32ul "type" param in the gist here, that seems to be gone now. 
+    # there was a Int32ul "type" param in the gist here, that seems to be gone now.
     uniform_params=PrefixedArray(Int32ul, uniform_param),
     sampler_params=PrefixedArray(Int32ul, sampler_param)
 )
@@ -243,7 +255,7 @@ class Bsmat(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
         return BSMAT
-    
+
     def _get_param(self, uniform_name: str, uniforms_arr: Construct) -> Container:
         for u in uniforms_arr:
             if u.name == uniform_name:
@@ -255,7 +267,7 @@ class Bsmat(BaseResource):
             return self._get_param(uniform_name, self.raw.extra_uniforms)
         else:
             return self._get_param(uniform_name, self.raw.shader_stages[shader_stage].uniform_params)
-    
+
     def get_sampler(self, sampler_name: str, in_extra: bool = False, shader_stage: int = 0):
         if in_extra:
             return self._get_param(sampler_name, self.raw.extra_samplers)

@@ -1,9 +1,9 @@
-from typing import Dict
 import warnings
+from typing import Dict
 
 import construct
 
-from mercury_engine_data_structures import dread_data, crc
+from mercury_engine_data_structures import crc, dread_data
 
 
 class CRCAdapter(construct.Adapter):

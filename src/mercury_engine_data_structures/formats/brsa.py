@@ -1,4 +1,5 @@
 from typing import Iterator
+
 from construct import Construct, Container
 
 from mercury_engine_data_structures.formats import BaseResource, standard_format
@@ -14,11 +15,10 @@ class Brsa(BaseResource):
 
     @property
     def subarea_setups(self) -> Iterator[Container]:
-        for setup in self.raw.Root.pSubareaManager.vSubareaSetups:
-            yield setup
+        yield from self.raw.Root.pSubareaManager.vSubareaSetups
 
     def get_subarea_setup(self, id: str) -> Container:
         return next(setup for setup in self.subarea_setups if setup.sId == id)
-    
+
     def get_subarea_config(self, id: str, setup_id: str) -> Container:
         return next(config for config in self.get_subarea_setup(setup_id).vSubareaConfigs if config.sId == id)

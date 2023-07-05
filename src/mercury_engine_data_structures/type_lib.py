@@ -5,10 +5,12 @@ import functools
 import importlib
 import typing
 from enum import Enum
-from typing import Optional, Dict, Type, Set
+from typing import Dict, Optional, Set, Type
+
 import construct
 
 from mercury_engine_data_structures import dread_data
+
 # from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 
 @dataclasses.dataclass(frozen=True)
@@ -27,7 +29,7 @@ class BaseType:
     def name_as_python_identifier(self) -> str:
         return self.name.replace("::", "_").replace(" ", "_").replace("<", "_").replace(
             ">", "_").replace(",", "_").replace("*", "Ptr")
-    
+
     @property
     def construct(self) -> construct.Construct:
         from mercury_engine_data_structures.formats import dread_types
@@ -91,7 +93,7 @@ class PrimitiveType(BaseType):
     @classmethod
     def from_json(cls, name: str, data: dict) -> "PrimitiveType":
         return cls(name, PrimitiveKind(data["primitive_kind"]))
-    
+
     @property
     def construct(self) -> construct.Construct:
         from mercury_engine_data_structures.formats import dread_types
@@ -200,7 +202,7 @@ def decode_type(name: str, data: dict) -> BaseType:
     return kind.type_class.from_json(name, data)
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def all_types() -> Dict[str, BaseType]:
     return {
         name: decode_type(name, data)
@@ -208,7 +210,7 @@ def all_types() -> Dict[str, BaseType]:
     }
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def all_constructs() -> Dict[str, construct.Construct]:
     return {
         name: type.construct
@@ -263,7 +265,7 @@ def is_child_of(type_name: Optional[str], parent_name: str) -> bool:
     return is_child_of(get_parent_for(type_name), parent_name)
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def all_direct_children() -> Dict[str, Set[str]]:
     """
     Returns a mapping of type names to all their direct children.

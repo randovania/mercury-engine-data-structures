@@ -1,14 +1,23 @@
 import construct
 from construct.core import (
-    Array, Byte, Const, Construct, Container, Flag, Float32l, Hex, If, Int16ul, Int32ul, Int32sl, Int64ul, LazyBound, PrefixedArray, Select, Struct, Switch, IfThenElse
+    Array,
+    Const,
+    Construct,
+    Container,
+    Flag,
+    Hex,
+    Int32sl,
+    Int32ul,
+    Int64ul,
+    LazyBound,
+    PrefixedArray,
+    Select,
+    Struct,
+    Switch,
 )
 
-from mercury_engine_data_structures import common_types, type_lib
-from mercury_engine_data_structures import game_check
-from mercury_engine_data_structures.common_types import Float, StrId, make_dict, make_vector
-from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
-from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
-from mercury_engine_data_structures.formats import BaseResource, dread_types
+from mercury_engine_data_structures.common_types import Float, StrId
+from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
 
@@ -60,7 +69,7 @@ class Bmtre(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
         return BMTRE
-    
+
     # private func to print a line in the pretty printer
     def _pretty_print_line(self, text: str, depth: int) -> None:
         print('    ' * depth + text)
@@ -81,31 +90,32 @@ class Bmtre(BaseResource):
     def _pretty_print_behavior(self, behavior: Container, depth: int) -> None:
         # Repeats the behavior of its child regardless of success or failure
         if behavior.type == "behaviortree::CRepeat":
-            self._pretty_print_line(f"Repeat behavior:", depth)
+            self._pretty_print_line("Repeat behavior:", depth)
             self._pretty_print_behavior(behavior.children[0], depth+1)
-        
-        # if the first child returns success, runs the second child. otherwise runs the third child. 
+
+        # if the first child returns success, runs the second child. otherwise runs the third child.
         elif behavior.type ==  "behaviortree::CIf":
-            self._pretty_print_line(f"If:", depth)
+            self._pretty_print_line("If:", depth)
             self._pretty_print_behavior(behavior.children[0], depth+1)
             self._pretty_print_line("Then:", depth)
             self._pretty_print_behavior(behavior.children[1], depth+1)
             self._pretty_print_line("Else:", depth)
             self._pretty_print_behavior(behavior.children[2], depth+1)
-        
+
         # runs children in sequence until one fails, then returns to parent
         elif behavior.type ==  "behaviortree::CSequence":
             self._pretty_print_line("Sequence:", depth)
             for child in behavior.children:
                 self._pretty_print_behavior(child, depth+1)
-        
+
         # runs children in sequence until one succeeds, then returns to parent
         elif behavior.type ==  "behaviortree::CSelector":
             self._pretty_print_line("Selector:", depth)
             for child in behavior.children:
                 self._pretty_print_behavior(child, depth+1)
-        
-        # runs *all* children in parallel until all succeed or one fails. if one fails, it terminates all other children and returns to parent
+
+        # runs *all* children in parallel until all succeed or one fails.
+        # if one fails, it terminates all other children and returns to parent
         elif behavior.type ==  "behaviortree::CParallel":
             self._pretty_print_line("Parallel:", depth)
             for child in behavior.children:

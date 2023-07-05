@@ -1,11 +1,30 @@
 import construct
-from construct import Construct
 from construct.core import (
-    Array, Byte, Bytes, Const, Construct, Container, Flag, GreedyBytes, Hex, If, IfThenElse,
-    Int16ul, Int32sl, Int32ul, Int64ul, ListContainer, Pointer, Peek, RepeatUntil, stream_seek, Struct, Tell
+    Array,
+    Byte,
+    Bytes,
+    Const,
+    Construct,
+    Container,
+    Flag,
+    GreedyBytes,
+    Hex,
+    If,
+    IfThenElse,
+    Int16ul,
+    Int32sl,
+    Int32ul,
+    Int64ul,
+    ListContainer,
+    Peek,
+    Pointer,
+    RepeatUntil,
+    Struct,
+    Tell,
+    stream_seek,
 )
 
-from mercury_engine_data_structures.common_types import Float, StrId, make_vector
+from mercury_engine_data_structures.common_types import Float, StrId
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
@@ -134,7 +153,7 @@ MAT_entry = Struct(
     unk0 = Pointer(construct.this._unk_ptr, StrId),
     _unk_region = Bytes(0x118),
     _bc = Ptr, # FF-padded str
-    _bc_datregion = Ptr, # 64bytes 
+    _bc_datregion = Ptr, # 64bytes
     _nm = Ptr, # FF-padded str
     _nm_datregion = Ptr, # 64bytes
     _at = Ptr, # FF-padded str
@@ -157,7 +176,7 @@ MESH_entry = Struct(
     MESHNAME_ptr = Ptr, # points to MESHNAME_entry
     visible = Flag,
     _remainder = Array(7, Byte)
-    
+
 )
 
 # mesh name, also controls whether mesh is visible
@@ -226,8 +245,8 @@ toc9_subinfo = Struct(
     unk5 = Ptr, # if unk0 != 0 seems to point to something
 )
 
-# TOC9 info entry (unsure of name or use). 
-# BUG: either pointer can be null, and size can be one or two. 
+# TOC9 info entry (unsure of name or use).
+# BUG: either pointer can be null, and size can be one or two.
 TOC9_info = Struct(
     ptr0 = Ptr,
     ptr0_ref = If(
@@ -250,7 +269,7 @@ TOC9_info_ptr = Struct(
     )
 )
 
-# entry for TOC9. 
+# entry for TOC9.
 TOC9_entry = Struct(
     ptr = Tell,
     mat_ptr = Ptr,
@@ -267,7 +286,7 @@ TOC9_entry = Struct(
     toc9_info3 = TOC9_info_ptr,
 )
 
-# Linked-list TOC. Always seems to be in sequence so we can use the "hack" of just repeating until next=0. 
+# Linked-list TOC. Always seems to be in sequence so we can use the "hack" of just repeating until next=0.
 Sub_TOC = Struct(
     ptr = Tell,
     subtoc_entries = RepeatUntil(lambda obj, lst, ctx: obj.next == 0, TOC_subentry)
@@ -296,15 +315,15 @@ Header = Struct(
 
 class Mdl(Construct):
     # NOTE: Current status of parsing/building
-    # - Can parse most assets, but not ones with TOC9 which is... complicated. 
+    # - Can parse most assets, but not ones with TOC9 which is... complicated.
     # - Can build with new material files, but the material's path (name) must be
-    #   equal or shorter length as its original path. 
+    #   equal or shorter length as its original path.
     # - The above is theoretically true with other fields but may cause unintended behavior
     # - Can rebuild files that it can parse to source without modifications
-    
 
-    # NOTE: data types are stored in order (ie TOCs, then VertexInfos, etc) and pointers point 
-    # towards each asset (i.e. MESH_entry has a pointer to its MAT_entry). 
+
+    # NOTE: data types are stored in order (ie TOCs, then VertexInfos, etc) and pointers point
+    # towards each asset (i.e. MESH_entry has a pointer to its MAT_entry).
     # TODO: add a dict of pointers that can be added/updated to allow changes in length of sections
 
     def _parse(self, stream, context, path):
@@ -315,7 +334,7 @@ class Mdl(Construct):
         for key, val in header.toc.items():
             # skip these two keys, _io breaks this and joints_offset has to be handled differently
             # probably should be for key in [list_of_keys] but those names are *very* up for
-            # debate as I learn more about the format - TOC6, TOC8, TOC9 are not understood at all. 
+            # debate as I learn more about the format - TOC6, TOC8, TOC9 are not understood at all.
             if key in ["_io", "joints_offset"]:
                 continue
 
@@ -331,7 +350,7 @@ class Mdl(Construct):
         for cont in sub_tocs.vertex_info_offset.subtoc_entries:
             stream_seek(stream, cont.ptr, 0, path)
             vertex_info.append(Vertex_Info._parsereport(stream, context, f"{path} -> vertex_info"))
-        
+
         # vertex buffers
         for cont in vertex_info:
             stream_seek(stream, cont.buffer_offset, 0, f"{path} -> vertex_buffer")
@@ -351,14 +370,14 @@ class Mdl(Construct):
                 #         level=9
                 #     )
                 # )._parsereport(stream, context, f"{path} -> vertex_bufs")
-                
-        
+
+
         # store data in vert tri entries
         tri_info = ListContainer()
         for cont in sub_tocs.tri_info_offset.subtoc_entries:
             stream_seek(stream, cont.ptr, 0, path)
             tri_info.append(Tri_Info._parsereport(stream, context, f"{path} -> tri_info"))
-        
+
         # tri buffers
         tri_buffers = ListContainer()
         for cont in tri_info:
@@ -368,23 +387,23 @@ class Mdl(Construct):
                 cont._buffer = Bytes(cont.idx_count * 2)
             else:
                 cont._buffer = Bytes(cont.comp_size)
-        
+
         # submeshes? TOC3
         submeshes = ListContainer()
         for cont in sub_tocs.submeshes_offset.subtoc_entries:
             stream_seek(stream, cont.ptr, 0, path)
             submeshes.append(TOC2_entry._parsereport(stream, context, f"{path} -> submeshes"))
-        
+
         submesh_info_tocs = ListContainer()
         for cont in submeshes:
             stream_seek(stream, cont._submesh_info_offsets_ptr, 0, path)
             submesh_info_tocs.append(Sub_TOC._parsereport(stream, context, f"{path} -> submeshes -> TOC"))
-        
+
         for smit in submesh_info_tocs:
             smit.submesh_infos = ListContainer()
             for cont in smit.subtoc_entries:
                 stream_seek(stream, cont.ptr, 0, path)
-                smit.submesh_infos.append(submesh_info._parsereport(stream, context, 
+                smit.submesh_infos.append(submesh_info._parsereport(stream, context,
                                                                     f"{path} -> submeshes -> TOC -> infos"))
 
         # materials
@@ -392,13 +411,13 @@ class Mdl(Construct):
         for cont in sub_tocs.materials_offset.subtoc_entries:
             stream_seek(stream, cont.ptr, 0, path)
             materials.append(MAT_entry._parsereport(stream, context, f"{path} -> materials"))
-        
+
         # meshes
         meshes = ListContainer()
         for cont in sub_tocs.meshes_offset.subtoc_entries:
             stream_seek(stream, cont.ptr, 0, path)
             meshes.append(MESH_entry._parsereport(stream, context, f"{path} -> meshes"))
-        
+
         # mesh names
         mesh_names = ListContainer()
         if header.toc.mesh_names_offset != 0:
@@ -412,7 +431,7 @@ class Mdl(Construct):
         for cont in sub_tocs.offset_6.subtoc_entries:
             stream_seek(stream, cont.ptr, 0, path)
             toc6.append(TOC6_entry._parsereport(stream, context, f"{path} -> TOC6"))
-        
+
         # toc8
         toc8 = ListContainer()
         if header.toc.offset_8 != 0:
@@ -432,11 +451,11 @@ class Mdl(Construct):
         joints_info = JOINTS._parsereport(stream, context, f"{path} -> joints_info")
         stream_seek(stream, joints_info.joints_toc, 0, path)
         joints_toc = Sub_TOC._parsereport(stream, context, f"{path} -> joints -> TOC")
-        
+
         if joints_info.joints_toc_2 != 0:
             stream_seek(stream, joints_info.joints_toc_2, 0, path)
             joints_toc_2 = Sub_TOC._parsereport(stream, context, f"{path} -> joints -> TOC2")
-            
+
             for joint in joints_toc_2.subtoc_entries:
                 stream_seek(stream, joint.ptr, 0, path)
                 joint.data = Struct(
@@ -451,14 +470,14 @@ class Mdl(Construct):
             stream_seek(stream, joint.ptr, 0, path)
             joint.data = joint_entry._parse(stream, context, f"{path} -> joints -> joint")
 
-        # HACK: this padding is really weird, should be understood/fixed. 
-        # seems to pad to 0x8 offset between entries, except for the final one. 
+        # HACK: this padding is really weird, should be understood/fixed.
+        # seems to pad to 0x8 offset between entries, except for the final one.
         jMap_head_ptr = submesh_info_tocs[0].submesh_infos[0].jMapOffset
         stream_seek(stream, jMap_head_ptr, 0, path)
         jmap_data = Struct(ptr = Tell, data = GreedyBytes)._parse(stream, context, f"{path} -> joints -> jmap")
 
         return Container(
-            header=header, 
+            header=header,
             sub_tocs=sub_tocs,
             vertex_info=vertex_info,
             tri_info=tri_info,
@@ -476,9 +495,9 @@ class Mdl(Construct):
             toc8 = toc8,
             toc9 = toc9,
         )
-    
 
-    
+
+
     def _build(self, obj, stream, context, path):
         # build header/main toc
         Header._build(obj.header, stream, context, f"{path} -> header")
@@ -488,7 +507,7 @@ class Mdl(Construct):
             if key in ["_io", "joints_offset", "offset_8", "offset_9"]:
                 continue
             Sub_TOC._build(val, stream, context, f"{path} -> {key}_TOC")
-        
+
         JOINTS._build(obj.joints_info, stream, context, f"{path} -> joints_TOC")
 
         # if offset8 is there build it

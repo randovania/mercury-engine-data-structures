@@ -1,6 +1,6 @@
 import construct
 
-from mercury_engine_data_structures.common_types import UInt, StrId
+from mercury_engine_data_structures.common_types import StrId, UInt
 
 BlockType = construct.Enum(
     UInt,

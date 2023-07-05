@@ -1,10 +1,17 @@
 import construct
+from construct import Construct
+from construct.core import (
+    Byte,
+    Const,
+    Hex,
+    Int32ul,
+    LazyBound,
+    PrefixedArray,
+    Struct,
+)
 
-from construct import Construct, Container, ListContainer
-from construct.core import (PrefixedArray, Byte, Const, Flag, Hex, If, Int32ul, LazyBound, Struct, )
-
+from mercury_engine_data_structures.common_types import Float, StrId
 from mercury_engine_data_structures.formats import BaseResource
-from mercury_engine_data_structures.common_types import StrId, Float
 from mercury_engine_data_structures.game_check import Game
 
 UnkStruct = Struct(
@@ -27,7 +34,7 @@ Item = Struct(
     type = StrId,
     unk1 = StrId,
     unk2 = Float,
-    unk3 = StrId,   
+    unk3 = StrId,
     unk4 = Float,
     unk5 = StrId,
     unk6 = Byte,

@@ -1,11 +1,11 @@
 from typing import Dict
-from construct.core import Struct, Construct, Const, GreedyRange
+
+from construct.core import Const, Construct, GreedyRange, Struct
 
 from mercury_engine_data_structures.common_types import DictAdapter, DictElement
 from mercury_engine_data_structures.construct_extensions.strings import CStringRobust
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
-
 
 TXT = Struct(
     "magic" / Const(b'BTXT'),
@@ -21,7 +21,7 @@ class Txt(BaseResource):
     @property
     def strings(self) -> Dict[str, str]:
         return self._raw.strings
-    
+
     @strings.setter
     def strings(self, value):
         self._raw.strings = value

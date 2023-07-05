@@ -3,17 +3,16 @@ import enum
 import json
 import logging
 import os.path
-import os.path
 import typing
 from pathlib import Path
-from typing import Dict, Optional, Iterator, Set
+from typing import Dict, Iterator, Optional, Set
 
 import construct
 
-from mercury_engine_data_structures import formats, dread_data, samus_returns_data
+from mercury_engine_data_structures import dread_data, formats, samus_returns_data
 from mercury_engine_data_structures.formats import Toc
 from mercury_engine_data_structures.formats.base_resource import AssetId, BaseResource, NameOrAssetId, resolve_asset_id
-from mercury_engine_data_structures.formats.pkg import PKGHeader, Pkg
+from mercury_engine_data_structures.formats.pkg import Pkg, PKGHeader
 from mercury_engine_data_structures.game_check import Game
 
 T = typing.TypeVar("T")

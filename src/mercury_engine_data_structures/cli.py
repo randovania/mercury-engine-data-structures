@@ -10,8 +10,8 @@ from typing import Optional
 
 from mercury_engine_data_structures import formats
 from mercury_engine_data_structures.construct_extensions.json import convert_to_raw_python
-from mercury_engine_data_structures.game_check import Game
 from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
+from mercury_engine_data_structures.game_check import Game
 
 
 def game_argument_type(s: str) -> Game:

@@ -1,4 +1,5 @@
 from typing import Tuple
+
 from construct import Construct, Container
 
 from mercury_engine_data_structures.formats import BaseResource, standard_format
@@ -11,13 +12,13 @@ class Bmmdef(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
         return BMMDEF
-    
+
     @property
     def icons(self) -> Container:
         return self.raw.Root.mapIconDefs
-    
+
     def add_icon(self, icon_id: str, uSpriteRow: int, uSpriteCol: int,
-            sInspectorLabel: str, sDisabledIconId: str = '', 
+            sInspectorLabel: str, sDisabledIconId: str = '',
             vAnchorOffset: Tuple[int, int] = (0, 0), bAutoScale: bool = True, **kwargs):
         icon = Container()
         icon.uSpriteRow = uSpriteRow
@@ -28,5 +29,5 @@ class Bmmdef(BaseResource):
         icon.bAutoScale = bAutoScale
         for k, v in kwargs.items():
             icon[k] = v
-        
+
         self.icons[icon_id] = icon

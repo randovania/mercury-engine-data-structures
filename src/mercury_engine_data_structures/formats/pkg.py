@@ -2,15 +2,21 @@ from __future__ import annotations
 
 import dataclasses
 import typing
-from typing import Optional
 
 import construct
 from construct import (
-    Struct, PrefixedArray, Int64ul, Int32ul, Hex, Construct, IfThenElse, )
+    Construct,
+    Hex,
+    IfThenElse,
+    Int32ul,
+    Int64ul,
+    PrefixedArray,
+    Struct,
+)
 
 from mercury_engine_data_structures import dread_data, samus_returns_data
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
-from mercury_engine_data_structures.formats.base_resource import BaseResource, NameOrAssetId, resolve_asset_id, AssetId
+from mercury_engine_data_structures.formats.base_resource import AssetId, BaseResource, NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.game_check import Game, get_current_game
 
 Construct_AssetId = Hex(IfThenElse(construct.this._params.target_game == Game.SAMUS_RETURNS.value, Int32ul, Int64ul))
@@ -157,7 +163,7 @@ class PkgFile:
     data: bytes
 
     @property
-    def asset_name(self) -> Optional[str]:
+    def asset_name(self) -> str | None:
         if self.game == Game.DREAD:
             return dread_data.name_for_asset_id(self.asset_id)
         elif self.game == Game.SAMUS_RETURNS:
@@ -184,7 +190,7 @@ class Pkg(BaseResource):
         for file in self.raw.files:
             yield PkgFile(self.target_game, file.asset_id, file.data)
 
-    def get_asset(self, asset_id: NameOrAssetId) -> Optional[bytes]:
+    def get_asset(self, asset_id: NameOrAssetId) -> bytes | None:
         asset_id = resolve_asset_id(asset_id, self.target_game)
         for file in self.raw.files:
             if file.asset_id == asset_id:

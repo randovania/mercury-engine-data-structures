@@ -2,10 +2,10 @@
 Helper class to handle objects that contain a pointer to objects of varied types, usually all with the same base type.
 """
 import copy
-from typing import Dict, Union, Type
+from typing import Dict, Type, Union
 
 import construct
-from construct import Construct, Container, ListContainer, Struct, Hex, Int64ul, Switch, Adapter
+from construct import Adapter, Construct, Container, Hex, Int64ul, ListContainer, Struct, Switch
 
 import mercury_engine_data_structures.dread_data
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
@@ -35,7 +35,7 @@ class PointerAdapter(Adapter):
 
         ret = construct.Container()
         ret["@type"] = mercury_engine_data_structures.dread_data.all_property_id_to_name()[obj.type]
-        
+
         if isinstance(obj.ptr, ListContainer):
             try:
                 obj.ptr = Container({field.type: field.item for field in obj.ptr})

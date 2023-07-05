@@ -1,5 +1,5 @@
 import typing
-from typing import Dict, Union, Type
+from typing import Dict, Type, Union
 
 import construct
 

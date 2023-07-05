@@ -1,10 +1,22 @@
 import construct
-from construct import Construct, IfThenElse, Struct, Const, Hex, Int16ul, Int8ul, Switch, Array, Rebuild, Flag, \
-    Terminated, GreedyBytes
-from mercury_engine_data_structures import game_check
+from construct import (
+    Array,
+    Const,
+    Construct,
+    Flag,
+    GreedyBytes,
+    Hex,
+    IfThenElse,
+    Int8ul,
+    Int16ul,
+    Rebuild,
+    Struct,
+    Switch,
+)
 
-from mercury_engine_data_structures.common_types import UInt, make_vector, StrId, Float, CVector2D
-from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, OptionalValue, ForceQuit
+from mercury_engine_data_structures import game_check
+from mercury_engine_data_structures.common_types import CVector2D, Float, StrId, UInt, make_vector
+from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, OptionalValue
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
 

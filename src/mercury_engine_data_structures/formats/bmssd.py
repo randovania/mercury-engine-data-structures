@@ -1,13 +1,23 @@
 import construct
 from construct import (
-    Struct, Construct, Const, Int32ul, PrefixedArray, CString, Byte, Array, Float32l, PaddedString,
-    Int64ul, Hex, Int8ul, Int16ul, IfThenElse
+    Array,
+    Byte,
+    Const,
+    Construct,
+    CString,
+    Float32l,
+    IfThenElse,
+    Int8ul,
+    Int32ul,
+    Int64ul,
+    PaddedString,
+    PrefixedArray,
+    Struct,
 )
 
-from mercury_engine_data_structures.common_types import make_vector, StrId, UInt, Float, make_dict
 from mercury_engine_data_structures import game_check
 from mercury_engine_data_structures.formats import BaseResource
-from mercury_engine_data_structures.game_check import Game, current_game_at_most
+from mercury_engine_data_structures.game_check import Game
 
 VectorArray = Array(3, Float32l)
 
@@ -79,7 +89,7 @@ BMSSD = Struct(
                 int10=Int32ul,
                 float13=VectorArray,
                 int11=Int8ul,
-            ) 
+            )
         ),
         PrefixedArray(
             Int32ul,

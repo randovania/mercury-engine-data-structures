@@ -12,7 +12,7 @@ class Bmscp(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
         return BMSCP
-    
+
     def get_child(self, path: str) -> Container:
         hier = path.split('.')
         root = self.raw.Root

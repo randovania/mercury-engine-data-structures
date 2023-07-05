@@ -1,7 +1,7 @@
 import construct
-from construct import Array, Construct, Struct, Const, Int32ul, Hex, Float32l, Flag
+from construct import Array, Const, Construct, Flag, Float32l, Hex, Int32ul, Struct
 
-from mercury_engine_data_structures.common_types import make_vector, StrId, UInt, Float, make_dict
+from mercury_engine_data_structures.common_types import Float, StrId, UInt, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
