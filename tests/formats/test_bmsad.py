@@ -1,8 +1,8 @@
 import contextlib
-from test.test_lib import parse_and_build_compare, parse_build_compare_editor
 
 import construct
 import pytest
+from tests.test_lib import parse_and_build_compare, parse_build_compare_editor
 
 from mercury_engine_data_structures.formats.bmsad import BMSAD
 from mercury_engine_data_structures.game_check import Game

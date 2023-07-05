@@ -1,4 +1,4 @@
-from test.test_lib import parse_and_build_compare
+from tests.test_lib import parse_and_build_compare
 
 from mercury_engine_data_structures.formats.bmbls import BMBLS
 from mercury_engine_data_structures.game_check import Game

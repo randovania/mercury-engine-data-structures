@@ -1,7 +1,6 @@
-from test.test_lib import parse_build_compare_editor
-
 import pytest
 from construct.core import ListContainer
+from tests.test_lib import parse_build_compare_editor
 
 from mercury_engine_data_structures.formats.bsmat import BSMAT, Bsmat
 
