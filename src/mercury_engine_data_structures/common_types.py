@@ -165,12 +165,12 @@ class DictElement(construct.Construct):
                 this['_root'] = this['_'].get('_root', this)
 
                 objdict = obj
-                
+
                 obj = objdict["key"]
                 this['key'] = obj
                 this['key'] = {self.key._compilebuild(code)}
                 
-                {f'obj = objdict.get("value", None)' if self.field.flagbuildnone else f'obj = objdict["value"]'}
+                {'obj = objdict.get("value", None)' if self.field.flagbuildnone else 'obj = objdict["value"]'}
                 this['value'] = obj
                 this['value'] = {self.field._compilebuild(code)}
 
@@ -212,7 +212,7 @@ class DictConstruct(construct.Construct):
             self.value_type._build(value, stream, context, field_path)
 
     def _emitparse(self, code):
-        return "Container((%s, %s) for i in range(%s))" % (
+        return "Container(({}, {}) for i in range({}))".format(
             self.key_type._compileparse(code),
             self.value_type._compileparse(code),
             self.count_type._compileparse(code),
@@ -229,7 +229,9 @@ class DictConstruct(construct.Construct):
                 {self.value_type._compilebuild(code)}
         """
         code.append(block)
-        return f"(reuse(len(obj), lambda obj: {self.count_type._compilebuild(code)}), list({fname}(key, value, io, this) for key, value in obj.items()), obj)[2]"
+        return (f"(reuse(len(obj), "
+                f"lambda obj: {self.count_type._compilebuild(code)}), "
+                f"list({fname}(key, value, io, this) for key, value in obj.items()), obj)[2]")
 
 
 def make_dict(value: construct.Construct, key=StrId):
