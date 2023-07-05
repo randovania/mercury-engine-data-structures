@@ -1,5 +1,5 @@
 import construct
-from construct import FocusedSeq, stream_tell, Construct, Optional, Const
+from construct import Const, Construct, FocusedSeq, Optional, stream_tell
 
 
 def Skip(count, subcon):

@@ -1,4 +1,13 @@
-from construct.core import FixedSized, GreedyBytes, NullStripped, NullTerminated, Prefixed, StringEncoded, StringError, encodingunit
+from construct.core import (
+    FixedSized,
+    GreedyBytes,
+    NullStripped,
+    NullTerminated,
+    Prefixed,
+    StringEncoded,
+    StringError,
+    encodingunit,
+)
 
 
 class StringEncodedRobust(StringEncoded):
@@ -12,9 +21,12 @@ def PaddedStringRobust(length, encoding):
     r"""
     Configurable, fixed-length or variable-length string field.
 
-    When parsing, the byte string is stripped of null bytes (per encoding unit), then decoded. Length is an integer or context lambda. When building, the string is encoded and then padded to specified length. If encoded string is larger than the specified length, it fails with PaddingError. Size is same as length parameter.
+    When parsing, the byte string is stripped of null bytes (per encoding unit), then decoded. Length is an integer
+    or context lambda. When building, the string is encoded and then padded to specified length.
+    If encoded string is larger than the specified length, it fails with PaddingError. Size is same as length parameter.
 
-    .. warning:: PaddedStringRobust only supports encodings explicitly listed in :class:`~construct.core.possiblestringencodings` .
+    .. warning:: PaddedStringRobust only supports encodings explicitly listed
+    in :class:`~construct.core.possiblestringencodings` .
 
     :param length: integer or context lambda, length in bytes (not unicode characters)
     :param encoding: string like: utf8 utf16 utf32 ascii
@@ -42,14 +54,16 @@ def PaddedStringRobust(length, encoding):
 
 def PascalStringRobust(lengthfield, encoding):
     r"""
-    Length-prefixed string. The length field can be variable length (such as VarInt) or fixed length (such as Int64ub). :class:`~construct.core.VarInt` is recommended when designing new protocols. Stored length is in bytes, not characters. Size is not defined.
+    Length-prefixed string. The length field can be variable length (such as VarInt) or fixed length (such as Int64ub).
+    :class:`~construct.core.VarInt` is recommended when designing new protocols. Stored length is in bytes,
+    not characters. Size is not defined.
 
     :param lengthfield: Construct instance, field used to parse and build the length (like VarInt Int64ub)
     :param encoding: string like: utf8 utf16 utf32 ascii
 
     :raises StringError: building a non-unicode string
     :raises StringError: unicode decoding failed
-    
+
 
     Example::
 
@@ -67,7 +81,7 @@ def PascalStringRobust(lengthfield, encoding):
 
     def _emitseq(ksy, bitwise):
         return [
-            dict(id="lengthfield", type=lengthfield._compileprimitivetype(ksy, bitwise)), 
+            dict(id="lengthfield", type=lengthfield._compileprimitivetype(ksy, bitwise)),
             dict(id="data", size="lengthfield", type="str", encoding=encoding),
         ]
     macro._emitseq = _emitseq
@@ -78,7 +92,8 @@ def CStringRobust(encoding):
     r"""
     String ending in a terminating null byte (or null bytes in case of UTF16 UTF32).
 
-    .. warning:: CStringRobust only supports encodings explicitly listed in :class:`~construct.core.possiblestringencodings` .
+    .. warning:: CStringRobust only supports encodings explicitly listed in
+    :class:`~construct.core.possiblestringencodings` .
 
     :param encoding: string like: utf8 utf16 utf32 ascii
 
@@ -102,7 +117,8 @@ def CStringRobust(encoding):
 
 def GreedyStringRobust(encoding):
     r"""
-    String that reads entire stream until EOF, and writes a given string as-is. Analog to :class:`~construct.core.GreedyBytes` but also applies unicode-to-bytes encoding.
+    String that reads entire stream until EOF, and writes a given string as-is.
+    Analog to :class:`~construct.core.GreedyBytes` but also applies unicode-to-bytes encoding.
 
     :param encoding: string like: utf8 utf16 utf32 ascii
 

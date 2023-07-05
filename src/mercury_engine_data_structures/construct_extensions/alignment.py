@@ -1,7 +1,7 @@
 import io
 
 import construct
-from construct import Construct, stream_tell, Subconstruct, GreedyBytes
+from construct import Construct, GreedyBytes, Subconstruct, stream_tell
 from construct.core import FocusedSeq, If, IfThenElse, Optional, Peek, Prefixed
 
 
