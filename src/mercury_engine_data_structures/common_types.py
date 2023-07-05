@@ -169,7 +169,7 @@ class DictElement(construct.Construct):
                 obj = objdict["key"]
                 this['key'] = obj
                 this['key'] = {self.key._compilebuild(code)}
-                
+
                 {'obj = objdict.get("value", None)' if self.field.flagbuildnone else 'obj = objdict["value"]'}
                 this['value'] = obj
                 this['value'] = {self.field._compilebuild(code)}
