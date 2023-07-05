@@ -59,7 +59,8 @@ line-length = 120
 select = ["E", "F", "W", "C90", "I", "UP"]
 src = ["src"]
 extend-exclude = [
-    "src/mercury_engine_data_structures/formats/dread_types.py"
+    # ruff can't handle this file on Windows?!
+    "src/mercury_engine_data_structures/common_types.py"
 ]
 
 # Version to target for generated code.

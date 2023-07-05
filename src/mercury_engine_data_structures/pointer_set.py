@@ -144,6 +144,8 @@ class PointerSet:
         self.types[prop_id] = name / value
 
     def create_construct(self) -> Construct:
+        get_name = mercury_engine_data_structures.dread_data.all_property_id_to_name().get
+
         return PointerAdapter(Struct(
             type=Hex(Int64ul),
             ptr=Switch(
@@ -151,7 +153,7 @@ class PointerSet:
                 self.types,
                 ErrorWithMessage(
                     lambda
-                        ctx: f"Property {ctx.type} ({mercury_engine_data_structures.dread_data.all_property_id_to_name().get(ctx.type)}) "
+                        ctx: f"Property {ctx.type} ({get_name(ctx.type)}) "
                              "without assigned type"),
             )
         ), self.types)
