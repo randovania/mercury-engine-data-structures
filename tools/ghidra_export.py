@@ -11,7 +11,7 @@ from pathlib import Path
 import ghidra_bridge
 
 from mercury_engine_data_structures import dread_data
-from mercury_engine_data_structures.type_lib import TypeKind, PrimitiveKind
+from mercury_engine_data_structures.type_lib import PrimitiveKind, TypeKind
 
 # New JSON Format
 known_types_to_construct = {
@@ -48,15 +48,18 @@ known_flagsets = {
 }
 known_typedefs = {
     "TPatterns": "base::global::CRntVector<COffset>",
-    "CCharClassRodotukAIComponent::TVAbsorbConfigs": "base::global::CRntVector<CCharClassRodotukAIComponent::SAbsorbConfig>",
+    "CCharClassRodotukAIComponent::TVAbsorbConfigs":
+        "base::global::CRntVector<CCharClassRodotukAIComponent::SAbsorbConfig>",
     "TLaunchPattern": "base::global::CRntVector<SLaunchPatternStep>",
     "TLaunchConfigs": "base::global::CRntVector<SLaunchConfig>",
     "TBigkranXSpitLaunchPattern": "base::global::CRntVector<SBigkranXSpitLaunchPatternStep>",
-    "CCharClassRodomithonXAIComponent::TVFirePillarConfigs": "base::global::CRntVector<CCharClassRodomithonXAIComponent::SFirePillarConfig>",
+    "CCharClassRodomithonXAIComponent::TVFirePillarConfigs":
+        "base::global::CRntVector<CCharClassRodomithonXAIComponent::SFirePillarConfig>",
     "CMinimapDef::TMapLabelDefs": "base::global::CRntDictionary<base::global::CStrId, SMapLabelDef>",
     "CMinimapDef::TMapIconDefs": "base::global::CRntDictionary<base::global::CStrId, SMapIconDef>",
     "CBlackboard::TSectionContainer": "base::global::CRntDictionary<base::global::CStrId, CBlackboard::CSection*>",
-    "CPlaythrough::TDictCheckpointDatas": "base::global::CRntDictionary<base::global::CStrId, std::unique_ptr<CPlaythrough::SCheckpointData>>",
+    "CPlaythrough::TDictCheckpointDatas":
+        "base::global::CRntDictionary<base::global::CStrId, std::unique_ptr<CPlaythrough::SCheckpointData>>",
     "TSoundEventRules": "base::global::CRntVector<std::unique_ptr<sound::CSoundEventsDef::SSoundEventsRule>>",
     "CGameBlackboard::TPropDeltaValues": "base::global::CRntSmallDictionary<base::global::CStrId, float>",
     "CMinimapData::TOccludedIcons": "base::global::CRntVector<base::global::CStrId>",
@@ -240,7 +243,8 @@ _aliases = {
     "&vectSpawnPoints_DAT_71729aaf30": "base::global::CRntVector<CGameLink<CSpawnPointComponent>>",
     "&Vector_CSpawnerActorBlueprint_DAT_71729aa9d0": "base::global::CRntVector<CSpawnerActorBlueprint>",
     "&Trigger_DAT_71726f4968": "base::global::CRntVector<std::unique_ptr<CTriggerComponent::SActivationCondition>>",
-    "&DictStr_ListStr_DAT_71726f5da0": "base::global::CRntDictionary<base::global::CStrId, base::global::CRntVector<base::global::CStrId>>",
+    "&DictStr_ListStr_DAT_71726f5da0":
+        "base::global::CRntDictionary<base::global::CStrId, base::global::CRntVector<base::global::CStrId>>",
     "&VectorStrId_DAT_7101d03998": "base::global::CRntVector<base::global::CStrId>",
     "&DAT_71726f8e78": "base::global::CRntVector<SDoorInfo>",
     "&DAT_71726fd0c0": "base::global::CRntVector<SWorldGraphNode>",

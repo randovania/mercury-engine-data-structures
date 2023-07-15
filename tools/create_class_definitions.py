@@ -5,10 +5,11 @@ from pathlib import Path
 
 import construct
 
-dread_types_path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "dread_types.json")
+meds_root = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures")
+dread_types_path = meds_root.joinpath("dread_types.json")
 dread_types = json.loads(dread_types_path.read_text())
 
-type_lib_path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "type_lib.py")
+type_lib_path = meds_root.joinpath("type_lib.py")
 type_lib_source = type_lib_path.read_text().replace("from mercury_engine_data_structures import dread_data", ""
                                                     ).replace("dread_data.get_raw_types()", "dread_types")
 
@@ -188,7 +189,7 @@ from mercury_engine_data_structures.construct_extensions.enum import StrictEnum,
 
 """
         code += 'primitive_to_construct = {\n'
-        code += "".join('    "{}": {},\n'.format(k.value, v) for k, v in primitive_to_construct.items())
+        code += "".join(f'    "{k.value}": {v},\n' for k, v in primitive_to_construct.items())
         code += "}\n\n"
 
         seen_types_with_pointer = set()
@@ -227,7 +228,7 @@ from mercury_engine_data_structures.construct_extensions.enum import StrictEnum,
 
 
 def main():
-    output_path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "formats", "dread_types.py")
+    output_path = meds_root.joinpath("formats", "dread_types.py")
 
     all_types: dict[str, type_lib.BaseType] = copy.copy(type_lib.all_types())
 
