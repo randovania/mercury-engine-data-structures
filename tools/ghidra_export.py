@@ -388,11 +388,7 @@ def get_function_list() -> dict[str, tuple[int, int, int]]:
         ]
         """)
 
-        print("Found {} init, {} fields and {} values".format(
-            len(result_init),
-            len(result_fields),
-            len(result_values),
-        ))
+        print(f"Found {len(result_init)} init, {len(result_fields)} fields and {len(result_values)} values")
 
         init_funcs = {}
         fields_funcs = {}

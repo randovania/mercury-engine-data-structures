@@ -201,10 +201,7 @@ from mercury_engine_data_structures.construct_extensions.enum import StrictEnum,
                     self.ensure_exported_type(child)
 
         for type_name in sorted(self._types_with_pointer):
-            code += '{} = PointerSet("{}")\n'.format(
-                self.pointer_to_type(type_name),
-                type_name,
-            )
+            code += f'{self.pointer_to_type(type_name)} = PointerSet("{type_name}")\n'
 
         # for type_name in self.all_types.keys():
         #     self.ensure_exported_type(type_name)
