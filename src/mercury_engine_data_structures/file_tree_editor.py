@@ -216,11 +216,17 @@ class FileTreeEditor:
     def add_new_asset(self, name: str, new_data: typing.Union[bytes, BaseResource],
                       in_pkgs: typing.Iterable[str]):
         """
-        Adds an asset that doesn't already exists.
+        Adds an asset that doesn't already exist.
         """
         asset_id = resolve_asset_id(name, self.target_game)
         if self.does_asset_exists(asset_id):
-            raise ValueError(f"{name} already exists")
+            if asset_id in self._modified_resources:
+                raise ValueError(f"{name} was already modified")
+            else:
+                raise ValueError("Asset already exists in:\n" + "\n".join(
+                    pkg if pkg is not None else "In the RomFS"
+                    for pkg in self._files_for_asset_id[asset_id]
+                ))
 
         in_pkgs = list(in_pkgs)
         files_set = set()
