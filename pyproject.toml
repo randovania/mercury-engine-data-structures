@@ -4,6 +4,7 @@ requires = [
     "setuptools_scm[toml]>=3.4.3",
     "wheel>=0.37.0",
     "construct>=2.10.0",
+    "zstd",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -23,7 +24,8 @@ requires-python = ">=3.8"
 dynamic = ["version"]
 
 dependencies = [
-    "construct>=2.10.0"
+    "construct>=2.10.0",
+    "zstd",
 ]
 
 
