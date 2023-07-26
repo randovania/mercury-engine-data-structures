@@ -1,0 +1,798 @@
+{
+    "CTypedObject": {
+        "kind": "struct",
+        "parent": null,
+        "fields": {}
+    },
+    "CAIBaseState": {
+        "kind": "struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CAIBehaviorTreeState": {
+        "kind": "struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CAIState": {
+        "kind": "struct",
+        "parent": "CAIState",
+        "fields": {}
+    },
+    "CAIChaseState": {
+        "kind": "struct",
+        "parent": null,
+        "fields": {}
+    },
+    "CAIAttackComponent": {
+        "kind": "struct",
+        "parent": "CAttackComponent",
+        "fields": {
+            "fFailAttackShieldEnergyConsumed": "float"
+        }
+    },
+    "CAIComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {
+            "bPlaceholder": "bool",
+            "sForcedAttack": "string",
+            "iForcedAttackPreset": "int",
+            "bIgnoreAttack": "bool"
+        }
+    },
+    "CAIIdleState": {
+        "kind": "struct",
+        "parent": "CAIState",
+        "fields": {}
+    },
+    "CAINavigationComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {}
+    },
+    "CAimComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {
+            "sLaserFX": "string",
+            "sAutoAimLaserFX": "string",
+            "bAutoAimActive": "bool",
+            "bLockOnSoundAllowed": "bool",
+            "fCurrentAutoAimWidth": "float",
+            "fCurrentAutoAimConeLength": "float"
+        }
+    },
+    "CAttackComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {
+            "bRotateToDamagedEntity": "bool",
+            "fRotateToDamagedEntityMaxAngle": "float",
+            "fRotateToDamagedEntityMinAngle": "float"
+        }
+    },
+    "CComponent": {
+        "kind": "struct",
+        "parent": "CTypedObject",
+        "fields": {
+            "bEnabled": "bool"
+        }
+    },
+    "CPickable": {
+        "kind": "struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CPickableComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {
+            "sOnPickFX": "string"
+        }
+    },
+    "CPickableItemComponent": {
+        "kind": "struct",
+        "parent": "CPickableComponent",
+        "fields": {
+            "fTimeToCanBePicked": "float"
+        }
+    },
+    "CPickableSpringBallComponent": {
+        "kind": "struct",
+        "parent": "CPickableItemComponent",
+        "fields": {}
+    },
+    "CPickableSuitComponent": {
+        "kind": "struct",
+        "parent": "CPickableItemComponent",
+        "fields": {}
+    },
+    "CModelUpdaterComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {}
+    },
+    "CScriptComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {}
+    },
+    "CAnimationComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {
+            "sDefaultSpawnAction": "string"
+        }
+    },
+    "CAudioComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {}
+    },
+    "CFXComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {
+            "fSelectedHighRadius": "float",
+            "fSelectedLowRadius": "float"
+        }
+    },
+    "CTunable": {
+        "kind": "struct",
+        "parent": "null",
+        "fields": {}
+    },
+    "CUsableComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {}
+    },
+    "CMetroidDNAUsableComponent": {
+        "kind": "struct",
+        "parent": "CUsableComponent",
+        "fields": {
+            "bCanProceedWithUse": "bool",
+            "bShouldHintUseDNA": "bool",
+            "sBlinkFX": "string",
+            "sReceiveFX": "string",
+            "sLeftEyeGlow": "string",
+            "sRightEyeGlow": "string"
+        }
+    },
+    "CMetroidRadar": {
+        "kind": "struct",
+        "parent": "CDisplayObjectContainer",
+        "fields": {}
+    },
+    "CTunableMetroidRadar": {
+        "kind": "struct",
+        "parent": "CTunable",
+        "fields": {
+            "fDetectionDistanceInTiles": "float",
+            "fMinBlinkSpeed": "float",
+            "fMaxBlinkSpeed": "float",
+            "fUnitLength": "float",
+            "fUpdateFrequency": "float"
+        }
+    },
+    "CGun": {
+        "kind": "struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CTunableGun": {
+        "kind": "struct",
+        "parent": "CTunable",
+        "fields": {
+            "fCheckBackDefaultDistance": "float",
+            "fCheckBackAnalogDistance": "float",
+            "fCheckBackAnalogFallDistance": "float",
+            "fCheckBackHangDistance": "float",
+            "fTimeHitMissedModifierDuration": "float",
+            "fVolumeHitMissedModifier": "float"
+        }
+    },
+    "CProjectileMovement": {
+        "kind": "struct",
+        "parent": "CWeaponMovement",
+        "fields": {
+            "fMaxDist": "float",
+            "fMaxLifeTime": "float",
+            "sCollisionFX": "string",
+            "fFXAngZOffset": "float",
+            "fFXScl": "float",
+            "sNoDamageFX": "string",
+            "sEnergyCollisionFX": "string",
+            "fGravity": "float",
+            "sCollider": "string"
+        }
+    },
+    "CGunComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {}
+    },
+    "CPrimaryGun": {
+        "kind": "struct",
+        "parent": "CGun",
+        "fields": {}
+    },
+    "CSecondaryGun": {
+        "kind": "struct",
+        "parent": "CGun",
+        "fields": {}
+    },
+    "CBeamGun": {
+        "kind": "struct",
+        "parent": "CPrimaryGun",
+        "fields": {}
+    },
+    "CPowerBeamGun": {
+        "kind": "struct",
+        "parent": "CBeamGun",
+        "fields": {}
+    },
+    "CPowerBeamTunable": {
+        "kind": "struct",
+        "parent": "CWeaponMovement",
+        "fields": {
+            "fDamageAmount": "float",
+            "sDamageSource": "string",
+            "fChargeDamageMult": "float",
+            "fWeaponBoostMetroidDamageMult": "float"
+        }
+    },
+    "CWaveBeamGun": {
+        "kind": "struct",
+        "parent": "CBeamGun",
+        "fields": {}
+    },
+    "CTunableWaveBeam": {
+        "kind": "struct",
+        "parent": "CTunable",
+        "fields": {
+            "fDamageAmount": "float",
+            "sDamageSource": "string",
+            "fChargeDamageMult": "float",
+            "fWeaponBoostMetroidDamageMult": "float",
+            "fWeaponBoostSpecialEnergyConsumption": "float",
+            "fWeaponBoostSpecialEnergyConsumptionWithPD": "float",
+            "fMaximumHeat": "float",
+            "fWeaponBoostMaximumHeat": "float",
+            "fWeaponBoostBurstMaximumHeat": "float",
+            "sWeaponBoostBurstCameraFXPreset": "string",
+            "fFractionOfHeatAddedPerShot": "float",
+            "fFractionOfHeatAddedPerWeaponBoostShot": "float",
+            "fFractionOfHeatAddedPerWeaponBoostBurstShot": "float"
+        }
+    },
+    "CSpazerBeamGun": {
+        "kind": "struct",
+        "parent": "CBeamGun",
+        "fields": {}
+    },
+    "CTunableSpazerBeam": {
+        "kind": "struct",
+        "parent": "CTunable",
+        "fields": {
+            "fPerpendicularOffsetSize": "float",
+            "fDamageAmount": "float",
+            "sDamageSource": "string",
+            "fChargeDamageMult": "float",
+            "fWeaponBoostSpecialEnergyConsumption": "float",
+            "fWeaponBoostSpecialEnergyConsumptionWithPD": "float",
+            "fWeaponBoostMetroidDamageMult": "float",
+            "sWeaponBoostBurstCameraFXPreset": "string",
+            "fMaximumHeat": "float",
+            "fWeaponBoostMaximumHeat": "float",
+            "fWeaponBoostBurstMaximumHeat": "float",
+            "fFractionOfHeatAddedPerShot": "float",
+            "fFractionOfHeatAddedPerWeaponBoostShot": "float",
+            "fFractionOfHeatAddedPerWeaponBoostBurstShot": "float"
+        }
+    },
+    "CPlasmaBeamGun": {
+        "kind": "struct",
+        "parent": "CBeamGun",
+        "fields": {}
+    },
+    "CTunablePlasmaBeam": {
+        "kind": "struct",
+        "parent": "CTunable",
+        "fields": {
+            "fPerpendicularOffsetSize": "float",
+            "fExtraProjectileLength": "float",
+            "fDamageAmount": "float",
+            "sDamageSource": "string",
+            "fChargeDamageMult": "float",
+            "fWeaponBoostSpecialEnergyConsumption": "float",
+            "fWeaponBoostSpecialEnergyConsumptionWithPD": "float",
+            "fWeaponBoostMetroidDamageMult": "float",
+            "fMaximumHeat": "float",
+            "fWeaponBoostMaximumHeat": "float",
+            "fWeaponBoostBurstMaximumHeat": "float",
+            "sWeaponBoostBurstCameraFXPreset": "string",
+            "fFractionOfHeatAddedPerShot": "float",
+            "fFractionOfHeatAddedPerWeaponBoostShot": "float",
+            "fFractionOfHeatAddedPerWeaponBoostBurstShot": "float"
+        }
+    },
+    "CGrappleBeamComponent": {
+        "kind": "struct",
+        "parent": "CWeaponMovement",
+        "fields": {
+            "sIniFXID": "string",
+            "sEndFXId": "string"
+        }
+    },
+    "CTunableGrappleBeamComponent": {
+        "kind": "struct",
+        "parent": "CTunable",
+        "fields": {
+            "fAdvanceSpeed": "float",
+            "fRetractSpeed": "float",
+            "fMaxLength": "float"
+        }
+    },
+    "CCharClassWeaponMovement": {
+        "kind": "struct",
+        "parent": "CCharClassWeaponMovement",
+        "fields": {
+            "sDamageID": "string",
+            "sDamageSource": "string",
+            "eDamageType": "enum",
+            "eLightningArmorReaction": "enum",
+            "eDamageStrength": "enum"
+        }
+    },
+    "CCharClassGrappleBeamComponent": {
+        "kind": "struct",
+        "parent": "CCharClassWeaponMovement",
+        "fields": {
+            "fDamage": "float"
+        }
+    },
+    "CMissileBaseGun": {
+        "kind": "struct",
+        "parent": "CSecondaryGun",
+        "fields": {}
+    },
+    "CMissileMovement": {
+        "kind": "struct",
+        "parent": "CProjectileMovement",
+        "fields": {
+            "sTrailFX": "string",
+            "sBurstFX": "string",
+            "sIgnitionFX": "string"
+        }
+    },
+    "CSuperMissileGun": {
+        "kind": "struct",
+        "parent": "CMissileGun",
+        "fields": {}
+    },
+    "CSuperMissileMovement": {
+        "kind": "struct",
+        "parent": "CMissileGun",
+        "fields": {}
+    },
+    "CTunableSuperMissile": {
+        "kind": "struct",
+        "parent": "CTunable",
+        "fields": {
+            "fDamageAmount": "float",
+            "sDamageSource": "string",
+            "fHeat": "float"
+        }
+    },
+    "CPowerBombGun": {
+        "kind": "struct",
+        "parent": "CSecondaryGun",
+        "fields": {}
+    },
+    "CSpecialEnergyComponent": {
+        "kind":"struct",
+        "parent": "CComponent",
+        "fields": {
+            "fMaxEnergy": "float",
+            "fEnergy": "float",
+            "bSpecialEnergyLocked": "bool"
+        }
+    },
+    "CAbility": {
+        "kind": "struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CAbilityComponent": {
+        "kind":"struct",
+        "parent": "CComponent",
+        "fields": {
+            "bAccurateAiming": "bool",
+            "sBlockSyncFX": "string",
+            "bElectricMeleeSPConsumption": "bool"
+        }
+    },
+    "CTunableAbilityComponent": {
+        "kind":"struct",
+        "parent": "CTunable",
+        "fields": {
+            "fSynchronizedBlockTime": "float",
+            "fSpecialEnergyConsumedOnBlock": "float",
+            "fShieldMinAngle": "float",
+            "fShieldMaxAngle": "float",
+            "fMinTimeBetweenMeleeActions": "float",
+            "fActivationHoldToStartDeactivateAll": "float",
+            "fActivationHoldToCompleteDeactivateAll": "float"
+        }
+    },
+    "CAbilityScanningPulse": {
+        "kind": "struct",
+        "parent": "CAbility",
+        "fields": {}
+    },
+    "CTunableAbilityScanningPulse": {
+        "kind":"struct",
+        "parent": "CTunable",
+        "fields": {
+            "fConsumptionOnActivation": "float",
+            "fDiscoveredBreakableTilesTime": "float",
+            "fDiscoveredBreakableTilesDistance": "float",
+            "vDiscoveredBreakableTileInitialColor": "vector",
+            "fDiscoveredBreakableTileInitialAlpha": "float",
+            "vDiscoveredBreakableTileColor": "vector",
+            "fDiscoveredBreakableTileAlpha": "float",
+            "vDiscoveredBreakableTileEndColor": "vector",
+            "fDiscoveredBreakableTileEndAlpha": "float",
+            "fChargingTime": "float",
+            "sChargePlaySound": "string",
+            "sChargeCancelSound": "string"
+        }
+    },
+    "CAbilityEnergyShield": {
+        "kind": "struct",
+        "parent": "CAbility",
+        "fields": {
+            "sEnergyShieldSamusMeshNode": "string",
+            "sEnergyShieldSamusUpgradeMeshNode": "string",
+            "sEnergyShieldSamusDamageMeshNode": "string",
+            "sEnergyShieldMorphballMeshNode": "string",
+            "sEnergyShieldMorphballDamageMeshNode": "string",
+            "fIgnoreLastBlockedImpactDamageForTime": "float",
+            "fIgnoreDamageWithReactionForTime": "float"
+        }
+    },
+    "CAbilityEnergyWave": {
+        "kind": "struct",
+        "parent": "CAbility",
+        "fields": {}
+    },
+    "CTunableAbilityEnergyWave": {
+        "kind":"struct",
+        "parent": "CTunable",
+        "fields": {
+            "fWeaponBoostDamageMult_alphaelectricmine": "float",
+            "fWeaponBoostDamageMult_alphanewbornelectricmine": "float",
+            "fWeaponBoostDamageMult_autoad": "float",
+            "fWeaponBoostDamageMult_autoadblack": "float",
+            "fWeaponBoostDamageMult_autrack": "float",
+            "fWeaponBoostDamageMult_autrackblack": "float",
+            "fWeaponBoostDamageMult_babyhatchling": "float",
+            "fWeaponBoostDamageMult_beeswarm": "float",
+            "fWeaponBoostDamageMult_blobthrower": "float",
+            "fWeaponBoostDamageMult_chuteleech": "float",
+            "fWeaponBoostDamageMult_doorchargecharge": "float",
+            "fWeaponBoostDamageMult_doorclosedpower": "float",
+            "fWeaponBoostDamageMult_doorclosedcharge": "float",
+            "fWeaponBoostDamageMult_doorcreature": "float",
+            "fWeaponBoostDamageMult_doorpowerpower": "float",
+            "fWeaponBoostDamageMult_doorpowerclosed": "float",
+            "fWeaponBoostDamageMult_doorspazerbeam": "float",
+            "fWeaponBoostDamageMult_doorwave": "float",
+            "fWeaponBoostDamageMult_drivel": "float",
+            "fWeaponBoostDamageMult_drivelstronger": "float",
+            "fWeaponBoostDamageMult_fleechswarm": "float",
+            "fWeaponBoostDamageMult_gawron": "float",
+            "fWeaponBoostDamageMult_gammaelectricmine": "float",
+            "fWeaponBoostDamageMult_gammagiantelectricmine": "float",
+            "fWeaponBoostDamageMult_glowfly": "float",
+            "fWeaponBoostDamageMult_glowflypuzzle": "float",
+            "fWeaponBoostDamageMult_gravitt": "float",
+            "fWeaponBoostDamageMult_gravittadamant": "float",
+            "fWeaponBoostDamageMult_gullugg": "float",
+            "fWeaponBoostDamageMult_gulluggstronger": "float",
+            "fWeaponBoostDamageMult_gulluggelectric": "float",
+            "fWeaponBoostDamageMult_gunzoo": "float",
+            "fWeaponBoostDamageMult_halzyn": "float",
+            "fWeaponBoostDamageMult_hornoad": "float",
+            "fWeaponBoostDamageMult_hornoadstronger": "float",
+            "fWeaponBoostDamageMult_itemsphere_chargebeam": "float",
+            "fWeaponBoostDamageMult_itemsphere_morphball": "float",
+            "fWeaponBoostDamageMult_itemsphere_bomb": "float",
+            "fWeaponBoostDamageMult_itemsphere_icebeam": "float",
+            "fWeaponBoostDamageMult_itemsphere_highjumpboots": "float",
+            "fWeaponBoostDamageMult_itemsphere_variasuit": "float",
+            "fWeaponBoostDamageMult_itemsphere_wavebeam": "float",
+            "fWeaponBoostDamageMult_itemsphere_grapplebeam": "float",
+            "fWeaponBoostDamageMult_itemsphere_spazerbeam": "float",
+            "fWeaponBoostDamageMult_itemsphere_supermissile": "float",
+            "fWeaponBoostDamageMult_itemsphere_spacejump": "float",
+            "fWeaponBoostDamageMult_itemsphere_screwattack": "float",
+            "fWeaponBoostDamageMult_itemsphere_gravitysuit": "float",
+            "fWeaponBoostDamageMult_itemsphere_plasmabeam": "float",
+            "fWeaponBoostDamageMult_itemsphere_powerbomb": "float",
+            "fWeaponBoostDamageMult_moheek": "float",
+            "fWeaponBoostDamageMult_moheekwall": "float",
+            "fWeaponBoostDamageMult_moto": "float",
+            "fWeaponBoostDamageMult_motostronger": "float",
+            "fWeaponBoostDamageMult_mumbo": "float",
+            "fWeaponBoostDamageMult_omegastalactite": "float",
+            "fWeaponBoostDamageMult_omegaevolvedstalactite": "float",
+            "fWeaponBoostDamageMult_parabite": "float",
+            "fWeaponBoostDamageMult_meboid": "float",
+            "fWeaponBoostDamageMult_ramulken": "float",
+            "fWeaponBoostDamageMult_ramulkenstronger": "float",
+            "fWeaponBoostDamageMult_rockicicle": "float",
+            "fWeaponBoostDamageMult_tsumuri": "float",
+            "fWeaponBoostDamageMult_tsumurialternative": "float",
+            "fWeaponBoostDamageMult_wallfirefireball": "float",
+            "fWeaponBoostDamageMult_wallfirefireballblack": "float",
+            "fWeaponBoostDamageMult_wallfireflame": "float",
+            "fWeaponBoostDamageMult_wallfireflameblack": "float",
+            "fWeaponBoostDamageMult_blockingplant": "float",
+            "fWeaponBoostDamageMult_manicminerbotrock": "float"
+        }
+    },
+    "CAbilityPhaseDisplacement": {
+        "kind": "struct",
+        "parent": "CAbility",
+        "fields": {}
+    },
+    "CTunableAbilityPhaseDisplacement": {
+        "kind":"struct",
+        "parent": "CTunable",
+        "fields": {
+            "fConsumptionPerSecond": "float",
+            "fAlphaFactor": "float",
+            "fAlphaConsumptionPerSecond": "float",
+            "fGammaFactor": "float",
+            "fGammaConsumptionPerSecond": "float",
+            "fZetaFactor": "float",
+            "fZetaConsumptionPerSecond": "float",
+            "fOmegaFactor": "float",
+            "fOmegaConsumptionPerSecond": "float",
+            "fQueenFactor": "float",
+            "fQueenConsumptionPerSecond": "float",
+            "fRidleyFactor": "float",
+            "fRidleyConsumptionPerSecond": "float",
+            "fManicMinerBotFactor": "float",
+            "fManicMinerBotConsumptionPerSecond": "float"
+        }
+    },
+    "CReserveTankInfo": {
+        "kind": "struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CTunableReserveTanks": {
+        "kind":"struct",
+        "parent": "CTunable",
+        "fields": {
+            "fLifeTankSize": "float",
+            "fSETankSize": "float",
+            "fMissileTankSize": "float",
+            "fSuperMissileTankSize": "float"
+        }
+    },
+    "CDroppableComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {
+            "fMaxTimeAlive": "float"
+        }
+    },
+    "CTunableDroppable": {
+        "kind": "struct",
+        "parent": "CTunable",
+        "fields": {
+            "fSpawnSpeedFactor": "float",
+            "fMaxSpawnVelocity": "float"
+        }
+    },
+    "CDroppableMissileComponent": {
+        "kind": "struct",
+        "parent": "CDroppableComponent",
+        "fields": {
+            "sItemMax": "string",
+            "sItemCurrent": "string"
+        }
+    },
+    "CDroppableSuperMissileComponent": {
+        "kind": "struct",
+        "parent": "CDroppableComponent",
+        "fields": {
+            "sItemMax": "string",
+            "sItemCurrent": "string"
+        }
+    },
+    "CTutorialComponent": {
+        "kind":"struct",
+        "parent": "CComponent",
+        "fields": {}
+    },
+    "CTutorialMissileAimingComponent": {
+        "kind":"struct",
+        "parent": "CTutorialComponent",
+        "fields": {
+            "fMinTimeToShowBlockMessage": "float",
+            "sChargeFX": "string"
+        }
+    },
+    "CTutorialMissileComponent": {
+        "kind":"struct",
+        "parent": "CTutorialComponent",
+        "fields": {}
+    },
+    "CMovementComponent": {
+        "kind":"struct",
+        "parent": "CComponent",
+        "fields": {
+            "bIsFlying": "bool"
+        }
+    },
+    "CADNMovementComponent": {
+        "kind":"struct",
+        "parent": "CMovementComponent",
+        "fields": {}
+    },
+    "CTunableADNComponent": {
+        "kind":"struct",
+        "parent": "CTunable",
+        "fields": {}
+    },
+    "CADNScannerUserComponent": {
+        "kind":"struct",
+        "parent": "CComponent",
+        "fields": {}
+    },
+    "CTunableADNScannerUserComponent": {
+        "kind":"struct",
+        "parent": "CTunable",
+        "fields": {
+            "fFollowADNCameraMinZ": "float",
+            "fFollowADNCameraMaxZ": "float",
+            "fFollowADNCameraMinZDistance": "float",
+            "fFollowADNCameraMaxZDistance": "float",
+            "fFollowADNCameraNoSceneOffsetDistance": "float",
+            "fFollowADNCameraExitInterp": "float",
+            "fFollowADNCameraExitInterpTime": "float",
+            "fFollowADNCameraExitInterpInSceneTime": "float",
+            "sScanMatFX": "string",
+            "fFirstTimeStateFadeStepTime": "float",
+            "fFirstTimeStateFadedIdleTime": "float"
+        }
+    },
+    "CBombFanComponent": {
+        "kind":"struct",
+        "parent": "CComponent",
+        "fields": {
+           "sWindFX": "string" 
+        }
+    },
+    "CHazarousPoolComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {
+            "fSpeed": "float",
+            "fMaxSpeed": "float",
+            "fFillSpeed": "float",
+            "fAcceleration": "float",
+            "fTotalTime": "float",
+            "sDrainSound": "string",
+            "_sFanfareSound": "string"
+        }
+    },
+    "CBehavior": {
+        "kind":"struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CBaseAction": {
+        "kind":"struct",
+        "parent": "CBehavior",
+        "fields": {}
+    },
+    "CBreakableTileGroup": {
+        "kind": "struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CDisplayObject": {
+        "kind":"struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CDisplayObjectContainer": {
+        "kind": "struct",
+        "parent": "CDisplayObject",
+        "fields": {}
+    },
+    "CGameMessageDispatcher": {
+        "kind":"struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CLabel": {
+        "kind": "struct",
+        "parent": "CDisplayObject",
+        "fields": {}
+    },
+    "CModel3D": {
+        "kind": "struct",
+        "parent": "CDisplayObject",
+        "fields": {}
+    },
+    "CText": {
+        "kind": "struct",
+        "parent": "CDisplayObject",
+        "fields": {}
+    },
+    "CLogAction": {
+        "kind": "struct",
+        "parent": "CBaseAction",
+        "fields": {
+            "iCount": "int",
+            "sText": "string"
+        }
+    },
+    "CWaitAction": {
+        "kind": "struct",
+        "parent": "CBaseAction",
+        "fields": {
+            "fTime": "float",
+            "sTime": "string",
+            "bWaitTick": "bool"
+        }
+    },
+    "CStopWatchAction": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {
+            "sElapsedTime": "string",
+            "fMinTime": "float",
+            "fMaxTime": "float",
+            "sMinTime": "string",
+            "sMaxTime": "string",
+            "bResetElapsedTimeOnSuccess": "bool",
+            "eReturnStatusFailed": "enum"
+        }
+    },
+    "CTargetComponent": {
+        "kind":"struct",
+        "parent": "CComponent",
+        "fields": {}
+    },
+    "CAttack": {
+        "kind":"struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CZetaAIComponent": {
+        "kind":"struct",
+        "parent": "CAIComponent",
+        "fields": {
+            "sNavigableAreaID": "string"
+        }
+    },
+    "CZetaAttack": {
+        "kind":"struct",
+        "parent": "CAttack",
+        "fields": {}
+    },
+    "CZetaFireArcAttack": {
+        "kind":"struct",
+        "parent": "CZetaAttack",
+        "fields": {}
+    }
+}
