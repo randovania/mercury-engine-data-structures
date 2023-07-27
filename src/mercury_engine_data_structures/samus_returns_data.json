@@ -138,6 +138,32 @@
             "fSelectedLowRadius": "float"
         }
     },
+    "CBaseCondition": {
+        "kind":"struct",
+        "parent": "CBehavior",
+        "fields": {
+            "bNegate": "bool",
+            "eReturnStatusSuccess": "enum",
+            "eReturnStatusFailed": "enum"
+        }
+    },
+    "CCamerCtrl": {
+        "kind":"struct",
+        "parent": "CTypedObject",
+        "fields": {
+            "bEnabled": "bool"
+        }
+    },
+    "CCameraBoundaryCtrl": {
+        "kind":"struct",
+        "parent": "CCameraCtrl",
+        "fields": {}
+    },
+    "CAnimatedCameraCtrl": {
+        "kind":"struct",
+        "parent": "CCameraBoundaryCtrl",
+        "fields": {}
+    },
     "CTunable": {
         "kind": "struct",
         "parent": "null",
@@ -176,6 +202,43 @@
             "fUpdateFrequency": "float"
         }
     },
+    "CGotoAction": {
+        "kind": "struct",
+        "parent": "CBaseAction",
+        "fields": {}
+    },
+    "CChaseTargetAction": {
+        "kind": "struct",
+        "parent": "CGotoAction",
+        "fields": {
+            "fMinDistance": "float",
+            "fMaxDistance": "float",
+            "bMaintainViewDirOnReached": "bool",
+            "bIgnoreTargetAccesible": "bool",
+            "bAllowTargetToJumpOver": "bool",
+            "fMovingToIdleLimitsOffset": "float"
+        }
+    },
+    "CWeaponMovement": {
+        "kind": "struct",
+        "parent": "CMovementComponent",
+        "fields": {}
+    },
+    "CProjectileMovement": {
+        "kind": "struct",
+        "parent": "CWeaponMovement",
+        "fields": {
+            "fMaxDist": "float",
+            "fMaxLifeTime": "float",
+            "sCollisionFX": "string",
+            "fFXAngZOffset": "float",
+            "fFXScl": "float",
+            "sNoDamageFX": "string",
+            "sEnergyCollisionFX": "string",
+            "fGravity": "float",
+            "sCollider": "string"
+        }
+    },
     "CGun": {
         "kind": "struct",
         "parent": "CTypedObject",
@@ -191,21 +254,6 @@
             "fCheckBackHangDistance": "float",
             "fTimeHitMissedModifierDuration": "float",
             "fVolumeHitMissedModifier": "float"
-        }
-    },
-    "CProjectileMovement": {
-        "kind": "struct",
-        "parent": "CWeaponMovement",
-        "fields": {
-            "fMaxDist": "float",
-            "fMaxLifeTime": "float",
-            "sCollisionFX": "string",
-            "fFXAngZOffset": "float",
-            "fFXScl": "float",
-            "sNoDamageFX": "string",
-            "sEnergyCollisionFX": "string",
-            "fGravity": "float",
-            "sCollider": "string"
         }
     },
     "CGunComponent": {
@@ -673,6 +721,11 @@
             "fFirstTimeStateFadedIdleTime": "float"
         }
     },
+    "CADNCameraCtrl": {
+        "kind":"struct",
+        "parent": "CCameraBoundaryCtrl",
+        "fields": {}
+    },
     "CBombFanComponent": {
         "kind":"struct",
         "parent": "CComponent",
@@ -690,8 +743,43 @@
             "fAcceleration": "float",
             "fTotalTime": "float",
             "sDrainSound": "string",
-            "_sFanfareSound": "string"
+            "sFanfareSound": "string"
         }
+    },
+    "CAnimTreeElement": {
+        "kind":"struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CAnimTreeNode": {
+        "kind":"struct",
+        "parent": "CAnimTreeElement",
+        "fields": {}
+    },
+    "CAnimTreeControl": {
+        "kind":"struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CAnimatedNode": {
+        "kind":"struct",
+        "parent": "CAnimTreeNode",
+        "fields": {}
+    },
+    "CAnimatedControl": {
+        "kind":"struct",
+        "parent": "CAnimTreeNode",
+        "fields": {}
+    },
+    "CAnimationPlayerNode": {
+        "kind":"struct",
+        "parent": "CAnimTreeNode",
+        "fields": {}
+    },
+    "CAnimSelectByPlayerStateAttack": {
+        "kind":"struct",
+        "parent": "CAttack",
+        "fields": {}
     },
     "CBehavior": {
         "kind":"struct",
@@ -776,6 +864,176 @@
     "CAttack": {
         "kind":"struct",
         "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CChargeAttack": {
+        "kind": "struct",
+        "parent": "CAttack",
+        "fields": {}
+    },
+    "CAerialRammingAttack": {
+        "kind":"struct",
+        "parent": "CAttack",
+        "fields": {}
+    },
+    "CInitSelectorAttack": {
+        "kind":"struct",
+        "parent": "CAttack",
+        "fields": {}
+    },
+    "CBehaviorTreeAIComponent": {
+        "kind":"struct",
+        "parent": "CAIComponent",
+        "fields": {}
+    },
+    "CBossAIComponent": {
+        "kind":"struct",
+        "parent": "CBehaviorTreeAIComponent",
+        "fields": {
+            "sArenaLeftLandmark": "string",
+            "sArenaRightLandmark": "string",
+            "fArenaLimitDist": "float"
+        }
+    },
+    "CBaseAlphaAIComponent": {
+        "kind":"struct",
+        "parent": "CBossAIComponent",
+        "fields": {}
+    },
+    "CAlphaAIComponent": {
+        "kind":"struct",
+        "parent": "CBaseAlphaAIComponent",
+        "fields": {
+            "bUseSpawnGroupEdges": "bool",
+            "bCanUseMinesIfHangInNeutralZone": "bool"
+        }
+    },
+    "CAlphaAerialRammingAttack": {
+        "kind":"struct",
+        "parent": "CAerialRammingAttack",
+        "fields": {}
+    },
+    "CAlphaCheckMultiLayerChangeAction": {
+        "kind":"struct",
+        "parent": "CBaseAction",
+        "fields": {}
+    },
+    "CBaseAlphaElectricMinesAttack": {
+        "kind":"struct",
+        "parent": "CAttack",
+        "fields": {}
+    },
+    "CBaseAlphaGiantElectricMineAttack": {
+        "kind":"struct",
+        "parent": "CAttack",
+        "fields": {}
+    },
+    "CAlphaElectricMineMovement": {
+        "kind":"struct",
+        "parent": "CProjectileMovement",
+        "fields": {}
+    },
+    "CAlphaElectricMinesAttack": {
+        "kind":"struct",
+        "parent": "CBaseAlphaElectricMinesAttack",
+        "fields": {}
+    },
+    "CAlphaGiantElectricMineAttack": {
+        "kind":"struct",
+        "parent": "CBaseAlphaGiantElectricMineAttack",
+        "fields": {}
+    },
+    "CAlphaGiantElectricMineMovement": {
+        "kind":"struct",
+        "parent": "CProjectileMovement",
+        "fields": {}
+    },
+    "CAlphaHasMultiLayerArenaCondition": {
+        "kind":"struct",
+        "parent": "CBaseCondition",
+        "fields": {}
+    },
+    "CAlphaSingleElectricMinesAttack": {
+        "kind":"struct",
+        "parent": "CAttack",
+        "fields": {}
+    },
+    "CAlphaTripleAerialRammingAttack": {
+        "kind":"struct",
+        "parent": "CAlphaAerialRammingAttack",
+        "fields": {}
+    },
+    "CArachnusAIComponent": {
+        "kind":"struct",
+        "parent": "CBossAIComponent",
+        "fields": {}
+    },
+    "CArachnusBallAIComponent": {
+        "kind":"struct",
+        "parent": "CBossAIComponent",
+        "fields": {}
+    },
+    "CArachnusBallChaseTargetAction": {
+        "kind":"struct",
+        "parent": "CChaseTargetAction",
+        "fields": {
+            "sJumpFrontLong": "string",
+            "sJumpFront": "string",
+            "sJumpFrontShort": "string"
+        }
+    },
+    "CArachnusBallJumpAttack": {
+        "kind":"struct",
+        "parent": "CAttack",
+        "fields": {}
+    },
+    "CArachnusBallMovement": {
+        "kind":"struct",
+        "parent": null,
+        "fields": {}
+    },
+    "CArachnusBallRamAttack": {
+        "kind":"struct",
+        "parent": "CAttack",
+        "fields": {}
+    },
+    "CArachnusBallStompAttack": {
+        "kind":"struct",
+        "parent": "CAttack",
+        "fields": {}
+    },
+    "CArachnusChaseTargetAction": {
+        "kind":"struct",
+        "parent": "CChaseTargetAction",
+        "fields": {
+            "sJumpFront": "string"
+        }
+    },
+    "CArachnusEnergyWaveAttack": {
+        "kind":"struct",
+        "parent": "CInitSelectorAttack",
+        "fields": {}
+    },
+    "CArachnusEnergyWaveMovement": {
+        "kind":"struct",
+        "parent": "CProjectileMovement",
+        "fields": {}
+    },
+    "CArachnusFireSplash": {
+        "kind":"struct",
+        "parent": "CProjectileMovement",
+        "fields": {
+            "sFloorCollisionFX": "string"
+        }
+    },
+    "CArachnusFireSplashAttack": {
+        "kind":"struct",
+        "parent": "CInitSelectorAttack",
+        "fields": {}
+    },
+    "CArachnusStompAttack": {
+        "kind":"struct",
+        "parent": "CAttack",
         "fields": {}
     },
     "CZetaAIComponent": {
