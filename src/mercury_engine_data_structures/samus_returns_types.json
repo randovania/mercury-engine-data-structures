@@ -164,14 +164,52 @@
         "parent": "CCameraBoundaryCtrl",
         "fields": {}
     },
+    "CCharClass": {
+        "kind": "struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
     "CTunable": {
         "kind": "struct",
-        "parent": "null",
+        "parent": null,
         "fields": {}
+    },
+    "CTunableDroppableBillboard": {
+        "kind": "struct",
+        "parent": "CTunable",
+        "fields": {
+            "fSpawnSpeedFactor": "float",
+            "fMaxSpawnVelocity": "float",
+            "fMaxTimeAlive": "float",
+            "fTimeToStartBlinking": "float",
+            "fBlinkPeriod": "float",
+            "fMaxSqrDistanceToAbsorb": "float",
+            "sMissileCurrent": "string",
+            "sMissileMax": "string",
+            "sSuperMissileCurrent": "string",
+            "sSuperMissileMax": "string",
+            "sPowerBombCurrent": "string",
+            "sPowerBombMax": "string",
+            "fLifeAmount": "float",
+            "fLifeBigAmount": "float",
+            "fSpecialEnergyAmount": "float",
+            "fSpecialEnergyBigAmount": "float",
+            "fMissileAmount": "float",
+            "fSuperMissileAmount": "float",
+            "fPowerBombAmount": "float",
+            "fTimeSpawning": "float",
+            "fTimeSpawningMelee": "float",
+            "fTimeToBeCollectible": "float"
+        }
     },
     "CUsableComponent": {
         "kind": "struct",
         "parent": "CComponent",
+        "fields": {}
+    },
+    "CElevatorUsableComponent": {
+        "kind": "struct",
+        "parent": "CUsableComponent",
         "fields": {}
     },
     "CMetroidDNAUsableComponent": {
@@ -725,6 +763,80 @@
         "kind":"struct",
         "parent": "CCameraBoundaryCtrl",
         "fields": {}
+    },
+    "CInterpolationComponent": {
+        "kind":"struct",
+        "parent": "CComponent",
+        "fields": {}
+    },
+    "CLifeComponent": {
+        "kind":"struct",
+        "parent": "CComponent",
+        "fields": {
+            "bDisableCollidersOnDead": "bool",
+            "bWantsCameraFXPreset": "bool",
+            "fMaxLife": "float",
+            "fCurrentLife": "float",
+            "bCurrentLifeLocked": "float"
+        }
+    },
+    "CCharacterLifeComponent": {
+        "kind":"struct",
+        "parent": "CLifeComponent",
+        "fields": {
+            "sImpactAnim": "string",
+            "sDeadAnim": "string"
+        }
+    },
+    "CPlayerInfo": {
+        "kind":"struct",
+        "parent": "CTypedObject",
+        "fields": {
+            "sInputPreset": "string",
+            "bIgnoreShellWithIceBeam": "bool",
+            "iHeatZoneCount": "int"
+        }
+    },
+    "CPlayerInterpolation": {
+        "kind":"struct",
+        "parent": "CInterpolationComponent",
+        "fields": {}
+    },
+    "CPlayerLifeComponent": {
+        "kind":"struct",
+        "parent": "CCharacterLifeComponent",
+        "fields": {
+            "fImpactInvulnerableTime": "float",
+            "sImpactHardAnim": "string",
+            "sHardImpactFX": "string"
+        }
+    },
+    "CTunablePlayerLifeComponent": {
+        "kind":"struct",
+        "parent": "CTunable",
+        "fields": {
+            "fVariaSuitDamageMult": "float",
+            "fGravitySuitDamageMult": "float",
+            "fFusionDamageMult": "float",
+            "fHardModeDamageMult": "float",
+            "fMorphImplulseDefaultDamage": "float",
+            "fOnDeathMusicsFade": "float",
+            "fSlomoInterpTimeDead": "float",
+            "fSlomoInterpTimeRevive": "float"
+        }
+    },
+    "CPlayerMovement": {
+        "kind":"struct",
+        "parent": "CCharacterMovement",
+        "fields": {
+            "bForcedAnalogInput": "bool",
+            "fImpactImpulseX": "float",
+            "fImpactImpulseY": "float",
+            "fImpactAirImpulseY": "float",
+            "fImpactHardImpulseX": "float",
+            "fImpactHardImpulseY": "float",
+            "fImpactHardAirImpulseY": "float"
+        }
     },
     "CBombFanComponent": {
         "kind":"struct",
