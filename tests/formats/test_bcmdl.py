@@ -5532,11 +5532,6 @@ ALL_BCMDL_NO_TOC9 = [
 
 
 @pytest.mark.parametrize("bcmdl_path", ALL_BCMDL_NO_TOC9)
-def test_can_parse(dread_file_tree, bcmdl_path):
-    dread_file_tree.get_parsed_asset(bcmdl_path)
-
-
-@pytest.mark.parametrize("bcmdl_path", ALL_BCMDL_NO_TOC9)
 def test_compare_dread_all(dread_file_tree, bcmdl_path):
     parse_build_compare_editor(BCMDL, dread_file_tree, bcmdl_path)
 
