@@ -2,6 +2,7 @@
 For checking which game is being parsed
 """
 from enum import Enum
+from functools import cached_property
 from typing import Any, Callable
 
 from construct.core import IfThenElse
@@ -50,6 +51,17 @@ class Game(Enum):
             raise ValueError(f"Unsupported game: {self}")
 
         return func(msg)
+
+    @cached_property
+    def known_hashes_table(self):
+        if self == Game.DREAD:
+            from mercury_engine_data_structures import dread_data
+            return dread_data.all_name_to_asset_id()
+        elif self == Game.SAMUS_RETURNS:
+            from mercury_engine_data_structures import samus_returns_data
+            return samus_returns_data.all_name_to_asset_id()
+        else:
+            raise ValueError(f"Unsupported game: {self}")
 
 
 def get_current_game(ctx):
