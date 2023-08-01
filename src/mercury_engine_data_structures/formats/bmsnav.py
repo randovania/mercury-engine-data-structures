@@ -160,7 +160,7 @@ BMSNAV = Struct(
     props=make_dict(Prop),  # seems to change emmi animations around specific props (ie water button)
     actors=make_dict(Actor),  # info on actors' navmeshes
     unk2=PrefixedArray(Int32ul, Struct2)  # idk on this one
-)
+).compile()
 
 
 class Bmsnav(BaseResource):
