@@ -249,11 +249,22 @@ def make_vector(value: construct.Construct):
     arr.name = "items"
     get_len = construct.len_(construct.this.items)
 
-    return construct.FocusedSeq(
+    result = construct.FocusedSeq(
         "items",
         "count" / construct.Rebuild(construct.Int32ul, get_len),
         arr,
     )
+
+    def _emitparse(code):
+        return f"ListContainer(({value._compileparse(code)}) for i in range({construct.Int32ul._compileparse(code)}))"
+    result._emitparse = _emitparse
+
+    def _emitbuild(code):
+        return (f"(reuse(len(obj), lambda obj: {construct.Int32ul._compilebuild(code)}),"
+                f" list({value._compilebuild(code)} for obj in obj), obj)[2]")
+    result._emitbuild = _emitbuild
+
+    return result
 
 
 def make_enum(values: typing.Union[typing.List[str], typing.Dict[str, int]], *,
