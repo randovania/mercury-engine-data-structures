@@ -1,4 +1,5 @@
 import copy
+import functools
 import typing
 
 import construct
@@ -14,6 +15,21 @@ Float: construct.FormatField = typing.cast(construct.FormatField, construct.Floa
 CVector2D = construct.Array(2, Float)
 CVector3D = construct.Array(3, Float)
 CVector4D = construct.Array(4, Float)
+
+
+def _vector_emitparse(length: int, code: construct.CodeGen):
+    code.append(f"CVector{length}D_Format = struct.Struct('<{length}f')")
+    return f"ListContainer(CVector{length}D_Format.unpack(io.read({length * 4})))"
+
+
+def _vector_emitbuild(length: int, code: construct.CodeGen):
+    code.append(f"CVector{length}D_Format = struct.Struct('<{length}f')")
+    return f"(io.write(CVector{length}D_Format.pack(*obj)), obj)"
+
+
+for i, vec in enumerate([CVector2D, CVector3D, CVector4D]):
+    vec._emitparse = functools.partial(_vector_emitparse, i + 2)
+    vec._emitbuild = functools.partial(_vector_emitbuild, i + 2)
 
 
 class ListContainerWithKeyAccess(construct.ListContainer):
@@ -265,11 +281,13 @@ def make_vector(value: construct.Construct):
 
     def _emitparse(code):
         return f"ListContainer(({value._compileparse(code)}) for i in range({construct.Int32ul._compileparse(code)}))"
+
     result._emitparse = _emitparse
 
     def _emitbuild(code):
         return (f"(reuse(len(obj), lambda obj: {construct.Int32ul._compilebuild(code)}),"
                 f" list({value._compilebuild(code)} for obj in obj), obj)[2]")
+
     result._emitbuild = _emitbuild
 
     return result
