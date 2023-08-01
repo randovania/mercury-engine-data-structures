@@ -138,6 +138,29 @@
             "fSelectedLowRadius": "float"
         }
     },
+    "CCollisionComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {}
+    },
+    "CGrabComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {
+            "eLinkModeAsGrabber": "enum",
+            "bIsInGrab": "bool"
+        }
+    },
+    "CCollider": {
+        "kind": "struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CColliderTriggerComponent": {
+        "kind": "struct",
+        "parent": "CTriggerComponent",
+        "fields": {}
+    },
     "CBaseCondition": {
         "kind":"struct",
         "parent": "CBehavior",
@@ -146,6 +169,32 @@
             "eReturnStatusSuccess": "enum",
             "eReturnStatusFailed": "enum"
         }
+    },
+    "CSwarmAttackComponent": {
+        "kind": "struct",
+        "parent": "CAttackComponent",
+        "fields": {}
+    },
+    "CSwarmControllerComponent": {
+        "kind": "struct",
+        "parent": "CComponent",
+        "fields": {}
+    },
+    "CTunableSwarmDamage": {
+        "kind": "struct",
+        "parent": "CTunable",
+        "fields": {
+            "fChargedImpactExtraRadius": "float",
+            "fLightningArmorImpactRadius": "float",
+            "fMissileColliderRadius": "float",
+            "fMissileSplashDamageRadius": "float",
+            "fSuperMissileSplashDamageRadius": "float"
+        }
+    },
+    "CBillboardComponent": {
+        "kind":"struct",
+        "parent": "CComponent",
+        "fields": {}
     },
     "CCamerCtrl": {
         "kind":"struct",
@@ -164,14 +213,197 @@
         "parent": "CCameraBoundaryCtrl",
         "fields": {}
     },
+    "CCharClass": {
+        "kind": "struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CCharClassAbilityComponent": {
+        "kind": "struct",
+        "parent": "CCharClassComponent",
+        "fields": {
+            "bAutoLockOnMelee": "bool",
+            "sMeleeKillFX": "string",
+            "sMeleeKillSound": "string"
+        }
+    },
+    "CCharClassComponent": {
+        "kind": "struct",
+        "parent": "CTypedObject",
+        "fields": {}
+    },
+    "CCharClassAIComponent": {
+        "kind": "struct",
+        "parent": "CCharClassComponent",
+        "fields": {
+            "sLife": "string",
+            "sDefeatedEnemyClass": "string",
+            "fChaseMinDistance": "float",
+            "fChaseMaxDistance": "float",
+            "bUseElectricAreaAttackFX": "bool",
+            "fElectricAreaAttackMaxDist": "float",
+            "fShortDistance": "float",
+            "fLongDistance": "float",
+            "bUseTargetPos": "bool",
+            "bSuspendIfNotInFrustum": "bool",
+            "bWantsAdjustHeightOnMelee": "bool",
+            "bWantsMeleeCamera": "bool",
+            "fMeleeCameraMinExtraZDist": "float",
+            "fMeleeCameraTime": "float",
+            "fMeleeCounterCameraMinExtraZDist": "float",
+            "sAutoLockOnNode": "string",
+            "sCrazyEndAnim": "string",
+            "sElectrifiedPushEndAnim": "string",
+            "eLightningArmorReaction": "enum",
+            "sCrazyFXNode": "string",
+            "vCrazyFXPositionOffset": "vector",
+            "vCrazyFXRotationOffset": "vector",
+            "sElectrifiedFXNode": "string",
+            "vElectrifiedFXPositionOffset": "vector",
+            "vElectrifiedFXRotationOffset": "vector"
+        }
+    },
+    "CCharClassBabyHatchlingAIMovement": {
+        "kind": "struct",
+        "parent": "CCharClassBehaviorTreeAIComponent",
+        "fields": {
+            "fTargetOffsetX": "float",
+            "fTargetOffsetY": "float"
+        }
+    },
+    "CCharClassBehaviorTreeAIComponent": {
+        "kind": "struct",
+        "parent": "CCharClassAIComponent",
+        "fields": {
+            "sBehaviorTreePath": "string"
+        }
+    },
+    "CCharClassDropComponent": {
+        "kind": "struct",
+        "parent": "CCharClassComponent",
+        "fields": {
+            "fNothingProbability": "float",
+            "fLifeProbability": "float",
+            "fLifeBigProbability": "float",
+            "fSpecialEnergyProbability": "float",
+            "fMissileProbability": "float",
+            "fSuperMissileProbability": "float",
+            "fPowerBombProbability": "float",
+            "fADNProbability": "float",
+            "fSpringBallProbability": "float",
+            "iMinSpecialEnergy": "int",
+            "iMaxSpecialEnergy": "int",
+            "iMinSpecialEnergyBig": "int",
+            "iMaxSpecialEnergyBig": "int",
+            "iCrazyWeaponBoostMinSpecialEnergy": "int",
+            "iCrazyWeaponBoostMaxSpecialEnergy": "int",
+            "iCrazyWeaponBoostMinSpecialEnergyBig": "int",
+            "iCrazyWeaponBoostMaxSpecialEnergyBig": "int",
+            "sADNNode": "string",
+            "vADNOffset": "vector",
+            "vDropOffset": "vector",
+            "fProbabilityMultiplierForSEWhenDieInCrazy": "float",
+            "bDropOnDeath": "bool",
+            "iNumOfDroppedItems": "int",
+            "fMinDistance": "float",
+            "fMaxDistance": "float",
+            "fMaxZDisp": "float",
+            "bRestrictFloorSectors": "bool",
+            "bDropItemOnDeath": "bool",
+            "bDropSEOnDeath": "bool",
+            "bDropItemOnDeathByMelee": "bool",
+            "bDropSEOnDeathByMelee": "bool",
+            "bDropItemOnDeathByElectricMelee": "bool",
+            "bDropSEOnDeathByElectricMelee": "bool",
+            "iMaxItemTypeMin": "int",
+            "iMaxItemTypeMax": "int",
+            "iMaxSuperMissileMin": "int",
+            "iMaxSuperMissileMax": "int",
+            "sDirToDrop": "string",
+            "bStrictDir": "bool",
+            "bAutomaticGrab": "bool"
+        }
+    },
+    "CCharClassFXComponent": {
+        "kind": "struct",
+        "parent": "CCharClassComponent",
+        "fields": {}
+    },
+    "CCharClassUsableComponent": {
+        "kind": "struct",
+        "parent": "CCharClassWeaponMovement",
+        "fields": {
+            "fGrabInterpTime": "float",
+            "fUseTime": "float",
+            "sDamageID": "string",
+            "sUseQuestionID": "string",
+            "sCanNotUseID": "string",
+            "sUseSuccessMessage": "string",
+            "sUsePrepareLeftAction": "string",
+            "sUsePrepareRightAction": "string",
+            "sUseInitAction": "string",
+            "sUseAction": "string",
+            "sUseLevelChangeAction": "string",
+            "sUseEndAction": "string",
+            "sUsableInitAction": "string",
+            "sUsableAction": "string",
+            "sUsableLevelChangeAction": "string",
+            "sUsableEndAction": "string",
+            "sUseIdleAction": "string"
+        }
+    },
+    "CCharClassWeaponMovement": {
+        "kind": "struct",
+        "parent": "CCharClassWeaponMovement",
+        "fields": {
+            "sDamageID": "string",
+            "sDamageSource": "string",
+            "eDamageType": "enum",
+            "eLightningArmorReaction": "enum",
+            "eDamageStrength": "enum"
+        }
+    },
     "CTunable": {
         "kind": "struct",
-        "parent": "null",
+        "parent": null,
         "fields": {}
+    },
+    "CTunableDroppableBillboard": {
+        "kind": "struct",
+        "parent": "CTunable",
+        "fields": {
+            "fSpawnSpeedFactor": "float",
+            "fMaxSpawnVelocity": "float",
+            "fMaxTimeAlive": "float",
+            "fTimeToStartBlinking": "float",
+            "fBlinkPeriod": "float",
+            "fMaxSqrDistanceToAbsorb": "float",
+            "sMissileCurrent": "string",
+            "sMissileMax": "string",
+            "sSuperMissileCurrent": "string",
+            "sSuperMissileMax": "string",
+            "sPowerBombCurrent": "string",
+            "sPowerBombMax": "string",
+            "fLifeAmount": "float",
+            "fLifeBigAmount": "float",
+            "fSpecialEnergyAmount": "float",
+            "fSpecialEnergyBigAmount": "float",
+            "fMissileAmount": "float",
+            "fSuperMissileAmount": "float",
+            "fPowerBombAmount": "float",
+            "fTimeSpawning": "float",
+            "fTimeSpawningMelee": "float",
+            "fTimeToBeCollectible": "float"
+        }
     },
     "CUsableComponent": {
         "kind": "struct",
         "parent": "CComponent",
+        "fields": {}
+    },
+    "CElevatorUsableComponent": {
+        "kind": "struct",
+        "parent": "CUsableComponent",
         "fields": {}
     },
     "CMetroidDNAUsableComponent": {
@@ -381,17 +613,6 @@
             "fAdvanceSpeed": "float",
             "fRetractSpeed": "float",
             "fMaxLength": "float"
-        }
-    },
-    "CCharClassWeaponMovement": {
-        "kind": "struct",
-        "parent": "CCharClassWeaponMovement",
-        "fields": {
-            "sDamageID": "string",
-            "sDamageSource": "string",
-            "eDamageType": "enum",
-            "eLightningArmorReaction": "enum",
-            "eDamageStrength": "enum"
         }
     },
     "CCharClassGrappleBeamComponent": {
@@ -725,6 +946,80 @@
         "kind":"struct",
         "parent": "CCameraBoundaryCtrl",
         "fields": {}
+    },
+    "CInterpolationComponent": {
+        "kind":"struct",
+        "parent": "CComponent",
+        "fields": {}
+    },
+    "CLifeComponent": {
+        "kind":"struct",
+        "parent": "CComponent",
+        "fields": {
+            "bDisableCollidersOnDead": "bool",
+            "bWantsCameraFXPreset": "bool",
+            "fMaxLife": "float",
+            "fCurrentLife": "float",
+            "bCurrentLifeLocked": "bool"
+        }
+    },
+    "CCharacterLifeComponent": {
+        "kind":"struct",
+        "parent": "CLifeComponent",
+        "fields": {
+            "sImpactAnim": "string",
+            "sDeadAnim": "string"
+        }
+    },
+    "CPlayerInfo": {
+        "kind":"struct",
+        "parent": "CTypedObject",
+        "fields": {
+            "sInputPreset": "string",
+            "bIgnoreShellWithIceBeam": "bool",
+            "iHeatZoneCount": "int"
+        }
+    },
+    "CPlayerInterpolation": {
+        "kind":"struct",
+        "parent": "CInterpolationComponent",
+        "fields": {}
+    },
+    "CPlayerLifeComponent": {
+        "kind":"struct",
+        "parent": "CCharacterLifeComponent",
+        "fields": {
+            "fImpactInvulnerableTime": "float",
+            "sImpactHardAnim": "string",
+            "sHardImpactFX": "string"
+        }
+    },
+    "CTunablePlayerLifeComponent": {
+        "kind":"struct",
+        "parent": "CTunable",
+        "fields": {
+            "fVariaSuitDamageMult": "float",
+            "fGravitySuitDamageMult": "float",
+            "fFusionDamageMult": "float",
+            "fHardModeDamageMult": "float",
+            "fMorphImplulseDefaultDamage": "float",
+            "fOnDeathMusicsFade": "float",
+            "fSlomoInterpTimeDead": "float",
+            "fSlomoInterpTimeRevive": "float"
+        }
+    },
+    "CPlayerMovement": {
+        "kind":"struct",
+        "parent": "CCharacterMovement",
+        "fields": {
+            "bForcedAnalogInput": "bool",
+            "fImpactImpulseX": "float",
+            "fImpactImpulseY": "float",
+            "fImpactAirImpulseY": "float",
+            "fImpactHardImpulseX": "float",
+            "fImpactHardImpulseY": "float",
+            "fImpactHardAirImpulseY": "float"
+        }
     },
     "CBombFanComponent": {
         "kind":"struct",
