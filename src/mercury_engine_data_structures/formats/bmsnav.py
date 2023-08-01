@@ -11,6 +11,7 @@ from construct.core import (
 )
 
 from mercury_engine_data_structures.common_types import CVector2D, CVector3D, Float, StrId, make_dict
+from mercury_engine_data_structures.construct_extensions.limited_struct import LimitedStruct
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
@@ -59,7 +60,7 @@ EmmyZone = Struct(
 )
 
 # a specific traversal (ie "emmi can swing across this gap")
-Traversal = Struct(
+Traversal = LimitedStruct(
     unk0=Array(4, Int32ul),  # weird shit
     initial_position=CVector2D,
     final_position=CVector2D,
