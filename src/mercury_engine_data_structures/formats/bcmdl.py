@@ -449,7 +449,7 @@ class Mdl(Construct):
         stream_seek(stream, joints_info.joints_toc, 0, path)
         joints_toc = Sub_TOC._parsereport(stream, context, f"{path} -> joints -> TOC")
 
-        join_data_struct = Struct(
+        joint_data_struct = Struct(
             header=Const(4777532174063007314, Int64ul),
             data=Array(joints_info.num_joints, Flag),
             _padding=PadTo8B,
@@ -461,7 +461,7 @@ class Mdl(Construct):
 
             for joint in joints_toc_2.subtoc_entries:
                 stream_seek(stream, joint.ptr, 0, path)
-                joint.data = join_data_struct._parse(stream, context, f"{path} -> joints -> joint")
+                joint.data = joint_data_struct._parse(stream, context, f"{path} -> joints -> joint")
         else:
             joints_toc_2 = 0
 
