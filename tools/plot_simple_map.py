@@ -3293,9 +3293,10 @@ def get_actor_name_for_node(node: dict) -> str:
             return node["extra"][variable]
 
 
-def decode_world(root: Path, target_level: str, out_path: Path, only_update_existing_areas: bool = True,
-                 skip_existing_actors: bool = True):  # ruff: noqa: C901
-
+def decode_world(  # noqa: C901
+        root: Path, target_level: str, out_path: Path, only_update_existing_areas: bool = True,
+        skip_existing_actors: bool = True
+):
     global pickup_index, bmscc, brsa, brfld, brfld_path
     all_names = dread_data.all_asset_id_to_name()
     game = Game.DREAD
