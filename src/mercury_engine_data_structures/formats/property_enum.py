@@ -1,6 +1,6 @@
 import enum
 import warnings
-from typing import Dict
+from typing import Dict, Tuple
 
 import construct
 
@@ -11,7 +11,7 @@ class HashSet(enum.Enum):
     DREAD_PROPERTY = enum.auto()
     DREAD_FILE_NAME = enum.auto()
 
-    def get_hashes(self) -> tuple[Dict[str, int], Dict[int, str]]:
+    def get_hashes(self) -> Tuple[Dict[str, int], Dict[int, str]]:
         if self == HashSet.DREAD_PROPERTY:
             return dread_data.all_name_to_property_id(), dread_data.all_property_id_to_name()
         elif self == HashSet.DREAD_FILE_NAME:
