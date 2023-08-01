@@ -1,3 +1,4 @@
+import construct
 from construct.core import (
     FixedSized,
     GreedyBytes,
@@ -16,6 +17,7 @@ class StringEncodedRobust(StringEncoded):
             return super()._decode(obj, context, path)
         except UnicodeDecodeError as e:
             raise StringError(f"string decoding failed: {e}", path=path) from e
+
 
 def PaddedStringRobust(length, encoding):
     r"""
@@ -52,7 +54,7 @@ def PaddedStringRobust(length, encoding):
     return macro
 
 
-def PascalStringRobust(lengthfield, encoding):
+def PascalStringRobust(lengthfield: construct.Construct, encoding):
     r"""
     Length-prefixed string. The length field can be variable length (such as VarInt) or fixed length (such as Int64ub).
     :class:`~construct.core.VarInt` is recommended when designing new protocols. Stored length is in bytes,
@@ -85,6 +87,16 @@ def PascalStringRobust(lengthfield, encoding):
             dict(id="data", size="lengthfield", type="str", encoding=encoding),
         ]
     macro._emitseq = _emitseq
+
+    def _emitbuild(code: construct.CodeGen):
+        i = code.allocateId()
+        code.append(f"def add_prefix_{i}(io, obj): return {lengthfield._compilebuild(code)}")
+
+        return (f"reuse(obj.encode({repr(encoding)}),"
+                f" lambda encoded: (add_prefix_{i}(io, len(encoded)), io.write(encoded)))")
+
+    macro._emitbuild = _emitbuild
+
 
     return macro
 
