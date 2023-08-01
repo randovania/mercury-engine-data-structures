@@ -5,16 +5,26 @@ import construct
 from mercury_engine_data_structures import common_types
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.formats.base_resource import NameOrAssetId, resolve_asset_id
-from mercury_engine_data_structures.formats.pkg import Construct_AssetId
 from mercury_engine_data_structures.game_check import Game
 
-TOC_Raw = construct.Struct(
+TOC_SR = construct.Struct(
     files=common_types.make_dict(
         value=construct.Int32ul,
-        key=Construct_AssetId,
+        key=construct.Int32ul,
     ),
 )
-TOC = TOC_Raw.compile()
+TOC_Dread = construct.Struct(
+    files=common_types.make_dict(
+        value=construct.Int32ul,
+        key=construct.Int64ul,
+    ),
+)
+
+TOC = construct.IfThenElse(
+    construct.this._params.target_game == Game.SAMUS_RETURNS.value,
+    TOC_SR,
+    TOC_Dread,
+).compile()
 
 
 class Toc(BaseResource):
