@@ -1,4 +1,5 @@
 import enum
+import typing
 import warnings
 from typing import Dict, Tuple
 
@@ -46,7 +47,7 @@ class CRCAdapter(construct.Adapter):
                 path=path,
             )
 
-    def _encode(self, obj: str | int, context, path):
+    def _encode(self, obj: typing.Union[str, int], context, path):
         try:
             return self.known_hashes[obj]
         except KeyError:
