@@ -112,7 +112,7 @@ class FileTreeEditor:
             if f.suffix == ".pkg":
                 self.all_pkgs.append(name)
 
-            if self._toc.get_size_for(asset_id) is None:
+            elif self._toc.get_size_for(asset_id) is None:
                 # Vanilla has a bunch of files inside `textures/` that are missing from the toc
                 if not name.startswith("textures/"):
                     logger.debug("Skipping extracted file %s as it does not have a TOC entry", name)
