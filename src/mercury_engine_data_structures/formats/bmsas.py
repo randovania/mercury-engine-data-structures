@@ -24,12 +24,33 @@ from mercury_engine_data_structures.game_check import Game
 
 StrId = PascalStringRobust(Int16ul, "utf-8")
 
+
+class StrIdOrInt(Select):
+    def __init__(self):
+        super().__init__(StrId, Hex(Int64ul))
+
+    def _emitparse(self, code: construct.CodeGen):
+        code.append(f"""
+            def parse_str_or_int(io):
+                fallback = io.tell()
+                try:
+                    return {StrId._compileparse(code)}
+                except UnicodeDecodeError:
+                    io.seek(fallback)
+                    return {Int64ul._compileparse(code)}
+        """)
+        return "parse_str_or_int(io)"
+
+    def _emitbuild(self, code: construct.CodeGen):
+        return f"({Int64ul._compilebuild(code)}) if isinstance(obj, int) else ({StrId._compilebuild(code)})"
+
+
 Argument = Struct(
     key=PropertyEnum,
     value=Switch(
         construct.this.key[0],
         {
-            's': Select(StrId, Hex(Int64ul)),
+            's': StrIdOrInt(),
             'f': Float,
             'b': Flag,
             'u': Int32ul,
@@ -93,7 +114,7 @@ Animation = Struct(
     unk7=Float,
     unk8=Int32ul,
     unk9=Float,
-    unk10=If(construct.this.unk0 & 32, Select(PropertyEnum, Hex(Int64ul))),
+    unk10=If(construct.this.unk0 & 32, Hex(Int64ul)),
     unk11=If(construct.this.unk0 & 64, StrId),
     unk12=make_vector(Struct(
         unk1=Float,
@@ -114,7 +135,7 @@ Animation = Struct(
     unk14=make_vector(Struct(
         unk0=Int64ul,
         curve=StrId,
-        unk1=make_vector(Select(PropertyEnum, Hex(Int64ul))),
+        unk1=make_vector(Hex(Int64ul)),
         unk2=Int32ul,
     )),
 )
@@ -126,7 +147,7 @@ BMSAS = Struct(
     unk=Hex(Int32ul),
     animations=make_vector(Animation),
     _end=construct.Terminated,
-)
+).compile()
 
 
 class Bmsas(BaseResource):
