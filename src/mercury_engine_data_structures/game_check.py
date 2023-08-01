@@ -1,7 +1,7 @@
 """
 For checking which game is being parsed
 """
-from enum import Enum
+import enum
 from functools import cached_property
 from typing import Any, Callable
 
@@ -10,7 +10,7 @@ from construct.core import IfThenElse
 from mercury_engine_data_structures import crc
 
 
-class Game(Enum):
+class Game(enum.IntEnum):
     SAMUS_RETURNS = 10
     DREAD = 11
 
@@ -41,6 +41,9 @@ class Game(Enum):
         if self.__class__ is other.__class__:
             return self.value < other.value
         return NotImplemented
+
+    def __hash__(self):
+        return hash(("Game", self.value))
 
     def hash_asset(self, msg: str) -> int:
         if self == Game.SAMUS_RETURNS:
