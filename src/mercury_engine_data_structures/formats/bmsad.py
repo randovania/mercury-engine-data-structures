@@ -8,6 +8,7 @@ from construct.core import (
     Float32l,
     Hex,
     IfThenElse,
+    Int8ul,
     Int16ul,
     Int32ul,
     PrefixedArray,
@@ -22,6 +23,15 @@ from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMe
 from mercury_engine_data_structures.formats import BaseResource, dread_types
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
+
+
+def SR_or_Dread(sr, dread):
+    return IfThenElse(
+        game_check.current_game_at_most(Game.SAMUS_RETURNS),
+        sr,
+        dread,
+    )
+
 
 FunctionArgument = Struct(
     type=Char,
@@ -40,7 +50,11 @@ Functions = make_vector(Struct(
     name=StrId,
     unk=Int16ul,
     params=common_types.DictAdapter(common_types.make_vector(
-        common_types.DictElement(FunctionArgument, key=PropertyEnum)
+        common_types.DictElement(
+            FunctionArgument,
+            # FIXME: PropertyEnum should properly support SR
+            key=SR_or_Dread(Hex(Int32ul), PropertyEnum),
+        )
     )),
 ))
 
@@ -150,7 +164,7 @@ Component = Struct(
         ))
     ),
     functions=Functions,
-    dependencies=Dependencies()
+    dependencies=Dependencies(),
 )
 
 CCharClass = Struct(
@@ -189,13 +203,32 @@ property_types = {
     "CActorDef": CActorDef
 }
 #
-BMSAD = Struct(
+
+SR_Component = Struct(
+    type=StrId,
+    unk_1=Hex(Int32ul)[2],
+    functions=Functions,
+    unk_2=Hex(Int32ul),
+    unk_3=construct.If(construct.this.type == "CAnimationComponent", Hex(Int32ul)),
+)
+
+BMSAD_SR = Struct(
     _magic=Const(b"MSAD"),
-    version=IfThenElse(
-        game_check.current_game_at_most(Game.SAMUS_RETURNS),
-        Const(0x002C0001, Hex(Int32ul)),
-        Const(0x0200000F, Hex(Int32ul)),
-    ),
+    version=Const(0x002C0001, Hex(Int32ul)),
+
+    name=StrId,
+    model_name=StrId,
+    unk_1=Hex(Int32ul)[14],
+    unk_2=Hex(Int8ul)[3],
+    components=make_dict(SR_Component),
+
+    rest=construct.GreedyBytes,
+    _end=construct.Terminated,
+)
+
+BMSAD_Dread = Struct(
+    _magic=Const(b"MSAD"),
+    version=Const(0x0200000F, Hex(Int32ul)),
 
     # # gameeditor::CGameModelRoot
     # root_type=construct.Const('Root', PropertyEnum),
@@ -209,11 +242,9 @@ BMSAD = Struct(
         property_types,
         ErrorWithMessage(lambda ctx: f"Unknown property type: {ctx.type}"),
     ),
-    # rest=Peek(construct.GreedyBytes),
-
-    # z=Probe(),
     _end=construct.Terminated,
 )
+BMSAD = SR_or_Dread(BMSAD_SR, BMSAD_Dread)
 
 
 # BMSAD = game_model_root.create('CActorDef', 0x02000031)
