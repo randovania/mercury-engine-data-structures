@@ -48,6 +48,11 @@ def create_parser():
     decode.add_argument("--dump-to", help="Write to the given path a json encoded contents of the file", type=Path)
     decode.add_argument("input_path", type=Path, help="Path to the file")
 
+    decode_from_pkg = subparser.add_parser("decode-from-pkg")
+    add_game_argument(decode_from_pkg)
+    decode_from_pkg.add_argument("--root", type=Path, required=True, help="Path to the PKG files")
+    decode_from_pkg.add_argument("asset_name", type=str, help="Asset name to print")
+
     replace_pkg_file = subparser.add_parser("replace-in-pkg")
     add_game_argument(replace_pkg_file)
     replace_pkg_file.add_argument("--pkg-input", type=Path, required=True, help="Path to the PKG file")
@@ -108,6 +113,15 @@ def do_decode(args):
         encoded = decoded_resource.build()
         if raw != encoded:
             print(f"{input_path}: Results differ (len(raw): {len(raw)}; len(encoded): {len(encoded)})")
+
+
+def do_decode_from_pkg(args):
+    root: Path = args.root
+    asset_name: str = args.asset_name
+
+    pkg_editor = FileTreeEditor(root, args.game)
+    asset = pkg_editor.get_parsed_asset(asset_name)
+    print(asset.raw)
 
 
 def replace_in_pkg(args):
@@ -224,6 +238,8 @@ def main():
 
     if args.command == "decode":
         do_decode(args)
+    elif args.command == "decode-from-pkg":
+        do_decode_from_pkg(args)
     elif args.command == "replace-in-pkg":
         replace_in_pkg(args)
     elif args.command == "find-pkg-for":

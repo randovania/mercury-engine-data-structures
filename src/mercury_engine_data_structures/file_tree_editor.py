@@ -15,7 +15,7 @@ from mercury_engine_data_structures.formats.base_resource import AssetId, BaseRe
 from mercury_engine_data_structures.formats.pkg import Pkg, PKGHeader
 from mercury_engine_data_structures.game_check import Game
 
-T = typing.TypeVar("T")
+_T = typing.TypeVar("_T", bound=BaseResource)
 logger = logging.getLogger(__name__)
 
 
@@ -196,7 +196,7 @@ class FileTreeEditor:
         raise ValueError(f"Unknown asset_id: {original_name}")
 
     def get_parsed_asset(self, name: str, *, in_pkg: Optional[str] = None,
-                         type_hint: typing.Type[T] = BaseResource) -> T:
+                         type_hint: typing.Type[_T] = BaseResource) -> _T:
         """
         Gets the resource with the given name and decodes it based on the extension.
         """
