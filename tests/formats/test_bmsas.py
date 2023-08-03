@@ -10,4 +10,4 @@ all_dread_bmsas = [name for name in dread_data.all_name_to_asset_id().keys()
 
 @pytest.mark.parametrize("bmsas_path", all_dread_bmsas)
 def test_bmsas(dread_file_tree, bmsas_path):
-    parse_build_compare_editor(Bmsas.construct_class(dread_file_tree.target_game), dread_file_tree, bmsas_path)
+    parse_build_compare_editor(Bmsas, dread_file_tree, bmsas_path)

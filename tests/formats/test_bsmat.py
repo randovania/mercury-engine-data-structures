@@ -11,7 +11,7 @@ all_dread_bsmat = [name for name in dread_data.all_name_to_asset_id().keys()
 
 @pytest.mark.parametrize("bsmat_path", all_dread_bsmat)
 def test_compare_dread_all(dread_file_tree, bsmat_path):
-    parse_build_compare_editor(Bsmat.construct_class(dread_file_tree.target_game), dread_file_tree, bsmat_path)
+    parse_build_compare_editor(Bsmat, dread_file_tree, bsmat_path)
 
 
 def test_get_uniform(dread_file_tree):

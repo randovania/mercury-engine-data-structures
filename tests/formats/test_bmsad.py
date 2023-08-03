@@ -24,5 +24,5 @@ def test_compare_dread_all(dread_file_tree, bmsad_path):
 
     with expectation:
         parse_build_compare_editor(
-            Bmsad.construct_class(dread_file_tree.target_game), dread_file_tree, bmsad_path
+            Bmsad, dread_file_tree, bmsad_path
         )

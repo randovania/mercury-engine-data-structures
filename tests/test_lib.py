@@ -1,9 +1,11 @@
+import typing
 from pathlib import Path
 
 import pytest
 from construct.lib.containers import Container
 
 from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
+from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 
@@ -44,12 +46,14 @@ def purge_hidden(data: Container) -> Container:
     return {k: purge_hidden(v) if isinstance(v, Container) else v for k, v in data.items()}
 
 
-def parse_build_compare_editor(module, editor: FileTreeEditor, file_name: str, print_data=False):
+def parse_build_compare_editor(module: typing.Type[BaseResource],
+                               editor: FileTreeEditor, file_name: str, print_data=False):
+    construct_class = module.construct_class(editor.target_game)
     raw = editor.get_raw_asset(file_name)
 
-    data = module.parse(raw, target_game=editor.target_game)
+    data = construct_class.parse(raw, target_game=editor.target_game)
     if print_data:
         print(data)
-    encoded = module.build(data, target_game=editor.target_game)
+    encoded = construct_class.build(data, target_game=editor.target_game)
 
     assert encoded == raw

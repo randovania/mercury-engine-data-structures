@@ -19,4 +19,4 @@ all_brfld = [
 
 @pytest.mark.parametrize("brfld_path", all_brfld)
 def test_brfld(dread_file_tree, brfld_path):
-    parse_build_compare_editor(Brfld.construct_class(dread_file_tree.target_game), dread_file_tree, brfld_path)
+    parse_build_compare_editor(Brfld, dread_file_tree, brfld_path)
