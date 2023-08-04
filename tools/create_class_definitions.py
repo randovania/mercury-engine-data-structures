@@ -241,7 +241,7 @@ def main():
 
     output_path.write_text(type_exporter.export_code())
 
-    for file_name in ["dread_resource_names", "dread_property_names", "sr_resource_names"]:
+    for file_name in ["dread_resource_names", "dread_property_names", "sr_resource_names", "sr_property_names"]:
         with meds_root.joinpath(f"{file_name}.json").open() as f:
             file_data: dict[str, int] = json.load(f)
 

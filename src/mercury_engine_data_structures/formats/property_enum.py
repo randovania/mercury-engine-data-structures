@@ -1,43 +1,62 @@
 import enum
+import functools
 import typing
 import warnings
-from typing import Dict, Tuple
+from typing import Dict
 
 import construct
 
-from mercury_engine_data_structures import crc, dread_data
+from mercury_engine_data_structures import crc, dread_data, samus_returns_data
+from mercury_engine_data_structures.game_check import Game, is_sr_or_else
+
+
+@functools.lru_cache
+def _correct_data(game: Game):
+    if game is Game.SAMUS_RETURNS:
+        return samus_returns_data
+    elif game is Game.DREAD:
+        return dread_data
+    else:
+        raise ValueError("Unknown")
 
 
 class HashSet(enum.Enum):
-    DREAD_PROPERTY = enum.auto()
-    DREAD_FILE_NAME = enum.auto()
+    PROPERTY = enum.auto()
+    FILE_NAME = enum.auto()
 
-    def get_hashes(self) -> Tuple[Dict[str, int], Dict[int, str]]:
-        if self == HashSet.DREAD_PROPERTY:
-            return dread_data.all_name_to_property_id(), dread_data.all_property_id_to_name()
-        elif self == HashSet.DREAD_FILE_NAME:
-            return dread_data.all_name_to_asset_id(), dread_data.all_asset_id_to_name()
+    def known_hashes(self, context) -> Dict[str, int]:
+        if self == HashSet.PROPERTY:
+            return _correct_data(context._params.target_game).all_name_to_property_id()
+        elif self == HashSet.FILE_NAME:
+            return _correct_data(context._params.target_game).all_name_to_asset_id()
+        else:
+            raise ValueError("Unknown")
+
+    def inverted_hashes(self, context) -> Dict[int, str]:
+        if self == HashSet.PROPERTY:
+            return _correct_data(context._params.target_game).all_property_id_to_name()
+        elif self == HashSet.FILE_NAME:
+            return _correct_data(context._params.target_game).all_asset_id_to_name()
         else:
             raise ValueError("Unknown")
 
 
 class CRCAdapter(construct.Adapter):
-    known_hashes: Dict[str, int]
-    inverted_hashes: Dict[int, str]
-
     def __init__(self, hash_set: HashSet, allow_unknowns=False, display_warnings=True):
-        super().__init__(construct.Hex(construct.Int64ul))
-        self._raw_subcon = construct.Int64ul
+        self._raw_subcon = is_sr_or_else(construct.Int32ul, construct.Int64ul)
+        super().__init__(construct.Hex(self._raw_subcon))
         self.hash_set = hash_set
-        self.known_hashes, self.inverted_hashes = hash_set.get_hashes()
         self.allow_unknowns = allow_unknowns
         self.display_warnings = display_warnings
 
     def _decode(self, obj: int, context, path):
         try:
-            return self.inverted_hashes[obj]
+            return self.hash_set.inverted_hashes(context)[obj]
         except KeyError:
-            msg = "no mapping for 0x{:8X} ({})".format(obj, obj.to_bytes(8, "little"))
+            msg = "no mapping for 0x{:08X} ({})".format(
+                obj, obj.to_bytes(self._raw_subcon.sizeof(target_game=context._params.target_game),
+                                  "little")
+            )
             if self.allow_unknowns:
                 if self.display_warnings:
                     warnings.warn(UserWarning(msg))
@@ -49,7 +68,7 @@ class CRCAdapter(construct.Adapter):
 
     def _encode(self, obj: typing.Union[str, int], context, path):
         try:
-            return self.known_hashes[obj]
+            return self.hash_set.known_hashes(context)[obj]
         except KeyError:
             msg = f"no mapping for {obj}"
             if self.allow_unknowns:
@@ -68,12 +87,12 @@ class CRCAdapter(construct.Adapter):
     def _emitparse(self, code: construct.CodeGen):
         n = self.hash_set.name
         code.append("from mercury_engine_data_structures.formats.property_enum import HashSet")
-        code.append(f"known_hashes_{n}, inverted_hashes_{n} = HashSet.{n}.get_hashes()")
 
         if self.allow_unknowns:
-            return f"reuse({self.subcon._compileparse(code)}, lambda key: inverted_hashes_{n}.get(key, key))"
+            return (f"reuse({self.subcon._compileparse(code)}, "
+                    f"lambda key: HashSet.{n}.inverted_hashes(this).get(key, key))")
         else:
-            return f"inverted_hashes_{n}[{self.subcon._compileparse(code)}]"
+            return f"HashSet.{n}.inverted_hashes(this)[{self.subcon._compileparse(code)}]"
 
     def _emitbuild(self, code: construct.CodeGen):
         if self.allow_unknowns:
@@ -81,14 +100,13 @@ class CRCAdapter(construct.Adapter):
 
         n = self.hash_set.name
         code.append("from mercury_engine_data_structures.formats.property_enum import HashSet")
-        code.append(f"known_hashes_{n}, inverted_hashes_{n} = HashSet.{n}.get_hashes()")
 
         ret: str = self._raw_subcon._compilebuild(code)
-        return ret.replace(".pack(obj)", f".pack(known_hashes_{n}[obj])")
+        return ret.replace(".pack(obj)", f".pack(HashSet.{n}.known_hashes(this)[obj])")
 
 
-PropertyEnum = CRCAdapter(HashSet.DREAD_PROPERTY)
-PropertyEnumUnsafe = CRCAdapter(HashSet.DREAD_PROPERTY, True)
+PropertyEnum = CRCAdapter(HashSet.PROPERTY)
+PropertyEnumUnsafe = CRCAdapter(HashSet.PROPERTY, True)
 
-FileNameEnum = CRCAdapter(HashSet.DREAD_FILE_NAME)
-FileNameEnumUnsafe = CRCAdapter(HashSet.DREAD_FILE_NAME, True, False)
+FileNameEnum = CRCAdapter(HashSet.FILE_NAME)
+FileNameEnumUnsafe = CRCAdapter(HashSet.FILE_NAME, True, False)

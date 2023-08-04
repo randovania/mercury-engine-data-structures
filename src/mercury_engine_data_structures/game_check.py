@@ -4,6 +4,7 @@ For checking which game is being parsed
 from enum import Enum
 from typing import Any, Callable
 
+import construct
 from construct.core import IfThenElse
 
 from mercury_engine_data_structures import crc
@@ -20,6 +21,9 @@ class Game(Enum):
             return self.value == other
         else:
             return False
+
+    def __hash__(self):
+        return id(self)
 
     def __ge__(self, other):
         if self.__class__ is other.__class__:
@@ -82,5 +86,5 @@ def current_game_at_least(target: Game) -> Callable[[Any], bool]:
     return result
 
 
-def current_game_at_least_else(target: Game, subcon1, subcon2) -> IfThenElse:
-    return IfThenElse(current_game_at_least(target), subcon1, subcon2)
+def is_sr_or_else(subcon1, subcon2) -> IfThenElse:
+    return IfThenElse(construct.this._params.target_game == Game.SAMUS_RETURNS.value, subcon1, subcon2)
