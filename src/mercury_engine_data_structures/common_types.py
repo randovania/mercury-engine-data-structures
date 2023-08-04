@@ -48,16 +48,24 @@ class ListContainerWithKeyAccess(construct.ListContainer):
 
 
 class DictAdapter(Adapter):
+    def __init__(self, subcon, *, allow_duplicates: bool = False):
+        super().__init__(subcon)
+        self.allow_duplicates = allow_duplicates
+
     def _decode(self, obj: construct.ListContainer, context, path):
         result = construct.Container()
         for item in obj:
             key = item.key
             if key in result:
+                if self.allow_duplicates:
+                    return obj
                 raise construct.ConstructError(f"Key {key} found twice in object", path)
             result[key] = item.value
         return result
 
     def _encode(self, obj: construct.Container, context, path):
+        if self.allow_duplicates and isinstance(obj, list):
+            return obj
         return construct.ListContainer(
             construct.Container(key=type_, value=item)
             for type_, item in obj.items()
