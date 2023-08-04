@@ -257,6 +257,7 @@ BMSAD_SR = Struct(
     unk_6=StrId[2],
     unk_7=Int8ul,
     sub_actors=make_vector(StrId),
+    unk_8=Int32ul,
 
     components=make_dict(SR_Component),
 
