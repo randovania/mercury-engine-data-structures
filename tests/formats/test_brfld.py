@@ -1,7 +1,7 @@
 import pytest
 from tests.test_lib import parse_build_compare_editor
 
-from mercury_engine_data_structures.formats.brfld import BRFLD
+from mercury_engine_data_structures.formats.brfld import Brfld
 
 all_brfld = [
     "maps/levels/c10_samus/s010_cave/s010_cave.brfld",
@@ -19,4 +19,4 @@ all_brfld = [
 
 @pytest.mark.parametrize("brfld_path", all_brfld)
 def test_brfld(dread_file_tree, brfld_path):
-    parse_build_compare_editor(BRFLD, dread_file_tree, brfld_path)
+    parse_build_compare_editor(Brfld, dread_file_tree, brfld_path)

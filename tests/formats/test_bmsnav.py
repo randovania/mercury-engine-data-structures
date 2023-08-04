@@ -1,7 +1,7 @@
 import pytest
 from tests.test_lib import parse_build_compare_editor
 
-from mercury_engine_data_structures.formats.bmsnav import BMSNAV
+from mercury_engine_data_structures.formats.bmsnav import Bmsnav
 
 all_bmsnav = [
     "maps/levels/c10_samus/s010_cave/s010_cave.bmsnav",
@@ -18,4 +18,4 @@ all_bmsnav = [
 
 @pytest.mark.parametrize("bmsnav_path", all_bmsnav)
 def test_bmsnav(dread_file_tree, bmsnav_path):
-    parse_build_compare_editor(BMSNAV, dread_file_tree, bmsnav_path)
+    parse_build_compare_editor(Bmsnav, dread_file_tree, bmsnav_path)
