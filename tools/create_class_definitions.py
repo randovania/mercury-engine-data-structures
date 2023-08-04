@@ -16,6 +16,11 @@ type_lib_source = type_lib_path.read_text().replace("from mercury_engine_data_st
 type_lib = construct.Container(dread_types=dread_types)
 exec(compile(type_lib_source, type_lib_path, "exec"), type_lib)
 
+dread_data_construct_path = meds_root.joinpath("_dread_data_construct.py")
+dread_data_construct = construct.Container()
+exec(compile(dread_data_construct_path.read_text(), dread_data_construct_path, "exec"), dread_data_construct)
+
+
 primitive_to_construct = {
     type_lib.PrimitiveKind.VECTOR_2: "common_types.CVector2D",
     type_lib.PrimitiveKind.VECTOR_3: "common_types.CVector3D",
@@ -57,7 +62,8 @@ class TypeExporter:
                 yield from self.children_for(child)
 
     def _debug(self, msg: str):
-        print("  " * len(self._types_being_exported) + f"* {msg}")
+        pass
+        # print("  " * len(self._types_being_exported) + f"* {msg}")
 
     def _export_enum_type(self, type_variable: str, type_name: str):
         data = self.all_types[type_name]
@@ -234,6 +240,15 @@ def main():
         type_exporter.ensure_exported_type(type_name)
 
     output_path.write_text(type_exporter.export_code())
+
+    for file_name in ["dread_resource_names", "dread_property_names", "sr_resource_names"]:
+        with meds_root.joinpath(f"{file_name}.json").open() as f:
+            file_data: dict[str, int] = json.load(f)
+
+        dread_data_construct.KnownHashes.build_file(
+            file_data,
+            meds_root.joinpath(f"{file_name}.bin")
+        )
 
 
 if __name__ == '__main__':

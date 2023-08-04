@@ -131,9 +131,10 @@ dmypy.json
 # PyCharm
 /.idea
 
-# Version
+# Generated files
 src/mercury_engine_data_structures/version.py
 src/mercury_engine_data_structures/formats/dread_types.py
+src/mercury_engine_data_structures/*.bin
 
 # Deny certain files at root
 /*.txt
