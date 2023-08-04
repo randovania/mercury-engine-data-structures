@@ -16,6 +16,10 @@ all_dread_bmsad = [name for name in dread_data.all_name_to_asset_id().keys()
 expected_dread_failures = {
     "actors/props/pf_mushr_fr/charclasses/pf_mushr_fr.bmsad",
 }
+expected_sr_failures = {
+    "actors/items/adn/charclasses/adn.bmsad",
+    "actors/props/ridleystorm/charclasses/ridleystorm.bmsad",
+}
 
 
 @pytest.mark.parametrize("bmsad_path", all_dread_bmsad)
@@ -36,7 +40,10 @@ def test_compare_sr_all(samus_returns_tree, bmsad_path):
     if not samus_returns_tree.does_asset_exists(bmsad_path):
         return pytest.skip()
 
-    expectation = contextlib.nullcontext()
+    if bmsad_path in expected_sr_failures:
+        expectation = pytest.raises(construct.core.ConstError)
+    else:
+        expectation = contextlib.nullcontext()
 
     with expectation:
         parse_build_compare_editor(

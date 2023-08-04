@@ -148,7 +148,7 @@ ExtraFields = common_types.DictAdapter(common_types.make_vector(
             ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
         )
     ))
-))
+), allow_duplicates=True)
 
 
 DreadComponent = Struct(
@@ -214,7 +214,7 @@ property_types = {
 
 def SRDependencies():
     component_dependencies = {
-        "CAnimationComponent": Hex(Int32ul),
+        "CAnimationComponent": make_vector(StrId),
         "CFXComponent": make_vector(Struct(
             "file" / StrId,
             "unk1" / Int32ul,
@@ -225,9 +225,54 @@ def SRDependencies():
             "unk" / Int16ul
         ),
         "CGrabComponent": make_vector(Struct(
-            "unk" / Const(0, Int32ul),
+            a=StrId,
+            b=StrId,
+            c=StrId,
+            d=Hex(Int32ul)[2],
+            e=Float[8],
+            f=Hex(Int32ul)[9],
         )),
+        "CGlowflyAnimationComponent": make_vector(StrId),
+        "CSceneModelAnimationComponent": make_dict(make_dict(StrId)),
+
+        "CBillboardComponent": Struct(
+            "id1" / StrId,
+            "unk1" / make_dict(Struct(
+                "unk1" / Int32ul[3],
+                "unk2" / Byte,
+                "unk3" / Int32ul[2],
+                "unk4" / Float32l
+            )),
+            "id2" / StrId,
+            "unk3" / make_vector(Struct(
+                "id" / StrId,
+                "unk1" / Byte,
+                "unk2" / make_vector(Struct(
+                    "a" / Float,
+                    "b" / Float,
+                    "c" / Float,
+                )),
+            )),
+        ),
+
+        "CSwarmControllerComponent": Struct(
+            "unk1" / make_vector(StrId),
+            "unk2" / make_vector(StrId),
+            "unk3" / make_vector(StrId)
+        ),
     }
+    for dep in [
+        "CTsumuriAcidDroolCollision",
+        "CBillboardCollisionComponent",
+        "CQueenPlasmaArcCollision",
+    ]:
+        component_dependencies[dep] = component_dependencies["CCollisionComponent"]
+
+    for dep in [
+        "CFlockingSwarmControllerComponent",
+        "CBeeSwarmControllerComponent",
+    ]:
+        component_dependencies[dep] = component_dependencies["CSwarmControllerComponent"]
 
     return Switch(construct.this.type, component_dependencies)
 
@@ -259,7 +304,11 @@ BMSAD_SR = Struct(
     sub_actors=make_vector(StrId),
     unk_8=Int32ul,
 
+    # count=Int32ul,
+    # component=(StrId >> SR_Component)[4],
     components=make_dict(SR_Component),
+
+    binaries=make_vector(StrId),
 
     rest=construct.GreedyBytes,
     _end=construct.Terminated,
