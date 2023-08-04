@@ -74,7 +74,7 @@ def find_charclass_for_type(type_name: str):
     )
 
 
-def Dependencies():
+def DreadDependencies():
     component_dependencies = {
         "CFXComponent": make_vector(Struct(
             "file" / StrId,
@@ -132,7 +132,23 @@ def Dependencies():
     return Switch(component_type, component_dependencies)
 
 
-Component = Struct(
+ExtraFields = common_types.DictAdapter(common_types.make_vector(
+    common_types.DictElement(Struct(
+        "type" / StrId,
+        "value" / Switch(
+            construct.this.type,
+            {
+                "bool": Flag,
+                "string": StrId,
+                "float": Float,
+            },
+            ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
+        )
+    ))
+))
+
+
+DreadComponent = Struct(
     type=StrId,
     unk_1=Array(2, Hex(Int32ul)),
     fields=PrefixedAllowZeroLen(
@@ -149,22 +165,10 @@ Component = Struct(
     ),
     extra_fields=construct.If(
         lambda this: type_lib.is_child_of(this.type, "CComponent"),
-        common_types.DictAdapter(common_types.make_vector(
-            common_types.DictElement(Struct(
-                "type" / StrId,
-                "value" / Switch(
-                    construct.this.type,
-                    {
-                        "bool": Flag,
-                        "string": StrId
-                    },
-                    ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
-                )
-            ))
-        ))
+        ExtraFields,
     ),
     functions=Functions,
-    dependencies=Dependencies(),
+    dependencies=DreadDependencies(),
 )
 
 CCharClass = Struct(
@@ -179,7 +183,7 @@ CCharClass = Struct(
     unk_6=StrId,
     unk_7=Byte,
 
-    components=make_dict(Component),
+    components=make_dict(DreadComponent),
 
     binaries=make_vector(StrId),
     sources=make_vector(StrId >> Byte),
@@ -192,7 +196,7 @@ CActorDef = Struct(
     sub_actors=PrefixedArray(Int32ul, StrId),
     unk_4=StrId,
 
-    components=make_dict(Component),
+    components=make_dict(DreadComponent),
 
     binaries=make_vector(StrId),
     sources=make_vector(StrId >> Byte),
@@ -204,12 +208,34 @@ property_types = {
 }
 #
 
+
+def SRDependencies():
+    component_dependencies = {
+        "CAnimationComponent": Hex(Int32ul),
+        "CFXComponent": make_vector(Struct(
+            "file" / StrId,
+            "unk1" / Int32ul,
+            "unk2" / Int32ul,
+        )),
+        "CCollisionComponent": Struct(
+            "file" / StrId,
+            "unk" / Int16ul
+        ),
+        "CGrabComponent": make_vector(Struct(
+            "unk" / Const(0, Int32ul),
+        )),
+    }
+
+    return Switch(construct.this.type, component_dependencies)
+
+
 SR_Component = Struct(
     type=StrId,
     unk_1=Hex(Int32ul)[2],
     functions=Functions,
-    unk_2=Hex(Int32ul),
-    unk_3=construct.If(construct.this.type == "CAnimationComponent", Hex(Int32ul)),
+
+    extra_fields=ExtraFields,
+    dependencies=SRDependencies(),
 )
 
 BMSAD_SR = Struct(
@@ -218,8 +244,13 @@ BMSAD_SR = Struct(
 
     name=StrId,
     model_name=StrId,
-    unk_1=Hex(Int32ul)[14],
+    unk_1=Hex(Int32ul)[12],
     unk_2=Hex(Int8ul)[3],
+    sub_actors=make_vector(StrId),
+    unk_3=Hex(Int32ul),
+
+    # count=Int32ul,
+    # comp=(StrId >> SR_Component)[6],
     components=make_dict(SR_Component),
 
     rest=construct.GreedyBytes,
