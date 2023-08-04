@@ -141,6 +141,9 @@ ExtraFields = common_types.DictAdapter(common_types.make_vector(
                 "bool": Flag,
                 "string": StrId,
                 "float": Float,
+
+                "int": construct.Int32sl,
+                "vec3": Float[3],
             },
             ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
         )
@@ -244,13 +247,17 @@ BMSAD_SR = Struct(
 
     name=StrId,
     model_name=StrId,
-    unk_1=Hex(Int32ul)[12],
-    unk_2=Hex(Int8ul)[3],
-    sub_actors=make_vector(StrId),
-    unk_3=Hex(Int32ul),
 
-    # count=Int32ul,
-    # comp=(StrId >> SR_Component)[6],
+    unk_1=Int8ul,
+    unk_2=Float[9],
+    unk_3=Int8ul,
+    unk_4=Int32ul,
+    other_magic=Const(0xFFFFFFFF, Hex(Int32ul)),
+    unk_5=Int16ul,
+    unk_6=StrId[2],
+    unk_7=Int8ul,
+    sub_actors=make_vector(StrId),
+
     components=make_dict(SR_Component),
 
     rest=construct.GreedyBytes,
