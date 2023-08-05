@@ -2,7 +2,7 @@ import io
 
 import construct
 from construct import Construct, GreedyBytes, Subconstruct, stream_tell
-from construct.core import FocusedSeq, If, IfThenElse, Optional, Peek, Prefixed
+from construct.core import FocusedSeq, If, IfThenElse, Peek, Prefixed
 
 
 class AlignTo(Construct):
@@ -117,7 +117,7 @@ def PrefixedAllowZeroLen(lengthfield, subcon, includelengthfield=False):
             IfThenElse(
                 construct.this._parsing,
                 If(construct.this.len > 0, subcon),
-                Optional(subcon)
+                If(construct.this.prefixed, subcon),
             ),
             includelengthfield
         )
