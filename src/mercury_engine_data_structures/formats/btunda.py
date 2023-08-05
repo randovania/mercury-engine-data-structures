@@ -1,14 +1,24 @@
-import construct
 
+import construct
 from construct import Container, Struct
-from enum import Enum
-from mercury_engine_data_structures.formats import BaseResource, standard_format
+
+from mercury_engine_data_structures import type_lib
+from mercury_engine_data_structures.formats import BaseResource
+from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
 
 VALID_BTUNDA_VERSIONS = [
     0x02000077, # 1.0.0
     0x02000080, # 2.1.0
 ]
+
+BTUNDA = Struct(
+    _class_crc=construct.Const('base::tunable::CTunableManager', PropertyEnum),
+    _version=construct.OneOf(construct.Int32ul, VALID_BTUNDA_VERSIONS),
+    root_type=construct.Const('Root', PropertyEnum),
+    Root=type_lib.get_type('base::tunable::CTunableManager').construct,
+    _end=construct.Terminated
+)
 
 class Btunda(BaseResource):
     """
@@ -22,20 +32,8 @@ class Btunda(BaseResource):
     """
 
     @classmethod
-    def construct_class(cls, target_game: Game, version:int) -> construct.Construct:
-        return standard_format.create('base::tunable::CTunableManager', version)
+    def construct_class(cls, target_game: Game) -> construct.Construct:
+        return BTUNDA
 
-    @classmethod
-    def parse(cls, data: bytes, target_game: Game) -> "BaseResource":
-        # peek at data to get version
-        version = int.from_bytes(data[8:12], byteorder='little')
-
-        # confirm version is valid
-        if version not in VALID_BTUNDA_VERSIONS:
-            raise ValueError((f"BTUNDA version {hex(version.to_bytes(4, byteorder='little'))}"
-                             " is not an implemented BTUNDA version!"))
-        
-        return cls(Btunda.construct_class(target_game, version).parse(data, target_game=target_game), target_game)
-    
     def get_tunable(self, tunable: str) -> Container:
         return self.raw.Root.hashTunables[tunable]
