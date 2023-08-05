@@ -332,13 +332,12 @@ BMSAD_Dread = Struct(
     ),
     _end=construct.Terminated,
 )
-BMSAD = SR_or_Dread(BMSAD_SR, BMSAD_Dread)
-
-
-# BMSAD = game_model_root.create('CActorDef', 0x02000031)
 
 
 class Bmsad(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
-        return BMSAD
+        return {
+            Game.SAMUS_RETURNS: BMSAD_SR,
+            Game.DREAD: BMSAD_Dread,
+        }[target_game]
