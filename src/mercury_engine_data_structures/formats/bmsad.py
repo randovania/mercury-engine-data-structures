@@ -52,8 +52,7 @@ Functions = make_vector(Struct(
     params=common_types.DictAdapter(common_types.make_vector(
         common_types.DictElement(
             FunctionArgument,
-            # FIXME: PropertyEnum should properly support SR
-            key=SR_or_Dread(Hex(Int32ul), PropertyEnum),
+            key=PropertyEnum,
         )
     )),
 ))
@@ -150,7 +149,6 @@ ExtraFields = common_types.DictAdapter(common_types.make_vector(
     ))
 ), allow_duplicates=True)
 
-
 DreadComponent = Struct(
     type=StrId,
     unk_1=Array(2, Hex(Int32ul)),
@@ -209,6 +207,8 @@ property_types = {
     "CCharClass": CCharClass,
     "CActorDef": CActorDef
 }
+
+
 #
 
 
@@ -332,13 +332,12 @@ BMSAD_Dread = Struct(
     ),
     _end=construct.Terminated,
 )
-BMSAD = SR_or_Dread(BMSAD_SR, BMSAD_Dread)
-
-
-# BMSAD = game_model_root.create('CActorDef', 0x02000031)
 
 
 class Bmsad(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
-        return BMSAD
+        return {
+            Game.SAMUS_RETURNS: BMSAD_SR,
+            Game.DREAD: BMSAD_Dread,
+        }[target_game]

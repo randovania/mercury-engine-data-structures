@@ -7,7 +7,6 @@ import construct
 from construct import (
     Construct,
     Hex,
-    IfThenElse,
     Int32ul,
     Int64ul,
     PrefixedArray,
@@ -17,9 +16,9 @@ from construct import (
 from mercury_engine_data_structures import dread_data, samus_returns_data
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
 from mercury_engine_data_structures.formats.base_resource import AssetId, BaseResource, NameOrAssetId, resolve_asset_id
-from mercury_engine_data_structures.game_check import Game, get_current_game
+from mercury_engine_data_structures.game_check import Game, get_current_game, is_sr_or_else
 
-Construct_AssetId = Hex(IfThenElse(construct.this._params.target_game == Game.SAMUS_RETURNS.value, Int32ul, Int64ul))
+Construct_AssetId = Hex(is_sr_or_else(Int32ul, Int64ul))
 
 
 def offset_for(con: Struct, name: str):

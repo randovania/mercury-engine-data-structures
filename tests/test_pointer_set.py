@@ -1,6 +1,7 @@
 import pytest
 
 from mercury_engine_data_structures import common_types
+from mercury_engine_data_structures.game_check import Game
 from mercury_engine_data_structures.object import Object
 from mercury_engine_data_structures.pointer_set import PointerSet
 
@@ -61,12 +62,12 @@ def _two_type_sample(request):
 
 
 def test_build_single_object(single_type_sample):
-    result = SingleTypeConstruct.build(single_type_sample[0])
+    result = SingleTypeConstruct.build(single_type_sample[0], target_game=Game.DREAD)
     assert result == single_type_sample[1]
 
 
 def test_parse_single_object(single_type_sample):
-    result = SingleTypeConstruct.parse(single_type_sample[1])
+    result = SingleTypeConstruct.parse(single_type_sample[1], target_game=Game.DREAD)
     assert result == single_type_sample[0]
 
 
@@ -77,25 +78,25 @@ def test_parse_single_object(single_type_sample):
 
 
 def test_compile_parse_single_object(single_type_sample):
-    result = SingleTypeConstruct.compile().parse(single_type_sample[1])
+    result = SingleTypeConstruct.compile().parse(single_type_sample[1], target_game=Game.DREAD)
     assert result == single_type_sample[0]
 
 
 def test_build_two_object(two_type_sample):
-    result = TwoTypeConstruct.build(two_type_sample[0])
+    result = TwoTypeConstruct.build(two_type_sample[0], target_game=Game.DREAD)
     assert result == two_type_sample[1]
 
 
 def test_parse_two_object(two_type_sample):
-    result = TwoTypeConstruct.parse(two_type_sample[1])
+    result = TwoTypeConstruct.parse(two_type_sample[1], target_game=Game.DREAD)
     assert result == two_type_sample[0]
 
 
 def test_compile_build_two_object(two_type_sample):
-    result = TwoTypeConstruct.compile().build(two_type_sample[0])
+    result = TwoTypeConstruct.compile().build(two_type_sample[0], target_game=Game.DREAD)
     assert result == two_type_sample[1]
 
 
 def test_compile_parse_two_object(two_type_sample):
-    result = TwoTypeConstruct.compile().parse(two_type_sample[1])
+    result = TwoTypeConstruct.compile().parse(two_type_sample[1], target_game=Game.DREAD)
     assert result == two_type_sample[0]

@@ -1,6 +1,7 @@
 import pytest
 
 from mercury_engine_data_structures import common_types
+from mercury_engine_data_structures.game_check import Game
 from mercury_engine_data_structures.object import Object
 
 TestClass = Object({
@@ -32,20 +33,20 @@ def _sample_object(request):
 
 
 def test_build_object(sample_object):
-    result = TestClass.build(sample_object[0])
+    result = TestClass.build(sample_object[0], target_game=Game.DREAD)
     assert result == sample_object[1]
 
 
 def test_parse_object(sample_object):
-    result = TestClass.parse(sample_object[1])
+    result = TestClass.parse(sample_object[1], target_game=Game.DREAD)
     assert result == sample_object[0]
 
 
 def test_compile_build_object(sample_object):
-    result = TestClass.compile().build(sample_object[0])
+    result = TestClass.compile().build(sample_object[0], target_game=Game.DREAD)
     assert result == sample_object[1]
 
 
 def test_compile_parse_object(sample_object):
-    result = TestClass.compile().parse(sample_object[1])
+    result = TestClass.compile().parse(sample_object[1], target_game=Game.DREAD)
     assert result == sample_object[0]
