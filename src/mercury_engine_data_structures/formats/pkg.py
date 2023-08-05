@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import functools
 import typing
 
 import construct
@@ -21,56 +22,27 @@ from mercury_engine_data_structures.game_check import Game, get_current_game, is
 Construct_AssetId = Hex(is_sr_or_else(Int32ul, Int64ul))
 
 
-def offset_for(con: Struct, name: str):
-    result = 0
-    for sc in con.subcons:
-        sc = typing.cast(Construct, sc)
-        if sc.name == name:
-            return result
-        result += sc.sizeof()
-    raise construct.ConstructError(f"Unknown field: {name}")
-
-
-def header_field(field_name: str):
-    offset = offset_for(FileEntry, field_name)
-
-    def result(ctx):
-        parents = [ctx]
-        while "_" in parents[-1]:
-            parents.append(parents[-1]["_"])
-
-        start_headers = None
-        index = None
-
-        for c in reversed(parents):
-            if "_start_headers" in c:
-                start_headers = c["_start_headers"]
-                break
-
-        for c in parents:
-            if "_resource_index" in c:
-                index = c["_resource_index"]
-                break
-
-        if index is None or start_headers is None:
-            raise ValueError("Missing required context key")
-
-        return start_headers + (index * FileEntry.sizeof()) + offset
-
-    return result
-
-
 FileEntry = Struct(
     asset_id=Construct_AssetId,
     start_offset=Int32ul,
     end_offset=Int32ul,
 )
 
-PKGHeader = Struct(
-    header_size=Int32ul,
-    data_section_size=Int32ul,
-    file_entries=PrefixedArray(Int32ul, FileEntry),
-).compile()
+
+def _file_entry(target_game: Game):
+    return Struct(
+        asset_id=Hex(Int32ul if target_game == Game.SAMUS_RETURNS else Int64ul),
+        start_offset=Int32ul,
+        end_offset=Int32ul,
+    )
+
+
+def _pkg_header(target_game: Game):
+    return Struct(
+        header_size=Int32ul,
+        data_section_size=Int32ul,
+        file_entries=PrefixedArray(Int32ul, _file_entry(target_game)),
+    )
 
 
 class PkgConstruct(construct.Construct):
@@ -175,6 +147,11 @@ class Pkg(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
         return PKG
+
+    @classmethod
+    @functools.lru_cache
+    def header_class(cls, target_game: Game) -> Construct:
+        return _pkg_header(target_game).compile()
 
     @classmethod
     def parse_stream(cls, stream: typing.BinaryIO, target_game: Game) -> Pkg:

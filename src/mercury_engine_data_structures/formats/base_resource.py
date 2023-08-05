@@ -37,5 +37,8 @@ NameOrAssetId = typing.Union[str, AssetId]
 
 def resolve_asset_id(value: NameOrAssetId, game: Game) -> AssetId:
     if isinstance(value, str):
-        return game.hash_asset(value)
+        asset_id = game.known_hashes_table.get(value)
+        if asset_id is None:
+            return game.hash_asset(value)
+        return asset_id
     return value

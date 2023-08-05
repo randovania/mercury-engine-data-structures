@@ -1,3 +1,4 @@
+import functools
 import logging
 from typing import Iterator, List, Tuple
 
@@ -7,13 +8,14 @@ from mercury_engine_data_structures.formats import BaseResource, standard_format
 from mercury_engine_data_structures.game_check import Game
 
 logger = logging.getLogger(__name__)
-BRFLD = standard_format.game_model('CScenario', 0x02000031).compile()
+_BRFLD = standard_format.game_model('CScenario', 0x02000031)
 
 
 class Brfld(BaseResource):
     @classmethod
+    @functools.lru_cache
     def construct_class(cls, target_game: Game) -> construct.Construct:
-        return BRFLD
+        return _BRFLD.compile()
 
     def actors_for_layer(self, name: str) -> dict:
         return self.raw.Root.pScenario.rEntitiesLayer.dctSublayers[name].dctActors

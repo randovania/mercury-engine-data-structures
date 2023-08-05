@@ -12,7 +12,7 @@ import construct
 from mercury_engine_data_structures import dread_data, formats, samus_returns_data
 from mercury_engine_data_structures.formats import Toc
 from mercury_engine_data_structures.formats.base_resource import AssetId, BaseResource, NameOrAssetId, resolve_asset_id
-from mercury_engine_data_structures.formats.pkg import Pkg, PKGHeader
+from mercury_engine_data_structures.formats.pkg import Pkg
 from mercury_engine_data_structures.game_check import Game
 
 _T = typing.TypeVar("_T", bound=BaseResource)
@@ -112,7 +112,7 @@ class FileTreeEditor:
             if f.suffix == ".pkg":
                 self.all_pkgs.append(name)
 
-            if self._toc.get_size_for(asset_id) is None:
+            elif self._toc.get_size_for(asset_id) is None:
                 # Vanilla has a bunch of files inside `textures/` that are missing from the toc
                 if not name.startswith("textures/"):
                     logger.debug("Skipping extracted file %s as it does not have a TOC entry", name)
@@ -121,7 +121,7 @@ class FileTreeEditor:
 
         for name in self.all_pkgs:
             with self.path_for_pkg(name).open("rb") as f:
-                self.headers[name] = PKGHeader.parse_stream(f, target_game=self.target_game)
+                self.headers[name] = Pkg.header_class(self.target_game).parse_stream(f, target_game=self.target_game)
 
             self._ensured_asset_ids[name] = set()
 

@@ -1,3 +1,4 @@
+import functools
 from typing import Iterator
 
 from construct import Construct, Container
@@ -5,13 +6,14 @@ from construct import Construct, Container
 from mercury_engine_data_structures.formats import BaseResource, standard_format
 from mercury_engine_data_structures.game_check import Game
 
-BRSA = standard_format.game_model('CSubAreaManager', 0x02010002).compile()
+_BRSA = standard_format.game_model('CSubAreaManager', 0x02010002)
 
 
 class Brsa(BaseResource):
     @classmethod
+    @functools.lru_cache
     def construct_class(cls, target_game: Game) -> Construct:
-        return BRSA
+        return _BRSA.compile()
 
     @property
     def subarea_setups(self) -> Iterator[Container]:

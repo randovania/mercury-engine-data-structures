@@ -3,7 +3,7 @@ from pathlib import Path
 
 from mercury_engine_data_structures import cli, dread_data, samus_returns_data
 from mercury_engine_data_structures.formats import Toc
-from mercury_engine_data_structures.formats.pkg import PKGHeader
+from mercury_engine_data_structures.formats.pkg import Pkg
 from mercury_engine_data_structures.game_check import Game
 
 
@@ -31,7 +31,7 @@ def main():
     for pkg_path in game_root.rglob("*.pkg"):
         with pkg_path.open("rb") as f:
             # print(f"\n\n=== {pkg_path.relative_to(game_root)}")
-            header = PKGHeader.parse_stream(f, target_game=args.game)
+            header = Pkg.header_class(args.game).parse_stream(f, target_game=args.game)
             for file_entry in header.file_entries:
                 used_asset_id.add(file_entry.asset_id)
 
