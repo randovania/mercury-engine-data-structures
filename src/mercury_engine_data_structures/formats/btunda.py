@@ -1,7 +1,7 @@
-import construct
 
-from construct import Container, Struct
-from enum import Enum
+import construct
+from construct import Container
+
 from mercury_engine_data_structures.formats import BaseResource, standard_format
 from mercury_engine_data_structures.game_check import Game
 
@@ -13,7 +13,7 @@ VALID_BTUNDA_VERSIONS = [
 class Btunda(BaseResource):
     """
     /!\\ /!\\ /!\\ READ THIS WHEN USING!!! /!\\ /!\\ /!\\
-    
+
     This format has TWO VERSIONS between 1.0.0 and 2.1.0!
 
     To prevent unexpected behavior across versions, do not use:\n
@@ -32,10 +32,10 @@ class Btunda(BaseResource):
 
         # confirm version is valid
         if version not in VALID_BTUNDA_VERSIONS:
-            raise ValueError((f"BTUNDA version {hex(version.to_bytes(4, byteorder='little'))}"
-                             " is not an implemented BTUNDA version!"))
-        
+            raise ValueError(f"BTUNDA version {hex(version.to_bytes(4, byteorder='little'))}"
+                             " is not an implemented BTUNDA version!")
+
         return cls(Btunda.construct_class(target_game, version).parse(data, target_game=target_game), target_game)
-    
+
     def get_tunable(self, tunable: str) -> Container:
         return self.raw.Root.hashTunables[tunable]
