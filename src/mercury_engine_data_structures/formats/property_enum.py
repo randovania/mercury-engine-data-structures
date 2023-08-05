@@ -6,7 +6,7 @@ from typing import Dict
 
 import construct
 
-from mercury_engine_data_structures import crc, dread_data, samus_returns_data
+from mercury_engine_data_structures import dread_data, samus_returns_data
 from mercury_engine_data_structures.game_check import Game, is_sr_or_else
 
 
@@ -77,7 +77,8 @@ class CRCAdapter(construct.Adapter):
                 if isinstance(obj, int):
                     return obj
                 else:
-                    return crc.crc64(obj)
+                    game: Game = context._params.target_game
+                    return game.hash_asset(obj)
 
             raise construct.MappingError(
                 "building failed, " + msg,
