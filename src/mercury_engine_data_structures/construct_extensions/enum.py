@@ -12,11 +12,14 @@ class StrictEnum(construct.Adapter):
     def _decode(self, obj: int, context, path):
         return self.enum_class(obj)
 
-    def _encode(self, obj: typing.Union[str, enum.IntEnum], context, path) -> int:
+    def _encode(self, obj: typing.Union[str, enum.IntEnum, int], context, path) -> int:
         if isinstance(obj, str):
             obj = getattr(self.enum_class, obj)
 
-        return obj.value
+        if isinstance(obj, enum.IntEnum):
+            obj = obj.value
+
+        return obj
 
 
 def BitMaskEnum(enum_type: typing.Type[enum.IntEnum]):
