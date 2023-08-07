@@ -15756,7 +15756,8 @@
             "fEasyModeKraidBouncingCreatureLifeFactor": "float",
             "bIgnoreImpact": "bool"
         }
-    },"CProgressStatsManager::CTunableProgressStatManager": {
+    },
+    "CProgressStatsManager::CTunableProgressStatManager": {
         "kind": "struct",
         "parent": "base::tunable::CTunable",
         "fields": {
