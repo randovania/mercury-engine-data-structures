@@ -256,13 +256,15 @@ from mercury_engine_data_structures.construct_extensions.enum import StrictEnum,
 def main():
     output_path = meds_root.joinpath("formats", output_name)
 
-    all_types: dict[str, type_lib.BaseType] = copy.copy(type_lib.TypeLib().all_types())
+    # Skip it for sr as it has some errors in its types json
+    if args.game != "sr":
+        all_types: dict[str, type_lib.BaseType] = copy.copy(type_lib.TypeLib().all_types())
 
-    type_exporter = TypeExporter(all_types)
-    for type_name in sorted(all_types.keys()):
-        type_exporter.ensure_exported_type(type_name)
+        type_exporter = TypeExporter(all_types)
+        for type_name in sorted(all_types.keys()):
+            type_exporter.ensure_exported_type(type_name)
 
-    output_path.write_text(type_exporter.export_code())
+        output_path.write_text(type_exporter.export_code())
 
     for file_name in file_names:
         with meds_root.joinpath(f"{file_name}.json").open() as f:
