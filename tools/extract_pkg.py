@@ -20,7 +20,7 @@ def main():
     else:
         raise ValueError(f"unsupported game {args.game}")
 
-    path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures",
+    path = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures",
                                               f"{short_game}_resource_names.json")
     known_names: dict[str, int] = json.loads(path.read_text())
     name_for_asset_id: dict[int, str] = {asset_id: name for name, asset_id in known_names.items()}
