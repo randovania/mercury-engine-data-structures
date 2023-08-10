@@ -11,7 +11,9 @@ _root = Path(__file__).parent
 
 @functools.lru_cache
 def get_raw_types() -> Dict[str, typing.Any]:
-    raise NotImplementedError()
+    path = Path(__file__).parent.joinpath("samus_returns_types.json")
+    with path.open() as f:
+        return json.load(f)
 
 
 @functools.lru_cache

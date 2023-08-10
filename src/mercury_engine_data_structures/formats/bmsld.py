@@ -1,3 +1,4 @@
+from typing import Iterator
 import construct
 from construct import Array, Const, Construct, Flag, Float32l, Hex, Int32ul, Struct
 
@@ -172,3 +173,13 @@ class Bmsld(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
         return BMSLD
+
+    def all_actor_groups(self) -> Iterator[str]:
+        for area in self.raw.sub_areas:
+            yield area.name
+
+    def is_actor_in_group(self, group_name: str, actor_name: str, layer_name: str = "default") -> bool:
+        generator = (area for area in self.raw.sub_areas if area.name == group_name)
+        for area in generator:
+            return actor_name in area.names
+        return False

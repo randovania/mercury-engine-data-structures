@@ -69,7 +69,7 @@ def find_charclass_for_type(type_name: str):
         return as_char
 
     return find_charclass_for_type(
-        type_lib.get_parent_for(type_name),
+        type_lib.get_parent_for(Game.DREAD, type_name),
     )
 
 
@@ -124,7 +124,7 @@ def DreadDependencies():
 
     def component_type(this):
         for component_type in component_dependencies.keys():
-            if type_lib.is_child_of(this.type, component_type):
+            if type_lib.is_child_of(Game.DREAD, this.type, component_type):
                 return component_type
         return None
 
@@ -165,7 +165,7 @@ DreadComponent = Struct(
         )
     ),
     extra_fields=construct.If(
-        lambda this: type_lib.is_child_of(this.type, "CComponent"),
+        lambda this: type_lib.is_child_of(Game.DREAD, this.type, "CComponent"),
         ExtraFields,
     ),
     functions=Functions,

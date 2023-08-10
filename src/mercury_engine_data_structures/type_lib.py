@@ -10,6 +10,8 @@ from typing import Dict, Optional, Set, Type
 import construct
 
 from mercury_engine_data_structures import dread_data
+from mercury_engine_data_structures import samus_returns_data
+from mercury_engine_data_structures.game_check import Game, is_dread
 
 # from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 
@@ -203,47 +205,48 @@ def decode_type(name: str, data: dict) -> BaseType:
 
 
 @functools.lru_cache
-def all_types() -> Dict[str, BaseType]:
+def all_types(game: Game) -> Dict[str, BaseType]:
+    data = dread_data if is_dread(game) else samus_returns_data
     return {
         name: decode_type(name, data)
-        for name, data in dread_data.get_raw_types().items()
+        for name, data in data.get_raw_types().items()
     }
 
 
 @functools.lru_cache
-def all_constructs() -> Dict[str, construct.Construct]:
+def all_constructs(game: Game) -> Dict[str, construct.Construct]:
     return {
         name: type.construct
-        for name, type in all_types().items()
+        for name, type in all_types(game).items()
     }
 
 
-def get_type(type_name: str, *, follow_typedef: bool = True) -> BaseType:
-    result = all_types()[type_name]
+def get_type(game: Game, type_name: str, *, follow_typedef: bool = True) -> BaseType:
+    result = all_types(game)[type_name]
 
     if follow_typedef and result.kind == TypeKind.TYPEDEF:
         assert isinstance(result, TypedefType)
-        return get_type(result.alias, follow_typedef=follow_typedef)
+        return get_type(game, result.alias, follow_typedef=follow_typedef)
 
     return result
 
 
-def GetTypeConstruct(keyfunc, follow_typedef: bool = True) -> construct.Construct:
+def GetTypeConstruct(game: Game, keyfunc, follow_typedef: bool = True) -> construct.Construct:
     return construct.FocusedSeq(
         "switch",
         "key" / construct.Computed(keyfunc),
-        "type" / construct.Computed(lambda this: get_type(this.key, follow_typedef=follow_typedef).name),
+        "type" / construct.Computed(lambda this: get_type(game, this.key, follow_typedef=follow_typedef).name),
         "switch" / construct.Switch(
             lambda this: this.type,
-            all_constructs(),
+            all_constructs(game),
             construct.Error
             # ErrorWithMessage(lambda this: f"Unknown type: {this.type}", construct.SwitchError)
         )
     )
 
 
-def get_parent_for(type_name: str) -> Optional[str]:
-    data = get_type(type_name)
+def get_parent_for(game: Game, type_name: str) -> Optional[str]:
+    data = get_type(game, type_name)
 
     if data.kind == TypeKind.STRUCT:
         assert isinstance(data, StructType)
@@ -252,7 +255,7 @@ def get_parent_for(type_name: str) -> Optional[str]:
     return None
 
 
-def is_child_of(type_name: Optional[str], parent_name: str) -> bool:
+def is_child_of(game: Game, type_name: Optional[str], parent_name: str) -> bool:
     """
     Checks if the type_name is a direct or indirect child of the type parent_name
     """
@@ -262,24 +265,24 @@ def is_child_of(type_name: Optional[str], parent_name: str) -> bool:
     if type_name is None:
         return False
 
-    return is_child_of(get_parent_for(type_name), parent_name)
+    return is_child_of(game, get_parent_for(game, type_name), parent_name)
 
 
 @functools.lru_cache
-def all_direct_children() -> Dict[str, Set[str]]:
+def all_direct_children(game: Game) -> Dict[str, Set[str]]:
     """
     Returns a mapping of type names to all their direct children.
     """
     result = collections.defaultdict(set)
 
-    for type_name in all_types().keys():
-        if (parent := get_parent_for(type_name)) is not None:
+    for type_name in all_types(game).keys():
+        if (parent := get_parent_for(game, type_name)) is not None:
             result[parent].add(type_name)
 
     return dict(result)
 
 
-def get_all_children_for(type_name: str) -> Set[str]:
+def get_all_children_for(game: Game, type_name: str) -> Set[str]:
     """
     Get all direct and indirect children for a given type.
     """
@@ -293,6 +296,6 @@ def get_all_children_for(type_name: str) -> Set[str]:
             continue
         result.add(next_type)
 
-        types_to_check.update(all_direct_children().get(next_type, set()))
+        types_to_check.update(all_direct_children(game).get(next_type, set()))
 
     return result
