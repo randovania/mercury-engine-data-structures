@@ -18,7 +18,7 @@ def generate_property_templates():
         os.fspath(Path(__file__).parent.joinpath("tools", "create_class_definitions.py")),
         "sr",
     ], check=True)
-     
+
 
 
 class BuildPyCommand(build_py):
