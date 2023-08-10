@@ -2,12 +2,14 @@ from typing import Optional
 
 import construct
 
-from mercury_engine_data_structures import type_lib
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.type_lib import TypeLib
 
 
 def create(name: str, version: int, root_name: Optional[str] = None, explicit_root: bool = False):
+    # this maybe needs to change in the future if SR and Dread have different formats for type using this
+    type_lib = TypeLib(Game.DREAD)
     if root_name is None:
         root_name = name
 
@@ -15,10 +17,10 @@ def create(name: str, version: int, root_name: Optional[str] = None, explicit_ro
         root = construct.FocusedSeq(
             "root",
             "type" / construct.Rebuild(PropertyEnum, name),
-            "root" / type_lib.GetTypeConstruct(Game.DREAD, lambda this: this._.type)
+            "root" / type_lib.GetTypeConstruct(lambda this: this._.type)
         )
     else:
-        root = type_lib.get_type(Game.DREAD, root_name).construct
+        root = type_lib.get_type(root_name).construct
 
     result = construct.Struct(
         _class_crc=construct.Const(name, PropertyEnum),

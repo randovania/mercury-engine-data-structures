@@ -1,4 +1,5 @@
 from typing import Iterator
+
 import construct
 from construct import Array, Const, Construct, Flag, Float32l, Hex, Int32ul, Struct
 

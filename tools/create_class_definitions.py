@@ -1,3 +1,4 @@
+import argparse
 import collections
 import copy
 import json
@@ -5,20 +6,42 @@ from pathlib import Path
 
 import construct
 
+parser = argparse.ArgumentParser()
+def game_argument_type(s: str) -> str:
+    if s not in ["dread", "sr"]:
+        raise ValueError(f"No enum named {s} found")
+    return s
+
+parser.add_argument("game", help="The game to create the class definitions for",
+                     type=game_argument_type, choices=list(["dread", "sr"]))
+args = parser.parse_args()
+
 meds_root = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures")
-dread_types_path = meds_root.joinpath("dread_types.json")
-dread_types = json.loads(dread_types_path.read_text())
+if args.game == "dread":
+    types_path = meds_root.joinpath("dread_types.json")
+    output_name = "dread_types.py"
+    file_names = ["dread_resource_names", "dread_property_names"]
+else:
+    types_path = meds_root.joinpath("samus_returns_types.json")
+    output_name = "sr_types.py"
+    file_names =  ["sr_resource_names", "sr_property_names"]
+game_types = json.loads(types_path.read_text())
 
 type_lib_path = meds_root.joinpath("type_lib.py")
-type_lib_source = type_lib_path.read_text().replace("from mercury_engine_data_structures import dread_data", ""
-                                                    ).replace("dread_data.get_raw_types()", "dread_types")
+type_lib_source = (type_lib_path.read_text()
+                   .replace("from mercury_engine_data_structures import dread_data, samus_returns_data", "")
+                   .replace("from mercury_engine_data_structures.game_check import Game", "")
+                   .replace("def __init__(self, game: Game):", "def __init__(self):")
+                   .replace("self.data = dread_data if game == Game.DREAD else samus_returns_data", "pass")
+                   .replace("self.data.get_raw_types()", "game_types")
+                   )
 
-type_lib = construct.Container(dread_types=dread_types)
+type_lib = construct.Container(game_types=game_types)
 exec(compile(type_lib_source, type_lib_path, "exec"), type_lib)
 
 dread_data_construct_path = meds_root.joinpath("_dread_data_construct.py")
-dread_data_construct = construct.Container()
-exec(compile(dread_data_construct_path.read_text(), dread_data_construct_path, "exec"), dread_data_construct)
+data_construct = construct.Container()
+exec(compile(dread_data_construct_path.read_text(), dread_data_construct_path, "exec"), data_construct)
 
 
 primitive_to_construct = {
@@ -231,9 +254,9 @@ from mercury_engine_data_structures.construct_extensions.enum import StrictEnum,
 
 
 def main():
-    output_path = meds_root.joinpath("formats", "dread_types.py")
+    output_path = meds_root.joinpath("formats", output_name)
 
-    all_types: dict[str, type_lib.BaseType] = copy.copy(type_lib.all_types())
+    all_types: dict[str, type_lib.BaseType] = copy.copy(type_lib.TypeLib().all_types())
 
     type_exporter = TypeExporter(all_types)
     for type_name in sorted(all_types.keys()):
@@ -241,11 +264,11 @@ def main():
 
     output_path.write_text(type_exporter.export_code())
 
-    for file_name in ["dread_resource_names", "dread_property_names", "sr_resource_names", "sr_property_names"]:
+    for file_name in file_names:
         with meds_root.joinpath(f"{file_name}.json").open() as f:
             file_data: dict[str, int] = json.load(f)
 
-        dread_data_construct.KnownHashes.build_file(
+        data_construct.KnownHashes.build_file(
             file_data,
             meds_root.joinpath(f"{file_name}.bin")
         )
