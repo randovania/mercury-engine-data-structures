@@ -7,7 +7,8 @@ from mercury_engine_data_structures import crc
 
 def main():
     types_file = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures", "dread_types.json")
-    properties_file = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures", "dread_property_names.json")
+    properties_file = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures",
+                                                         "dread_property_names.json")
 
     with types_file.open() as f:
         all_types: dict[str, dict[str, typing.Any]] = json.load(f)
