@@ -3,13 +3,12 @@ from typing import Optional
 import construct
 
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
-from mercury_engine_data_structures.game_check import Game
-from mercury_engine_data_structures.type_lib import TypeLib
+from mercury_engine_data_structures.type_lib_instances import get_type_lib_dread
 
 
 def create(name: str, version: int, root_name: Optional[str] = None, explicit_root: bool = False):
     # this maybe needs to change in the future if SR and Dread have different formats for type using this
-    type_lib = TypeLib(Game.DREAD)
+    type_lib = get_type_lib_dread()
     if root_name is None:
         root_name = name
 

@@ -9,9 +9,6 @@ from typing import Dict, Optional, Set, Type
 
 import construct
 
-from mercury_engine_data_structures import dread_data, samus_returns_data
-from mercury_engine_data_structures.game_check import Game
-
 # from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 
 @dataclasses.dataclass(frozen=True)
@@ -204,14 +201,14 @@ def decode_type(name: str, data: dict) -> BaseType:
 
 
 class TypeLib:
-    def __init__(self, game: Game):
-        self.data = dread_data if game == Game.DREAD else samus_returns_data
+    def __init__(self, types_dict: Dict[str, typing.Any]):
+        self.types_dict = types_dict
 
     @functools.lru_cache
     def all_types(self) -> Dict[str, BaseType]:
         return {
             name: decode_type(name, data)
-            for name, data in self.data.get_raw_types().items()
+            for name, data in self.types_dict.items()
         }
 
     @functools.lru_cache

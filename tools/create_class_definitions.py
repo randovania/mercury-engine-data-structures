@@ -3,61 +3,15 @@ import collections
 import copy
 import json
 from pathlib import Path
+from typing import Any
 
 import construct
 
-parser = argparse.ArgumentParser()
-def game_argument_type(s: str) -> str:
-    if s not in ["dread", "sr"]:
-        raise ValueError(f"No enum named {s} found")
-    return s
-
-parser.add_argument("game", help="The game to create the class definitions for",
-                     type=game_argument_type, choices=list(["dread", "sr"]))
-args = parser.parse_args()
-
 meds_root = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures")
-if args.game == "dread":
-    types_path = meds_root.joinpath("dread_types.json")
-    output_name = "dread_types.py"
-    file_names = ["dread_resource_names", "dread_property_names"]
-else:
-    types_path = meds_root.joinpath("samus_returns_types.json")
-    output_name = "sr_types.py"
-    file_names =  ["sr_resource_names", "sr_property_names"]
-game_types = json.loads(types_path.read_text())
-
-type_lib_path = meds_root.joinpath("type_lib.py")
-type_lib_source = (type_lib_path.read_text()
-                   .replace("from mercury_engine_data_structures import dread_data, samus_returns_data", "")
-                   .replace("from mercury_engine_data_structures.game_check import Game", "")
-                   .replace("def __init__(self, game: Game):", "def __init__(self):")
-                   .replace("self.data = dread_data if game == Game.DREAD else samus_returns_data", "pass")
-                   .replace("self.data.get_raw_types()", "game_types")
-                   )
-
-type_lib = construct.Container(game_types=game_types)
-exec(compile(type_lib_source, type_lib_path, "exec"), type_lib)
 
 dread_data_construct_path = meds_root.joinpath("_dread_data_construct.py")
 data_construct = construct.Container()
 exec(compile(dread_data_construct_path.read_text(), dread_data_construct_path, "exec"), data_construct)
-
-
-primitive_to_construct = {
-    type_lib.PrimitiveKind.VECTOR_2: "common_types.CVector2D",
-    type_lib.PrimitiveKind.VECTOR_3: "common_types.CVector3D",
-    type_lib.PrimitiveKind.VECTOR_4: "common_types.CVector4D",
-    type_lib.PrimitiveKind.FLOAT: "common_types.Float",
-    type_lib.PrimitiveKind.INT: "common_types.Int",
-    type_lib.PrimitiveKind.STRING: "common_types.StrId",
-    type_lib.PrimitiveKind.UINT: "common_types.UInt",
-    type_lib.PrimitiveKind.BOOL: "construct.Flag",
-    type_lib.PrimitiveKind.UINT_16: "construct.Int16ul",
-    type_lib.PrimitiveKind.UINT_64: "construct.Int64ul",
-    type_lib.PrimitiveKind.BYTES: "construct.Prefixed(construct.Int32ul, construct.GreedyBytes)",
-    type_lib.PrimitiveKind.PROPERTY: "PropertyEnum",
-}
 
 
 def _type_name_to_python_identifier(type_name: str):
@@ -66,13 +20,15 @@ def _type_name_to_python_identifier(type_name: str):
 
 
 class TypeExporter:
-    def __init__(self, all_types: dict[str, type_lib.BaseType]):
+    def __init__(self, all_types: dict[str, Any], primitive_to_construct, type_lib):
         self.all_types = all_types
         self._exported_types = {}
         self._types_with_pointer = set()
         self._types_being_exported = set()
         self._children_for = collections.defaultdict(set)
         self._type_definition_code = ""
+        self._primitive_to_construct = primitive_to_construct
+        self._type_lib = type_lib
 
         for type_name, data in all_types.items():
             if isinstance(data, type_lib.StructType) and data.parent is not None:
@@ -90,7 +46,7 @@ class TypeExporter:
 
     def _export_enum_type(self, type_variable: str, type_name: str):
         data = self.all_types[type_name]
-        if not isinstance(data, type_lib.EnumType):
+        if not isinstance(data, self._type_lib.EnumType):
             raise ValueError(f"_export_enum_type called for {type_name}, a non-Enum")
 
         enum_definition = f"\n\n\nclass {type_variable}(enum.IntEnum):\n"
@@ -105,7 +61,7 @@ class TypeExporter:
 
     def _export_struct_type(self, type_variable: str, type_name: str):
         data = self.all_types[type_name]
-        assert isinstance(data, type_lib.StructType)
+        assert isinstance(data, self._type_lib.StructType)
 
         parent_name = None
         if data.parent is not None:
@@ -141,36 +97,36 @@ class TypeExporter:
         type_data = self.all_types[type_name]
         type_variable = type_data.name_as_python_identifier
 
-        if isinstance(type_data, type_lib.PrimitiveType):
-            type_variable = primitive_to_construct[type_data.primitive_kind]
+        if isinstance(type_data, self._type_lib.PrimitiveType):
+            type_variable = self._primitive_to_construct[type_data.primitive_kind]
 
-        elif isinstance(type_data, type_lib.StructType):
+        elif isinstance(type_data, self._type_lib.StructType):
             type_code = self._export_struct_type(type_variable, type_name)
             self._type_definition_code += f'\n\n{type_variable} = {type_code}'
 
-        elif isinstance(type_data, type_lib.EnumType):
+        elif isinstance(type_data, self._type_lib.EnumType):
             type_variable, type_code = self._export_enum_type(type_variable, type_name)
             self._type_definition_code += type_code
 
-        elif isinstance(type_data, type_lib.FlagsetType):
+        elif isinstance(type_data, self._type_lib.FlagsetType):
             reference = self.ensure_exported_type(type_data.enum)
             flags = f'BitMaskEnum({reference}.enum_class)'
             self._type_definition_code += f'\n\n{type_variable} = {flags}'
 
-        elif isinstance(type_data, type_lib.TypedefType):
+        elif isinstance(type_data, self._type_lib.TypedefType):
             reference = self.ensure_exported_type(type_data.alias)
             self._type_definition_code += f'\n\n{type_variable} = {reference}'
 
-        elif isinstance(type_data, type_lib.PointerType):
+        elif isinstance(type_data, self._type_lib.PointerType):
             inner_field = self.pointer_to_type(type_data.target)
             self._type_definition_code += f'\n\n{type_variable} = {inner_field}.create_construct()'
 
-        elif isinstance(type_data, type_lib.VectorType):
+        elif isinstance(type_data, self._type_lib.VectorType):
             inner_field = self.ensure_exported_type(type_data.value_type)
             type_code = f"common_types.make_vector({inner_field})"
             self._type_definition_code += f'\n\n{type_variable} = {type_code}'
 
-        elif isinstance(type_data, type_lib.DictionaryType):
+        elif isinstance(type_data, self._type_lib.DictionaryType):
             key_field = self.ensure_exported_type(type_data.key_type)
             inner_field = self.ensure_exported_type(type_data.value_type)
             type_code = f"common_types.make_dict({inner_field}, key={key_field})"
@@ -218,7 +174,7 @@ from mercury_engine_data_structures.construct_extensions.enum import StrictEnum,
 
 """
         code += 'primitive_to_construct = {\n'
-        code += "".join(f'    "{k.value}": {v},\n' for k, v in primitive_to_construct.items())
+        code += "".join(f'    "{k.value}": {v},\n' for k, v in self._primitive_to_construct.items())
         code += "}\n\n"
 
         seen_types_with_pointer = set()
@@ -253,14 +209,54 @@ from mercury_engine_data_structures.construct_extensions.enum import StrictEnum,
         return code
 
 
+def game_argument_type(s: str) -> str:
+    if s not in ["dread", "sr"]:
+        raise ValueError(f"No enum named {s} found")
+    return s
+
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("game", help="The game to create the class definitions for",
+                        type=game_argument_type, choices=["dread", "sr"])
+    args = parser.parse_args()
+
+    if args.game == "dread":
+        types_path = meds_root.joinpath("dread_types.json")
+        output_name = "dread_types.py"
+        file_names = ["dread_resource_names", "dread_property_names"]
+    else:
+        types_path = meds_root.joinpath("samus_returns_types.json")
+        output_name = "sr_types.py"
+        file_names =  ["sr_resource_names", "sr_property_names"]
+
+    game_types = json.loads(types_path.read_text())
+
+    type_lib_path = meds_root.joinpath("type_lib.py")
+    type_lib_source = type_lib_path.read_text()
+    type_lib = construct.Container(game_types=game_types)
+    exec(compile(type_lib_source, type_lib_path, "exec"), type_lib)
+    primitive_to_construct = {
+        type_lib.PrimitiveKind.VECTOR_2: "common_types.CVector2D",
+        type_lib.PrimitiveKind.VECTOR_3: "common_types.CVector3D",
+        type_lib.PrimitiveKind.VECTOR_4: "common_types.CVector4D",
+        type_lib.PrimitiveKind.FLOAT: "common_types.Float",
+        type_lib.PrimitiveKind.INT: "common_types.Int",
+        type_lib.PrimitiveKind.STRING: "common_types.StrId",
+        type_lib.PrimitiveKind.UINT: "common_types.UInt",
+        type_lib.PrimitiveKind.BOOL: "construct.Flag",
+        type_lib.PrimitiveKind.UINT_16: "construct.Int16ul",
+        type_lib.PrimitiveKind.UINT_64: "construct.Int64ul",
+        type_lib.PrimitiveKind.BYTES: "construct.Prefixed(construct.Int32ul, construct.GreedyBytes)",
+        type_lib.PrimitiveKind.PROPERTY: "PropertyEnum",
+    }
+
     output_path = meds_root.joinpath("formats", output_name)
 
     # Skip it for sr as it has some errors in its types json
     if args.game != "sr":
-        all_types: dict[str, type_lib.BaseType] = copy.copy(type_lib.TypeLib().all_types())
+        all_types: dict[str, type_lib.BaseType] = copy.copy(type_lib.TypeLib(game_types).all_types())
 
-        type_exporter = TypeExporter(all_types)
+        type_exporter = TypeExporter(all_types, primitive_to_construct, type_lib)
         for type_name in sorted(all_types.keys()):
             type_exporter.ensure_exported_type(type_name)
 
