@@ -45,7 +45,6 @@ ALL_FORMATS = {
     "BRFLD": Brfld,
     "BMSCC": Bmscc,
     "BMSCD": Bmscc,
-    "BMSCP": Bmscp,
     "BMSCU": Bmscu,
     "BMSLD": Bmsld,
     "BMSNAV": Bmsnav,
