@@ -577,7 +577,7 @@ def main(only_missing: bool = True, ignore_without_hash: bool = True,
     all_fields_functions = get_function_list() if query_ghidra else {}
     print(f"Got {len(all_fields_functions)} functions!")
 
-    path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures", "dread_types.json")
+    path = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures", "dread_types.json")
 
     try:
         with path.open() as f:

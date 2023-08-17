@@ -67,7 +67,7 @@ def main():
     else:
         raise ValueError(f"unsupported game {game}")
 
-    path = Path(__file__).parents[1].joinpath("mercury_engine_data_structures",
+    path = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures",
                                               f"{short_game}_resource_names.json")
 
     game_root: Path = args.game_root
