@@ -45,7 +45,11 @@ class StrIdOrInt(Select):
         return "parse_str_or_int(io)"
 
     def _emitbuild(self, code: construct.CodeGen):
-        return f"({self.int_subcon._compilebuild(code)}) if isinstance(obj, int) else ({self.str_subcon._compilebuild(code)})"
+        return (
+            f"({self.int_subcon._compilebuild(code)})"
+            "if isinstance(obj, int) else "
+            f"({self.str_subcon._compilebuild(code)})"
+        )
 
 ArgTypes = {
     'f': Float,
