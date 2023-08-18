@@ -16,10 +16,7 @@ all_dread_bmsad = [name for name in dread_data.all_name_to_asset_id().keys()
 expected_dread_failures = {
     "actors/props/pf_mushr_fr/charclasses/pf_mushr_fr.bmsad",
 }
-expected_sr_failures = {
-    "actors/items/adn/charclasses/adn.bmsad",
-    "actors/props/ridleystorm/charclasses/ridleystorm.bmsad",
-}
+expected_sr_failures = set()
 
 
 @pytest.mark.parametrize("bmsad_path", all_dread_bmsad)

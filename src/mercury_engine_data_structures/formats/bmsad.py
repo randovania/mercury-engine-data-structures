@@ -10,17 +10,18 @@ from construct.core import (
     IfThenElse,
     Int8ul,
     Int16ul,
+    Int32sl,
     Int32ul,
-    PrefixedArray,
     Struct,
     Switch,
 )
 
-from mercury_engine_data_structures import common_types, game_check
-from mercury_engine_data_structures.common_types import Char, Float, StrId, make_dict, make_vector
+from mercury_engine_data_structures import common_types, game_check, type_lib
+from mercury_engine_data_structures.common_types import Char, CVector3D, Float, StrId, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource, dread_types
+from mercury_engine_data_structures.formats.bmsas import BMSAS_SR, StrIdOrInt
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
 from mercury_engine_data_structures.type_lib import get_type_lib_dread
@@ -48,7 +49,8 @@ FunctionArgument = Struct(
 )
 Functions = make_vector(Struct(
     name=StrId,
-    unk=Int16ul,
+    unk1=Flag,
+    unk2=Flag,
     params=common_types.DictAdapter(common_types.make_vector(
         common_types.DictElement(
             FunctionArgument,
@@ -172,35 +174,30 @@ DreadComponent = Struct(
     dependencies=DreadDependencies(),
 )
 
+_CActorDefFields = {
+    "unk_1": Flag,
+    "unk_2": Flag,
+    "unk_3": Int32ul,
+    "unk_4": Flag,
+    "unk_5": Flag,
+    "sub_actors": make_vector(StrId),
+}
+
+CActorDef = Struct(**_CActorDefFields)
+
 CCharClass = Struct(
     model_name=StrId,
-    unk_1=Int16ul,
-    unk_2=Int32ul,
-    unk_3=Int16ul,
-    sub_actors=PrefixedArray(Int32ul, StrId),
-    unk_4=Array(9, Float32l),
+    **_CActorDefFields,
+    unk_6=Float,
+    unk_7=Float,
+    unk_8=Float,
+    unk_9=Float,
+    unk_10=Float,
+    unk_11=CVector3D,
+    unk_12=Float,
     magic=Const(0xFFFFFFFF, Hex(Int32ul)),
-    unk_5=Byte,
-    unk_6=StrId,
-    unk_7=Byte,
-
-    components=make_dict(DreadComponent),
-
-    binaries=make_vector(StrId),
-    sources=make_vector(StrId >> Byte),
-)
-
-CActorDef = Struct(
-    unk_1=Int16ul,
-    unk_2=Int32ul,
-    unk_3=Int16ul,
-    sub_actors=PrefixedArray(Int32ul, StrId),
-    unk_4=StrId,
-
-    components=make_dict(DreadComponent),
-
-    binaries=make_vector(StrId),
-    sources=make_vector(StrId >> Byte),
+    unk_13=Flag,
+    category=StrId,
 )
 
 property_types = {
@@ -279,11 +276,35 @@ def SRDependencies():
 
 SR_Component = Struct(
     type=StrId,
-    unk_1=Hex(Int32ul)[2],
+    unk_1=Hex(Int32ul),
+    unk_2=Float32l,
     functions=Functions,
-
     extra_fields=ExtraFields,
     dependencies=SRDependencies(),
+)
+
+ArgList = make_vector(Struct(
+    "name" / Hex(Int32ul),
+    "type" / Char,
+    "value" / Switch(
+        lambda this: this.type,
+        {
+            's': StrIdOrInt(StrId, Int32ul),
+            'f': Float,
+            'b': Flag,
+            'u': Int32ul,
+            'i': Int32sl,
+            'e': Int32ul,
+            'o': Int32ul,
+            't': Int32ul,
+        }
+    )
+))
+
+Event = Struct(
+    "unk" / Int32ul,
+    "args" / ArgList,
+    construct.Probe(lookahead=256),
 )
 
 BMSAD_SR = Struct(
@@ -294,23 +315,35 @@ BMSAD_SR = Struct(
     model_name=StrId,
 
     unk_1=Int8ul,
-    unk_2=Float[9],
+    unk_2a=Float,
+    unk_2b=Float,
+    unk_2c=Float,
+    unk_2d=Float,
+    unk_2e=Float,
+    unk_2f=CVector3D,
+    unk_2g=Float,
     unk_3=Int8ul,
     unk_4=Int32ul,
-    other_magic=Const(0xFFFFFFFF, Hex(Int32ul)),
-    unk_5=Int16ul,
-    unk_6=StrId[2],
-    unk_7=Int8ul,
+    other_magic=Int32sl,
+    unk_5=Flag,
+    unk_5b=Flag,
+    unk_6=Flag,
+    category=StrId,
+    unk_7=Flag,
     sub_actors=make_vector(StrId),
     unk_8=Int32ul,
 
-    # count=Int32ul,
-    # component=(StrId >> SR_Component)[4],
     components=make_dict(SR_Component),
 
-    binaries=make_vector(StrId),
+    unk_9=Int32ul,
+    unk_9a=construct.If(lambda this: this.unk_9 == 2, construct.Bytes(9)),
+    unk_9b=construct.If(lambda this: this.unk_9 == 0, construct.Bytes(15)),
+    unk_10=StrId,
+    unk_11=Int32ul,
 
-    rest=construct.GreedyBytes,
+    action_sets=make_vector(BMSAS_SR),
+    sound_fx=construct.Optional(make_vector(StrId >> Byte)),
+
     _end=construct.Terminated,
 )
 
@@ -325,11 +358,15 @@ BMSAD_Dread = Struct(
     name=StrId,
     type=StrId,
 
-    property=Switch(
+    header=Switch(
         construct.this.type,
         property_types,
         ErrorWithMessage(lambda ctx: f"Unknown property type: {ctx.type}"),
     ),
+    unk=Flag,
+    components=make_dict(DreadComponent),
+    action_sets=make_vector(StrId),
+    sound_fx=make_vector(StrId >> Byte),
     _end=construct.Terminated,
 )
 
