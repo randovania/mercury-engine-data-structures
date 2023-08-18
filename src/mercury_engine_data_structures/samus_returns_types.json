@@ -1347,5 +1347,67 @@
         "kind":"struct",
         "parent": "CZetaAttack",
         "fields": {}
+    },
+    "ProperActor": {
+        "kind": "struct",
+        "parent": "CGameObject",
+        "fields": {
+            "type": "base::global::StrId",
+            "x": "float",
+            "y": "float",
+            "z": "float",
+            "unk05": "unsigned",
+            "unk06": "unsigned",
+            "unk07": "unsigned",
+            "components": "base::global::CRntVector<Component>"
+        }
+    },
+    "CGameObject": {
+        "kind": "struct",
+        "parent": "base::core::CBaseObject",
+        "fields": {}
+    },
+    "Component": {
+        "kind": "struct",
+        "parent": "CGameObject",
+        "fields": {
+            "component_type": "base::global::StrId",
+            "command": "base::global::StrId",
+            "arguments": "base::global::CRntVector<FunctionArgument>"
+        }
+    },
+    "FunctionArgument": {
+        "kind": "struct",
+        "parent": "CGameObject",
+        "fields": {
+            "type": "base::global::StrId",
+            "value": "base::global::StrId"
+        }
+    },
+    "base::global::StrId": {
+        "kind": "primitive",
+        "primitive_kind": "string"
+    },
+    "base::core::CBaseObject": {
+        "kind": "struct",
+        "parent": null,
+        "fields": {}
+    },
+    "base::global::CRntVector<Component>": {
+        "kind": "vector",
+        "value_type": "Component"
+    },
+
+    "base::global::CRntVector<FunctionArgument>": {
+        "kind": "vector",
+        "value_type": "FunctionArgument"
+    },
+    "float": {
+        "kind": "primitive",
+        "primitive_kind": "float"
+    },
+    "unsigned": {
+        "kind": "primitive",
+        "primitive_kind": "uint"
     }
 }

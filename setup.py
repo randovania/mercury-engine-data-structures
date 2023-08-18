@@ -10,8 +10,15 @@ from setuptools.command.build_py import build_py
 def generate_property_templates():
     subprocess.run([
         sys.executable,
-        os.fspath(Path(__file__).parent.joinpath("tools", "create_class_definitions.py"))
+        os.fspath(Path(__file__).parent.joinpath("tools", "create_class_definitions.py")),
+        "dread",
     ], check=True)
+    subprocess.run([
+        sys.executable,
+        os.fspath(Path(__file__).parent.joinpath("tools", "create_class_definitions.py")),
+        "sr",
+    ], check=True)
+
 
 
 class BuildPyCommand(build_py):

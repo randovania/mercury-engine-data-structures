@@ -9,8 +9,6 @@ from typing import Dict, Optional, Set, Type
 
 import construct
 
-from mercury_engine_data_structures import dread_data
-
 # from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 
 @dataclasses.dataclass(frozen=True)
@@ -202,97 +200,100 @@ def decode_type(name: str, data: dict) -> BaseType:
     return kind.type_class.from_json(name, data)
 
 
-@functools.lru_cache
-def all_types() -> Dict[str, BaseType]:
-    return {
-        name: decode_type(name, data)
-        for name, data in dread_data.get_raw_types().items()
-    }
+class TypeLib:
+    def __init__(self, types_dict: Dict[str, typing.Any]):
+        self.types_dict = types_dict
+
+    @functools.lru_cache
+    def all_types(self) -> Dict[str, BaseType]:
+        return {
+            name: decode_type(name, data)
+            for name, data in self.types_dict.items()
+        }
+
+    @functools.lru_cache
+    def all_constructs(self) -> Dict[str, construct.Construct]:
+        return {
+            name: type.construct
+            for name, type in self.all_types().items()
+        }
 
 
-@functools.lru_cache
-def all_constructs() -> Dict[str, construct.Construct]:
-    return {
-        name: type.construct
-        for name, type in all_types().items()
-    }
+    def get_type(self, type_name: str, *, follow_typedef: bool = True) -> BaseType:
+        result = self.all_types()[type_name]
+
+        if follow_typedef and result.kind == TypeKind.TYPEDEF:
+            assert isinstance(result, TypedefType)
+            return self.get_type(result.alias, follow_typedef=follow_typedef)
+
+        return result
 
 
-def get_type(type_name: str, *, follow_typedef: bool = True) -> BaseType:
-    result = all_types()[type_name]
-
-    if follow_typedef and result.kind == TypeKind.TYPEDEF:
-        assert isinstance(result, TypedefType)
-        return get_type(result.alias, follow_typedef=follow_typedef)
-
-    return result
-
-
-def GetTypeConstruct(keyfunc, follow_typedef: bool = True) -> construct.Construct:
-    return construct.FocusedSeq(
-        "switch",
-        "key" / construct.Computed(keyfunc),
-        "type" / construct.Computed(lambda this: get_type(this.key, follow_typedef=follow_typedef).name),
-        "switch" / construct.Switch(
-            lambda this: this.type,
-            all_constructs(),
-            construct.Error
-            # ErrorWithMessage(lambda this: f"Unknown type: {this.type}", construct.SwitchError)
+    def GetTypeConstruct(self, keyfunc, follow_typedef: bool = True) -> construct.Construct:
+        return construct.FocusedSeq(
+            "switch",
+            "key" / construct.Computed(keyfunc),
+            "type" / construct.Computed(lambda this: self.get_type(this.key, follow_typedef=follow_typedef).name),
+            "switch" / construct.Switch(
+                lambda this: this.type,
+                self.all_constructs(),
+                construct.Error
+                # ErrorWithMessage(lambda this: f"Unknown type: {this.type}", construct.SwitchError)
+            )
         )
-    )
 
 
-def get_parent_for(type_name: str) -> Optional[str]:
-    data = get_type(type_name)
+    def get_parent_for(self, type_name: str) -> Optional[str]:
+        data = self.get_type(type_name)
 
-    if data.kind == TypeKind.STRUCT:
-        assert isinstance(data, StructType)
-        return data.parent
+        if data.kind == TypeKind.STRUCT:
+            assert isinstance(data, StructType)
+            return data.parent
 
-    return None
-
-
-def is_child_of(type_name: Optional[str], parent_name: str) -> bool:
-    """
-    Checks if the type_name is a direct or indirect child of the type parent_name
-    """
-    if type_name == parent_name:
-        return True
-
-    if type_name is None:
-        return False
-
-    return is_child_of(get_parent_for(type_name), parent_name)
+        return None
 
 
-@functools.lru_cache
-def all_direct_children() -> Dict[str, Set[str]]:
-    """
-    Returns a mapping of type names to all their direct children.
-    """
-    result = collections.defaultdict(set)
+    def is_child_of(self, type_name: Optional[str], parent_name: str) -> bool:
+        """
+        Checks if the type_name is a direct or indirect child of the type parent_name
+        """
+        if type_name == parent_name:
+            return True
 
-    for type_name in all_types().keys():
-        if (parent := get_parent_for(type_name)) is not None:
-            result[parent].add(type_name)
+        if type_name is None:
+            return False
 
-    return dict(result)
+        return self.is_child_of(self.get_parent_for(type_name), parent_name)
 
 
-def get_all_children_for(type_name: str) -> Set[str]:
-    """
-    Get all direct and indirect children for a given type.
-    """
-    result = set()
+    @functools.lru_cache
+    def all_direct_children(self) -> Dict[str, Set[str]]:
+        """
+        Returns a mapping of type names to all their direct children.
+        """
+        result = collections.defaultdict(set)
 
-    types_to_check = {type_name}
-    while types_to_check:
-        next_type = types_to_check.pop()
+        for type_name in self.all_types().keys():
+            if (parent := self.get_parent_for(type_name)) is not None:
+                result[parent].add(type_name)
 
-        if next_type in result:
-            continue
-        result.add(next_type)
+        return dict(result)
 
-        types_to_check.update(all_direct_children().get(next_type, set()))
 
-    return result
+    def get_all_children_for(self, type_name: str) -> Set[str]:
+        """
+        Get all direct and indirect children for a given type.
+        """
+        result = set()
+
+        types_to_check = {type_name}
+        while types_to_check:
+            next_type = types_to_check.pop()
+
+            if next_type in result:
+                continue
+            result.add(next_type)
+
+            types_to_check.update(self.all_direct_children().get(next_type, set()))
+
+        return result
