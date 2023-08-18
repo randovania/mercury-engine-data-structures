@@ -20,7 +20,7 @@ from mercury_engine_data_structures.common_types import Char, DictAdapter, Float
 from mercury_engine_data_structures.common_types import StrId as StrIdSR
 from mercury_engine_data_structures.construct_extensions.strings import PascalStringRobust
 from mercury_engine_data_structures.formats import BaseResource
-from mercury_engine_data_structures.formats.property_enum import PropertyEnum, PropertyEnumSR, PropertyEnumUnsafe
+from mercury_engine_data_structures.formats.property_enum import PropertyEnum, PropertyEnumSR
 from mercury_engine_data_structures.game_check import Game
 
 StrId = PascalStringRobust(Int16ul, "utf-8")
