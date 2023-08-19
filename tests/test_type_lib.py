@@ -1,3 +1,5 @@
+import contextlib
+
 import pytest
 
 from mercury_engine_data_structures.formats import dread_types
@@ -192,10 +194,18 @@ def _dread_type_lib():
 def test_find_type_errors(dread_type_lib: TypeLib, type_name, value, expected):
     type_class = dread_type_lib.get_type(type_name)
     err = type_class._find_type_errors(value)
+
     if expected is None:
         assert err is None
+        ctx = contextlib.nullcontext()
     else:
         assert str(err) == str(expected)
+        ctx = pytest.raises(type(expected))
+
+    with ctx:
+        type_class.verify_integrity(value)
+
+    assert type_class.is_value_of_type(value) == (expected is None)
 
 
 def test_get_parent_for(dread_type_lib: TypeLib):
