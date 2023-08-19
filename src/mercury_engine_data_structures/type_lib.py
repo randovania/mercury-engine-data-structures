@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections
 import dataclasses
 import enum
@@ -5,15 +7,17 @@ import functools
 import importlib
 import typing
 from enum import Enum
-from typing import Dict, Optional, Set, Type
+from typing import TYPE_CHECKING
 
 import construct
 
-from mercury_engine_data_structures.formats.property_enum import HashedName
 from mercury_engine_data_structures.game_check import Game
-from mercury_engine_data_structures.pointer_set import PointerSet
+
+if TYPE_CHECKING:
+    from mercury_engine_data_structures.pointer_set import PointerSet
 
 # from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
+
 
 @dataclasses.dataclass(frozen=True)
 class BaseType:
@@ -21,11 +25,11 @@ class BaseType:
     target_game: Game
 
     @property
-    def kind(self) -> "TypeKind":
+    def kind(self) -> TypeKind:
         raise NotImplementedError
 
     @classmethod
-    def from_json(cls, name: str, data: dict, target_game: Game) -> "BaseType":
+    def from_json(cls, name: str, data: dict, target_game: Game) -> BaseType:
         raise NotImplementedError
 
     @property
@@ -39,7 +43,7 @@ class BaseType:
         return getattr(dread_types, self.name_as_python_identifier)
 
     @property
-    def type_lib(self) -> "TypeLib":
+    def type_lib(self) -> TypeLib:
         return get_type_lib_for_game(self.target_game)
 
     def _find_type_errors(self, __value: typing.Any) -> BaseException | None:
@@ -65,7 +69,7 @@ class TypeKind(Enum):
     DICTIONARY = "dictionary"
 
     @property
-    def type_class(self) -> Type[BaseType]:
+    def type_class(self) -> type[BaseType]:
         if self == TypeKind.PRIMITIVE:
             return PrimitiveType
         if self == TypeKind.STRUCT:
@@ -111,7 +115,7 @@ primitive_to_type = {
     PrimitiveKind.VECTOR_3: typing.Sequence,
     PrimitiveKind.VECTOR_4: typing.Sequence,
     PrimitiveKind.BYTES: bytes,
-    PrimitiveKind.PROPERTY: HashedName,
+    PrimitiveKind.PROPERTY: str | int,
 }
 
 primitive_int_bounds = {
@@ -119,6 +123,7 @@ primitive_int_bounds = {
     PrimitiveKind.UINT_16:  (0,      2**16 - 1),
     PrimitiveKind.UINT:     (0,      2**32 - 1),
     PrimitiveKind.UINT_64:  (0,      2**64 - 1),
+    PrimitiveKind.PROPERTY: (0,      2**64 - 1),
 }
 
 primitive_vector_lengths = {
@@ -137,7 +142,7 @@ class PrimitiveType(BaseType):
         return TypeKind.PRIMITIVE
 
     @classmethod
-    def from_json(cls, name: str, data: dict, target_game: Game) -> "PrimitiveType":
+    def from_json(cls, name: str, data: dict, target_game: Game) -> PrimitiveType:
         return cls(name, target_game, PrimitiveKind(data["primitive_kind"]))
 
     @property
@@ -148,13 +153,15 @@ class PrimitiveType(BaseType):
     def _find_type_errors(self, __value: typing.Any) -> BaseException | None:
         expected_type = primitive_to_type[self.primitive_kind]
         if not isinstance(__value, expected_type):
-            return TypeError(f"Expected {expected_type}; got {type(__value)}")
+            if isinstance(expected_type, type):
+                expected_type = expected_type.__name__
+            return TypeError(f"Expected {expected_type}; got {type(__value).__name__}")
 
-        if self.primitive_kind in primitive_int_bounds:
+        if isinstance(__value, int) and self.primitive_kind in primitive_int_bounds:
             low, high = primitive_int_bounds[self.primitive_kind]
             if low <= __value <= high:
                 return None
-            return ValueError(f"{__value} is out of range of [{low}, {high}]")
+            return ValueError(f"{__value} is out of range of [{hex(low)}, {hex(high)}]")
 
         if self.primitive_kind in primitive_vector_lengths:
             length = primitive_vector_lengths[self.primitive_kind]
@@ -169,47 +176,61 @@ class PrimitiveType(BaseType):
 
 @dataclasses.dataclass(frozen=True)
 class StructType(BaseType):
-    parent: Optional[str]
-    fields: Dict[str, str]
+    parent: str | None
+    fields: dict[str, str]
 
     @property
     def kind(self):
         return TypeKind.STRUCT
 
     @classmethod
-    def from_json(cls, name: str, data: dict, target_game: Game) -> "StructType":
+    def from_json(cls, name: str, data: dict, target_game: Game) -> StructType:
         return cls(name, target_game, data["parent"], data["fields"])
+
+    @property
+    def parent_class(self) -> StructType | None:
+        if self.parent is None:
+            return None
+        return self.type_lib.get_type(self.parent)
+
+    @property
+    def all_fields(self) -> dict[str, str]:
+        fields = dict(self.fields)
+        if self.parent_class is not None:
+            fields.update(self.parent_class.all_fields)
+        return fields
 
     def _find_type_errors(self, __value: typing.Any) -> BaseException | None:
         if not isinstance(__value, dict):
-            return TypeError(f"Expected dict; got {type(__value)}")
+            return TypeError(f"Expected {self.name}; got {type(__value).__name__}")
 
         errors = []
         for k, v in __value.items():
-            if k not in self.fields:
-                errors.append(AttributeError(name=k, obj=self))
-            err = self.type_lib.get_type(self.fields[k])._find_type_errors(v)
+            if k not in self.all_fields:
+                err = AttributeError(f"Invalid attribute '{k}' for {self.name}", name=k, obj=self)
+            else:
+                err = self.type_lib.get_type(self.all_fields[k])._find_type_errors(v)
             if err is not None:
                 errors.append(err)
 
         if errors:
-            return TypeError(errors)
+            return TypeError(*errors)
         return None
 
 
 @dataclasses.dataclass(frozen=True)
 class EnumType(BaseType):
-    values: Dict[str, int]
+    values: dict[str, int]
 
     @property
     def kind(self):
         return TypeKind.ENUM
 
     @classmethod
-    def from_json(cls, name: str, data: dict, target_game: Game) -> "EnumType":
+    def from_json(cls, name: str, data: dict, target_game: Game) -> EnumType:
         return cls(name, target_game, data["values"])
 
-    def enum_class(self) -> typing.Type[enum.IntEnum]:
+    def enum_class(self) -> type[enum.IntEnum]:
         if self.target_game == Game.DREAD:
             return getattr(importlib.import_module("mercury_engine_data_structures.formats.dread_types"),
                        self.name_as_python_identifier)
@@ -220,11 +241,16 @@ class EnumType(BaseType):
 
         if isinstance(__value, int) and not isinstance(__value, enum.IntEnum):
             if __value not in {v.value for v in expected}:
-                return ValueError(f"{__value} is not a valid {expected}")
+                return ValueError(f"{__value} is not a valid {self.name}")
             __value = expected(__value)
 
-        if not isinstance(__value, expected):
-            return TypeError(f"Expected {expected}; got {type(__value)}")
+        if isinstance(__value, str):
+            name_to_entry = {v.name: v for v in expected}
+            if __value in name_to_entry:
+                __value = name_to_entry[__value]
+
+        if type(__value) != expected:
+            return TypeError(f"Expected {self.name}; got {type(__value).__name__}")
 
         return None
 
@@ -238,24 +264,24 @@ class FlagsetType(BaseType):
         return TypeKind.FLAGSET
 
     @classmethod
-    def from_json(cls, name: str, data: dict, target_game: Game) -> "FlagsetType":
+    def from_json(cls, name: str, data: dict, target_game: Game) -> FlagsetType:
         return cls(name, target_game, data["enum"])
 
     def _find_type_errors(self, __value: typing.Any) -> BaseException | None:
         enum_type: EnumType = self.type_lib.get_type(self.enum)
         expected = enum_type.enum_class()
 
-        if isinstance(__value, expected):
+        if type(__value) == expected:
             return None
 
-        if isinstance(__value, int):
+        if isinstance(__value, int) and not isinstance(__value, enum.IntEnum):
             mask = 0
             for v in expected:
-                mask |= v.value
+                mask |= 2**v.value
             mask = ~mask
 
             if __value & mask:
-                return TypeError(f"{__value} is not a valid {type(self)}")
+                return TypeError(f"{__value} is not a valid {self.name}")
             return None
 
         names = {v.name for v in expected}
@@ -270,7 +296,7 @@ class FlagsetType(BaseType):
         elif isinstance(__value, str):
             invalid = [v for v in __value.split('|') if v not in names]
         else:
-            return TypeError(f"Expected {type(self)}; got {type(__value)}")
+            return TypeError(f"Expected {self.name}; got {type(__value).__name__}")
 
         if invalid:
             return TypeError(f"Contains invalid {self.enum} names: {invalid}")
@@ -287,7 +313,7 @@ class TypedefType(BaseType):
         return TypeKind.TYPEDEF
 
     @classmethod
-    def from_json(cls, name: str, data: dict, target_game: Game) -> "TypedefType":
+    def from_json(cls, name: str, data: dict, target_game: Game) -> TypedefType:
         return cls(name, target_game, data["alias"])
 
     def _find_type_errors(self, __value: typing.Any) -> BaseException | None:
@@ -303,12 +329,14 @@ class PointerType(BaseType):
         return TypeKind.POINTER
 
     @classmethod
-    def from_json(cls, name: str, data: dict, target_game: Game) -> "PointerType":
+    def from_json(cls, name: str, data: dict, target_game: Game) -> PointerType:
         return cls(name, target_game, data["target"])
 
     @property
     def pointer_set(self) -> PointerSet:
-        return typing.cast(PointerSet, self.construct)
+        from mercury_engine_data_structures.formats import dread_types
+        target = self.type_lib.get_type(self.target)
+        return getattr(dread_types, f"Pointer_{target.name_as_python_identifier}")
 
     def _find_type_errors(self, __value: typing.Any) -> BaseException | None:
         names = set(self.pointer_set.type_names)
@@ -327,13 +355,13 @@ class PointerType(BaseType):
                 __value = __value["@value"]
 
         if type_name is not None and type_name not in names:
-            return TypeError(f"{type_name} is not a valid target for {self.target}")
+            return TypeError(f"{type_name} is not a valid target for {self.name}")
 
         if len(names) == 1:
-            return self.type_lib.get_type(next(names))._find_type_errors(__value)
+            return self.type_lib.get_type(next(n for n in names))._find_type_errors(__value)
 
         if type_name is None:
-            return TypeError(f"No type specified for {self.target}")
+            return TypeError(f"No type specified for {self.name}")
 
         return self.type_lib.get_type(type_name)._find_type_errors(__value)
 
@@ -347,19 +375,19 @@ class VectorType(BaseType):
         return TypeKind.VECTOR
 
     @classmethod
-    def from_json(cls, name: str, data: dict, target_game: Game) -> "VectorType":
+    def from_json(cls, name: str, data: dict, target_game: Game) -> VectorType:
         return cls(name, target_game, data["value_type"])
 
     def _find_type_errors(self, __value: typing.Any) -> BaseException | None:
         if not isinstance(__value, typing.Iterable):
-            return TypeError(f"{type(__value)} is not iterable")
+            return TypeError(f"{type(__value).__name__} is not iterable")
         errors = {
             i: self.type_lib.get_type(self.value_type)._find_type_errors(v)
             for i, v in enumerate(__value)
         }
         errors = {i: v for i, v in errors.items() if v is not None}
         if errors:
-            return TypeError(errors)
+            return TypeError(*errors.items())
         return None
 
 
@@ -373,12 +401,12 @@ class DictionaryType(BaseType):
         return TypeKind.DICTIONARY
 
     @classmethod
-    def from_json(cls, name: str, data: dict, target_game: Game) -> "DictionaryType":
+    def from_json(cls, name: str, data: dict, target_game: Game) -> DictionaryType:
         return cls(name, target_game, data["key_type"], data["value_type"])
 
     def _find_type_errors(self, __value: typing.Any) -> BaseException | None:
         if not isinstance(__value, dict):
-            return TypeError(f"Expected dict; got {type(__value)}")
+            return TypeError(f"Expected dict[{self.key_type}, {self.value_type}]; got {type(__value).__name__}")
 
         key_errors = {
             key: self.type_lib.get_type(self.key_type)._find_type_errors(key)
@@ -398,7 +426,7 @@ class DictionaryType(BaseType):
         if value_errors:
             errors["Values"] = value_errors
         if errors:
-            return TypeError(errors)
+            return TypeError(*errors.items())
 
         return None
 
@@ -409,19 +437,19 @@ def decode_type(name: str, data: dict, target_game: Game) -> BaseType:
 
 
 class TypeLib:
-    def __init__(self, types_dict: Dict[str, typing.Any], target_game: Game):
+    def __init__(self, types_dict: dict[str, typing.Any], target_game: Game):
         self.types_dict = types_dict
         self.target_game = target_game
 
     @functools.lru_cache
-    def all_types(self) -> Dict[str, BaseType]:
+    def all_types(self) -> dict[str, BaseType]:
         return {
             name: decode_type(name, data, self.target_game)
             for name, data in self.types_dict.items()
         }
 
     @functools.lru_cache
-    def all_constructs(self) -> Dict[str, construct.Construct]:
+    def all_constructs(self) -> dict[str, construct.Construct]:
         return {
             name: type.construct
             for name, type in self.all_types().items()
@@ -452,7 +480,7 @@ class TypeLib:
         )
 
 
-    def get_parent_for(self, type_name: str) -> Optional[str]:
+    def get_parent_for(self, type_name: str) -> str | None:
         data = self.get_type(type_name)
 
         if data.kind == TypeKind.STRUCT:
@@ -462,7 +490,7 @@ class TypeLib:
         return None
 
 
-    def is_child_of(self, type_name: Optional[str], parent_name: str) -> bool:
+    def is_child_of(self, type_name: str | None, parent_name: str) -> bool:
         """
         Checks if the type_name is a direct or indirect child of the type parent_name
         """
@@ -476,7 +504,7 @@ class TypeLib:
 
 
     @functools.lru_cache
-    def all_direct_children(self) -> Dict[str, Set[str]]:
+    def all_direct_children(self) -> dict[str, set[str]]:
         """
         Returns a mapping of type names to all their direct children.
         """
@@ -489,7 +517,7 @@ class TypeLib:
         return dict(result)
 
 
-    def get_all_children_for(self, type_name: str) -> Set[str]:
+    def get_all_children_for(self, type_name: str) -> set[str]:
         """
         Get all direct and indirect children for a given type.
         """
