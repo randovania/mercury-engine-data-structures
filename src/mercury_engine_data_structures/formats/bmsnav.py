@@ -1,14 +1,4 @@
-from construct.core import (
-    Array,
-    Byte,
-    Const,
-    Construct,
-    Flag,
-    Hex,
-    Int32ul,
-    PrefixedArray,
-    Struct,
-)
+from construct.core import Array, Byte, Const, Construct, Flag, Hex, Int32ul, PrefixedArray, Struct, Terminated
 
 from mercury_engine_data_structures.common_types import CVector2D, CVector3D, Float, StrId, make_dict
 from mercury_engine_data_structures.formats import BaseResource
@@ -27,6 +17,13 @@ geo_connection = Struct(
 geo_connections = Struct(
     directions=PrefixedArray(Int32ul, Int32ul),
     connections=PrefixedArray(Int32ul, geo_connection),
+)
+
+geo_connections_sr = Struct(
+    unk0=Byte,
+    unk1=Byte,
+    unk2=Byte, # 0?
+    gcs = geo_connections
 )
 
 # idk
@@ -144,6 +141,25 @@ Struct2 = Struct(
     unk1=PrefixedArray(Int32ul, Struct3),
 )
 
+sr_unk_struct = Struct(
+    bound_start = CVector2D,
+    bound_end = CVector2D,
+    unk1 = Int32ul,
+    const0 = Int32ul,
+    unk2 = Int32ul,
+    unk3 = Int32ul
+)
+
+BMSNAV_SR = Struct(
+    _magic=Const(b'MNAV'),
+    version=Const(0x000C0001, Hex(Int32ul)),
+    aNavmeshGeos = PrefixedArray(Int32ul, CVector2D),
+    geo_connections = PrefixedArray(Int32ul, geo_connections_sr),
+    unk1=PrefixedArray(Int32ul, Struct1),
+    navigable_paths=make_dict(NavigablePath),  # contains additional paths for certain enemies (ie chozo soldiers)
+    unk2 = make_dict(PrefixedArray(Int32ul, sr_unk_struct)),
+    _eof = Terminated
+)
 BMSNAV = Struct(
     _magic=Const(b'MNAV'),
     version=Const(0x00030002, Hex(Int32ul)),
@@ -166,4 +182,7 @@ BMSNAV = Struct(
 class Bmsnav(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
-        return BMSNAV
+        return {
+            Game.SAMUS_RETURNS: BMSNAV_SR,
+            Game.DREAD: BMSNAV,
+        }[target_game]
