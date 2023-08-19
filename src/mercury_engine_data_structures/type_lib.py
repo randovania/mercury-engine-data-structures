@@ -358,7 +358,7 @@ class PointerType(BaseType):
             return TypeError(f"{type_name} is not a valid target for {self.name}")
 
         if len(names) == 1:
-            return self.type_lib.get_type(next(n for n in names))._find_type_errors(__value)
+            type_name = next(n for n in names)
 
         if type_name is None:
             return TypeError(f"No type specified for {self.name}")
