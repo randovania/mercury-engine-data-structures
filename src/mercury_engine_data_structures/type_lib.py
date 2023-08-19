@@ -11,9 +11,8 @@ from typing import TYPE_CHECKING
 
 import construct
 
-from mercury_engine_data_structures.game_check import Game
-
 if TYPE_CHECKING:
+    from mercury_engine_data_structures.game_check import Game
     from mercury_engine_data_structures.pointer_set import PointerSet
 
 # from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
@@ -231,6 +230,7 @@ class EnumType(BaseType):
         return cls(name, target_game, data["values"])
 
     def enum_class(self) -> type[enum.IntEnum]:
+        from mercury_engine_data_structures.game_check import Game
         if self.target_game == Game.DREAD:
             return getattr(importlib.import_module("mercury_engine_data_structures.formats.dread_types"),
                        self.name_as_python_identifier)
@@ -539,17 +539,20 @@ class TypeLib:
 @functools.lru_cache
 def get_type_lib_dread():
     from mercury_engine_data_structures import dread_data
+    from mercury_engine_data_structures.game_check import Game
     return TypeLib(dread_data.get_raw_types(), Game.DREAD)
 
 
 @functools.lru_cache
 def get_type_lib_samus_returns():
     from mercury_engine_data_structures import samus_returns_data
+    from mercury_engine_data_structures.game_check import Game
     return TypeLib(samus_returns_data.get_raw_types(), Game.SAMUS_RETURNS)
 
 
 @functools.lru_cache
 def get_type_lib_for_game(game: Game):
+    from mercury_engine_data_structures.game_check import Game
     if game == Game.DREAD:
         return get_type_lib_dread()
     if game == Game.SAMUS_RETURNS:
