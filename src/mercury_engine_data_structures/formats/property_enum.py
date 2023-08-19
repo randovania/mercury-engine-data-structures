@@ -41,6 +41,9 @@ class HashSet(enum.Enum):
             raise ValueError("Unknown")
 
 
+HashedName = typing.Union[str, int]
+
+
 class CRCAdapter(construct.Adapter):
     def __init__(self, hash_set: HashSet, allow_unknowns=False, display_warnings=True):
         self._raw_subcon = is_sr_or_else(construct.Int32ul, construct.Int64ul)
@@ -49,7 +52,7 @@ class CRCAdapter(construct.Adapter):
         self.allow_unknowns = allow_unknowns
         self.display_warnings = display_warnings
 
-    def _decode(self, obj: int, context, path):
+    def _decode(self, obj: int, context, path) -> HashedName:
         try:
             return self.hash_set.inverted_hashes(context)[obj]
         except KeyError:
@@ -66,7 +69,7 @@ class CRCAdapter(construct.Adapter):
                 path=path,
             )
 
-    def _encode(self, obj: typing.Union[str, int], context, path):
+    def _encode(self, obj: HashedName, context, path):
         try:
             return self.hash_set.known_hashes(context)[obj]
         except KeyError:

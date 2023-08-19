@@ -143,6 +143,11 @@ class PointerSet:
             raise ValueError(f"Attempting to add {name} to {self.category}, but already present.")
         self.types[prop_id] = name / value
 
+    @property
+    def type_names(self) -> tuple[str, ...]:
+        all_names = mercury_engine_data_structures.dread_data.all_property_id_to_name()
+        return tuple(all_names[prop_id] for prop_id in self.types)
+
     def create_construct(self) -> Construct:
         get_name = mercury_engine_data_structures.dread_data.all_property_id_to_name().get
 

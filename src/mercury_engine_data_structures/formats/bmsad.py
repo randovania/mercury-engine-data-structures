@@ -23,7 +23,7 @@ from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMe
 from mercury_engine_data_structures.formats import BaseResource, dread_types
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
-from mercury_engine_data_structures.type_lib_instances import get_type_lib_dread
+from mercury_engine_data_structures.type_lib import get_type_lib_dread
 
 
 def SR_or_Dread(sr, dread):
