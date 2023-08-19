@@ -254,7 +254,7 @@ def main():
 
     # Skip it for sr as it has some errors in its types json
     if args.game != "sr":
-        all_types: dict[str, type_lib.BaseType] = copy.copy(type_lib.TypeLib(game_types).all_types())
+        all_types: dict[str, type_lib.BaseType] = copy.copy(type_lib.TypeLib(game_types, 11).all_types())
 
         type_exporter = TypeExporter(all_types, primitive_to_construct, type_lib)
         for type_name in sorted(all_types.keys()):
