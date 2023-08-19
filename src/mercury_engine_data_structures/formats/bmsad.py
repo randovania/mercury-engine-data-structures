@@ -16,13 +16,14 @@ from construct.core import (
     Switch,
 )
 
-from mercury_engine_data_structures import common_types, game_check, type_lib
+from mercury_engine_data_structures import common_types, game_check
 from mercury_engine_data_structures.common_types import Char, Float, StrId, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource, dread_types
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.type_lib_instances import get_type_lib_dread
 
 
 def SR_or_Dread(sr, dread):
@@ -31,7 +32,6 @@ def SR_or_Dread(sr, dread):
         sr,
         dread,
     )
-
 
 FunctionArgument = Struct(
     type=Char,
@@ -69,7 +69,7 @@ def find_charclass_for_type(type_name: str):
         return as_char
 
     return find_charclass_for_type(
-        type_lib.get_parent_for(type_name),
+        get_type_lib_dread().get_parent_for(type_name),
     )
 
 
@@ -124,7 +124,7 @@ def DreadDependencies():
 
     def component_type(this):
         for component_type in component_dependencies.keys():
-            if type_lib.is_child_of(this.type, component_type):
+            if get_type_lib_dread().is_child_of(this.type, component_type):
                 return component_type
         return None
 
@@ -165,7 +165,7 @@ DreadComponent = Struct(
         )
     ),
     extra_fields=construct.If(
-        lambda this: type_lib.is_child_of(this.type, "CComponent"),
+        lambda this: get_type_lib_dread().is_child_of(this.type, "CComponent"),
         ExtraFields,
     ),
     functions=Functions,
