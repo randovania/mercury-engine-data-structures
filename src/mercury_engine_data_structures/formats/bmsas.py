@@ -4,6 +4,7 @@ from construct.core import (
     Byte,
     Const,
     Construct,
+    Error,
     Flag,
     Hex,
     If,
@@ -20,7 +21,7 @@ from mercury_engine_data_structures.common_types import Char, DictAdapter, Float
 from mercury_engine_data_structures.common_types import StrId as StrIdSR
 from mercury_engine_data_structures.construct_extensions.strings import PascalStringRobust
 from mercury_engine_data_structures.formats import BaseResource
-from mercury_engine_data_structures.formats.property_enum import PropertyEnum, PropertyEnumSR
+from mercury_engine_data_structures.formats.property_enum import PropertyEnum, PropertyEnumDoubleUnsafe
 from mercury_engine_data_structures.game_check import Game
 
 StrId = PascalStringRobust(Int16ul, "utf-8")
@@ -90,7 +91,7 @@ ArgListDread = DictAdapter(make_vector(Struct(
 )))
 
 ArgListSR = DictAdapter(make_vector(Struct(
-    key=PropertyEnumSR,
+    key=PropertyEnumDoubleUnsafe,
     value=Struct(
         type=Char,
         value=Switch(
@@ -231,7 +232,7 @@ BMSAS_Dread = Struct(
 BMSAS_SR = Struct(
     name=StrIdSR,
     animations=make_vector(AnimationSR),
-).compile()
+)
 '''
 `.bmsas` files don't exist in Samus Returns. The format is instead embedded in `.bmsad`.
 '''
@@ -240,4 +241,8 @@ BMSAS_SR = Struct(
 class Bmsas(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
-        return BMSAS_Dread
+        if target_game == Game.DREAD:
+            return BMSAS_Dread
+        if target_game == Game.SAMUS_RETURNS:
+            return BMSAS_SR
+        return Error

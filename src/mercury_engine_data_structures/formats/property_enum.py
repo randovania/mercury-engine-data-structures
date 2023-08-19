@@ -111,7 +111,7 @@ class CRCAdapter(construct.Adapter):
 
 PropertyEnum = CRCAdapter(HashSet.PROPERTY)
 PropertyEnumUnsafe = CRCAdapter(HashSet.PROPERTY, True)
-PropertyEnumSR = CRCAdapter(HashSet.PROPERTY, True, False)
+PropertyEnumDoubleUnsafe = CRCAdapter(HashSet.PROPERTY, True, False)
 
 FileNameEnum = CRCAdapter(HashSet.FILE_NAME)
 FileNameEnumUnsafe = CRCAdapter(HashSet.FILE_NAME, True, False)

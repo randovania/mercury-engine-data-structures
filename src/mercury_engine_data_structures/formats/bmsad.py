@@ -334,7 +334,14 @@ BMSAD_SR = Struct(
     "unk_3" / Int32ul,
 
     "action_sets" / make_vector(BMSAS_SR),
-    "sound_fx" / construct.Optional(make_vector(StrId >> Byte)),
+    "_remaining" / construct.Peek(construct.GreedyBytes),
+    "sound_fx" / construct.If(
+        lambda this: (
+            (this._parsing and this._remaining)
+            or (this._building and (this.sound_fx is not None))
+        ),
+        make_vector(StrId >> Byte)
+    ),
 
     construct.Terminated,
 )
