@@ -114,6 +114,14 @@ def test_api_dread_charclass(dread_file_tree: FileTreeEditor):
 
     navmesh = bmsad.components["NAVMESHITEM"]
 
+    # type
+    assert navmesh.type == "CNavMeshItemComponent"
+    assert navmesh.get_component_type() == "CCharClassNavMeshItemComponent"
+    navmesh.type = "CPowerBombBlockLifeComponent"
+    assert navmesh.type == "CPowerBombBlockLifeComponent"
+    assert navmesh.get_component_type() == "CCharClassLifeComponent"
+    navmesh.type = "CNavMeshItemComponent"
+
     # extra_fields
     assert navmesh.fields.sInitialStage == "closed"
     navmesh.fields.sInitialStage = "opened"

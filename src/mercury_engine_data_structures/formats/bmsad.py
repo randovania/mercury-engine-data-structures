@@ -569,10 +569,21 @@ class Component:
         return self._raw
 
     def get_component_type(self) -> str:
+        return find_charclass_for_type(self.type)
+
+    @property
+    def type(self) -> str:
         if self.target_game == Game.SAMUS_RETURNS:
-            raise AttributeError(name="_get_component_type", obj=self)
+            raise AttributeError(name="type", obj=self)
         if self.target_game == Game.DREAD:
-            return find_charclass_for_type(self.raw.type)
+            return self.raw.type
+
+    @type.setter
+    def type(self, value: str):
+        if self.target_game == Game.SAMUS_RETURNS:
+            raise AttributeError(name="type", obj=self)
+        if self.target_game == Game.DREAD:
+            self.raw.type = value
 
     def get_component_type_class(self) -> type_lib.StructType:
         return get_type_lib_for_game(self.target_game).get_type(self.get_component_type())
