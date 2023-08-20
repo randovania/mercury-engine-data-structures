@@ -234,8 +234,8 @@ def SRDependencies():
 # Components
 DreadComponent = Struct(
     type=StrId,
-    unk_1=Hex(Int32ul),
-    unk_2=Float32l,
+    unk_1=Int32sl,
+    unk_2=Int32sl,
     fields=PrefixedAllowZeroLen(
         Int32ul,
         Struct(
