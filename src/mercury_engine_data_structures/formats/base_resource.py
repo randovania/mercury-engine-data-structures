@@ -9,9 +9,10 @@ class BaseResource:
     _raw: Container
     target_game: Game
 
-    def __init__(self, raw: Container, target_game: Game):
+    def __init__(self, raw: Container, target_game: Game, version_str: str = "NONE"):
         self._raw = raw
         self.target_game = target_game
+        self.version_str = version_str
 
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
