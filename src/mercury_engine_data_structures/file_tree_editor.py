@@ -211,7 +211,13 @@ class FileTreeEditor:
             elif type_hint != type_from_name:
                 raise ValueError(f"type_hint was {type_hint}, expected {type_from_name} from name")
 
-        return format_class.parse(data, target_game=self.target_game)
+        return format_class.parse(data, target_game=self.target_game, editor=self)
+
+    def get_file(self, path: str, type_hint: type[_T] = BaseResource) -> _T:
+        """
+        Wrapper for `get_parsed_asset`. Override in children for additional functionality.
+        """
+        return self.get_parsed_asset(path, type_hint=type_hint)
 
     def add_new_asset(self, name: str, new_data: typing.Union[bytes, BaseResource],
                       in_pkgs: typing.Iterable[str]):
