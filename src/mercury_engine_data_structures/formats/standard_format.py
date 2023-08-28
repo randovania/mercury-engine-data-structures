@@ -3,6 +3,7 @@ from typing import Optional
 import construct
 
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
+from mercury_engine_data_structures.game_check import Game, GameSpecificStruct
 from mercury_engine_data_structures.type_lib import get_type_lib_dread
 
 
@@ -21,7 +22,7 @@ def create(name: str, version: int, root_name: Optional[str] = None, explicit_ro
     else:
         root = type_lib.get_type(root_name).construct
 
-    result = construct.Struct(
+    result = GameSpecificStruct(construct.Struct(
         _class_crc=construct.Const(name, PropertyEnum),
         _version=construct.Const(version, construct.Hex(construct.Int32ul)),
 
@@ -29,7 +30,7 @@ def create(name: str, version: int, root_name: Optional[str] = None, explicit_ro
         Root=root,
 
         _end=construct.Terminated,
-    )
+    ), Game.DREAD)
     result.name = name
     return result
 

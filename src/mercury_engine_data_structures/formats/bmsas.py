@@ -226,7 +226,7 @@ BMSAS_Dread = Struct(
     unk=Hex(Int32ul),
     animations=make_vector(AnimationDread),
     _end=construct.Terminated,
-).compile()
+)
 
 
 BMSAS_SR = Struct(
