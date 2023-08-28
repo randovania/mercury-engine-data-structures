@@ -321,6 +321,11 @@ class FileTreeEditor:
         if None in modified_pkgs:
             modified_pkgs.remove(None)
 
+        if output_format == OutputFormat.ROMFS:
+            # Clear modified_pkgs, so we don't read/write any new pkg
+            # We keep system.pkg because .bmmaps don't read properly with exlaunch and it's only 4MB
+            modified_pkgs = list(filter(lambda pkg: pkg == "packs/system/system.pkg", modified_pkgs))
+
         # Ensure all pkgs we'll modify is in memory already.
         # We'll need to read these files anyway to modify, so do it early to speedup
         # the get_raw_assets for _ensured_asset_ids.
@@ -371,10 +376,6 @@ class FileTreeEditor:
                 "replacements": replacements
             }, indent=4)
             output_path.joinpath("replacements.json").write_text(replacement_json, "utf-8")
-
-            # Clear modified_pkgs so we don't write any new pkg
-            # We keep system.pkg because .bmmaps don't read properly with exlaunch and it's only 4MB
-            modified_pkgs = list(filter(lambda pkg: pkg == "packs/system/system.pkg", modified_pkgs))
 
         # Update the PKGs
         for pkg_name in modified_pkgs:
