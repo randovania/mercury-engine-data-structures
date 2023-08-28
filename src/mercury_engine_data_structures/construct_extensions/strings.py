@@ -134,6 +134,19 @@ def CStringRobust(encoding):
         i = code.allocateId()
         code.append(f"""
         def read_util_term_{i}(io):
+            try:
+                # Assume it's a BytesIO. Then use bytes.find to do hard work on C
+                b = io.getvalue()
+                end = b.find({repr(term)}, io.tell())
+                if end == -1:
+                    raise StreamError
+                data = io.read(end - io.tell())
+                io.read({len(term)})
+                return data
+            except AttributeError:
+                # not a BytesIO
+                pass
+
             data = bytearray()
             while True:
                 before = io.tell()
