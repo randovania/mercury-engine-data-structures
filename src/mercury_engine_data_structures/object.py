@@ -70,6 +70,7 @@ class Object(construct.Construct):
 
         block += f"""
             def {fname}(io, this):
+                # {self.name}
                 field_count = {construct.Int32ul._compileparse(code)}
                 result = Container()
                 array_response = False
@@ -109,6 +110,7 @@ class Object(construct.Construct):
 
         block += f"""
             def {fname}(the_obj, io, this):
+                # {self.name}
                 obj = len_(the_obj)
                 {construct.Int32ul._compilebuild(code)}
                 if isinstance(the_obj, list):

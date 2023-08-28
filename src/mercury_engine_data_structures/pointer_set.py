@@ -156,9 +156,8 @@ class PointerSet:
             ptr=Switch(
                 construct.this.type,
                 self.types,
-                ErrorWithMessage(
-                    lambda
-                        ctx: f"Property {ctx.type} ({get_name(ctx.type)}) "
-                             "without assigned type"),
+                ErrorWithMessage(lambda ctx: (
+                    f"Property {ctx.type} ({get_name(ctx.type)}) without assigned type"
+                )),
             )
         ), self.types)
