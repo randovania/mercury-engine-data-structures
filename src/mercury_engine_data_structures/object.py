@@ -56,8 +56,9 @@ class Object(construct.Construct):
             self.fields[field_type]._build(field_value, stream, context, field_path)
 
     def _emitparse(self, code: construct.CodeGen) -> str:
-        fname = f"parse_object_{code.allocateId()}"
-        type_table = f"parse_object_types_{code.allocateId()}"
+        n = code.allocateId()
+        fname = f"parse_object_{n}"
+        type_table = f"parse_object_types_{n}"
 
         code.append(f"""
         def _parse_object(io, this, type_table):
@@ -97,8 +98,9 @@ class Object(construct.Construct):
         return f"{fname}(io, this)"
 
     def _emitbuild(self, code: construct.CodeGen) -> str:
-        fname = f"build_object_{code.allocateId()}"
-        type_table = f"build_object_types_{code.allocateId()}"
+        n = code.allocateId()
+        fname = f"build_object_{n}"
+        type_table = f"build_object_types_{n}"
 
         code.append(f"""
         def _build_object(the_obj, io, this, type_table):
