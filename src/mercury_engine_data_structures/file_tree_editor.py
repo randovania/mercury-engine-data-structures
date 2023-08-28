@@ -31,12 +31,6 @@ class OutputFormat(enum.Enum):
     ROMFS = enum.auto()
 
 
-def _find_entry_for_asset_id(asset_id: AssetId, pkg_header):
-    for entry in pkg_header.file_entries:
-        if entry.asset_id == asset_id:
-            return entry
-
-
 def _read_file_with_entry(path: Path, entry):
     with path.open("rb") as f:
         f.seek(entry.start_offset)
@@ -125,11 +119,13 @@ class FileTreeEditor:
 
             self._ensured_asset_ids[name] = set()
 
+            self.headers[name].entries_by_id = {}
             for entry in self.headers[name].file_entries:
                 if self._toc.get_size_for(entry.asset_id) is None:
                     logger.warning("File with asset id 0x%016x in pkg %s does not have an entry in the TOC",
                                    entry.asset_id, name)
                 self._add_pkg_name_for_asset_id(entry.asset_id, name)
+                self.headers[name].entries_by_id[entry.asset_id] = entry
 
     def all_asset_ids(self) -> Iterator[AssetId]:
         """
@@ -184,7 +180,7 @@ class FileTreeEditor:
             if in_pkg is not None and name != in_pkg:
                 continue
 
-            entry = _find_entry_for_asset_id(asset_id, header)
+            entry = header.entries_by_id.get(asset_id)
             if entry is not None:
                 logger.info("Reading asset %s from pkg %s", str(original_name), name)
                 return _read_file_with_entry(self.path_for_pkg(name), entry)
