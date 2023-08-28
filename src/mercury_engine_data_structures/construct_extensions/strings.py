@@ -128,17 +128,29 @@ def CStringRobust(encoding):
     term = encodingunit(encoding)
     macro = StringEncodedRobust(NullTerminated(GreedyBytes, term=term), encoding)
 
+    expected_size = 16
+
     def _emitparse(code: construct.CodeGen):
         i = code.allocateId()
         code.append(f"""
         def read_util_term_{i}(io):
             data = bytearray()
             while True:
-                b = io.read({len(term)})
-                if b == {repr(term)}:
+                before = io.tell()
+                b = io.read({len(term) * expected_size})
+                pos = b.find({repr(term)})
+                if pos != -1:
+                    io.seek(before + pos + {len(term)})
+                    data += b[:pos]
                     break
-                elif len(b) < {len(term)}:
-                    raise StreamError
+
+                if len(b) < {len(term) * expected_size}:
+                    io.seek(before)
+                    b = io.read({len(term)})
+                    if b == {repr(term)}:
+                        break
+                    elif len(b) < {len(term)}:
+                        raise StreamError
                 data += b
             return data
         """)
