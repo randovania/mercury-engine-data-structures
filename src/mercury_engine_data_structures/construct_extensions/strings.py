@@ -48,8 +48,10 @@ def PaddedStringRobust(length, encoding):
         u'Афон'
     """
     macro = StringEncodedRobust(FixedSized(length, NullStripped(GreedyBytes, pad=encodingunit(encoding))), encoding)
+
     def _emitfulltype(ksy, bitwise):
         return dict(size=length, type="strz", encoding=encoding)
+
     macro._emitfulltype = _emitfulltype
     return macro
 
@@ -79,6 +81,7 @@ def PascalStringRobust(lengthfield: construct.Construct, encoding):
 
     def _emitparse(code):
         return f"io.read({lengthfield._compileparse(code)}).decode({repr(encoding)})"
+
     macro._emitparse = _emitparse
 
     def _emitseq(ksy, bitwise):
@@ -86,6 +89,7 @@ def PascalStringRobust(lengthfield: construct.Construct, encoding):
             dict(id="lengthfield", type=lengthfield._compileprimitivetype(ksy, bitwise)),
             dict(id="data", size="lengthfield", type="str", encoding=encoding),
         ]
+
     macro._emitseq = _emitseq
 
     def _emitbuild(code: construct.CodeGen):
@@ -97,8 +101,8 @@ def PascalStringRobust(lengthfield: construct.Construct, encoding):
 
     macro._emitbuild = _emitbuild
 
-
     return macro
+
 
 def CStringRobust(encoding):
     r"""
@@ -121,11 +125,40 @@ def CStringRobust(encoding):
         >>> d.parse(_)
         u'Афон'
     """
-    macro = StringEncodedRobust(NullTerminated(GreedyBytes, term=encodingunit(encoding)), encoding)
+    term = encodingunit(encoding)
+    macro = StringEncodedRobust(NullTerminated(GreedyBytes, term=term), encoding)
+
+    def _emitparse(code: construct.CodeGen):
+        i = code.allocateId()
+        code.append(f"""
+        def read_util_term_{i}(io):
+            data = bytearray()
+            while True:
+                b = io.read({len(term)})
+                if b == {repr(term)}:
+                    break
+                elif len(b) < {len(term)}:
+                    raise StreamError
+                data += b
+            return data
+        """)
+
+        return f"read_util_term_{i}(io).decode({repr(encoding)})"
+
+    macro._emitparse = _emitparse
+
     def _emitfulltype(ksy, bitwise):
         return dict(type="strz", encoding=encoding)
+
     macro._emitfulltype = _emitfulltype
+
+    def _emitbuild(code: construct.CodeGen):
+        return f"(io.write(obj.encode({repr(encoding)})), io.write({repr(term)}), obj)[-1]"
+
+    macro._emitbuild = _emitbuild
+
     return macro
+
 
 def GreedyStringRobust(encoding):
     r"""
@@ -147,7 +180,9 @@ def GreedyStringRobust(encoding):
         u'Афон'
     """
     macro = StringEncodedRobust(GreedyBytes, encoding)
+
     def _emitfulltype(ksy, bitwise):
         return dict(size_eos=True, type="str", encoding=encoding)
+
     macro._emitfulltype = _emitfulltype
     return macro
