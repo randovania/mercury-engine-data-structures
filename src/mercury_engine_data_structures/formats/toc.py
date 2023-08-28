@@ -37,18 +37,18 @@ class Toc(BaseResource):
 
     def get_size_for(self, asset_id: NameOrAssetId) -> Optional[int]:
         asset_id = resolve_asset_id(asset_id, self.target_game)
-        return self.raw.files.get(asset_id)
+        return self._raw.files.get(asset_id)
 
     def add_file(self, asset_id: NameOrAssetId, file_size: int):
         asset_id = resolve_asset_id(asset_id, self.target_game)
-        self.raw.files[asset_id] = file_size
+        self._raw.files[asset_id] = file_size
 
     def remove_file(self, asset_id: NameOrAssetId):
         resolved_asset_id = resolve_asset_id(asset_id, self.target_game)
-        if resolved_asset_id not in self.raw.files:
+        if resolved_asset_id not in self._raw.files:
             raise ValueError(f"Unknown asset_id: {asset_id}")
 
-        del self.raw.files[resolved_asset_id]
+        del self._raw.files[resolved_asset_id]
 
     def get_all_asset_id(self) -> Iterator[int]:
-        yield from self.raw.files.keys()
+        yield from self._raw.files.keys()

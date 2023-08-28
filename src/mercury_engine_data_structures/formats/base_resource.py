@@ -7,6 +7,8 @@ from construct import Construct, Container
 from mercury_engine_data_structures.game_check import Game
 
 if typing.TYPE_CHECKING:
+    import typing_extensions
+
     from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 
 
@@ -25,7 +27,7 @@ class BaseResource:
         raise NotImplementedError()
 
     @classmethod
-    def parse(cls, data: bytes, target_game: Game, editor: FileTreeEditor | None = None) -> BaseResource:
+    def parse(cls, data: bytes, target_game: Game, editor: FileTreeEditor | None = None) -> typing_extensions.Self:
         return cls(cls.construct_class(target_game).parse(data, target_game=target_game),
                    target_game, editor)
 
