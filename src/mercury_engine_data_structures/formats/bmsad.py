@@ -530,7 +530,7 @@ class ComponentFields:
                 return
 
             cctype = self.parent.get_component_type_class()
-            if __name not in cctype.fields:
+            if __name not in cctype.all_fields:
                 raise self._get_attr_error(__name)
 
             if __value is None:
