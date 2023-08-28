@@ -305,7 +305,12 @@ class FileTreeEditor:
 
         return self._in_memory_pkgs[pkg_name]
 
-    def save_modifications(self, output_path: Path, output_format: OutputFormat):
+    def save_modifications(self, output_path: Path, output_format: OutputFormat, *, finalize_editor: bool = True):
+        """Creates a mod file in the given output format with all the modifications requested.
+        :param output_path: Where to write the mod files.
+        :param output_format: If we should create PKG files or not.
+        :param finalize_editor: If set, this editor will no longer be usable after this function, but is faster.
+        """
         replacements = []
         modified_pkgs = set()
         asset_ids_to_copy = {}
@@ -407,4 +412,14 @@ class FileTreeEditor:
             )
 
         self._modified_resources = {}
-        self._update_headers()
+        if finalize_editor:
+            # _update_headers has significant runtime costs, so avoid it.
+            # But lets delete these attributes so further use of this object fails explicitly
+            del self.all_pkgs
+            del self.headers
+            del self._ensured_asset_ids
+            del self._files_for_asset_id
+            del self._name_for_asset_id
+            del self._toc
+        else:
+            self._update_headers()
