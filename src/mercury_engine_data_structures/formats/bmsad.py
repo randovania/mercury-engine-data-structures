@@ -1,6 +1,7 @@
 import copy
 import functools
 import typing
+from collections.abc import Sequence
 
 import construct
 from construct.core import (
@@ -597,12 +598,13 @@ class Component:
         if self.target_game == Game.DREAD:
             self.raw.extra_fields = value.parent.raw.extra_fields
 
+    # FIXME: mypy doesn't support getter/setter with different types: https://github.com/python/mypy/issues/13127
     @property
-    def functions(self) -> tuple[ActorDefFunc, ...]:
+    def functions(self) -> Sequence[ActorDefFunc]:
         return tuple(ActorDefFunc(func) for func in self.raw.functions)
 
     @functions.setter
-    def functions(self, value: typing.Iterable[ActorDefFunc]):
+    def functions(self, value: Sequence[ActorDefFunc]):
         self.raw.functions = ListContainer(
             Container(func.raw) for func in value
         )
