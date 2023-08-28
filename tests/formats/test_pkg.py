@@ -1,7 +1,7 @@
 from construct import Container, ListContainer
 from tests.test_lib import parse_and_build_compare
 
-from mercury_engine_data_structures.formats.pkg import PKG, Pkg
+from mercury_engine_data_structures.formats.pkg import Pkg
 from mercury_engine_data_structures.game_check import Game
 
 _EMPTY_DREAD_PKG = (b'|\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
@@ -16,7 +16,7 @@ _EMPTY_DREAD_PKG = (b'|\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\
 
 def test_compare_dread(dread_path):
     parse_and_build_compare(
-        PKG, Game.DREAD, dread_path.joinpath("packs/system/system.pkg")
+        Pkg.construct_class(Game.DREAD), Game.DREAD, dread_path.joinpath("packs/system/system.pkg")
     )
 
 
