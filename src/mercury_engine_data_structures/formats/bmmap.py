@@ -1,3 +1,5 @@
+import functools
+
 from construct import Construct, Container
 
 from mercury_engine_data_structures.formats import BaseResource, standard_format
@@ -8,8 +10,9 @@ BMMAP = standard_format.create('CMinimapData', 0x02000001)
 
 class Bmmap(BaseResource):
     @classmethod
+    @functools.lru_cache
     def construct_class(cls, target_game: Game) -> Construct:
-        return BMMAP
+        return BMMAP.compile()
 
     @property
     def items(self) -> Container:
