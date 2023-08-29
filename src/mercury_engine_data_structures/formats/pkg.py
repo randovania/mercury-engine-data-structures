@@ -21,11 +21,31 @@ from mercury_engine_data_structures.game_check import Game, get_current_game
 
 
 def _file_entry(target_game: Game):
-    return Struct(
+    result = Struct(
         asset_id=Hex(Int32ul if target_game == Game.SAMUS_RETURNS else Int64ul),
         start_offset=Int32ul,
         end_offset=Int32ul,
     )
+
+    def _emitparse(code: construct.CodeGen) -> str:
+        fname = f"pkg_file_entry_{target_game.name}"
+
+        if target_game == Game.SAMUS_RETURNS:
+            id_fmt = "L"
+            byte_count = 12
+        else:
+            id_fmt = "Q"
+            byte_count = 16
+
+        code.append("import collections")
+        code.append("FileEntry = collections.namedtuple('FileEntry', ['asset_id', 'start_offset', 'end_offset'])")
+        code.append(f"format_{fname} = struct.Struct('<{id_fmt}LL')")
+
+        return f"FileEntry(*format_{fname}.unpack(io.read({byte_count})))"
+
+    result._emitparse = _emitparse
+
+    return result
 
 
 def _pkg_header(target_game: Game):
