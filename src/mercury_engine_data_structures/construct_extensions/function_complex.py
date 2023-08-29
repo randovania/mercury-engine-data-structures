@@ -1,3 +1,4 @@
+import re
 from typing import Dict, Optional, Type, Union
 
 import construct
@@ -7,6 +8,10 @@ def _resolve_id(type_class: Union[construct.Construct, Type[construct.Construct]
     if isinstance(type_class, construct.Renamed):
         return _resolve_id(type_class.subcon)
     return id(type_class)
+
+
+_simple_parse_re = re.compile(r"^(\w+)\(io, this\)$")
+_simple_build_re = re.compile(r"^(\w+)\(obj, io, this\)$")
 
 
 def emit_switch_cases_parse(
@@ -21,13 +26,20 @@ def emit_switch_cases_parse(
 
     block = f"{table_name} = {{\n"
     for type_name, type_class in fields.items():
-        type_id = _resolve_id(type_class)
-        code.append(f"""
-        def _parse_{type_id}(io, this):
-            return {type_class._compileparse(code)}
-        """)
+        type_code = type_class._compileparse(code)
 
-        block += f"    {repr(type_name)}: _parse_{type_id},  # {type_class.name}\n"
+        # if the type's code is just a function call, wrap it
+        code_match = _simple_parse_re.match(type_code)
+        if code_match is not None:
+            code_name = code_match.group(1)
+        else:
+            code_name = f"_parse_{_resolve_id(type_class)}"
+            code.append(f"""
+            def {code_name}(io, this):
+                return {type_code}
+            """)
+
+        block += f"    {repr(type_name)}: {code_name},\n"
     block += "}"
     code.append(block)
 
@@ -46,12 +58,21 @@ def emit_switch_cases_build(
 
     block = f"{table_name} = {{\n"
     for type_name, type_class in fields.items():
-        type_id = _resolve_id(type_class)
-        code.append(f"""
-        def _build_{type_id}(obj, io, this):
-            return {type_class._compilebuild(code)}
-        """)
-        block += f"    {repr(type_name)}: _build_{type_id},  # {type_class.name}\n"
+        type_code = type_class._compilebuild(code)
+
+        # if the type's code is just a function call, wrap it
+        code_match = _simple_build_re.match(type_code)
+        if code_match is not None:
+            code_name = code_match.group(1)
+        else:
+            code_name = f"_build_{_resolve_id(type_class)}"
+            code.append(f"""
+            def {code_name}(obj, io, this):
+                return {type_code}
+            """)
+
+        block += f"    {repr(type_name)}: {code_name},\n"
+
     block += "}"
     code.append(block)
     return table_name

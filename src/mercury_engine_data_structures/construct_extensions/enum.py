@@ -31,7 +31,7 @@ class StrictEnum(construct.Adapter):
 
         code.append(f"""
         _enum_name_to_value_{i} = {{{mapping}}}
-        def _encode_enum_{i}(io, obj):
+        def _encode_enum_{i}(obj, io, this):
             # {self.name}
             try:
                 obj = obj.value
@@ -39,7 +39,7 @@ class StrictEnum(construct.Adapter):
                 obj = _enum_name_to_value_{i}.get(obj, obj)
             return {construct.Int32ul._compilebuild(code)}
         """)
-        return f"_encode_enum_{i}(io, obj)"
+        return f"_encode_enum_{i}(obj, io, this)"
 
 
 def BitMaskEnum(enum_type: typing.Type[enum.IntEnum]):
