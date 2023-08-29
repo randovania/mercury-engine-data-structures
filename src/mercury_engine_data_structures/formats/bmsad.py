@@ -50,7 +50,7 @@ FunctionArgument = Struct(
             's': StrId,
             'f': Float,
             'b': Flag,
-            'i': Int32ul,
+            'i': Int32sl,
         },
         ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
     )
