@@ -4,6 +4,7 @@ from mercury_engine_data_structures import common_types
 from mercury_engine_data_structures.game_check import Game
 from mercury_engine_data_structures.object import Object
 from mercury_engine_data_structures.pointer_set import PointerSet
+from tests.test_lib import game_compile_build, game_compile_parse
 
 CEnemyPreset = Object({
     "sId": common_types.StrId,
@@ -78,7 +79,7 @@ def test_parse_single_object(single_type_sample):
 
 
 def test_compile_parse_single_object(single_type_sample):
-    result = SingleTypeConstruct.compile().parse(single_type_sample[1], target_game=Game.DREAD)
+    result = game_compile_parse(SingleTypeConstruct, single_type_sample[1], target_game=Game.DREAD)
     assert result == single_type_sample[0]
 
 
@@ -93,10 +94,10 @@ def test_parse_two_object(two_type_sample):
 
 
 def test_compile_build_two_object(two_type_sample):
-    result = TwoTypeConstruct.compile().build(two_type_sample[0], target_game=Game.DREAD)
+    result = game_compile_build(TwoTypeConstruct, two_type_sample[0], target_game=Game.DREAD)
     assert result == two_type_sample[1]
 
 
 def test_compile_parse_two_object(two_type_sample):
-    result = TwoTypeConstruct.compile().parse(two_type_sample[1], target_game=Game.DREAD)
+    result = game_compile_parse(TwoTypeConstruct, two_type_sample[1], target_game=Game.DREAD)
     assert result == two_type_sample[0]

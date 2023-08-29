@@ -31,12 +31,6 @@ class OutputFormat(enum.Enum):
     ROMFS = enum.auto()
 
 
-def _find_entry_for_asset_id(asset_id: AssetId, pkg_header):
-    for entry in pkg_header.file_entries:
-        if entry.asset_id == asset_id:
-            return entry
-
-
 def _read_file_with_entry(path: Path, entry):
     with path.open("rb") as f:
         f.seek(entry.start_offset)
@@ -125,11 +119,13 @@ class FileTreeEditor:
 
             self._ensured_asset_ids[name] = set()
 
+            self.headers[name].entries_by_id = {}
             for entry in self.headers[name].file_entries:
                 if self._toc.get_size_for(entry.asset_id) is None:
                     logger.warning("File with asset id 0x%016x in pkg %s does not have an entry in the TOC",
                                    entry.asset_id, name)
                 self._add_pkg_name_for_asset_id(entry.asset_id, name)
+                self.headers[name].entries_by_id[entry.asset_id] = entry
 
     def all_asset_ids(self) -> Iterator[AssetId]:
         """
@@ -184,7 +180,7 @@ class FileTreeEditor:
             if in_pkg is not None and name != in_pkg:
                 continue
 
-            entry = _find_entry_for_asset_id(asset_id, header)
+            entry = header.entries_by_id.get(asset_id)
             if entry is not None:
                 logger.info("Reading asset %s from pkg %s", str(original_name), name)
                 return _read_file_with_entry(self.path_for_pkg(name), entry)
@@ -305,7 +301,12 @@ class FileTreeEditor:
 
         return self._in_memory_pkgs[pkg_name]
 
-    def save_modifications(self, output_path: Path, output_format: OutputFormat):
+    def save_modifications(self, output_path: Path, output_format: OutputFormat, *, finalize_editor: bool = True):
+        """Creates a mod file in the given output format with all the modifications requested.
+        :param output_path: Where to write the mod files.
+        :param output_format: If we should create PKG files or not.
+        :param finalize_editor: If set, this editor will no longer be usable after this function, but is faster.
+        """
         replacements = []
         modified_pkgs = set()
         asset_ids_to_copy = {}
@@ -315,6 +316,11 @@ class FileTreeEditor:
 
         if None in modified_pkgs:
             modified_pkgs.remove(None)
+
+        if output_format == OutputFormat.ROMFS:
+            # Clear modified_pkgs, so we don't read/write any new pkg
+            # We keep system.pkg because .bmmaps don't read properly with exlaunch and it's only 4MB
+            modified_pkgs = list(filter(lambda pkg: pkg == "packs/system/system.pkg", modified_pkgs))
 
         # Ensure all pkgs we'll modify is in memory already.
         # We'll need to read these files anyway to modify, so do it early to speedup
@@ -367,10 +373,6 @@ class FileTreeEditor:
             }, indent=4)
             output_path.joinpath("replacements.json").write_text(replacement_json, "utf-8")
 
-            # Clear modified_pkgs so we don't write any new pkg
-            # We keep system.pkg because .bmmaps don't read properly with exlaunch and it's only 4MB
-            modified_pkgs = list(filter(lambda pkg: pkg == "packs/system/system.pkg", modified_pkgs))
-
         # Update the PKGs
         for pkg_name in modified_pkgs:
             logger.info("Updating %s", pkg_name)
@@ -407,4 +409,14 @@ class FileTreeEditor:
             )
 
         self._modified_resources = {}
-        self._update_headers()
+        if finalize_editor:
+            # _update_headers has significant runtime costs, so avoid it.
+            # But lets delete these attributes so further use of this object fails explicitly
+            del self.all_pkgs
+            del self.headers
+            del self._ensured_asset_ids
+            del self._files_for_asset_id
+            del self._name_for_asset_id
+            del self._toc
+        else:
+            self._update_headers()

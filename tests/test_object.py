@@ -3,6 +3,7 @@ import pytest
 from mercury_engine_data_structures import common_types
 from mercury_engine_data_structures.game_check import Game
 from mercury_engine_data_structures.object import Object
+from tests.test_lib import game_compile_build, game_compile_parse
 
 TestClass = Object({
     "fTimeToChargeDoubleGroundShock": common_types.Float,
@@ -43,10 +44,10 @@ def test_parse_object(sample_object):
 
 
 def test_compile_build_object(sample_object):
-    result = TestClass.compile().build(sample_object[0], target_game=Game.DREAD)
+    result = game_compile_build(TestClass, sample_object[0], target_game=Game.DREAD)
     assert result == sample_object[1]
 
 
 def test_compile_parse_object(sample_object):
-    result = TestClass.compile().parse(sample_object[1], target_game=Game.DREAD)
+    result = game_compile_parse(TestClass, sample_object[1], target_game=Game.DREAD)
     assert result == sample_object[0]

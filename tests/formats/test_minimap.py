@@ -1,16 +1,20 @@
-from tests.test_lib import parse_and_build_compare
+import pytest
+from tests.test_lib import parse_build_compare_editor
 
-from mercury_engine_data_structures.formats.bmmap import BMMAP
-from mercury_engine_data_structures.formats.bmmdef import BMMDEF
-from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures import dread_data
+from mercury_engine_data_structures.formats.bmmap import Bmmap
+from mercury_engine_data_structures.formats.bmmdef import Bmmdef
+
+all_dread_bmmap = [name for name in dread_data.all_name_to_asset_id().keys()
+                   if name.endswith(".bmmap")]
 
 
-def test_compare_bmmap_dread(dread_path):
-    parse_and_build_compare(
-        BMMAP, Game.DREAD, dread_path.joinpath("maps/levels/c10_samus/s010_cave/s010_cave.bmmap"), True
-    )
+@pytest.mark.parametrize("path", all_dread_bmmap)
+def test_dread_bmsnav(dread_file_tree, path):
+    parse_build_compare_editor(Bmmap, dread_file_tree, path)
 
-def test_compare_bmmdef_dread(dread_path):
-    parse_and_build_compare(
-        BMMDEF, Game.DREAD, dread_path.joinpath("system/minimap/minimap.bmmdef"), True
+
+def test_compare_bmmdef_dread(dread_file_tree):
+    parse_build_compare_editor(
+        Bmmdef, dread_file_tree, "system/minimap/minimap.bmmdef"
     )

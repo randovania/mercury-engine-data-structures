@@ -100,3 +100,35 @@ def current_game_at_least(target: Game) -> Callable[[Any], bool]:
 
 def is_sr_or_else(subcon1, subcon2) -> IfThenElse:
     return IfThenElse(construct.this._params.target_game == Game.SAMUS_RETURNS.value, subcon1, subcon2)
+
+
+class GameSpecificStruct(construct.Subconstruct):
+    def __init__(self, subcon, game: Game):
+        super().__init__(subcon)
+        self.target_game = game
+
+    def _parse(self, stream, context, path):
+        if get_current_game(context) != self.target_game:
+            raise construct.ExplicitError(
+                f"Expected {self.target_game}, got {get_current_game(context)}", path=path
+            )
+
+        return super()._parse(stream, context, path)
+
+    def _build(self, obj, stream, context, path):
+        if get_current_game(context) != self.target_game:
+            raise construct.ExplicitError(
+                f"Expected {self.target_game}, got {get_current_game(context)}", path=path
+            )
+
+        return super()._build(obj, stream, context, path)
+
+    def _emitparse(self, code: construct.CodeGen):
+        code.append("from mercury_engine_data_structures.game_check import Game")
+        code.append(f"TARGET_GAME = Game.{self.target_game.name}")
+        return self.subcon._emitparse(code)
+
+    def _emitbuild(self, code: construct.CodeGen):
+        code.append("from mercury_engine_data_structures.game_check import Game")
+        code.append(f"TARGET_GAME = Game.{self.target_game.name}")
+        return self.subcon._emitbuild(code)

@@ -17,24 +17,35 @@ from construct import (
 from mercury_engine_data_structures import dread_data, samus_returns_data
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
 from mercury_engine_data_structures.formats.base_resource import AssetId, BaseResource, NameOrAssetId, resolve_asset_id
-from mercury_engine_data_structures.game_check import Game, get_current_game, is_sr_or_else
-
-Construct_AssetId = Hex(is_sr_or_else(Int32ul, Int64ul))
-
-
-FileEntry = Struct(
-    asset_id=Construct_AssetId,
-    start_offset=Int32ul,
-    end_offset=Int32ul,
-)
+from mercury_engine_data_structures.game_check import Game, get_current_game
 
 
 def _file_entry(target_game: Game):
-    return Struct(
+    result = Struct(
         asset_id=Hex(Int32ul if target_game == Game.SAMUS_RETURNS else Int64ul),
         start_offset=Int32ul,
         end_offset=Int32ul,
     )
+
+    def _emitparse(code: construct.CodeGen) -> str:
+        fname = f"pkg_file_entry_{target_game.name}"
+
+        if target_game == Game.SAMUS_RETURNS:
+            id_fmt = "L"
+            byte_count = 12
+        else:
+            id_fmt = "Q"
+            byte_count = 16
+
+        code.append("import collections")
+        code.append("FileEntry = collections.namedtuple('FileEntry', ['asset_id', 'start_offset', 'end_offset'])")
+        code.append(f"format_{fname} = struct.Struct('<{id_fmt}LL')")
+
+        return f"FileEntry(*format_{fname}.unpack(io.read({byte_count})))"
+
+    result._emitparse = _emitparse
+
+    return result
 
 
 def _pkg_header(target_game: Game):
@@ -49,10 +60,11 @@ class PkgConstruct(construct.Construct):
     int_size: construct.FormatField
     file_headers_type: construct.Construct
 
-    def __init__(self):
+    def __init__(self, target_game: Game):
         super().__init__()
         self.int_size = typing.cast(construct.FormatField, Int32ul)
-        self.file_headers_type = PrefixedArray(self.int_size, FileEntry).compile()
+        self._file_entry = _file_entry(target_game)
+        self.file_headers_type = PrefixedArray(self.int_size, self._file_entry).compile()
 
     def _parse(self, stream, context, path) -> construct.Container:
         # Skip over header size and data section size
@@ -77,7 +89,7 @@ class PkgConstruct(construct.Construct):
         return construct.Container(files=files)
 
     def _build(self, obj: construct.Container, stream, context, path):
-        file_entry_size = FileEntry.sizeof(target_game=get_current_game(context))
+        file_entry_size = self._file_entry.sizeof()
 
         header_start = construct.stream_tell(stream, path)
 
@@ -124,9 +136,6 @@ class PkgConstruct(construct.Construct):
         construct.stream_seek(stream, files_end, 0, path)
 
 
-PKG = PkgConstruct()
-
-
 @dataclasses.dataclass(frozen=True)
 class PkgFile:
     game: Game
@@ -146,7 +155,7 @@ class PkgFile:
 class Pkg(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
-        return PKG
+        return PkgConstruct(target_game)
 
     @classmethod
     @functools.lru_cache

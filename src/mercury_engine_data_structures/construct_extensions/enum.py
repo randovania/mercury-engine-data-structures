@@ -21,6 +21,26 @@ class StrictEnum(construct.Adapter):
 
         return obj
 
+    def _emitbuild(self, code: construct.CodeGen):
+        i = code.allocateId()
+
+        mapping = ", ".join(
+            f"{repr(enum_entry.name)}: {enum_entry.value}"
+            for enum_entry in self.enum_class
+        )
+
+        code.append(f"""
+        _enum_name_to_value_{i} = {{{mapping}}}
+        def _encode_enum_{i}(io, obj):
+            # {self.name}
+            try:
+                obj = obj.value
+            except AttributeError:
+                obj = _enum_name_to_value_{i}.get(obj, obj)
+            return {construct.Int32ul._compilebuild(code)}
+        """)
+        return f"_encode_enum_{i}(io, obj)"
+
 
 def BitMaskEnum(enum_type: typing.Type[enum.IntEnum]):
     flags = {}

@@ -2,6 +2,7 @@
 Helper class to handle objects that contain a pointer to objects of varied types, usually all with the same base type.
 """
 import copy
+import struct
 from typing import Dict, Type, Union
 
 import construct
@@ -14,9 +15,21 @@ from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMe
 class PointerAdapter(Adapter):
     types: Dict[int, Union[Construct, Type[Construct]]]
 
-    def __init__(self, subcon, types):
-        super().__init__(subcon)
+    def __init__(self, types: Dict[int, Union[Construct, Type[Construct]]], category: str):
+        get_name = mercury_engine_data_structures.dread_data.all_property_id_to_name().get
+        self.switch_con = Switch(
+            construct.this.type,
+            types,
+            ErrorWithMessage(lambda ctx: (
+                f"Property {ctx.type} ({get_name(ctx.type)}) without assigned type"
+            )),
+        )
+        super().__init__(Struct(
+            type=Hex(Int64ul),
+            ptr=self.switch_con,
+        ))
         self.types = types
+        self.category = category
 
     @property
     def _allow_null(self):
@@ -69,53 +82,71 @@ class PointerAdapter(Adapter):
             ptr=obj,
         )
 
-    def _emitparse(self, code):
+    def _emitparse(self, code: construct.CodeGen) -> str:
+        n = code.allocateId()
+
+        fname = f"parse_pointer_{n}"
+        case_name = f"switch_cases_{n}"
+
         if self._single_type:
-            code.parsercache[id(self)] = f"({self.subcon._compileparse(code)}).ptr"
-            return code.parsercache[id(self)]
+            code.parsercache[id(self)] = f"{case_name}[{Int64ul._compileparse(code)}](io, this)"
+        else:
+            code.parsercache[id(self)] = f"{fname}(io, this)"
+            code.append("import mercury_engine_data_structures.dread_data")
+            block = f"""
+                def {fname}(io, this):
+                    # {self.category} supports {len(self.types)} types
+                    obj_type = {Int64ul._compileparse(code)}
+                    ptr = {case_name}[obj_type](io, this)
+                    if ptr is None:
+                        return None
+                    ptr["@type"] = mercury_engine_data_structures.dread_data.all_property_id_to_name()[obj_type]
+                    return ptr
+            """
+            code.append(block)
 
-        fname = f"parse_object_{code.allocateId()}"
-        code.parsercache[id(self)] = f"{fname}(io, this)"
-
-        block = f"""
-            import mercury_engine_data_structures.dread_data
-            def {fname}(io, this):
-                obj = {self.subcon._compileparse(code)}
-                if obj.ptr is None:
-                    return None
-                obj.ptr["@type"] = mercury_engine_data_structures.dread_data.all_property_id_to_name()[obj.type]
-                return obj.ptr
-        """
-        code.append(block)
+        code.append(f"{case_name} = {{}}")
+        for key, sc in self.types.items():
+            code.append(f"{case_name}[{repr(key)}] = lambda io,this: {sc._compileparse(code)}")
 
         return code.parsercache[id(self)]
 
-    def _emitbuild(self, code):
+    def _emitbuild(self, code: construct.CodeGen) -> str:
         void_id = mercury_engine_data_structures.dread_data.all_name_to_property_id()["void"]
-        fname = f"build_object_{code.allocateId()}"
+
+        n = code.allocateId()
+
+        fname = f"build_pointer_{n}"
+        case_name = f"switch_cases_{n}"
 
         # PointerSet is used recursively, so break the infinite loop by prefilling the cache
         code.buildercache[id(self)] = f"{fname}(obj, io, this)"
 
+        # Switch cases
+        code.append(f"{case_name} = {{}}")
+        for key, sc in self.types.items():
+            code.append(f"{case_name}[{repr(key)}] = lambda obj,io,this: {sc._compilebuild(code)}")
+
         block = f"""
             def {fname}(the_obj, io, this):
+                # {self.category} supports {len(self.types)} types
                 if the_obj is None:
-                    obj = Container(type={void_id}, ptr=None)
-                    return {self.subcon._compilebuild(code)}
+                    return io.write({repr(struct.pack(Int64ul.fmtstr, void_id))})
         """
 
         if self._single_type:
             type_id = list(self.types.keys())[1]
             block += f"""
-                obj = Container(type={type_id}, ptr=the_obj)
-                return {self.subcon._compilebuild(code)}
+                io.write({repr(struct.pack(Int64ul.fmtstr, type_id))})
+                return {case_name}[{type_id}](the_obj, io, this)
         """
         else:
+            code.append("import mercury_engine_data_structures.dread_data")
             block += f"""
-                ptr = Container(**the_obj)
-                type_id = mercury_engine_data_structures.dread_data.all_name_to_property_id()[ptr.pop("@type")]
-                obj = Container(type=type_id, ptr=ptr)
-                return {self.subcon._compilebuild(code)}
+                new_obj = Container(**the_obj)
+                obj = mercury_engine_data_structures.dread_data.all_name_to_property_id()[new_obj.pop("@type")]
+                {Int64ul._compilebuild(code)}
+                return {case_name}[obj](new_obj, io, this)
         """
 
         code.append(block)
@@ -149,16 +180,4 @@ class PointerSet:
         return tuple(all_names[prop_id] for prop_id in self.types)
 
     def create_construct(self) -> Construct:
-        get_name = mercury_engine_data_structures.dread_data.all_property_id_to_name().get
-
-        return PointerAdapter(Struct(
-            type=Hex(Int64ul),
-            ptr=Switch(
-                construct.this.type,
-                self.types,
-                ErrorWithMessage(
-                    lambda
-                        ctx: f"Property {ctx.type} ({get_name(ctx.type)}) "
-                             "without assigned type"),
-            )
-        ), self.types)
+        return PointerAdapter(self.types, self.category)

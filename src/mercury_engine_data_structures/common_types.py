@@ -1,4 +1,5 @@
 import copy
+import functools
 import typing
 
 import construct
@@ -14,6 +15,21 @@ Float: construct.FormatField = typing.cast(construct.FormatField, construct.Floa
 CVector2D = construct.Array(2, Float)
 CVector3D = construct.Array(3, Float)
 CVector4D = construct.Array(4, Float)
+
+
+def _vector_emitparse(length: int, code: construct.CodeGen):
+    code.append(f"CVector{length}D_Format = struct.Struct('<{length}f')")
+    return f"ListContainer(CVector{length}D_Format.unpack(io.read({length * 4})))"
+
+
+def _vector_emitbuild(length: int, code: construct.CodeGen):
+    code.append(f"CVector{length}D_Format = struct.Struct('<{length}f')")
+    return f"(io.write(CVector{length}D_Format.pack(*obj)), obj)"
+
+
+for i, vec in enumerate([CVector2D, CVector3D, CVector4D]):
+    vec._emitparse = functools.partial(_vector_emitparse, i + 2)
+    vec._emitbuild = functools.partial(_vector_emitbuild, i + 2)
 
 
 class ListContainerWithKeyAccess(construct.ListContainer):
@@ -52,7 +68,8 @@ class DictAdapter(Adapter):
         super().__init__(subcon)
         self.allow_duplicates = allow_duplicates
 
-    def _decode(self, obj: construct.ListContainer, context, path):
+    def _decode(self, obj: construct.ListContainer, context: construct.Container, path: str,
+                ) -> construct.ListContainer | construct.Container:
         result = construct.Container()
         for item in obj:
             key = item.key
@@ -63,7 +80,8 @@ class DictAdapter(Adapter):
             result[key] = item.value
         return result
 
-    def _encode(self, obj: construct.Container, context, path):
+    def _encode(self, obj: construct.ListContainer | construct.Container, context: construct.Container, path: str,
+                ) -> list:
         if self.allow_duplicates and isinstance(obj, list):
             return obj
         return construct.ListContainer(
@@ -73,6 +91,11 @@ class DictAdapter(Adapter):
 
     def _emitparse(self, code):
         fname = f"parse_dict_adapter_{code.allocateId()}"
+        if self.allow_duplicates:
+            on_duplicate = "return obj"
+        else:
+            on_duplicate = 'raise ConstructError("Duplicated keys found in object")'
+
         block = f"""
             def {fname}(io, this):
                 obj = {self.subcon._compileparse(code)}
@@ -80,7 +103,7 @@ class DictAdapter(Adapter):
                 for item in obj:
                     result[item.key] = item.value
                 if len(result) != len(obj):
-                    raise ConstructError("Duplicated keys found in object")
+                    {on_duplicate}
                 return result
         """
         code.append(block)
@@ -88,15 +111,19 @@ class DictAdapter(Adapter):
 
     def _emitbuild(self, code):
         fname = f"build_dict_adapter_{code.allocateId()}"
-        block = f"""
+        wrap = "obj = ListContainer(Container(key=type_, value=item) for type_, item in original_obj.items())"
+        if self.allow_duplicates:
+            wrap = f"""
+                if isinstance(original_obj, list):
+                    obj = original_obj
+                else:
+                    {wrap}
+            """
+        code.append(f"""
             def {fname}(original_obj, io, this):
-                obj = ListContainer(
-                    Container(key=type_, value=item)
-                    for type_, item in original_obj.items()
-                )
+                {wrap}
                 return {self.subcon._compilebuild(code)}
-        """
-        code.append(block)
+        """)
         return f"{fname}(obj, io, this)"
 
 
@@ -265,11 +292,13 @@ def make_vector(value: construct.Construct):
 
     def _emitparse(code):
         return f"ListContainer(({value._compileparse(code)}) for i in range({construct.Int32ul._compileparse(code)}))"
+
     result._emitparse = _emitparse
 
     def _emitbuild(code):
         return (f"(reuse(len(obj), lambda obj: {construct.Int32ul._compilebuild(code)}),"
                 f" list({value._compilebuild(code)} for obj in obj), obj)[2]")
+
     result._emitbuild = _emitbuild
 
     return result

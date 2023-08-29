@@ -25,11 +25,12 @@ from construct.lib.containers import Container, ListContainer
 from mercury_engine_data_structures import common_types, game_check, type_lib
 from mercury_engine_data_structures.common_types import Char, CVector3D, Float, StrId, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
+from mercury_engine_data_structures.construct_extensions.function_complex import ComplexIf, SwitchComplexKey
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource, dread_types
 from mercury_engine_data_structures.formats.bmsas import BMSAS_SR, Bmsas
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
-from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.game_check import Game, GameSpecificStruct
 from mercury_engine_data_structures.type_lib import get_type_lib_dread, get_type_lib_for_game
 
 
@@ -66,7 +67,6 @@ Functions = make_vector(Struct(
         )
     )),
 ))
-
 
 # Fields
 ExtraFields = common_types.DictAdapter(make_vector(
@@ -164,7 +164,7 @@ def DreadDependencies():
                 return component_type
         return None
 
-    return Switch(component_type, component_dependencies)
+    return SwitchComplexKey(component_type, component_dependencies)
 
 
 def SRDependencies():
@@ -232,6 +232,20 @@ def SRDependencies():
     return Switch(construct.this.type, component_dependencies)
 
 
+FieldsSwitch = construct.Switch(
+    lambda ctx: find_charclass_for_type(ctx._._.type),
+    fieldtypes(Game.DREAD),
+    ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx._._.type}", construct.SwitchError)
+)
+
+
+def _not_implemented(code):
+    raise NotImplementedError
+
+
+FieldsSwitch._emitparse = _not_implemented
+FieldsSwitch._emitbuild = _not_implemented
+
 # Components
 DreadComponent = Struct(
     type=StrId,
@@ -242,14 +256,10 @@ DreadComponent = Struct(
         Struct(
             empty_string=PropertyEnum,
             root=PropertyEnum,
-            fields=Switch(
-                lambda ctx: find_charclass_for_type(ctx._._.type),
-                fieldtypes(Game.DREAD),
-                ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx._._.type}", construct.SwitchError)
-            )
+            fields=FieldsSwitch,
         )
     ),
-    extra_fields=construct.If(
+    extra_fields=ComplexIf(
         lambda this: get_type_lib_dread().is_child_of(this.type, "CComponent"),
         ExtraFields,
     ),
@@ -265,7 +275,6 @@ SRComponent = Struct(
     fields=ExtraFields,
     dependencies=SRDependencies(),
 )
-
 
 # Header
 _CActorDefFields = {
@@ -316,7 +325,6 @@ SRHeader = Struct(
     unk_8=Int32ul,
 )
 
-
 # BMSAD
 BMSAD_SR = Struct(
     "_magic" / Const(b"MSAD"),
@@ -329,17 +337,17 @@ BMSAD_SR = Struct(
     "components" / make_dict(SRComponent),
 
     "unk_1" / Int32ul,
-    "unk_1a" / construct.If(lambda this: this.unk_1 == 2, construct.Bytes(9)),
-    "unk_1b" / construct.If(lambda this: this.unk_1 == 0, construct.Bytes(15)),
+    "unk_1a" / construct.If(construct.this.unk_1 == 2, construct.Bytes(9)),
+    "unk_1b" / construct.If(construct.this.unk_1 == 0, construct.Bytes(15)),
     "unk_2" / StrId,
     "unk_3" / Int32ul,
 
     "action_sets" / make_vector(BMSAS_SR),
     "_remaining" / construct.Peek(construct.GreedyBytes),
-    "sound_fx" / construct.If(
+    "sound_fx" / ComplexIf(
         lambda this: (
-            (this._parsing and this._remaining)
-            or (this._building and (this.sound_fx is not None))
+                (this._parsing and this._remaining)
+                or (this._building and (this.sound_fx is not None))
         ),
         make_vector(StrId >> Byte)
     ),
@@ -369,8 +377,9 @@ BMSAD_Dread = Struct(
     construct.Terminated,
 )
 
-
 ArgAnyType = str | float | bool | int
+
+
 class ActorDefFunc:
     def __init__(self, raw: dict) -> None:
         self._raw = raw
@@ -380,7 +389,7 @@ class ActorDefFunc:
             name: str,
             unk1: bool = True,
             unk2: bool = False,
-        ):
+            ):
         return cls(Container(
             name=name,
             unk1=unk1,
@@ -454,6 +463,8 @@ class ActorDefFunc:
 
 
 T = typing.TypeVar('T', bound=ArgAnyType)
+
+
 class ActorDefFuncParam(typing.Generic[T]):
     def __init__(self, index: int) -> None:
         self.index = index
@@ -467,6 +478,8 @@ class ActorDefFuncParam(typing.Generic[T]):
 
 Vec3 = list
 FieldType = typing.Union[bool, str, float, int, Vec3]
+
+
 class ComponentFields:
     def __init__(self, parent: "Component") -> None:
         self.parent = parent
@@ -505,8 +518,8 @@ class ComponentFields:
                 return self._get_extra_field(self.parent.raw.extra_fields, __name)
 
             if (
-                self.parent.raw.fields is not None
-                and __name in self.parent.raw.fields.fields
+                    self.parent.raw.fields is not None
+                    and __name in self.parent.raw.fields.fields
             ):
                 return self.parent.raw.fields.fields[__name]
 
@@ -620,11 +633,12 @@ class Component:
 
 class Bmsad(BaseResource):
     @classmethod
+    @functools.lru_cache
     def construct_class(cls, target_game: Game) -> Construct:
-        return {
-            Game.SAMUS_RETURNS: BMSAD_SR,
-            Game.DREAD: BMSAD_Dread,
-        }[target_game]
+        return GameSpecificStruct({
+                                      Game.SAMUS_RETURNS: BMSAD_SR,
+                                      Game.DREAD: BMSAD_Dread,
+                                  }[target_game], target_game).compile()
 
     @property
     def name(self) -> str:
@@ -718,4 +732,3 @@ class Bmsad(BaseResource):
         )
         if self.target_game == Game.SAMUS_RETURNS and not self.raw.sound_fx:
             self.raw.sound_fx = None
-

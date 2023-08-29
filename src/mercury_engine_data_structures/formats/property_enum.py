@@ -92,11 +92,20 @@ class CRCAdapter(construct.Adapter):
         n = self.hash_set.name
         code.append("from mercury_engine_data_structures.formats.property_enum import HashSet")
 
+        code.append(f"""
+        _inverted_hashes_{n} = HashSet.{n}.inverted_hashes(Container(_params=Container(target_game=TARGET_GAME)))
+        if TARGET_GAME == Game.DREAD:
+            def _parse_hashset_{n}(io, this):
+                return {construct.Int64ul._compileparse(code)}
+        elif TARGET_GAME == Game.SAMUS_RETURNS:
+            def _parse_hashset_{n}(io, this):
+                return {construct.Int32ul._compileparse(code)}
+        """)
+
         if self.allow_unknowns:
-            return (f"reuse({self.subcon._compileparse(code)}, "
-                    f"lambda key: HashSet.{n}.inverted_hashes(this).get(key, key))")
+            return f"reuse(_parse_hashset_{n}(io, this), lambda key: _inverted_hashes_{n}.get(key, key))"
         else:
-            return f"HashSet.{n}.inverted_hashes(this)[{self.subcon._compileparse(code)}]"
+            return f"_inverted_hashes_{n}[_parse_hashset_{n}(io, this)]"
 
     def _emitbuild(self, code: construct.CodeGen):
         if self.allow_unknowns:
@@ -105,8 +114,16 @@ class CRCAdapter(construct.Adapter):
         n = self.hash_set.name
         code.append("from mercury_engine_data_structures.formats.property_enum import HashSet")
 
-        ret: str = self._raw_subcon._compilebuild(code)
-        return ret.replace(".pack(obj)", f".pack(HashSet.{n}.known_hashes(this)[obj])")
+        code.append(f"""
+        _known_hashes_{n} = HashSet.{n}.known_hashes(Container(_params=Container(target_game=TARGET_GAME)))
+        if TARGET_GAME == Game.DREAD:
+            def _build_hashset_{n}(obj, io, this):
+                return {construct.Int64ul._compilebuild(code)}
+        elif TARGET_GAME == Game.SAMUS_RETURNS:
+            def _build_hashset_{n}(obj, io, this):
+                return {construct.Int32ul._compilebuild(code)}
+        """)
+        return f"(_build_hashset_{n}(_known_hashes_{n}[obj], io, this), obj)[1]"
 
 
 PropertyEnum = CRCAdapter(HashSet.PROPERTY)
