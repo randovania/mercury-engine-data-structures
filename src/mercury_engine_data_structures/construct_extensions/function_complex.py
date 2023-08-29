@@ -3,9 +3,15 @@ from typing import Dict, Optional, Type, Union
 import construct
 
 
+def _resolve_id(type_class: Union[construct.Construct, Type[construct.Construct]]) -> int:
+    if isinstance(type_class, construct.Renamed):
+        return _resolve_id(type_class.subcon)
+    return id(type_class)
+
+
 def emit_switch_cases_parse(
         code: construct.CodeGen,
-        fields: Dict[str, Union[construct.Construct, Type[construct.Construct]]],
+        fields: Dict[Union[str, int], Union[construct.Construct, Type[construct.Construct]]],
         custom_table_name: Optional[str] = None,
 ) -> str:
     """Construct codegen helper for handling the switch cases dict in _emitparse."""
@@ -15,12 +21,13 @@ def emit_switch_cases_parse(
 
     block = f"{table_name} = {{\n"
     for type_name, type_class in fields.items():
+        type_id = _resolve_id(type_class)
         code.append(f"""
-        def _parse_{id(type_class)}(io, this):
+        def _parse_{type_id}(io, this):
             return {type_class._compileparse(code)}
         """)
 
-        block += f"    {repr(type_name)}: _parse_{id(type_class)},  # {type_class.name}\n"
+        block += f"    {repr(type_name)}: _parse_{type_id},  # {type_class.name}\n"
     block += "}"
     code.append(block)
 
@@ -29,7 +36,7 @@ def emit_switch_cases_parse(
 
 def emit_switch_cases_build(
         code: construct.CodeGen,
-        fields: Dict[str, Union[construct.Construct, Type[construct.Construct]]],
+        fields: Dict[Union[str, int], Union[construct.Construct, Type[construct.Construct]]],
         custom_table_name: Optional[str] = None,
 ) -> str:
     """Construct codegen helper for handling the switch cases dict in _emitbuild."""
@@ -39,11 +46,12 @@ def emit_switch_cases_build(
 
     block = f"{table_name} = {{\n"
     for type_name, type_class in fields.items():
+        type_id = _resolve_id(type_class)
         code.append(f"""
-        def _build_{id(type_class)}(obj, io, this):
+        def _build_{type_id}(obj, io, this):
             return {type_class._compilebuild(code)}
         """)
-        block += f"    {repr(type_name)}: _build_{id(type_class)},  # {type_class.name}\n"
+        block += f"    {repr(type_name)}: _build_{type_id},  # {type_class.name}\n"
     block += "}"
     code.append(block)
     return table_name
