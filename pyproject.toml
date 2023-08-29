@@ -33,6 +33,12 @@ content-type = "text/markdown"
 [project.urls]
 Homepage = "https://github.com/randovania/mercury-engine-data-structures"
 
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+]
+
 # Entry Points for PyInstaller
 [project.entry-points.pyinstaller40]
 hook-dirs = "mercury_engine_data_structures.__pyinstaller:get_hook_dirs"
