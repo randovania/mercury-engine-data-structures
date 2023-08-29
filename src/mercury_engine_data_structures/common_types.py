@@ -17,19 +17,48 @@ CVector3D = construct.Array(3, Float)
 CVector4D = construct.Array(4, Float)
 
 
-def _vector_emitparse(length: int, code: construct.CodeGen):
+def _cvector_emitparse(length: int, code: construct.CodeGen) -> str:
+    """Specialized construct compile for CVector2/3/4D"""
     code.append(f"CVector{length}D_Format = struct.Struct('<{length}f')")
     return f"ListContainer(CVector{length}D_Format.unpack(io.read({length * 4})))"
 
 
-def _vector_emitbuild(length: int, code: construct.CodeGen):
+def _vector_cvector_emitparse(length: int, code: construct.CodeGen) -> str:
+    """Specialized construct compile for a dynamic array of CVector2/3/4D"""
+
+    code.append(f"""
+    def _parse_cvector{length}d_array(io, this):
+        count = {construct.Int32ul._compileparse(code)}
+        raw = struct.unpack(f'<{{{length} * count}}f', io.read({length * 4} * count))
+        args = [iter(raw)] * {length}
+        return ListContainer(zip(*args))
+    """)
+    return f"_parse_cvector{length}d_array(io, this)"
+
+
+def _cvector_emitbuild(length: int, code: construct.CodeGen):
     code.append(f"CVector{length}D_Format = struct.Struct('<{length}f')")
     return f"(io.write(CVector{length}D_Format.pack(*obj)), obj)"
 
 
 for i, vec in enumerate([CVector2D, CVector3D, CVector4D]):
-    vec._emitparse = functools.partial(_vector_emitparse, i + 2)
-    vec._emitbuild = functools.partial(_vector_emitbuild, i + 2)
+    vec._emitparse = functools.partial(_cvector_emitparse, i + 2)
+    vec._emitparse_vector = functools.partial(_vector_cvector_emitparse, i + 2)
+    vec._emitbuild = functools.partial(_cvector_emitbuild, i + 2)
+
+
+def _fmtfield_vector_emitparse(fmt_field: construct.FormatField, code: construct.CodeGen) -> str:
+    code.append(f"""
+    def _parse_{id(fmt_field)}_array(io, this):
+        count = {construct.Int32ul._compileparse(code)}
+        return ListContainer(struct.unpack(f'{fmt_field.fmtstr[0]}{{count}}{fmt_field.fmtstr[1]}',
+                             io.read({fmt_field.length} * count)))
+    """)
+    return f"_parse_{id(fmt_field)}_array(io, this)"
+
+
+for fmt in [Int, UInt, Float, construct.Int16ul]:
+    fmt._emitparse_vector = functools.partial(_fmtfield_vector_emitparse, fmt)
 
 
 class ListContainerWithKeyAccess(construct.ListContainer):
@@ -290,8 +319,12 @@ def make_vector(value: construct.Construct):
         arr,
     )
 
-    def _emitparse(code):
-        return f"ListContainer(({value._compileparse(code)}) for i in range({construct.Int32ul._compileparse(code)}))"
+    if hasattr(value, "_emitparse_vector"):
+        _emitparse = value._emitparse_vector
+    else:
+        def _emitparse(code: construct.CodeGen) -> str:
+            return (f"ListContainer(({value._compileparse(code)}) "
+                    f"for i in range({construct.Int32ul._compileparse(code)}))")
 
     result._emitparse = _emitparse
 
