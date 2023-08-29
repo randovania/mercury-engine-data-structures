@@ -337,14 +337,14 @@ BMSAD_SR = Struct(
     "components" / make_dict(SRComponent),
 
     "unk_1" / Int32ul,
-    "unk_1a" / construct.If(lambda this: this.unk_1 == 2, construct.Bytes(9)),
-    "unk_1b" / construct.If(lambda this: this.unk_1 == 0, construct.Bytes(15)),
+    "unk_1a" / construct.If(construct.this.unk_1 == 2, construct.Bytes(9)),
+    "unk_1b" / construct.If(construct.this.unk_1 == 0, construct.Bytes(15)),
     "unk_2" / StrId,
     "unk_3" / Int32ul,
 
     "action_sets" / make_vector(BMSAS_SR),
     "_remaining" / construct.Peek(construct.GreedyBytes),
-    "sound_fx" / construct.If(
+    "sound_fx" / ComplexIf(
         lambda this: (
                 (this._parsing and this._remaining)
                 or (this._building and (this.sound_fx is not None))

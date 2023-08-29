@@ -68,7 +68,8 @@ class DictAdapter(Adapter):
         super().__init__(subcon)
         self.allow_duplicates = allow_duplicates
 
-    def _decode(self, obj: construct.ListContainer, context, path):
+    def _decode(self, obj: construct.ListContainer, context: construct.Container, path: str,
+                ) -> construct.ListContainer | construct.Container:
         result = construct.Container()
         for item in obj:
             key = item.key
@@ -79,7 +80,8 @@ class DictAdapter(Adapter):
             result[key] = item.value
         return result
 
-    def _encode(self, obj: construct.Container, context, path):
+    def _encode(self, obj: construct.ListContainer | construct.Container, context: construct.Container, path: str,
+                ) -> list:
         if self.allow_duplicates and isinstance(obj, list):
             return obj
         return construct.ListContainer(
@@ -89,6 +91,11 @@ class DictAdapter(Adapter):
 
     def _emitparse(self, code):
         fname = f"parse_dict_adapter_{code.allocateId()}"
+        if self.allow_duplicates:
+            on_duplicate = "return obj"
+        else:
+            on_duplicate = 'raise ConstructError("Duplicated keys found in object")'
+
         block = f"""
             def {fname}(io, this):
                 obj = {self.subcon._compileparse(code)}
@@ -96,7 +103,7 @@ class DictAdapter(Adapter):
                 for item in obj:
                     result[item.key] = item.value
                 if len(result) != len(obj):
-                    raise ConstructError("Duplicated keys found in object")
+                    {on_duplicate}
                 return result
         """
         code.append(block)
@@ -104,15 +111,19 @@ class DictAdapter(Adapter):
 
     def _emitbuild(self, code):
         fname = f"build_dict_adapter_{code.allocateId()}"
-        block = f"""
+        wrap = "obj = ListContainer(Container(key=type_, value=item) for type_, item in original_obj.items())"
+        if self.allow_duplicates:
+            wrap = f"""
+                if isinstance(original_obj, list):
+                    obj = original_obj
+                else:
+                    {wrap}
+            """
+        code.append(f"""
             def {fname}(original_obj, io, this):
-                obj = ListContainer(
-                    Container(key=type_, value=item)
-                    for type_, item in original_obj.items()
-                )
+                {wrap}
                 return {self.subcon._compilebuild(code)}
-        """
-        code.append(block)
+        """)
         return f"{fname}(obj, io, this)"
 
 
