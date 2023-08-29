@@ -64,20 +64,17 @@ class SwitchComplexKey(construct.Switch):
         return f"linkedinstances[{id(self.keyfunc)}](this)"
 
     def _emitparse(self, code: construct.CodeGen):
-        fname = f"switch_cases_{code.allocateId()}"
-        code.append(f"{fname} = {{}}")
-        for key, sc in self.cases.items():
-            code.append(f"{fname}[{repr(key)}] = lambda io,this: {sc._compileparse(code)}")
-        defaultfname = f"switch_defaultcase_{code.allocateId()}"
+        fname = emit_switch_cases_parse(code, self.cases)
+
+        defaultfname = f"default_{fname}"
         code.append(f"{defaultfname} = lambda io,this: {self.default._compileparse(code)}")
+
         return f"{fname}.get({self._insert_keyfunc(code)}, {defaultfname})(io, this)"
 
     def _emitbuild(self, code: construct.CodeGen):
-        fname = f"switch_cases_{code.allocateId()}"
-        code.append(f"{fname} = {{}}")
-        for key, sc in self.cases.items():
-            code.append(f"{fname}[{repr(key)}] = lambda obj,io,this: {sc._compilebuild(code)}")
-        defaultfname = f"switch_defaultcase_{code.allocateId()}"
+        fname = emit_switch_cases_build(code, self.cases)
+
+        defaultfname = f"default_{fname}"
         code.append(f"{defaultfname} = lambda obj,io,this: {self.default._compilebuild(code)}")
         return f"{fname}.get({self._insert_keyfunc(code)}, {defaultfname})(obj, io, this)"
 
