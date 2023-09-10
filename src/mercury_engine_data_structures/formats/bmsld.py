@@ -1,12 +1,16 @@
+import logging
 from typing import Iterator
 
 import construct
-from construct import Array, Const, Construct, Flag, Float32l, Hex, Int32ul, Struct
+from construct import Const, Construct, Container, Flag, Float32l, Hex, Int32ul, Struct, Switch
 
-from mercury_engine_data_structures.common_types import Float, StrId, UInt, make_dict, make_vector
+from mercury_engine_data_structures.common_types import Float, StrId, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource
+from mercury_engine_data_structures.formats.collision import collision_formats
 from mercury_engine_data_structures.game_check import Game
+
+logger = logging.getLogger(__name__)
 
 FunctionArgument = Struct(
     type=construct.PaddedString(4, 'ascii'),
@@ -69,43 +73,13 @@ ProperActor = Struct(
 
 CollisionObject = Struct(
     object_type=StrId,
-    data=construct.Switch(
+    data=Switch(
         construct.this.object_type,
-        {
-            "CIRCLE": Struct(
-                value1=Float,
-                value2=Float,
-                value3=Float,
-                size=Float,
-            ),
-            "CAPSULE2D": Struct(
-                value1=Float,
-                value2=Float,
-                value3=Float,
-                value4=Float,
-                value5=Float,
-            ),
-            "POLYCOLLECTION2D": Struct(
-                unknown1=UInt,
-                unknown2=UInt,
-                unknown3=UInt,
-                polys=make_vector(Struct(
-                    num_points=UInt,
-                    unk=Float,
-                    points=Array(construct.this.num_points,
-                                 Struct(x=Hex(UInt), y=Hex(UInt), material_attribute=Hex(UInt))),
-                    loop=Flag,
-                    boundings=Array(4, Float),
-                )),
-                total_boundings=Array(4, Float),
-                something=Flag,
-                check=construct.If(construct.this.something, ErrorWithMessage(
-                    lambda ctx: "flag is enabled, but not supported",
-                ))
-                # binary_search_trees=OptionalValue(make_vector(BinarySearchTree)),
-            ),
-        }
-    )
+        collision_formats,
+        ErrorWithMessage(
+            lambda ctx: f"Type {ctx.type} not known, valid types are {list(collision_formats.keys())}."
+        )
+    ),
 )
 
 BMSLD = Struct(
@@ -175,12 +149,54 @@ class Bmsld(BaseResource):
     def construct_class(cls, target_game: Game) -> Construct:
         return BMSLD
 
-    def all_actor_groups(self) -> Iterator[str]:
-        for area in self.raw.sub_areas:
-            yield area.name
+    def all_actor_groups(self) -> Iterator[tuple[str, Container]]:
+        for sub_area in self.raw.sub_areas:
+            yield sub_area.name, sub_area
 
-    def is_actor_in_group(self, group_name: str, actor_name: str, layer_name: str = "default") -> bool:
+    def is_actor_in_group(self, group_name: str, actor_name: str) -> bool:
         generator = (area for area in self.raw.sub_areas if area.name == group_name)
         for area in generator:
             return actor_name in area.names
         return False
+
+    def get_actor_group(self, group_name: str) -> Container:
+        group = next(
+            (sub_area for sub_area_name, sub_area in self.all_actor_groups()
+            if sub_area_name == group_name),
+            None
+        )
+        if group is None:
+            raise Exception(f"No group found with name for {group_name}")
+        return group
+
+    def all_actor_group_names_for_actor(self, actor_name: str) -> list[str]:
+        return [
+            actor_group_name
+            for actor_group_name, actor_group in self.all_actor_groups()
+            if actor_name in actor_group.names
+        ]
+
+    def remove_actor_from_group(self, group_name: str, actor_name: str):
+        logger.debug("Remove actor %s from group %s", actor_name, group_name)
+        group = self.get_actor_group(group_name)
+        group.names.remove(actor_name)
+
+    def remove_actor_from_all_groups(self, actor_name: str):
+        group_names = self.all_actor_group_names_for_actor(actor_name)
+        for group_name in group_names:
+            self.remove_actor_from_group(group_name, actor_name)
+
+    def add_actor_to_entity_groups(self, collision_camera_name: str, actor_name: str, all_groups: bool = False):
+        def compare_func(first: str, second: str) -> bool:
+            if all_groups:
+                return first.startswith(f"eg_SubArea_{second}")
+            else:
+                return first == f"eg_SubArea_{second}"
+
+        collision_camera_groups = [group for group_name, group in self.all_actor_groups()
+                                    if compare_func(group_name, collision_camera_name)]
+        if len(collision_camera_groups) == 0:
+            raise Exception(f"No entity group found for {collision_camera_name}")
+        for group in collision_camera_groups:
+            logger.debug("Add actor %s to group %s", actor_name, group.name)
+            group.names.append(actor_name)
