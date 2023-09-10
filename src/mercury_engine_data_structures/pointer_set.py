@@ -9,6 +9,10 @@ import construct
 from construct import Adapter, Construct, Container, Hex, Int64ul, ListContainer, Struct, Switch
 
 import mercury_engine_data_structures.dread_data
+from mercury_engine_data_structures.construct_extensions.function_complex import (
+    emit_switch_cases_build,
+    emit_switch_cases_parse,
+)
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 
 
@@ -86,7 +90,7 @@ class PointerAdapter(Adapter):
         n = code.allocateId()
 
         fname = f"parse_pointer_{n}"
-        case_name = f"switch_cases_{n}"
+        case_name = f"pointer_switch_cases_{n}"
 
         if self._single_type:
             code.parsercache[id(self)] = f"{case_name}[{Int64ul._compileparse(code)}](io, this)"
@@ -105,9 +109,7 @@ class PointerAdapter(Adapter):
             """
             code.append(block)
 
-        code.append(f"{case_name} = {{}}")
-        for key, sc in self.types.items():
-            code.append(f"{case_name}[{repr(key)}] = lambda io,this: {sc._compileparse(code)}")
+        emit_switch_cases_parse(code, self.types, case_name)
 
         return code.parsercache[id(self)]
 
@@ -117,15 +119,13 @@ class PointerAdapter(Adapter):
         n = code.allocateId()
 
         fname = f"build_pointer_{n}"
-        case_name = f"switch_cases_{n}"
+        case_name = f"pointer_switch_cases_{n}"
 
         # PointerSet is used recursively, so break the infinite loop by prefilling the cache
         code.buildercache[id(self)] = f"{fname}(obj, io, this)"
 
         # Switch cases
-        code.append(f"{case_name} = {{}}")
-        for key, sc in self.types.items():
-            code.append(f"{case_name}[{repr(key)}] = lambda obj,io,this: {sc._compilebuild(code)}")
+        emit_switch_cases_build(code, self.types, case_name)
 
         block = f"""
             def {fname}(the_obj, io, this):

@@ -3,6 +3,10 @@ from typing import Dict, Type, Union
 
 import construct
 
+from mercury_engine_data_structures.construct_extensions.function_complex import (
+    emit_switch_cases_build,
+    emit_switch_cases_parse,
+)
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 
 
@@ -58,7 +62,6 @@ class Object(construct.Construct):
     def _emitparse(self, code: construct.CodeGen) -> str:
         n = code.allocateId()
         fname = f"parse_object_{n}"
-        type_table = f"parse_object_types_{n}"
 
         code.append(f"""
         def _parse_object(io, this, type_table):
@@ -84,11 +87,7 @@ class Object(construct.Construct):
             return result
         """)
 
-        block = f"{type_table} = {{\n"
-        for type_name, type_class in self.fields.items():
-            block += f"    {repr(type_name)}: lambda io, this: {type_class._compileparse(code)},\n"
-        block += "}"
-        code.append(block)
+        type_table = emit_switch_cases_parse(code, self.fields, f"parse_object_types_{n}")
 
         code.append(f"""
             def {fname}(io, this):
@@ -100,7 +99,6 @@ class Object(construct.Construct):
     def _emitbuild(self, code: construct.CodeGen) -> str:
         n = code.allocateId()
         fname = f"build_object_{n}"
-        type_table = f"build_object_types_{n}"
 
         code.append(f"""
         def _build_object(the_obj, io, this, type_table):
@@ -118,11 +116,7 @@ class Object(construct.Construct):
                     type_table[field_type](field_value, io, this)
         """)
 
-        block = f"{type_table} = {{\n"
-        for type_name, type_class in self.fields.items():
-            block += f"    {repr(type_name)}: lambda obj, io, this: {type_class._compilebuild(code)},\n"
-        block += "}"
-        code.append(block)
+        type_table = emit_switch_cases_build(code, self.fields, f"build_object_types_{n}")
 
         code.append(f"""
             def {fname}(the_obj, io, this):

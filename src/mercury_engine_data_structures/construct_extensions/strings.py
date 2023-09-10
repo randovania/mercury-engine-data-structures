@@ -128,12 +128,11 @@ def CStringRobust(encoding):
     term = encodingunit(encoding)
     macro = StringEncodedRobust(NullTerminated(GreedyBytes, term=term), encoding)
 
-    expected_size = 16
-
     def _emitparse(code: construct.CodeGen):
         i = code.allocateId()
-        code.append(f"""
-        def read_util_term_{i}(io):
+
+        if encoding == "utf-8":
+            fast_path = f"""
             try:
                 # Assume it's a BytesIO. Then use bytes.find to do hard work on C
                 b = io.getvalue()
@@ -142,33 +141,35 @@ def CStringRobust(encoding):
                     raise StreamError
                 data = io.read(end - io.tell())
                 io.read({len(term)})
-                return data
+                return decode_{i}(data)
             except AttributeError:
                 # not a BytesIO
                 pass
+"""
+        else:
+            fast_path = ""
 
+        code.append(f"""
+        def decode_{i}(data):
+            try:
+                return data.decode({repr(encoding)})
+            except UnicodeDecodeError as e:
+                raise StringError(f"string decoding failed: {{e}}") from e
+
+        def read_util_term_{i}(io, this):
+            {fast_path}
             data = bytearray()
             while True:
-                before = io.tell()
-                b = io.read({len(term) * expected_size})
-                pos = b.find({repr(term)})
-                if pos != -1:
-                    io.seek(before + pos + {len(term)})
-                    data += b[:pos]
+                b = io.read({len(term)})
+                if b == {repr(term)}:
                     break
-
-                if len(b) < {len(term) * expected_size}:
-                    io.seek(before)
-                    b = io.read({len(term)})
-                    if b == {repr(term)}:
-                        break
-                    elif len(b) < {len(term)}:
-                        raise StreamError
+                elif len(b) < {len(term)}:
+                    raise StreamError
                 data += b
-            return data
+            return decode_{i}(data)
         """)
 
-        return f"read_util_term_{i}(io).decode({repr(encoding)})"
+        return f"read_util_term_{i}(io, this)"
 
     macro._emitparse = _emitparse
 
