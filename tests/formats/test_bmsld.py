@@ -38,26 +38,35 @@ def test_all_actor_groups(surface_bmsld: Bmsld):
     all_groups = surface_bmsld.all_actor_groups()
     assert len(list(all_groups)) == 32
 
-    not_in_group = surface_bmsld.is_actor_in_group("eg_SubArea_collision_camera_012", "LE_PowerUP_ChargeBeam", )
-    assert not_in_group is False
+@pytest.mark.parametrize(("cc_name", "actor_name", "should_be_present"),
+                            [
+                                ("eg_SubArea_collision_camera_008", "LE_PowerUP_ChargeBeam", True),
+                                ("eg_SubArea_collision_camera_012", "LE_PowerUP_ChargeBeam", False),
+                                ("eg_SubArea_collision_camera_010", "SG_Alpha_001", True),
+                                ("eg_SubArea_collision_camera_020", "SG_Alpha_001", False),
+                                ("eg_SubArea_collision_camera_010", "LE_Item_001", True),
+                                ("eg_SubArea_collision_camera_012", "LE_Item_001", False),
+                            ]
+                         )
+def test_is_actor_in_group(surface_bmsld: Bmsld, cc_name, actor_name, should_be_present):
+    in_group = surface_bmsld.is_actor_in_group(cc_name, actor_name)
+    assert in_group is should_be_present
 
-def test_is_actor_in_group(surface_bmsld: Bmsld):
-    in_group = surface_bmsld.is_actor_in_group("eg_SubArea_collision_camera_008", "LE_PowerUP_ChargeBeam", )
-    assert in_group is True
-
-    not_in_group = surface_bmsld.is_actor_in_group("eg_SubArea_collision_camera_012", "LE_PowerUP_ChargeBeam", )
-    assert not_in_group is False
 
 def test_get_actor_group(surface_bmsld: Bmsld):
     group = surface_bmsld.get_actor_group("eg_SubArea_collision_camera_008")
     assert group is not None
 
-    with pytest.raises(Exception):
+    with pytest.raises(KeyError):
         surface_bmsld.get_actor_group("blabla")
 
 def test_all_actor_group_names_for_actor(surface_bmsld: Bmsld):
     groups = surface_bmsld.all_actor_group_names_for_actor("LE_EnergyRecharge")
-    assert len(groups) == 3
+    assert groups == [
+        'eg_SubArea_collision_camera_010',
+        'eg_SubArea_collision_camera_023',
+        'eg_SubArea_PostAlpha_001',
+    ]
 
 def test_add_actor_to_entity_groups(surface_bmsld: Bmsld):
     groups = surface_bmsld.all_actor_group_names_for_actor("LE_AmmoRecharge")

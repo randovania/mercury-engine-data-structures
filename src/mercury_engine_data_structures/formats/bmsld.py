@@ -166,7 +166,7 @@ class Bmsld(BaseResource):
             None
         )
         if group is None:
-            raise Exception(f"No group found with name for {group_name}")
+            raise KeyError(f"No group found with name for {group_name}")
         return group
 
     def all_actor_group_names_for_actor(self, actor_name: str) -> list[str]:
