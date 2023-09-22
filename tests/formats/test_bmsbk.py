@@ -10,4 +10,7 @@ all_sr_bmsbk = [name for name in samus_returns_data.all_name_to_asset_id().keys(
 
 @pytest.mark.parametrize("bmsbk_path", all_sr_bmsbk)
 def test_bmsbk(samus_returns_tree, bmsbk_path):
-    parse_build_compare_editor(Bmsbk, samus_returns_tree, bmsbk_path)
+    try:
+        parse_build_compare_editor(Bmsbk, samus_returns_tree, bmsbk_path)
+    except FileNotFoundError:
+        pytest.skip(f"{bmsbk_path} does not exist")

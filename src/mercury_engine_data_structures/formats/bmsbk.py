@@ -11,6 +11,7 @@ from construct import (
     Int32ul,
     Rebuild,
     Struct,
+    Terminated,
 )
 
 from mercury_engine_data_structures.common_types import CVector3D, StrId, make_vector
@@ -50,6 +51,7 @@ BMSBK = Struct(
         "name" / StrId,
         "entries" / make_vector(Int32ul),
     )),
+    Terminated,
 )
 
 class Bmsbk(BaseResource):
