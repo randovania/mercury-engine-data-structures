@@ -8,6 +8,7 @@ from mercury_engine_data_structures.formats.bmmap import Bmmap
 from mercury_engine_data_structures.formats.bmmdef import Bmmdef
 from mercury_engine_data_structures.formats.bmsad import Bmsad
 from mercury_engine_data_structures.formats.bmsas import Bmsas
+from mercury_engine_data_structures.formats.bmsbk import Bmsbk
 from mercury_engine_data_structures.formats.bmscc import Bmscc
 from mercury_engine_data_structures.formats.bmscu import Bmscu
 from mercury_engine_data_structures.formats.bmsld import Bmsld
@@ -36,6 +37,7 @@ ALL_FORMATS = {
     "BMBLS": Bmbls,
     "BMMAP": Bmmap,
     "BMMDEF": Bmmdef,
+    "BMSBK": Bmsbk,
     "BMSCP": Bmscp,
     "BMSSD": Bmssd,
     "BMSSK": Bmssk,
