@@ -22,7 +22,7 @@ Block = Struct(
     "pos" / CVector3D,
     "unk2" / Int32ul,
     "unk3" / Int32ul,
-    "unk4" / Float32l,
+    "respawn_time" / Float32l,
     "name1" / StrId,
     "name2" / StrId,
 )
