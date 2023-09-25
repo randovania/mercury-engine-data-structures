@@ -1,5 +1,5 @@
 import logging
-from typing import Iterator
+from typing import Iterator, Tuple
 
 import construct
 from construct import Const, Construct, Container, Flag, Float32l, Hex, Int32ul, Struct, Switch
@@ -55,10 +55,9 @@ ProperActor = Struct(
     x=Float,
     y=Float,
     z=Float,
-    unk05=Hex(Int32ul),
-    unk06=Hex(Int32ul),
-    unk07=Hex(Int32ul),
-
+    x_rotation=Float32l,
+    y_rotation=Float32l,
+    z_rotation=Float32l,
     components=make_vector(Struct(
         component_type=StrId,
         command=StrId,
@@ -148,6 +147,11 @@ class Bmsld(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
         return BMSLD
+
+    def all_actors(self) -> Iterator[Tuple[int, str, construct.Container]]:
+        for layer in self.raw.actors:
+            for actor_name, actor in layer.items():
+                yield layer, actor_name, actor
 
     def all_actor_groups(self) -> Iterator[tuple[str, Container]]:
         for sub_area in self.raw.sub_areas:

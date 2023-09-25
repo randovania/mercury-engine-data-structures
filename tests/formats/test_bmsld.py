@@ -60,6 +60,10 @@ def test_get_actor_group(surface_bmsld: Bmsld):
     with pytest.raises(KeyError):
         surface_bmsld.get_actor_group("blabla")
 
+def test_all_actors(surface_bmsld: Bmsld):
+    all_actors = list(surface_bmsld.all_actors())
+    assert len(all_actors) == 232
+
 def test_all_actor_group_names_for_actor(surface_bmsld: Bmsld):
     groups = surface_bmsld.all_actor_group_names_for_actor("LE_EnergyRecharge")
     assert groups == [
