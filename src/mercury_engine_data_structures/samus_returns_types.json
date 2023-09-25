@@ -1353,12 +1353,8 @@
         "parent": "CGameObject",
         "fields": {
             "type": "base::global::StrId",
-            "x": "float",
-            "y": "float",
-            "z": "float",
-            "unk05": "unsigned",
-            "unk06": "unsigned",
-            "unk07": "unsigned",
+            "position": "base::math::CVector3D",
+            "rotation": "base::math::CVector3D",
             "components": "base::global::CRntVector<Component>"
         }
     },
@@ -1409,5 +1405,9 @@
     "unsigned": {
         "kind": "primitive",
         "primitive_kind": "uint"
+    },
+    "base::math::CVector3D": {
+        "kind": "primitive",
+        "primitive_kind": "float_vec3"
     }
 }

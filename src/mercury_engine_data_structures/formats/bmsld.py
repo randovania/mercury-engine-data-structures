@@ -1,10 +1,10 @@
 import logging
-from typing import Iterator
+from typing import Iterator, Tuple
 
 import construct
 from construct import Const, Construct, Container, Flag, Float32l, Hex, Int32ul, Struct, Switch
 
-from mercury_engine_data_structures.common_types import Float, StrId, make_dict, make_vector
+from mercury_engine_data_structures.common_types import CVector3D, Float, StrId, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.formats.collision import collision_formats
@@ -52,13 +52,8 @@ Components = {
 ProperActor = Struct(
     type=StrId,
 
-    x=Float,
-    y=Float,
-    z=Float,
-    unk05=Hex(Int32ul),
-    unk06=Hex(Int32ul),
-    unk07=Hex(Int32ul),
-
+    position=CVector3D,
+    rotation=CVector3D,
     components=make_vector(Struct(
         component_type=StrId,
         command=StrId,
@@ -148,6 +143,11 @@ class Bmsld(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
         return BMSLD
+
+    def all_actors(self) -> Iterator[Tuple[int, str, construct.Container]]:
+        for layer in self.raw.actors:
+            for actor_name, actor in layer.items():
+                yield layer, actor_name, actor
 
     def all_actor_groups(self) -> Iterator[tuple[str, Container]]:
         for sub_area in self.raw.sub_areas:
