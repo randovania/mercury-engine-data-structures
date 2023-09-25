@@ -4,7 +4,7 @@ from typing import Iterator, Tuple
 import construct
 from construct import Const, Construct, Container, Flag, Float32l, Hex, Int32ul, Struct, Switch
 
-from mercury_engine_data_structures.common_types import Float, StrId, make_dict, make_vector
+from mercury_engine_data_structures.common_types import CVector3D, Float, StrId, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.formats.collision import collision_formats
@@ -52,12 +52,8 @@ Components = {
 ProperActor = Struct(
     type=StrId,
 
-    x=Float,
-    y=Float,
-    z=Float,
-    x_rotation=Float32l,
-    y_rotation=Float32l,
-    z_rotation=Float32l,
+    position=CVector3D,
+    rotation=CVector3D,
     components=make_vector(Struct(
         component_type=StrId,
         command=StrId,
