@@ -7,7 +7,7 @@ from construct.core import Const, Construct, GreedyRange, Struct
 from mercury_engine_data_structures.common_types import DictAdapter, DictElement
 from mercury_engine_data_structures.construct_extensions.strings import CStringRobust
 from mercury_engine_data_structures.formats import BaseResource
-from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.game_check import Game, is_sr_or_else
 
 _string_range = GreedyRange(DictElement(CStringRobust("utf-16-le")))
 
@@ -38,7 +38,10 @@ _string_range._emitparse = _emitparse
 
 TXT = Struct(
     "magic" / Const(b'BTXT'),
-    "version" / Const(b'\x01\x00\x0a\x00'),
+    "version" / is_sr_or_else(
+        Const(b'\x01\x00\x08\x00'),
+        Const(b'\x01\x00\x0a\x00'),
+    ),
     "strings" / DictAdapter(_string_range),
     "_end" / construct.Terminated,
 )
