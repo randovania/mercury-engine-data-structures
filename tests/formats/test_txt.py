@@ -9,3 +9,9 @@ def test_compare_dread(dread_path):
     parse_and_build_compare(
         TXT, Game.DREAD, file_path
     )
+
+def test_compare_sr(samus_returns_path):
+    file_path = samus_returns_path.joinpath("system/localization/us_english.txt")
+    parse_and_build_compare(
+        TXT, Game.SAMUS_RETURNS, file_path
+    )
