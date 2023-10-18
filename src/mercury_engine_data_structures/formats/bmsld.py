@@ -1,5 +1,4 @@
 import logging
-from bisect import bisect
 from typing import Iterator, Tuple
 
 import construct
@@ -215,10 +214,5 @@ class Bmsld(BaseResource):
 
     def insert_into_entity_group(self, sub_area: Container, name_to_add: str) -> None:
         # MSR requires to have the names in the sub area list sorted by their crc32 value
-        crcs_list = [
-            crc32(name)
-            for name in sub_area.names
-        ]
-        crc_to_add = crc32(name_to_add)
-        index = bisect(crcs_list, crc_to_add)
-        sub_area.names.insert(index, name_to_add)
+        sub_area.names.append(name_to_add)
+        sub_area.names.sort(key=crc32)
