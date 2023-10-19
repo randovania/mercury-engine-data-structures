@@ -6,6 +6,7 @@ from construct import Const, Construct, Container, Flag, Float32l, Hex, Int32ul,
 
 from mercury_engine_data_structures.common_types import CVector3D, Float, StrId, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
+from mercury_engine_data_structures.crc import crc32
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.formats.collision import collision_formats
 from mercury_engine_data_structures.game_check import Game
@@ -187,6 +188,16 @@ class Bmsld(BaseResource):
             self.remove_actor_from_group(group_name, actor_name)
 
     def add_actor_to_entity_groups(self, collision_camera_name: str, actor_name: str, all_groups: bool = False):
+        """
+        Adds an actor to either all entity groups or one entity group, which follow the name pattern of eg_SubArea_NAME.
+        In case an actor needs to be added to an entity group not following this name pattern
+        use `insert_into_sub_area`.
+
+        collision_camera_name: Name of the collision camera to find the entity groups for
+        actor_name: Actor name to add to the entity group
+        all_groups: A boolean which defines if the actor should be added to all entity groups starting with the name
+                   pattern or just to one entity group matching the name pattern exactly
+        """
         def compare_func(first: str, second: str) -> bool:
             if all_groups:
                 return first.startswith(f"eg_SubArea_{second}")
@@ -199,4 +210,9 @@ class Bmsld(BaseResource):
             raise Exception(f"No entity group found for {collision_camera_name}")
         for group in collision_camera_groups:
             logger.debug("Add actor %s to group %s", actor_name, group.name)
-            group.names.append(actor_name)
+            self.insert_into_entity_group(group, actor_name)
+
+    def insert_into_entity_group(self, sub_area: Container, name_to_add: str) -> None:
+        # MSR requires to have the names in the sub area list sorted by their crc32 value
+        sub_area.names.append(name_to_add)
+        sub_area.names.sort(key=crc32)
