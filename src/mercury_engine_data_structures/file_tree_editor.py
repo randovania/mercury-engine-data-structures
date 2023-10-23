@@ -314,6 +314,12 @@ class FileTreeEditor:
         for asset_id in self._modified_resources.keys():
             modified_pkgs.update(self._files_for_asset_id[asset_id])
 
+        # Ensure pkgs are written which only have new ensured assets without
+        # completly new assets
+        for key, asset_ids in self._ensured_asset_ids.items():
+            if len(asset_ids) != 0:
+                modified_pkgs.add(key)
+
         if None in modified_pkgs:
             modified_pkgs.remove(None)
 
