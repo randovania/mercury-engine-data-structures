@@ -15,7 +15,7 @@ BMSMSD = Struct(
     "tile_size" / construct.Array(2, Float32l),
     "x_tiles" / Int32sl,
     "y_tiles" / Int32sl,
-    "dimension" / Struct(
+    "map_dimensions" / Struct(
         "bottom_left" / CVector2D,
         "top_right" / CVector2D,
     ),
