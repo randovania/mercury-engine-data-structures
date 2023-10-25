@@ -1,11 +1,18 @@
 import functools
 
 import construct
-from construct.core import Const, Construct, Float32l, Hex, Int32sl, Int32ul, Struct
+from construct.core import Const, Construct, Enum, Float32l, Hex, Int32sl, Int32ul, Struct
 
 from mercury_engine_data_structures.common_types import CVector2D, CVector3D, StrId, make_vector
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
+
+TileType = Enum(
+    Int32ul,
+    BLUE=1,
+    RED=2,
+    PURPLE=4
+)
 
 # BMSMSD
 BMSMSD = Struct(
@@ -27,7 +34,7 @@ BMSMSD = Struct(
                 "top_right" / CVector2D,
             ),
             "border_type" / Int32sl,
-            "tile_type" / Int32sl,
+            "tile_type" / TileType,
             "icons" / make_vector(
                 Struct(
                     "actor_name" / StrId,
