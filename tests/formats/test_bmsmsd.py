@@ -9,5 +9,5 @@ all_sr_bmsmsd = [name for name in samus_returns_data.all_name_to_asset_id().keys
 
 
 @pytest.mark.parametrize("bmsmsd_path", all_sr_bmsmsd)
-def test_bmtun(samus_returns_tree, bmsmsd_path):
+def test_bmsmsd(samus_returns_tree, bmsmsd_path):
     parse_build_compare_editor(Bmsmsd, samus_returns_tree, bmsmsd_path)
