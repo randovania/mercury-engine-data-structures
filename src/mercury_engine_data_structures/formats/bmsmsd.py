@@ -12,8 +12,7 @@ BMSMSD = Struct(
     "_magic" / Const(b"MMSD"),
     "version" / Const(0x00070001, Hex(Int32ul)),
     "scenario" / StrId,
-    "unk1" / Float32l,
-    "unk2" / Float32l,
+    "tile_size" / construct.Array(2, Float32l),
     "x_tiles" / Int32sl,
     "y_tiles" / Int32sl,
     "dimension" / Struct(
@@ -27,14 +26,14 @@ BMSMSD = Struct(
                 "bottom_left" / CVector2D,
                 "top_right" / CVector2D,
             ),
-            "unk3" / Int32sl,
-            "unk4" / Int32sl,
+            "border_type" / Int32sl,
+            "tile_type" / Int32sl,
             "icons" / make_vector(
                 Struct(
                     "actor_name" / StrId,
-                    "item_id" / StrId,
+                    "clear_condition" / StrId,
                     "icon" / StrId,
-                    "unk5" / Int32sl,
+                    "icon_priority" / Int32sl,
                     "coordinates" / CVector3D,
                 )
             ),
