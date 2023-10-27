@@ -20,6 +20,7 @@ IconPriority = Enum(
     Int32sl,
     METROID=-1,
     ACTOR=0,
+    ENERGY_CLOUD=2,
     DOOR=3,
     CHOZO_SEAL=4,
     HIDDEN_ITEM=5
