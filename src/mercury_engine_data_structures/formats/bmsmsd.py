@@ -9,9 +9,21 @@ from mercury_engine_data_structures.game_check import Game
 
 TileType = Enum(
     Int32ul,
-    BLUE=1,
-    RED=2,
-    PURPLE=4
+    NORMAL=1,
+    HEAT=2,
+    ACID=4,
+    ACID_RISE=8,
+    ACID_FALL=12
+)
+
+IconPriority = Enum(
+    Int32sl,
+    METROID=-1,
+    ACTOR=0,
+    ENERGY_CLOUD=2,
+    DOOR=3,
+    CHOZO_SEAL=4,
+    HIDDEN_ITEM=5
 )
 
 # BMSMSD
@@ -29,7 +41,7 @@ BMSMSD = Struct(
     "tiles" / make_vector(
         Struct(
             "tile_coordinates" / construct.Array(2, Int32sl),
-            "dimension" / Struct(
+            "tile_dimension" / Struct(
                 "bottom_left" / CVector2D,
                 "top_right" / CVector2D,
             ),
@@ -40,7 +52,7 @@ BMSMSD = Struct(
                     "actor_name" / StrId,
                     "clear_condition" / StrId,
                     "icon" / StrId,
-                    "icon_priority" / Int32sl,
+                    "icon_priority" / IconPriority,
                     "coordinates" / CVector3D,
                 )
             ),
