@@ -1,19 +1,19 @@
 import functools
+
 import construct
 from construct.core import (
     Const,
     Construct,
     Float32l,
     Hex,
-    Int32ul,
     Int32sl,
+    Int32ul,
     Struct,
 )
 
 from mercury_engine_data_structures.common_types import CVector3D, StrId, make_vector
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
-
 
 BMSES = Struct(
     "magic" / Const(b"MSES"),
