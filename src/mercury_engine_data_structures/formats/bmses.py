@@ -16,8 +16,8 @@ from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 BMSES = Struct(
-    "magic" / Const(b"MSES"),
-    "version" / Hex(Int32ul),
+    "_magic" / Const(b"MSES"),
+    "version" / Const(0x00050001, Hex(Int32ul)),
     "sounds" / make_vector(Struct(
         "name" / StrId,
         "sound_file" / StrId,
@@ -27,12 +27,14 @@ BMSES = Struct(
             "start_delay" / Float32l,
             "volume" / Float32l,
             "unk1" / Int32sl,
-            "sub_sound" / make_vector(Struct(
+            "sub_sounds" / make_vector(Struct(
                 "name" / StrId,
                 "properties" / Struct(
-                    "unk2" / Float32l,
-                    "unk3" / CVector3D,
-                    "unk4" / Int32sl,
+                    "fade_in" / Float32l,
+                    "fade_out" / Float32l,
+                    "start_delay" / Float32l,
+                    "volume" / Float32l,
+                    "unk1" / Int32sl,
             ))),
         ))),
     construct.Terminated,
