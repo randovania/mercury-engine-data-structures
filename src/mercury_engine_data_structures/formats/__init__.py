@@ -15,6 +15,7 @@ from mercury_engine_data_structures.formats.bmses import Bmses
 from mercury_engine_data_structures.formats.bmsld import Bmsld
 from mercury_engine_data_structures.formats.bmslgroup import Bmslgroup
 from mercury_engine_data_structures.formats.bmslink import Bmslink
+from mercury_engine_data_structures.formats.bmsmd import Bmsmd
 from mercury_engine_data_structures.formats.bmsmsd import Bmsmsd
 from mercury_engine_data_structures.formats.bmsnav import Bmsnav
 from mercury_engine_data_structures.formats.bmssd import Bmssd
@@ -57,6 +58,7 @@ ALL_FORMATS = {
     "BMSNAV": Bmsnav,
     "BMSLGROUP": Bmslgroup,
     "BMSLINK": Bmslink,
+    "BMSMD": Bmsmd,
     "BMTRE": Bmtre,
     "BRSA": Brsa,
     "BREM": Brem,
