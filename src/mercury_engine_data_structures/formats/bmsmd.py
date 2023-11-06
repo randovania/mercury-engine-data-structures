@@ -1,4 +1,5 @@
 import functools
+
 from construct.core import (
     Array,
     Const,
