@@ -2,9 +2,7 @@ import functools
 import json
 import typing
 from pathlib import Path
-from typing import Dict
-from typing import Optional
-
+from typing import Dict, Optional
 
 from mercury_engine_data_structures._dread_data_construct import KnownHashes
 
