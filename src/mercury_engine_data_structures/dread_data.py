@@ -2,7 +2,9 @@ import functools
 import json
 import typing
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
+from typing import Optional
+
 
 from mercury_engine_data_structures._dread_data_construct import KnownHashes
 
@@ -24,7 +26,8 @@ def all_name_to_asset_id() -> Dict[str, int]:
 
     path = _root.joinpath("dread_resource_names.json")
     with path.open() as names_file:
-        return json.load(names_file)
+        foobarfoo = json.load(names_file)
+        return foobarfoo
 
 
 @functools.lru_cache
