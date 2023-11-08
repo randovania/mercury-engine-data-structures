@@ -1,11 +1,9 @@
-from tests.test_lib import parse_and_build_compare
+from tests.test_lib import parse_build_compare_editor
 
 from mercury_engine_data_structures.formats.bmsmd import Bmsmd
-from mercury_engine_data_structures.game_check import Game
 
 
-def test_bmsmd(samus_returns_path):
-    file_path = samus_returns_path.joinpath(r"gui\minimaps\c10_samus.bmsmd")
-    parse_and_build_compare(
-        Bmsmd, Game.SAMUS_RETURNS, file_path
+def test_bmsmd(samus_returns_tree):
+    parse_build_compare_editor(
+        Bmsmd, samus_returns_tree, r"gui/minimaps/c10_samus.bmsmd"
     )
