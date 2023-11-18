@@ -96,7 +96,7 @@ class PkgConstruct(construct.Construct):
         construct.stream_seek(stream, 2 * self.int_size.length, 1, path)
 
         # Skip over file headers
-        construct.stream_seek(stream, len(obj.files) * file_entry_size, 1, path)
+        construct.stream_seek(stream, self.int_size.length + len(obj.files) * file_entry_size, 1, path)
 
         # Align to 128 bytes
         AlignTo(128)._build(None, stream, context, path)
