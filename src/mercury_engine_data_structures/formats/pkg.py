@@ -65,6 +65,7 @@ class PkgConstruct(construct.Construct):
         self.int_size = typing.cast(construct.FormatField, Int32ul)
         self._file_entry = _file_entry(target_game)
         self.file_headers_type = PrefixedArray(self.int_size, self._file_entry).compile()
+        self.game = target_game
 
     def _parse(self, stream, context, path) -> construct.Container:
         # Skip over header size and data section size
@@ -114,8 +115,11 @@ class PkgConstruct(construct.Construct):
                 start_offset=start_offset,
                 end_offset=end_offset,
             ))
-            # Align to 8 bytes
-            pad = -(end_offset - start_offset) % 8
+            # Samus Returns aligns to 128 bytes, Dread aligns to 8 bytes
+            if self.game == Game.SAMUS_RETURNS:
+                pad = -(end_offset - start_offset) % 128
+            else:
+                pad = -(end_offset - start_offset) % 8
             construct.stream_write(stream, b"\x00" * pad, pad, path)
 
         files_end = construct.stream_tell(stream, path)
