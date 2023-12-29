@@ -8,9 +8,11 @@ _EMPTY_DREAD_PKG = (b'\x08\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
 
 
 def test_compare_dread(dread_path):
-    parse_and_build_compare(
-        Pkg.construct_class(Game.DREAD), Game.DREAD, dread_path.joinpath("packs/system/system.pkg")
-    )
+    pkg_files = [f for f in dread_path.rglob("*.pkg")]
+    for f in pkg_files:
+        parse_and_build_compare(
+            Pkg.construct_class(Game.DREAD), Game.DREAD, dread_path.joinpath(f)
+        )
 
 
 def test_build_empty_pkg():
