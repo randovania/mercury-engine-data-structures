@@ -29,6 +29,7 @@ from mercury_engine_data_structures.formats.brsa import Brsa
 from mercury_engine_data_structures.formats.bsmat import Bsmat
 from mercury_engine_data_structures.formats.gui_files import Bmscp, Bmssk, Bmsss
 from mercury_engine_data_structures.formats.ini import Ini
+from mercury_engine_data_structures.formats.lua import Lua
 from mercury_engine_data_structures.formats.pkg import Pkg
 from mercury_engine_data_structures.formats.toc import Toc
 from mercury_engine_data_structures.formats.txt import Txt
@@ -68,6 +69,7 @@ ALL_FORMATS = {
     "TOC": Toc,
     "TXT": Txt,
     "INI": Ini,
+    "LUA": Lua,
 }
 
 
