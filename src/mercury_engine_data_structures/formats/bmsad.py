@@ -305,7 +305,7 @@ CCharClassHeader = Struct(
 
 SRHeader = Struct(
     model_name=StrId,
-    collision_check=Flag,
+    ignore_samus=Flag,
     unk_2a=Float,
     unk_2b=Float,
     unk_2c=Float,
