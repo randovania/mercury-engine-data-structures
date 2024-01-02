@@ -305,13 +305,13 @@ CCharClassHeader = Struct(
 
 SRHeader = Struct(
     model_name=StrId,
-    unk_1=Int8ul,
+    collision_check=Flag,
     unk_2a=Float,
     unk_2b=Float,
     unk_2c=Float,
-    unk_2d=Float,
+    model_scale=Float,
     unk_2e=Float,
-    unk_2f=CVector3D,
+    hitbox_dimensions=CVector3D,
     unk_2g=Float,
     unk_3=Int8ul,
     unk_4=Int32ul,
