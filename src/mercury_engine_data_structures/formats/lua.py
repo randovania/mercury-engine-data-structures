@@ -26,8 +26,10 @@ class Lua(BaseResource):
     def build(self) -> bytes:
         if self.target_game == Game.SAMUS_RETURNS:
             import randovania_lupa.lua51_sr as lupa
-        else: # self.target_game == Game.DREAD
+        elif self.target_game == Game.DREAD:
             import randovania_lupa.lua51_dread as lupa
+        else:
+            raise ValueError("Unknown game")
         lua = lupa.LuaRuntime()
         byte_ret = lua.compile_to_byes(self._raw["lua_text"])
         return byte_ret

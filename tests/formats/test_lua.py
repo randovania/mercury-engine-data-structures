@@ -65,9 +65,10 @@ end
 """
 
 
-def test_build_lua():
+def test_build_lua_sr():
     lua_sr = Lua(Container(lua_text=lua_str), Game.SAMUS_RETURNS)
     assert lua_sr.build() == _SR_COMPILED_LUA
 
+def test_build_lua_dread():
     lua_dread = Lua(Container(lua_text=lua_str), Game.DREAD)
     assert lua_dread.build() == _DREAD_COMPILED_LUA
