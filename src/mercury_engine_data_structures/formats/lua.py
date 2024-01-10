@@ -31,5 +31,5 @@ class Lua(BaseResource):
         else:
             raise ValueError("Unknown game")
         lua = lupa.LuaRuntime()
-        byte_ret = lua.compile_to_byes(self._raw["lua_text"])
+        byte_ret = lua.compile_to_bytes(self._raw["lua_text"])
         return byte_ret
