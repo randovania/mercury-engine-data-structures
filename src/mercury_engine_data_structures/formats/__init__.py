@@ -3,8 +3,8 @@ from typing import Type
 from mercury_engine_data_structures.formats.base_resource import AssetType, BaseResource
 from mercury_engine_data_structures.formats.bcmdl import Bcmdl
 from mercury_engine_data_structures.formats.bldef import Bldef
-from mercury_engine_data_structures.formats.bmbls import Bmbls
 from mercury_engine_data_structures.formats.blsnd import Blsnd
+from mercury_engine_data_structures.formats.bmbls import Bmbls
 from mercury_engine_data_structures.formats.bmmap import Bmmap
 from mercury_engine_data_structures.formats.bmmdef import Bmmdef
 from mercury_engine_data_structures.formats.bmsad import Bmsad
