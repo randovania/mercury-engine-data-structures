@@ -4,9 +4,7 @@ import construct
 from construct.core import (
     Const,
     Construct,
-    Float32l,
     Hex,
-    Int32sl,
     Int32ul,
     Struct,
 )
