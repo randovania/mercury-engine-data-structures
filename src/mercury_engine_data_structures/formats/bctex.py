@@ -1,6 +1,9 @@
 import construct
+from construct.core import Error
 
 from mercury_engine_data_structures.common_types import StrId, UInt
+from mercury_engine_data_structures.formats.base_resource import BaseResource
+from mercury_engine_data_structures.game_check import Game
 
 BlockType = construct.Enum(
     UInt,
@@ -57,7 +60,7 @@ XTX = construct.Struct(
     blocks=construct.GreedyRange(XTX_Block),
 )
 
-BCTEX = construct.Struct(
+BCTEX_Dread = construct.Struct(
     _magic=construct.Const(b"MTXT"),
     flags=UInt,
     data=construct.Compressed(
@@ -86,3 +89,86 @@ BCTEX = construct.Struct(
         level=9,
     ),
 )
+
+PICATextureFormat = construct.Enum(
+    UInt,
+    L8=0,
+    A8=1,
+    LA4=2,
+    LA8=3,
+    HiLo8=4,
+    RGB565=5,
+    RGB8=6,
+    RGBA5551=7,
+    RGBA4=8,
+    RGBA8=9,
+    ETC1=10,
+    ETC1A4=11,
+    L4=12,
+    A4=13,
+)
+
+CTPK = construct.Struct(
+    _magic=construct.Const(b"CTPK"),
+    file_header = construct.Struct(
+        version=construct.Int16ul,
+        textures_count=construct.Int16ul,
+        texture_data_offset=UInt,
+        texture_data_size=UInt,
+        hash_list_offset=UInt,
+        mipmap_entries_offset=UInt,
+        _padding=construct.Int64ul
+    ),
+    image_header= construct.Struct(
+        name_offset=UInt,
+        image_size=UInt,
+        data_offset=UInt,
+        texture_format=PICATextureFormat,
+        width=construct.Int16ul,
+        height=construct.Int16ul,
+        mip_count=construct.Byte,
+        type=construct.Byte,
+        face_count=construct.Int16ul,
+        size_offset=UInt,
+        unix_time_stamp=UInt,
+    ),
+    mip_map_sizes=construct.Array(construct.this.image_header.mip_count, UInt),
+    name = StrId,
+    _hashlist_begin=construct.Seek(construct.this.file_header.hash_list_offset),
+    hash = UInt,
+    _mip_map_entries_begin=construct.Seek(construct.this.file_header.mipmap_entries_offset),
+    mip_map_entry= construct.Struct(
+        texture_format = construct.Byte,
+        mip_count = construct.Byte,
+        compressed = construct.Byte,
+        etc1_quality = construct.Byte,
+    ),
+    image_data = construct.Bytes(construct.this.file_header.texture_data_size)
+)
+
+BCTEX_SR = construct.Struct(
+    _magic=construct.Const(b"MTXT"),
+    major_version=construct.Int16ul,
+    minor_version=construct.Int16ul,
+    # no idea what this value means
+    texture_format=UInt,
+    width=UInt,
+    height=UInt,
+    mipmap_count=UInt,
+    name_offset=UInt,
+    data_offset=UInt,
+    ctpk_size=UInt,
+    _ctpk_start=construct.Seek(construct.this.data_offset),
+    ctpk = construct.FixedSized(construct.this.ctpk_size, CTPK),
+    name = StrId,
+    _terminated=construct.Terminated,
+)
+
+class Bctex(BaseResource):
+    @classmethod
+    def construct_class(cls, target_game: Game) -> construct.Construct:
+        if target_game == Game.DREAD:
+            return BCTEX_Dread
+        if target_game == Game.SAMUS_RETURNS:
+            return BCTEX_SR
+        return Error
