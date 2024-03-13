@@ -20,7 +20,7 @@ CollisionPolySR = Struct(
 )
 CollisionPolyDread = Struct(
     num_points=Rebuild(UInt, construct.len_(construct.this.points)),
-    unk=Float,
+    unk=Hex(UInt),
     points=Array(construct.this.num_points, CollisionPoint),
     loop=Flag,
     boundings=Array(4, Float),
@@ -38,9 +38,9 @@ BinarySearchTree = Struct(
 
 collision_formats = {
     "AABOX2D": Struct(
-        unknown1=UInt,
-        min=CVector2D,
-        max=CVector2D,
+        center=CVector2D,
+        unk=Float,
+        size=CVector2D,
     ),
     "CIRCLE": Struct(
         value1=Float,
