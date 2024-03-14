@@ -38,11 +38,11 @@ BinarySearchTree = Struct(
 
 collision_formats = {
     "AABOX2D": Struct(
-        offset=CVector3D,
+        position=CVector3D,
         size=CVector2D,
     ),
     "CIRCLE": Struct(
-        offset=CVector3D,
+        position=CVector3D,
         size=Float,
     ),
     "CAPSULE2D": Struct(
@@ -53,7 +53,7 @@ collision_formats = {
         value5=Float,
     ),
     "POLYCOLLECTION2D": Struct(
-        offset=CVector3D,
+        position=CVector3D,
         polys=make_vector(CollisionPoly),
         total_boundings=Array(4, Float),
         binary_search_trees=OptionalValue(make_vector(BinarySearchTree)),
