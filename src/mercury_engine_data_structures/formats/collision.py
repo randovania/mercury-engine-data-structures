@@ -2,7 +2,7 @@ import construct
 from construct import Array, Flag, Hex, IfThenElse, Int16ul, Rebuild, Struct
 
 from mercury_engine_data_structures import game_check
-from mercury_engine_data_structures.common_types import CVector2D, Float, UInt, make_vector
+from mercury_engine_data_structures.common_types import CVector2D, CVector3D, Float, UInt, make_vector
 from mercury_engine_data_structures.construct_extensions.misc import OptionalValue
 from mercury_engine_data_structures.game_check import Game
 
@@ -38,14 +38,11 @@ BinarySearchTree = Struct(
 
 collision_formats = {
     "AABOX2D": Struct(
-        center=CVector2D,
-        unk=Float,
+        offset=CVector3D,
         size=CVector2D,
     ),
     "CIRCLE": Struct(
-        value1=Float,
-        value2=Float,
-        value3=Float,
+        offset=CVector3D,
         size=Float,
     ),
     "CAPSULE2D": Struct(
@@ -56,9 +53,7 @@ collision_formats = {
         value5=Float,
     ),
     "POLYCOLLECTION2D": Struct(
-        unknown1=UInt,
-        unknown2=UInt,
-        unknown3=UInt,
+        offset=CVector3D,
         polys=make_vector(CollisionPoly),
         total_boundings=Array(4, Float),
         binary_search_trees=OptionalValue(make_vector(BinarySearchTree)),
