@@ -109,6 +109,18 @@ class PkgConstruct(construct.Construct):
         file_headers = []
         for i, file in enumerate(obj.files):
             field_path = f"{path}.field_{i}"
+            file_format = file.data[0:4]
+
+            if self.game == Game.SAMUS_RETURNS:
+                if file_format == b"CWAV":
+                    AlignTo(32)._build(None, stream, context, path)
+                elif file_format == b"MTXT" or file_format == b"MTUN":
+                    AlignTo(128)._build(None, stream, context, path)
+                elif file_format == b"LSND":
+                    AlignTo(16)._build(None, stream, context, path)
+                else:
+                    AlignTo(4)._build(None, stream, context, path)
+
             start_offset = construct.stream_tell(stream, path)
             construct.stream_write(stream, file.data, len(file.data), field_path)
             end_offset = construct.stream_tell(stream, path)
@@ -117,11 +129,15 @@ class PkgConstruct(construct.Construct):
                 start_offset=start_offset,
                 end_offset=end_offset,
             ))
-            # Samus Returns aligns to 128 bytes, Dread aligns to 8 bytes
-            if self.game == Game.SAMUS_RETURNS:
-                pad = -(end_offset - start_offset) % 128
-            else:
+            # Dread aligns to 8 bytes, Samus Returns randomly(???)
+            if self.game == Game.DREAD:
                 pad = -(end_offset - start_offset) % 8
+            elif self.game == Game.SAMUS_RETURNS:
+                pad = -(end_offset - start_offset) % 4
+
+                # extra nonsense at the end of the pkg file
+                if i == len(obj.files) - 1 and file_format not in [b"MSCU", b"MTXT", b"CUT "]:
+                    pad = 0
             construct.stream_write(stream, b"\x00" * pad, pad, path)
 
         files_end = construct.stream_tell(stream, path)
