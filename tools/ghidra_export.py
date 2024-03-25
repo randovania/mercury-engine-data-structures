@@ -661,10 +661,7 @@ def _merge_split_types(final_results: dict[str, typing.Any]):
 
             both_hash = key in hashes and similar[0] in hashes
             if both_hash:
-                print("{} (Hash: {}) is similar to {} (Hash: {})".format(
-                    key, key in dread_data.all_name_to_property_id(),
-                    similar[0], similar[0] in dread_data.all_name_to_property_id(),
-                ))
+                print(f"{key} (Hash: {key in dread_data.all_name_to_property_id()}) is similar to {similar[0]} (Hash: {similar[0] in dread_data.all_name_to_property_id()})")
             elif key in hashes:
                 wrong_to_correct[similar[0]] = key
             elif similar[0] in hashes:
