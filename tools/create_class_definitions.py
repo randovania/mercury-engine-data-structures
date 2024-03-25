@@ -197,11 +197,7 @@ from mercury_engine_data_structures.construct_extensions.enum import StrictEnum,
 
         for type_name in sorted(self._types_with_pointer):
             if type_name != "base::reflection::CTypedValue":
-                code += '{}.add_option("{}", {})\n'.format(
-                    self.pointer_to_type(type_name),
-                    type_name,
-                    self.ensure_exported_type(type_name),
-                )
+                code += f'{self.pointer_to_type(type_name)}.add_option("{type_name}", {self.ensure_exported_type(type_name)})\n'
             for child in sorted(self.children_for(type_name)):
                 code += f'{self.pointer_to_type(type_name)}.add_option("{child}", {self.ensure_exported_type(child)})\n'
             code += "\n"
