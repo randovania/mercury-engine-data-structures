@@ -63,13 +63,13 @@ filterwarnings = [
 
 [tool.ruff]
 line-length = 120
-select = ["E", "F", "W", "C90", "I", "UP"]
+lint.select = ["E", "F", "W", "C90", "I", "UP"]
 src = ["src"]
 
 # Version to target for generated code.
 target-version = "py38"
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 # Flag errors (`C901`) whenever the complexity level exceeds 25.
 # Defaults to 10, but we're being very flexible right now
 max-complexity = 25
