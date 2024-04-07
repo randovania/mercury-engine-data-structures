@@ -107,7 +107,10 @@ class ComplexIfThenElse(construct.IfThenElse):
         return f"linkedinstances[{id(self.condfunc)}](this)"
 
     def _emitparse(self, code):
-        return f"(({self.thensubcon._compileparse(code)}) if ({self._insert_cond(code)}) else ({self.elsesubcon._compileparse(code)}))"
+        return (
+            f"(({self.thensubcon._compileparse(code)}) if ({self._insert_cond(code)}) "
+            f"else ({self.elsesubcon._compileparse(code)}))"
+        )
 
     def _emitbuild(self, code):
         return (f"(({self.thensubcon._compilebuild(code)}) if ("
