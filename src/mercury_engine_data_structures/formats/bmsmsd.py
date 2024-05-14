@@ -7,7 +7,7 @@ from mercury_engine_data_structures.common_types import CVector2D, CVector3D, St
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
-BorderType = FlagsEnum(Int32sl,
+TileBorders = FlagsEnum(Int32sl,
     TOP=1,
     BOTTOM=2,
     LEFT=4,
@@ -57,7 +57,7 @@ BMSMSD = Struct(
                 "bottom_left" / CVector2D,
                 "top_right" / CVector2D,
             ),
-            "border_type" / BorderType,
+            "tile_borders" / TileBorders,
             "tile_type" / TileType,
             "icons" / make_vector(
                 Struct(
