@@ -1,11 +1,22 @@
 import functools
 
 import construct
-from construct.core import Const, Construct, Enum, Float32l, Hex, Int32sl, Int32ul, Struct
+from construct.core import Const, Construct, Enum, FlagsEnum, Float32l, Hex, Int32sl, Int32ul, Struct
 
 from mercury_engine_data_structures.common_types import CVector2D, CVector3D, StrId, make_vector
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
+
+TileBorders = FlagsEnum(Int32sl,
+    TOP=1,
+    BOTTOM=2,
+    LEFT=4,
+    RIGHT=8,
+    OPEN_TOP=16,
+    OPEN_BOTTOM=32,
+    OPEN_LEFT=64,
+    OPEN_RIGHT=128,
+)
 
 TileType = Enum(
     Int32ul,
@@ -20,6 +31,7 @@ IconPriority = Enum(
     Int32sl,
     METROID=-1,
     ACTOR=0,
+    SHIP=1,
     ENERGY_CLOUD=2,
     DOOR=3,
     CHOZO_SEAL=4,
@@ -45,7 +57,7 @@ BMSMSD = Struct(
                 "bottom_left" / CVector2D,
                 "top_right" / CVector2D,
             ),
-            "border_type" / Int32sl,
+            "tile_borders" / TileBorders,
             "tile_type" / TileType,
             "icons" / make_vector(
                 Struct(
