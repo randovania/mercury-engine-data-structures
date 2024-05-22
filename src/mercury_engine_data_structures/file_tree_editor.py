@@ -326,7 +326,11 @@ class FileTreeEditor:
         if output_format == OutputFormat.ROMFS:
             # Clear modified_pkgs, so we don't read/write any new pkg
             # We keep system.pkg because .bmmaps don't read properly with exlaunch and it's only 4MB
-            modified_pkgs = list(filter(lambda pkg: pkg == "packs/system/system.pkg", modified_pkgs))
+            # We keep MSR's "_discardables.pkg" as the files are not read from RomFS without the pkg
+            modified_pkgs = list(
+                        filter(lambda pkg: pkg == "packs/system/system.pkg" or pkg.endswith("discardables.pkg"),
+                        modified_pkgs)
+            )
 
         # Ensure all pkgs we'll modify is in memory already.
         # We'll need to read these files anyway to modify, so do it early to speedup
@@ -355,7 +359,11 @@ class FileTreeEditor:
                     _write_to_path(output_path.joinpath(path), data)
                     if self._files_for_asset_id[asset_id] - {None}:
                         replacements.append(path)
-                        if output_format == OutputFormat.ROMFS and asset_id in asset_ids_to_copy:
+                        if (
+                            output_format == OutputFormat.ROMFS and
+                            asset_id in asset_ids_to_copy and
+                            self.target_game != Game.SAMUS_RETURNS
+                        ):
                             del asset_ids_to_copy[asset_id]
             else:
                 self._toc.remove_file(asset_id)
