@@ -23,8 +23,8 @@ Block = Struct(
     "unk2" / Int32ul,
     "unk3" / Int32ul,
     "respawn_time" / Float32l,
-    "name1" / StrId,
-    "name2" / StrId,
+    "model_name" / StrId,
+    "vignette_name" / StrId,
 )
 
 def _rebuild_blocks(ctx: Container) -> int:
