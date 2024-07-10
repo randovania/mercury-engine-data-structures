@@ -118,21 +118,21 @@ BMSSD = Struct(
         Int32ul,
         CString("utf-8"),
     ),
-    unk_structs_b=IfThenElse(
+    scene_groups=IfThenElse(
         game_check.current_game_at_most(Game.SAMUS_RETURNS),
         PrefixedArray(
             Int32ul,
             Struct(
-                str1=CString("utf-8"),
-                int2=Int32ul,
-                struct3=PrefixedArray(
+                sg_name=CString("utf-8"),
+                models_per_sg=Int32ul,
+                model_groups=PrefixedArray(
                     Int32ul,
                     Struct(
-                        int4=Int32ul,
-                        struct5=PrefixedArray(
+                        model_group=Int32ul,
+                        models=PrefixedArray(
                             Int32ul,
                             Struct(
-                                int6=Int32ul,
+                                model_id=Int32ul,
                             )
                         )
                     )
