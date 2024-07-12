@@ -8,10 +8,14 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Optional
 
+import construct
+
 from mercury_engine_data_structures import formats
 from mercury_engine_data_structures.construct_extensions.json import convert_to_raw_python
 from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 from mercury_engine_data_structures.game_check import Game
+
+construct.setGlobalPrintFullStrings(True)
 
 
 def game_argument_type(s: str) -> Game:
