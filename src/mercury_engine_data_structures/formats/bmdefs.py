@@ -35,7 +35,7 @@ EnemyStruct = Struct(
                             "unk3" / Int32ul,
                             "unk4" / Int32ul,
                             "unk_bool" / Flag,
-                            "float1" / Float32l,
+                            "environment_sfx_volume" / Float32l,
                             "inner_states" / make_vector(Struct(
                                 "type" / StrId,
                                 "unk1" / Float32l,
@@ -52,7 +52,7 @@ EnemyStruct = Struct(
                             "unk3" / Int32ul,
                             "unk4" / Int32ul,
                             "unk_bool" / Flag,
-                            "float1" / Float32l,
+                            "environment_sfx_volume" / Float32l,
                             "inner_states" / make_vector(Struct(
                                 "type" / StrId,
                                 "unk1" / Float32l,
