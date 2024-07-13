@@ -212,3 +212,35 @@ def GreedyStringRobust(encoding):
 
     macro._emitfulltype = _emitfulltype
     return macro
+
+
+def StaticPaddedString(length: int, encoding: str) -> construct.Construct:
+    r"""
+    Configurable, fixed-length string field.
+
+    Similar to construct.PaddedString, but the length field must be a static value. This type supports compiling.
+    """
+
+    macro = construct.PaddedString(length, encoding)
+
+    pad = encodingunit(encoding)
+    if pad != b"\x00":
+        raise ValueError("only encodings with single-byte padding supported.")
+
+    def _emitparse(code: construct.CodeGen) -> str:
+        return f"io.read({length}).strip(b'\\x00').decode({repr(encoding)})"
+
+    def _emitbuild(code: construct.CodeGen) -> str:
+        code.append("""
+        def write_padding_to(length: int, io) -> None:
+            if length > 0:
+                io.write(b"\\x00" * length)
+        """)
+
+        return (f"reuse(obj.encode({repr(encoding)}),"
+                f" lambda encoded: (io.write(encoded), write_padding_to({length} - len(encoded), io), obj)[-1])")
+
+    macro._emitparse = _emitparse
+    macro._emitbuild = _emitbuild
+
+    return macro

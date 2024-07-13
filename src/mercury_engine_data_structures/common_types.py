@@ -5,24 +5,19 @@ import typing
 import construct
 from construct import Adapter
 
-from mercury_engine_data_structures.construct_extensions.strings import CStringRobust, PaddedStringRobust
+from mercury_engine_data_structures.construct_extensions.strings import (
+    CStringRobust,
+    StaticPaddedString,
+)
 
 StrId = CStringRobust("utf-8")
-Char = PaddedStringRobust(1, "utf-8")
+Char = StaticPaddedString(1, "utf-8")
 Int: construct.FormatField = typing.cast(construct.FormatField, construct.Int32sl)
 UInt: construct.FormatField = typing.cast(construct.FormatField, construct.Int32ul)
 Float: construct.FormatField = typing.cast(construct.FormatField, construct.Float32l)
 CVector2D = construct.Array(2, Float)
 CVector3D = construct.Array(3, Float)
 CVector4D = construct.Array(4, Float)
-
-
-def _char_emitparse(code: construct.CodeGen) -> str:
-    return "io.read(1).decode('utf-8')"
-
-
-def _char_emitbuild(code: construct.CodeGen) -> str:
-    return "(io.write(obj.encode('utf-8')), obj)[1]"
 
 
 def _cvector_emitparse(length: int, code: construct.CodeGen) -> str:
@@ -49,8 +44,6 @@ def _cvector_emitbuild(length: int, code: construct.CodeGen):
     return f"(io.write(CVector{length}D_Format.pack(*obj)), obj)"
 
 
-Char._emitparse = _char_emitparse
-Char._emitbuild = _char_emitbuild
 for i, vec in enumerate([CVector2D, CVector3D, CVector4D]):
     vec._emitparse = functools.partial(_cvector_emitparse, i + 2)
     vec._emitparse_vector = functools.partial(_vector_cvector_emitparse, i + 2)
