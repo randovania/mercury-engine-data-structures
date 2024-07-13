@@ -41,7 +41,7 @@ Construct type definitions for Mercury Engine
 | BMSLINK   | Missing              | Missing               | &check;      | &check;       |
 | BMSMD     | &check;              | &check;               | Missing      | Missing       |
 | BMSMSD    | &check;              | &check;               | Missing      | Missing       |
-| BMSNAV    | &cross;              | &cross;               | &check;      | &check;       |
+| BMSNAV    | &check;              | &check;               | &check;      | &check;       |
 | BMSND     | &cross;              | &cross;               | Missing      | Missing       |
 | BMSSA     | &cross;              | &cross;               | Missing      | Missing       |
 | BMSSD     | &cross;              | &cross;               | &check;      | &check;       |
