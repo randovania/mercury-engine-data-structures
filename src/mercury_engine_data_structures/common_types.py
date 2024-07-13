@@ -17,6 +17,14 @@ CVector3D = construct.Array(3, Float)
 CVector4D = construct.Array(4, Float)
 
 
+def _char_emitparse(code: construct.CodeGen) -> str:
+    return "io.read(1).decode('utf-8')"
+
+
+def _char_emitbuild(code: construct.CodeGen) -> str:
+    return "(io.write(obj.encode('utf-8')), obj)[1]"
+
+
 def _cvector_emitparse(length: int, code: construct.CodeGen) -> str:
     """Specialized construct compile for CVector2/3/4D"""
     code.append(f"CVector{length}D_Format = struct.Struct('<{length}f')")
@@ -41,6 +49,8 @@ def _cvector_emitbuild(length: int, code: construct.CodeGen):
     return f"(io.write(CVector{length}D_Format.pack(*obj)), obj)"
 
 
+Char._emitparse = _char_emitparse
+Char._emitbuild = _char_emitbuild
 for i, vec in enumerate([CVector2D, CVector3D, CVector4D]):
     vec._emitparse = functools.partial(_cvector_emitparse, i + 2)
     vec._emitparse_vector = functools.partial(_vector_cvector_emitparse, i + 2)
@@ -127,6 +137,7 @@ class DictAdapter(Adapter):
 
         block = f"""
             def {fname}(io, this):
+                # {self.name} ({self})
                 obj = {self.subcon._compileparse(code)}
                 result = Container()
                 for item in obj:
