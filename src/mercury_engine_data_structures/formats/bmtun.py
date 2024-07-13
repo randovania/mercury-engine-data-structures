@@ -2,11 +2,9 @@ import functools
 
 import construct
 from construct.core import (
-    Array,
     Const,
     Construct,
     Flag,
-    Float32l,
     Hex,
     Int32sl,
     Int32ul,
@@ -14,7 +12,7 @@ from construct.core import (
     Switch,
 )
 
-from mercury_engine_data_structures.common_types import Char, Float, StrId, make_dict
+from mercury_engine_data_structures.common_types import Char, CVector3D, Float, StrId, make_dict
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
@@ -29,7 +27,7 @@ TunableParam = Struct(
             'f': Float,
             'b': Flag,
             'i': Int32sl,
-            'v': Array(3, Float32l)
+            'v': CVector3D
         },
         ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
     )

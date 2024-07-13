@@ -1,11 +1,9 @@
 import construct
 from construct import (
-    Array,
     Byte,
     Const,
     Construct,
     CString,
-    Float32l,
     IfThenElse,
     Int8ul,
     Int32ul,
@@ -16,10 +14,9 @@ from construct import (
 )
 
 from mercury_engine_data_structures import game_check
+from mercury_engine_data_structures.common_types import CVector3D
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
-
-VectorArray = Array(3, Float32l)
 
 BMSSD = Struct(
     _magic=Const(b"MSSD"),
@@ -35,8 +32,8 @@ BMSSD = Struct(
                 byte2=Byte,
                 int3=Int32ul,
                 int4=Int32ul,
-                farr4=VectorArray,
-                farr5=VectorArray,
+                farr4=CVector3D,
+                farr5=CVector3D,
             )
         ),
         PrefixedArray(
@@ -48,9 +45,9 @@ BMSSD = Struct(
                 byte2=Byte,
                 int3=Int32ul,
                 byte4=Byte,
-                farr4=VectorArray,
-                farr5=VectorArray,
-                farr6=VectorArray,
+                farr4=CVector3D,
+                farr5=CVector3D,
+                farr6=CVector3D,
             )
         ),
     ),
@@ -61,9 +58,9 @@ BMSSD = Struct(
             elems=PrefixedArray(
                 Int32ul,
                 Struct(
-                    float1=VectorArray,
-                    float2=VectorArray,
-                    float3=VectorArray,
+                    float1=CVector3D,
+                    float2=CVector3D,
+                    float3=CVector3D,
                 )
             )
         )
@@ -87,7 +84,7 @@ BMSSD = Struct(
                 char8=Byte,
                 char9=Byte,
                 int10=Int32ul,
-                float13=VectorArray,
+                float13=CVector3D,
                 int11=Int8ul,
             )
         ),
@@ -106,11 +103,11 @@ BMSSD = Struct(
                 int10=Int32ul,
                 str11=PaddedString(16, "utf-8"),
                 int12=Int32ul,
-                float13=VectorArray,
-                float14=VectorArray,
-                float15=VectorArray,
+                float13=CVector3D,
+                float14=CVector3D,
+                float15=CVector3D,
                 int16=Int32ul,
-                float17=VectorArray,
+                float17=CVector3D,
             )
         )
     ),
