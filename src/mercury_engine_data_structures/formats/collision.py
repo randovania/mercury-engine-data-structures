@@ -1,5 +1,5 @@
 import construct
-from construct import Array, Flag, Hex, IfThenElse, Int16ul, Rebuild, Struct
+from construct import Array, Flag, Hex, Int16ul, Rebuild, Struct
 
 from mercury_engine_data_structures import game_check
 from mercury_engine_data_structures.common_types import CVector2D, CVector3D, Float, UInt, make_vector
@@ -25,11 +25,8 @@ CollisionPolyDread = Struct(
     loop=Flag,
     boundings=Array(4, Float),
 )
-CollisionPoly = IfThenElse(
-    game_check.current_game_at_most(Game.SAMUS_RETURNS),
-    CollisionPolySR,
-    CollisionPolyDread,
-)
+CollisionPoly = game_check.is_at_most(Game.SAMUS_RETURNS, CollisionPolySR, CollisionPolyDread)
+
 BinarySearchTree = Struct(
     binary_search_index1=Int16ul,
     binary_search_index2=Int16ul,
