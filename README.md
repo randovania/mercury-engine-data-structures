@@ -22,7 +22,7 @@ Construct type definitions for Mercury Engine
 | BLSND     | &check;              | &check;               | &check;      | &check;       |
 | BLUT      | Missing              | Missing               | &cross;      | &cross;       |
 | BMBLS     | Missing              | Missing               | &check;      | &check;       |
-| BMDEFS    | &cross;              | &cross;               | &cross;      | &cross;       |
+| BMDEFS    | &check;              | &check;               | &cross;      | &cross;       |
 | BMMAP     | Missing              | Missing               | &check;      | &check;       |
 | BMMDEF    | Missing              | Missing               | &check;      | &check;       |
 | BMSAD     | &check;              | &check;               | &check;      | &check;       |
@@ -33,7 +33,7 @@ Construct type definitions for Mercury Engine
 | BMSCD     | &check;              | &check;               | &check;      | &check;       |
 | BMSCP     | Missing              | Missing               | &check;      | &check;       |
 | BMSCU     | &cross;              | &cross;               | &check;      | &check;       |
-| BMSEM     | &cross;              | &cross;               | Missing      | Missing       |
+| BMSEM     | &check;              | &check;               | Missing      | Missing       |
 | BMSES     | &check;              | &check;               | Missing      | Missing       |
 | BMSEV     | &cross;              | &cross;               | Missing      | Missing       |
 | BMSLD     | &check;              | &check;               | Missing      | Missing       |
@@ -41,7 +41,7 @@ Construct type definitions for Mercury Engine
 | BMSLINK   | Missing              | Missing               | &check;      | &check;       |
 | BMSMD     | &check;              | &check;               | Missing      | Missing       |
 | BMSMSD    | &check;              | &check;               | Missing      | Missing       |
-| BMSNAV    | &cross;              | &cross;               | &check;      | &check;       |
+| BMSNAV    | &check;              | &check;               | &check;      | &check;       |
 | BMSND     | &cross;              | &cross;               | Missing      | Missing       |
 | BMSSA     | &cross;              | &cross;               | Missing      | Missing       |
 | BMSSD     | &cross;              | &cross;               | &check;      | &check;       |
