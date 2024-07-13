@@ -2,9 +2,11 @@ import construct
 from construct import (
     Array,
     Const,
+    Hex,
     Construct,
     Float32l,
     Int16ul,
+    Check,
     Int32ul,
     Struct,
 )
@@ -13,24 +15,20 @@ from mercury_engine_data_structures.common_types import StrId, make_vector
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
-VectorArray = Array(3, Float32l)
-
 BMSEM = Struct(
     _magic=Const(b"MSEM"),
-    unk1=Int16ul,
-    unk2=Int16ul,
-    things= make_vector(Struct(
-            "layer_name" / StrId,
-            "objects" / make_vector(Struct(
-                "whatever_name" / StrId,
-                # "unk1" / Int32ul
-                "inner_things" / make_vector(Struct(
-                    "first_part" / StrId,
-                    "second_part" / StrId,
-                    "unk3" / Int32ul,
-                    "unk4" / Int32ul,
-                    "unk6" / Int32ul,
-                    "unk7" / Int32ul
+    _version=Const(0x00030001, Hex(Int32ul)),
+    groups=make_vector(Struct(
+            "group_name" / StrId,
+            "layers" / make_vector(Struct(
+                "layer_name" / StrId,
+                "entries" / make_vector(Struct(
+                    "collision_camera" / StrId,
+                    "song" / StrId,             # Is empty if cc is "default".
+                    "unk1" / Float32l,          # Always either 2.0 or 1.5
+                    "unk2" / Float32l,          # Always same number as unk1
+                    "unk3" / Int32ul,           # Always 1
+                    "unk4" / Int32ul            # Always 0
                 ))
             ))
     )),
