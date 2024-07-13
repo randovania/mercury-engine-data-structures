@@ -108,9 +108,6 @@ class CRCAdapter(construct.Adapter):
             return f"_inverted_hashes_{n}[_parse_hashset_{n}(io, this)]"
 
     def _emitbuild(self, code: construct.CodeGen):
-        if self.allow_unknowns:
-            raise NotImplementedError
-
         n = self.hash_set.name
         code.append("from mercury_engine_data_structures.formats.property_enum import HashSet")
 
@@ -123,7 +120,17 @@ class CRCAdapter(construct.Adapter):
             def _build_hashset_{n}(obj, io, this):
                 return {construct.Int32ul._compilebuild(code)}
         """)
-        return f"(_build_hashset_{n}(_known_hashes_{n}[obj], io, this), obj)[1]"
+        if self.allow_unknowns:
+            code.append(f"""
+            def _hash_{n}(obj):
+                result = _known_hashes_{n}.get(obj)
+                if result is None:
+                    result = TARGET_GAME.hash_asset(obj)
+                return result
+            """)
+            return f"(_build_hashset_{n}(obj if isinstance(obj, int) else _hash_{n}(obj), io, this), obj)[1]"
+        else:
+            return f"(_build_hashset_{n}(_known_hashes_{n}[obj], io, this), obj)[1]"
 
 
 PropertyEnum = CRCAdapter(HashSet.PROPERTY)
