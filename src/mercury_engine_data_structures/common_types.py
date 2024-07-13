@@ -5,10 +5,13 @@ import typing
 import construct
 from construct import Adapter
 
-from mercury_engine_data_structures.construct_extensions.strings import CStringRobust, PaddedStringRobust
+from mercury_engine_data_structures.construct_extensions.strings import (
+    CStringRobust,
+    StaticPaddedString,
+)
 
 StrId = CStringRobust("utf-8")
-Char = PaddedStringRobust(1, "utf-8")
+Char = StaticPaddedString(1, "utf-8")
 Int: construct.FormatField = typing.cast(construct.FormatField, construct.Int32sl)
 UInt: construct.FormatField = typing.cast(construct.FormatField, construct.Int32ul)
 Float: construct.FormatField = typing.cast(construct.FormatField, construct.Float32l)
@@ -127,6 +130,7 @@ class DictAdapter(Adapter):
 
         block = f"""
             def {fname}(io, this):
+                # {self.name} ({self})
                 obj = {self.subcon._compileparse(code)}
                 result = Container()
                 for item in obj:

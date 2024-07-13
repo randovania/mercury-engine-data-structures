@@ -6,6 +6,7 @@ from construct import Const, Construct, Container, Flag, Float32l, Hex, Int32ul,
 
 from mercury_engine_data_structures.common_types import CVector3D, Float, StrId, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
+from mercury_engine_data_structures.construct_extensions.strings import StaticPaddedString
 from mercury_engine_data_structures.crc import crc32
 from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.formats.collision import collision_formats
@@ -14,7 +15,7 @@ from mercury_engine_data_structures.game_check import Game
 logger = logging.getLogger(__name__)
 
 FunctionArgument = Struct(
-    type=construct.PaddedString(4, 'ascii'),
+    type=StaticPaddedString(4, 'ascii'),
     value=construct.Switch(
         construct.this.type,
         {
