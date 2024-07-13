@@ -6,6 +6,7 @@ from mercury_engine_data_structures.formats.bctex import Bctex
 from mercury_engine_data_structures.formats.bldef import Bldef
 from mercury_engine_data_structures.formats.blsnd import Blsnd
 from mercury_engine_data_structures.formats.bmbls import Bmbls
+from mercury_engine_data_structures.formats.bmdefs import Bmdefs
 from mercury_engine_data_structures.formats.bmmap import Bmmap
 from mercury_engine_data_structures.formats.bmmdef import Bmmdef
 from mercury_engine_data_structures.formats.bmsad import Bmsad
@@ -56,6 +57,7 @@ ALL_FORMATS = {
     "BMSES": Bmses,
     "BMTUN": Bmtun,
     "BRFLD": Brfld,
+    "BMDEFS": Bmdefs,
     "BMSCC": Bmscc,
     "BMSCD": Bmscc,
     "BMSCU": Bmscu,
