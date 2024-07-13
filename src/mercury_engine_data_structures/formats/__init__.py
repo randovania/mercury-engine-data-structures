@@ -13,6 +13,7 @@ from mercury_engine_data_structures.formats.bmsas import Bmsas
 from mercury_engine_data_structures.formats.bmsbk import Bmsbk
 from mercury_engine_data_structures.formats.bmscc import Bmscc
 from mercury_engine_data_structures.formats.bmscu import Bmscu
+from mercury_engine_data_structures.formats.bmsem import Bmsem
 from mercury_engine_data_structures.formats.bmses import Bmses
 from mercury_engine_data_structures.formats.bmsld import Bmsld
 from mercury_engine_data_structures.formats.bmslgroup import Bmslgroup
@@ -58,6 +59,7 @@ ALL_FORMATS = {
     "BMSCC": Bmscc,
     "BMSCD": Bmscc,
     "BMSCU": Bmscu,
+    "BMSEM": Bmsem,
     "BMSLD": Bmsld,
     "BMSMSD": Bmsmsd,
     "BMSNAV": Bmsnav,
