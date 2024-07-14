@@ -138,7 +138,7 @@ BMSLD = Struct(
     )),
 
     rest=construct.GreedyBytes,
-)
+).compile()
 
 
 class Bmsld(BaseResource):

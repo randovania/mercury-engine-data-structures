@@ -102,6 +102,20 @@ def is_sr_or_else(subcon1, subcon2) -> IfThenElse:
     return IfThenElse(construct.this._params.target_game == Game.SAMUS_RETURNS.value, subcon1, subcon2)
 
 
+def is_at_most(target: Game, subcon_true, subcon_false) -> IfThenElse:
+    result = IfThenElse(construct.this._params.target_game <= target, subcon_true, subcon_false)
+
+    def _emitbuild(code: construct.CodeGen):
+        code.append("from mercury_engine_data_structures.game_check import Game")
+        return (f"(({result.thensubcon._compilebuild(code)}) "
+                f"if ({result.condfunc}) "
+                f"else ({result.elsesubcon._compilebuild(code)}))")
+
+    result._emitbuild = _emitbuild
+
+    return result
+
+
 class GameSpecificStruct(construct.Subconstruct):
     def __init__(self, subcon, game: Game):
         super().__init__(subcon)

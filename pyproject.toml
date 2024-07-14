@@ -22,7 +22,7 @@ requires-python = ">=3.10"
 dynamic = ["version"]
 
 dependencies = [
-    "construct>=2.10.0",
+    "construct>=2.10.70",  # 2.10.70 includes a fix for compiled structs building
     "randovania-lupa>=2.0.1",
     "zstd",
 ]
@@ -37,7 +37,7 @@ Homepage = "https://github.com/randovania/mercury-engine-data-structures"
 
 [project.optional-dependencies]
 test = [
-    "pytest",
+    "pytest<8.0.0",  # see https://github.com/pytest-dev/pytest/issues/12608
     "pytest-cov",
 ]
 

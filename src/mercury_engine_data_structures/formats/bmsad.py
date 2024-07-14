@@ -12,7 +12,6 @@ from construct.core import (
     Flag,
     Float32l,
     Hex,
-    IfThenElse,
     Int8ul,
     Int16ul,
     Int32sl,
@@ -22,7 +21,7 @@ from construct.core import (
 )
 from construct.lib.containers import Container, ListContainer
 
-from mercury_engine_data_structures import common_types, game_check, type_lib
+from mercury_engine_data_structures import common_types, type_lib
 from mercury_engine_data_structures.common_types import Char, CVector3D, Float, StrId, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
 from mercury_engine_data_structures.construct_extensions.function_complex import ComplexIf, SwitchComplexKey
@@ -32,15 +31,6 @@ from mercury_engine_data_structures.formats.bmsas import BMSAS_SR, Bmsas
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game, GameSpecificStruct
 from mercury_engine_data_structures.type_lib import get_type_lib_dread, get_type_lib_for_game
-
-
-def SR_or_Dread(sr, dread):
-    return IfThenElse(
-        game_check.current_game_at_most(Game.SAMUS_RETURNS),
-        sr,
-        dread,
-    )
-
 
 # Functions
 FunctionArgument = Struct(
