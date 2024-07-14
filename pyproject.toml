@@ -37,7 +37,7 @@ Homepage = "https://github.com/randovania/mercury-engine-data-structures"
 
 [project.optional-dependencies]
 test = [
-    "pytest",
+    "pytest<8.0.0",  # see https://github.com/pytest-dev/pytest/issues/12608
     "pytest-cov",
 ]
 
