@@ -54,11 +54,12 @@ XTX_Block = construct.Struct(
 )
 
 XTX = construct.Struct(
+    _start=construct.Tell,
     _magic=construct.Const(b"DFvN"),
     header_size=UInt,
     major_version=UInt,
     minor_version=UInt,
-    _header_end=construct.Seek(construct.this.header_size),
+    _header_end=construct.Seek(construct.this._start + construct.this.header_size),
     blocks=construct.GreedyRange(XTX_Block),
 )
 
@@ -119,6 +120,7 @@ BCTEXFormat = construct.Enum(
 )
 
 CTPK = construct.Struct(
+    _start=construct.Tell,
     _magic=construct.Const(b"CTPK"),
     file_header = construct.Struct(
         version=construct.Int16ul,
@@ -144,9 +146,9 @@ CTPK = construct.Struct(
     ),
     mip_map_sizes=construct.Array(construct.this.image_header.mip_count, UInt),
     name = StrId,
-    _hashlist_begin=construct.Seek(construct.this.file_header.hash_list_offset),
+    _hashlist_begin=construct.Seek(construct.this._start + construct.this.file_header.hash_list_offset),
     hash = UInt,
-    _mip_map_entries_begin=construct.Seek(construct.this.file_header.mipmap_entries_offset),
+    _mip_map_entries_begin=construct.Seek(construct.this._start + construct.this.file_header.mipmap_entries_offset),
     mip_map_entry= construct.Struct(
         texture_format = construct.Enum(construct.Byte, PICATextureFormat),
         mip_count = construct.Byte,
