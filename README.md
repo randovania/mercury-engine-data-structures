@@ -3,7 +3,7 @@ Construct type definitions for Mercury Engine
 
 | Format    | Samus Returns (Read) | Samus Returns (Write) | Dread (Read) | Dread (Write) |
 |-----------|----------------------|-----------------------|--------------|---------------|
-| BAPD      | Missing              | Missing               | &cross;      | &cross;       |
+| BAPD      | Missing              | Missing               | &check;      | &check;       |
 | BCCAM     | &cross;              | &cross;               | &cross;      | &cross;       |
 | BCLGT     | &cross;              | &cross;               | Missing      | Missing       |
 | BCMDL     | &cross;              | &cross;               | &check;      | &cross;       |
