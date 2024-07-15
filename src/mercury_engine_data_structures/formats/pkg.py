@@ -174,6 +174,7 @@ class PkgFile:
 
 class Pkg(BaseResource):
     @classmethod
+    @functools.cache
     def construct_class(cls, target_game: Game) -> Construct:
         return PkgConstruct(target_game)
 
