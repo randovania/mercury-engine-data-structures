@@ -14,7 +14,7 @@ from construct.core import (
 
 from mercury_engine_data_structures.common_types import Char, CVector3D, Float, StrId, make_dict
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
-from mercury_engine_data_structures.formats import BaseResource
+from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 # Functions

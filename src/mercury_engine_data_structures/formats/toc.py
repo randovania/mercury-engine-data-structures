@@ -4,8 +4,7 @@ from typing import Iterator, Optional
 import construct
 
 from mercury_engine_data_structures import common_types
-from mercury_engine_data_structures.formats import BaseResource
-from mercury_engine_data_structures.formats.base_resource import NameOrAssetId, resolve_asset_id
+from mercury_engine_data_structures.formats.base_resource import BaseResource, NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.game_check import Game
 
 TOC_SR = construct.Struct(

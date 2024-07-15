@@ -4,7 +4,8 @@ from typing import Iterator, List, Tuple
 
 import construct
 
-from mercury_engine_data_structures.formats import BaseResource, standard_format
+from mercury_engine_data_structures.formats import standard_format
+from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 logger = logging.getLogger(__name__)

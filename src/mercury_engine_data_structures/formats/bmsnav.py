@@ -1,7 +1,7 @@
 from construct.core import Array, Byte, Const, Construct, Flag, Hex, Int32ul, PrefixedArray, Struct, Terminated
 
 from mercury_engine_data_structures.common_types import CVector2D, CVector3D, Float, StrId, make_dict
-from mercury_engine_data_structures.formats import BaseResource
+from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 ### A ton of barely-understood structs :]

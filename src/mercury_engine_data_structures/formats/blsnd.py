@@ -11,7 +11,7 @@ from construct.core import (
 )
 
 from mercury_engine_data_structures.common_types import StrId, make_vector
-from mercury_engine_data_structures.formats import BaseResource
+from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game, current_game_at_most
 
 BLSND = Struct(

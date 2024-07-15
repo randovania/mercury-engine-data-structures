@@ -5,7 +5,7 @@ import typing
 import construct
 
 from mercury_engine_data_structures.common_types import StrId
-from mercury_engine_data_structures.formats import BaseResource
+from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 if typing.TYPE_CHECKING:

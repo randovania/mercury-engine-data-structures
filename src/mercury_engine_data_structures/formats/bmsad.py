@@ -26,7 +26,7 @@ from mercury_engine_data_structures.common_types import Char, CVector3D, Float, 
 from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
 from mercury_engine_data_structures.construct_extensions.function_complex import ComplexIf, SwitchComplexKey
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
-from mercury_engine_data_structures.formats import BaseResource, dread_types
+from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.bmsas import BMSAS_SR, Bmsas
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game, GameSpecificStruct
@@ -80,6 +80,8 @@ ExtraFields = common_types.DictAdapter(make_vector(
 
 @functools.cache
 def fieldtypes(game: Game) -> dict[str, Construct]:
+    from mercury_engine_data_structures.formats import dread_types
+
     if game == Game.DREAD:
         return {k: v for k, v in vars(dread_types).items() if isinstance(v, Construct)}
     raise ValueError(f"No field types defined for {game}")
