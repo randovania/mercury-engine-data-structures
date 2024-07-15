@@ -8,10 +8,8 @@ from construct.core import (
     Hex,
     Int32sl,
     Int32ul,
-    Int64ul,
     LazyBound,
     PrefixedArray,
-    Select,
     Struct,
     Switch,
 )
@@ -51,7 +49,7 @@ CrcKeyArgument = Struct(
 )
 
 Behavior = Struct(
-    type = Select(PropertyEnum, Hex(Int64ul)),
+    type = PropertyEnum,
     args = PrefixedArray(Int32ul, CrcKeyArgument),
     children = PrefixedArray(Int32ul, LazyBound(lambda: Behavior)),
 )
