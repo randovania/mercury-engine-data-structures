@@ -1,7 +1,7 @@
 from construct import Construct, Container
 
-from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats import standard_format
+from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 BMSCP = standard_format.create('GUI::CDisplayObjectContainer', 0x02020001, explicit_root=True)

@@ -1,5 +1,6 @@
 from typing import Type
 
+from mercury_engine_data_structures.formats.base_resource import AssetType, BaseResource
 from mercury_engine_data_structures.formats.bcmdl import Bcmdl
 from mercury_engine_data_structures.formats.bctex import Bctex
 from mercury_engine_data_structures.formats.bldef import Bldef
@@ -36,7 +37,6 @@ from mercury_engine_data_structures.formats.lua import Lua
 from mercury_engine_data_structures.formats.pkg import Pkg
 from mercury_engine_data_structures.formats.toc import Toc
 from mercury_engine_data_structures.formats.txt import Txt
-from mercury_engine_data_structures.formats.base_resource import AssetType, BaseResource
 
 ALL_FORMATS = {
     "PKG": Pkg,
