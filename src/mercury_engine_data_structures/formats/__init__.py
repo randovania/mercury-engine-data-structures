@@ -1,5 +1,6 @@
 from typing import Type
 
+from mercury_engine_data_structures.formats.bapd import Bapd
 from mercury_engine_data_structures.formats.base_resource import AssetType, BaseResource
 from mercury_engine_data_structures.formats.bcmdl import Bcmdl
 from mercury_engine_data_structures.formats.bctex import Bctex
@@ -40,6 +41,7 @@ from mercury_engine_data_structures.formats.txt import Txt
 
 ALL_FORMATS = {
     "PKG": Pkg,
+    "BAPD": Bapd,
     "BCMDL": Bcmdl,
     "BCTEX": Bctex,
     "BLDEF": Bldef,
