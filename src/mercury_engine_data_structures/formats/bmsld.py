@@ -8,7 +8,7 @@ from mercury_engine_data_structures.common_types import CVector3D, Float, StrId,
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.construct_extensions.strings import StaticPaddedString
 from mercury_engine_data_structures.crc import crc32
-from mercury_engine_data_structures.formats import BaseResource
+from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.collision import collision_formats
 from mercury_engine_data_structures.game_check import Game
 

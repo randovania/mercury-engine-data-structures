@@ -2,7 +2,8 @@ import functools
 
 from construct import Construct, Container
 
-from mercury_engine_data_structures.formats import BaseResource, standard_format
+from mercury_engine_data_structures.formats.base_resource import BaseResource
+from mercury_engine_data_structures.formats import standard_format
 from mercury_engine_data_structures.game_check import Game
 
 BMMAP = standard_format.create('CMinimapData', 0x02000001)

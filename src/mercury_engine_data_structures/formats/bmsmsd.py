@@ -4,7 +4,7 @@ import construct
 from construct.core import Const, Construct, Enum, FlagsEnum, Float32l, Hex, Int32sl, Int32ul, Struct
 
 from mercury_engine_data_structures.common_types import CVector2D, CVector3D, StrId, make_vector
-from mercury_engine_data_structures.formats import BaseResource
+from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 TileBorders = FlagsEnum(Int32sl,

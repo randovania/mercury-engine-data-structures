@@ -12,7 +12,7 @@ from construct import (
 from mercury_engine_data_structures import game_check
 from mercury_engine_data_structures.common_types import CVector3D, StrId, make_vector
 from mercury_engine_data_structures.construct_extensions.strings import StaticPaddedString
-from mercury_engine_data_structures.formats import BaseResource
+from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 BMSSD = Struct(

@@ -15,7 +15,7 @@ from construct.core import (
 )
 
 from mercury_engine_data_structures.common_types import Float, StrId
-from mercury_engine_data_structures.formats import BaseResource
+from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
 

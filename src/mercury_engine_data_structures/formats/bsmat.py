@@ -16,7 +16,7 @@ from construct.core import (
 )
 
 from mercury_engine_data_structures.common_types import Char, Float, StrId
-from mercury_engine_data_structures.formats import BaseResource
+from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 # these seem to be using Unity ShaderLab, or at least the gist I borrowed this from uses similar teminology
