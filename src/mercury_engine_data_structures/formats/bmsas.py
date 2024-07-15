@@ -90,17 +90,62 @@ ArgListDread = DictAdapter(make_vector(Struct(
     )
 )))
 
+ArgListValueSR = Switch(
+    construct.this.type,
+    ArgTypesSR,
+    default=construct.Error
+)
 ArgListSR = DictAdapter(make_vector(Struct(
     key=PropertyEnumDoubleUnsafe,
     value=Struct(
         type=Char,
-        value=Switch(
-            construct.this.type,
-            ArgTypesSR,
-            default=construct.Error
-        )
+        value=ArgListValueSR
     )
 )))
+
+
+def _arglist_sr_emitparse(code: construct.CodeGen):
+    PropertyEnumDoubleUnsafe._compileparse(code)
+
+    code.append(f"""
+        sr_arglist_key_fmt = struct.Struct('<Lc')
+        def parse_arg_list_sr(io, this):
+            count = {construct.Int32ul._compileparse(code)}
+            result = Container()
+            for i in range(count):
+                key, vtype = sr_arglist_key_fmt.unpack(io.read(5))
+                this = Container(type=vtype.decode('utf-8'))
+                this.value = {ArgListValueSR._compileparse(code)}
+                result[_inverted_hashes_PROPERTY.get(key, key)] = this
+            return result
+    """)
+    return "parse_arg_list_sr(io, this)"
+
+def _arglist_sr_emitbuild(code: construct.CodeGen):
+    PropertyEnumDoubleUnsafe._compilebuild(code)
+
+    code.append(f"""
+        sr_arglist_key_fmt = struct.Struct('<Lc')
+        def build_arg_list_sr(obj_data: dict, io, this):
+            obj = len(obj_data)
+            {construct.Int32ul._compilebuild(code)}
+            result = ListContainer()
+            for key, value in obj_data.items():
+                if not isinstance(key, int):
+                    key = _hash_PROPERTY(key)
+                io.write(sr_arglist_key_fmt.pack(key, value.type.encode("utf-8")))
+                obj = value.value
+                this = value
+                {ArgListValueSR._compilebuild(code)}
+                result.append(value)
+            return result
+    """)
+    return "build_arg_list_sr(obj, io, this)"
+
+
+ArgListSR._emitparse = _arglist_sr_emitparse
+ArgListSR._emitbuild = _arglist_sr_emitbuild
+
 
 EventDread = Struct(
     type=PropertyEnum,
