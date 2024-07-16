@@ -4,7 +4,6 @@ from tests.test_lib import parse_build_compare_editor
 from mercury_engine_data_structures import dread_data
 from mercury_engine_data_structures.formats.bcskla import Bcskla
 
-
 all_dread_bcskla = [name for name in dread_data.all_name_to_asset_id().keys()
                    if name.endswith(".bcskla")]
 

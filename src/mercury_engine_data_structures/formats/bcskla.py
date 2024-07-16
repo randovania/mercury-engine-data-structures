@@ -1,27 +1,23 @@
+from dataclasses import dataclass
+from pprint import pprint
+from typing import Union
+
 import construct
 from construct.core import (
     Array,
     Const,
     Construct,
     Container,
-    Hex,
     If,
-    IfThenElse,
     Int8ul,
     Int16ul,
     Int32ul,
-    Int64ul,
-    ListContainer,
     Struct,
-    Tell
+    Tell,
 )
 
-from pprint import pprint
-from dataclasses import dataclass
-from typing import Union
-
+from mercury_engine_data_structures.common_types import CVector2D, Float
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
-from mercury_engine_data_structures.common_types import Float, CVector2D
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.property_enum import PropertyEnumDoubleUnsafe
 from mercury_engine_data_structures.game_check import Game
@@ -52,18 +48,18 @@ class KeyFramedValues:
                 tt = 0
             if kf.time > 0xFFFF:
                 raise ValueError(f"Keyframe has too large of a time! Max size is 65535, keyframe has {kf.time}")
-        
+
         self.timing_type = tt
         return tt
-    
+
     def add(self, time: int, val: int, derivative: int):
         if time > 0xFFFF:
             raise ValueError(f"Cannot add time {time} as max value is {0xFFFF}")
-        
+
         new_kf = KeyFrameValue(time, val, derivative)
         self.keyframes.append(new_kf)
         self.keyframes.sort(key=lambda kfv: kfv.time)
-    
+
 
 class KeyFramedValuesConstruct(Construct):
     @classmethod
@@ -74,18 +70,18 @@ class KeyFramedValuesConstruct(Construct):
         # timings
         timings = Array(kf_count, Int8ul if timing_type == 8 else Int16ul)._parsereport(stream, context, f"{path} -> Timings")
         AlignTo(4, b"\xff")._parse(stream, context, path)
-        
+
         values = Array(kf_count, CVector2D)._parsereport(stream, context, f"{path} -> Values")
 
         kf_data = [KeyFrameValue(timings[i], values[i][0], values[i][1]) for i in range(kf_count)]
         return KeyFramedValues(timing_type=timing_type, keyframes=kf_data)
-    
+
     @classmethod
     def _build(self, obj: KeyFramedValues, stream, context, path) -> None:
         count = len(obj.keyframes)
         Int16ul._build(obj.timing_type, stream, context, path)
         Int16ul._build(count, stream, context, path)
-        
+
         field = Int8ul if obj.timing_type == 8 else Int16ul
         Array(count, field)._build([k.time for k in obj.keyframes], stream, context, path)
         AlignTo(4, b"\xff")._build(None, stream, context, path)
@@ -159,16 +155,16 @@ class BcsklaTrackConstruct(Construct):
                 values.append(KeyFramedValuesConstruct._parse(stream, context, f"{path} -> KF Value {i}"))
             else:
                 values.append(Float._parsereport(stream, context, path))
-        
+
         return BcsklaTrack(data.bone_hash, values)
-    
+
     @classmethod
     def _build(self, obj: BcsklaTrack, stream, context, path) -> None:
         flags = 0
         for i, val in enumerate(obj.values):
             if type(val) == KeyFramedValues:
                 flags += 2**i
-        
+
         self.STRUCT._build(Container(bone_hash=obj.bone_name, flags=flags), stream, context, path)
         offset = construct.stream_tell(stream, path)
 
@@ -191,7 +187,7 @@ class BcsklaData:
     def validate(self) -> None:
         if not self.frame_count.is_integer():
             raise ValueError("Frame count must be an integer!")
-        
+
         expected_timing_type = 8 if self.frame_count <= 0xFF else 0
 
         for track in self.tracks:
@@ -200,7 +196,7 @@ class BcsklaData:
                     value.auto_set_timing_type()
                     if expected_timing_type != value.timing_type:
                         raise ValueError(f"Track {track.bone_name} ({i}) has unexpected TT!")
-                    
+
                     if value.keyframes[-1].time != self.frame_count:
                         raise ValueError(f"KFV for {track.bone_name}, value {i} does not end on keyframe {self.frame_count}!")
 
@@ -224,7 +220,7 @@ class BcsklaConstruct(Construct):
 
     def _parse(self, stream, context, path) -> BcsklaData:
         hdr = self.HEADER_STRUCT._parse(stream, context, f"{path} -> Header")
-        
+
         offset = construct.stream_tell(stream, path)
         tracks: list[BcsklaTrack] = []
         for i in range(hdr.track_count):
@@ -232,7 +228,7 @@ class BcsklaConstruct(Construct):
             tracks.append(BcsklaTrackConstruct._parse(stream, context, f"{path} -> Track {i}"))
 
         return BcsklaData(hdr.unk, hdr.frame_count, tracks)
-    
+
     def _build(self, obj: BcsklaData, stream, context, path):
         obj.validate()
         hdr = Container(
@@ -247,7 +243,7 @@ class BcsklaConstruct(Construct):
             construct.stream_seek(stream, 0x18 + (i * 0x30), 0, path)
             BcsklaTrackConstruct._build(track, stream, context, f"{path} -> Track {i}")
 
-    
+
 class Bcskla(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
