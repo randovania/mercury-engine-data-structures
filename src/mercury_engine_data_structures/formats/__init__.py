@@ -3,6 +3,7 @@ from typing import Type
 from mercury_engine_data_structures.formats.bapd import Bapd
 from mercury_engine_data_structures.formats.base_resource import AssetType, BaseResource
 from mercury_engine_data_structures.formats.bcmdl import Bcmdl
+from mercury_engine_data_structures.formats.bcskla import Bcskla
 from mercury_engine_data_structures.formats.bctex import Bctex
 from mercury_engine_data_structures.formats.bldef import Bldef
 from mercury_engine_data_structures.formats.blsnd import Blsnd
@@ -43,6 +44,7 @@ ALL_FORMATS = {
     "PKG": Pkg,
     "BAPD": Bapd,
     "BCMDL": Bcmdl,
+    "BCSKLA": Bcskla,
     "BCTEX": Bctex,
     "BLDEF": Bldef,
     "BLSND": Blsnd,

@@ -8,7 +8,7 @@ Construct type definitions for Mercury Engine
 | BCLGT     | &cross;              | &cross;               | Missing      | Missing       |
 | BCMDL     | &cross;              | &cross;               | &check;      | &cross;       |
 | BCPTL     | &cross;              | &cross;               | &cross;      | &cross;       |
-| BCSKLA    | &cross;              | &cross;               | &cross;      | &cross;       |
+| BCSKLA    | &cross;              | &cross;               | &check;      | &check;       |
 | BCTEX     | &cross;              | &cross;               | &check;      | &cross;       |
 | BCURV     | Missing              | Missing               | &cross;      | &cross;       |
 | BCUT      | &cross;              | &cross;               | Missing      | Missing       |
