@@ -63,7 +63,7 @@ EnemyStruct = Struct(
             )),
         )),
     ))
-)
+)  # fmt: skip
 
 BMDEFS = Struct(
     _magic=Const(b"MDEF"),
@@ -82,7 +82,7 @@ BMDEFS = Struct(
         "volume" / Float32l,
         "unk_bool" / Flag,
         "environment_sfx_volume" / Float32l
-    )),
+    )),  # fmt: skip
     unk2=Int32ul,
     enemies_list=make_vector(EnemyStruct),
     rest=construct.GreedyBytes,

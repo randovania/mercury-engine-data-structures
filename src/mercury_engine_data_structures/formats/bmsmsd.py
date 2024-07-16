@@ -71,7 +71,7 @@ BMSMSD = Struct(
         )
     ),
     construct.Terminated,
-)
+)  # fmt: skip
 
 
 class Bmsmsd(BaseResource):

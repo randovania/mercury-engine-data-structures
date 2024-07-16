@@ -155,7 +155,7 @@ def DreadDependencies():
             "unk2" / make_vector(StrId),
             "unk3" / make_vector(StrId)
         )
-    }
+    }  # fmt: skip
     component_dependencies["CStandaloneFXComponent"] = component_dependencies["CFXComponent"]
 
     def component_type(this):
@@ -215,7 +215,7 @@ def SRDependencies():
             "unk2" / make_vector(StrId),
             "unk3" / make_vector(StrId)
         ),
-    }
+    }  # fmt: skip
     for dep in [
         "CTsumuriAcidDroolCollision",
         "CBillboardCollisionComponent",
@@ -353,7 +353,7 @@ BMSAD_SR = Struct(
     ),
 
     construct.Terminated,
-)
+)  # fmt: skip
 
 BMSAD_Dread = Struct(
     "_magic" / Const(b"MSAD"),
@@ -375,7 +375,7 @@ BMSAD_Dread = Struct(
     "action_sets" / make_vector(StrId),
     "sound_fx" / make_vector(StrId >> Byte),
     construct.Terminated,
-)
+)  # fmt: skip
 
 ArgAnyType = str | float | bool | int
 

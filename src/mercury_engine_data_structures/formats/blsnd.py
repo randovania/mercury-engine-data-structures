@@ -26,7 +26,7 @@ BLSND = Struct(
         "value" / Int32ul,
         )),
     construct.Terminated,
-)
+)  # fmt: skip
 
 
 class Blsnd(BaseResource):

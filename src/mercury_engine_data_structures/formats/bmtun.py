@@ -41,7 +41,7 @@ BMTUN = Struct(
     "version" / VersionAdapter("1.5.0"),
     "classes" / make_dict(TunableClass),
     construct.Terminated,
-)
+)  # fmt: skip
 
 
 class Bmtun(BaseResource):

@@ -24,7 +24,7 @@ Block = Struct(
     "respawn_time" / Float32l,
     "model_name" / StrId,
     "vignette_name" / StrId,
-)
+)  # fmt: skip
 
 def _rebuild_blocks(ctx: Container) -> int:
     return sum(len(group.blocks) for group in ctx.types)
@@ -40,7 +40,7 @@ BlockGroup = Struct(
         "block_type" / StrId,
         "blocks" / make_vector(Block),
     )),
-)
+)  # fmt: skip
 
 BMSBK = Struct(
     "magic" / Const(b"MSBK"),
@@ -51,7 +51,7 @@ BMSBK = Struct(
         "entries" / make_vector(Int32ul),
     )),
     Terminated,
-)
+)  # fmt: skip
 
 class Bmsbk(BaseResource):
     @classmethod

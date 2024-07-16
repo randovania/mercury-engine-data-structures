@@ -40,7 +40,7 @@ BMSMD = Struct(
             )),
         )),
     )),
-)
+)  # fmt: skip
 
 class Bmsmd(BaseResource):
     @classmethod
