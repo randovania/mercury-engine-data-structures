@@ -34,8 +34,8 @@ StrKeyArgument = Struct(
     val = Switch(
         construct.this.key[0],
         ArgumentCases,
-        construct.Error
-    )
+        construct.Error,
+    ),
 )
 
 CrcKeyArgument = Struct(
@@ -43,8 +43,8 @@ CrcKeyArgument = Struct(
     val = Switch(
         construct.this.key[0],
         ArgumentCases,
-        construct.Error
-    )
+        construct.Error,
+    ),
 )
 
 Behavior = Struct(

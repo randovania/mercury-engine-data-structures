@@ -24,7 +24,7 @@ BLSND = Struct(
     "sound_limits" / make_vector(Struct(
         "name" / StrId,
         "value" / Int32ul,
-        )),
+    )),
     construct.Terminated,
 )  # fmt: skip
 

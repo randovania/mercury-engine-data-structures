@@ -31,7 +31,7 @@ translucency_type = Enum(
     TILING_CLAMPCOLOR=1,
     TILING_REPEAT=2,
     TILING_MIRROR=3,
-    TILING_INVALID=0xffffffff
+    TILING_INVALID=0xffffffff,
 )
 
 # blend operation
@@ -43,7 +43,7 @@ blend_op = Enum(
     REV_SUB=2,
     MIN=3,
     MAX=4,
-    INVALID=0xffffffff
+    INVALID=0xffffffff,
 )
 
 # blend mode
@@ -60,7 +60,7 @@ blend_mode = Enum(
     ONE_MINUS_SRC_ALPHA=7,
     DST_ALPHA=8,
     ONE_MINUS_DST_ALPHA=9,
-    INVALID=0xffffffff
+    INVALID=0xffffffff,
 )
 
 # cull command
@@ -70,7 +70,7 @@ polygon_cull_mode = Enum(
     BACK = 2,
     FRONT = 3,
     OFF = 4,
-    INVALID = 0xffffffff
+    INVALID = 0xffffffff,
 )
 
 # stencil operation value
@@ -106,7 +106,7 @@ fill_mode = Enum(
     Int32ul,
     SOLID=0,
     WIRE=1,
-    INVALID=0xffffffff
+    INVALID=0xffffffff,
 )
 
 shader_type = Enum(
@@ -114,7 +114,7 @@ shader_type = Enum(
     VERTEX=0,
     PIXEL=1,
     GEOMETRY=2,
-    INVALID=0xffffffff
+    INVALID=0xffffffff,
 )
 
 # seems to be a fancier version of point/bilinear/trilinear with extra trilinear/mipmap stuff
@@ -126,7 +126,7 @@ filter_mode = Enum(
     FILTER_NEAREST_MIP_LINEAR=3,
     FILTER_LINEAR_MIP_NEAREST=4,
     FILTER_LINEAR_MIP_LINEAR=5,
-    FILTER_INVALID=0xffffffff
+    FILTER_INVALID=0xffffffff,
 )
 
 tile_wrap_mode = Enum(

@@ -38,7 +38,7 @@ Ptr = Hex(Int64ul)
 # pad 0xFF bytes to an offset of 8
 PadTo8B = Struct(
     _cur_pos=Tell,
-    padding=construct.Padding((8 - construct.this._cur_pos) % 8, pattern=b'\xff')
+    padding=construct.Padding((8 - construct.this._cur_pos) % 8, pattern=b'\xff'),
 )
 
 # an entry in a linked-list typically pointed to by TOC.
@@ -46,7 +46,7 @@ PadTo8B = Struct(
 # so we just need to break when next==0
 TOC_subentry = Struct(
     ptr=Ptr,
-    next=Ptr
+    next=Ptr,
 )
 
 # info on a section of the decompressed vertex buffer
@@ -198,7 +198,7 @@ transform = Struct(
     start=Hex(construct.Tell),
     pos=Array(3, Float),
     rot=Array(3, Float),
-    scale=Array(3, Float)
+    scale=Array(3, Float),
 ).compile()
 
 # joint TOC entry
@@ -263,8 +263,8 @@ TOC9_info_ptr = Struct(
     ptr=Ptr,
     ref=If(
         construct.this.ptr != 0,
-        Pointer(construct.this.ptr, TOC9_info)
-    )
+        Pointer(construct.this.ptr, TOC9_info),
+    ),
 ).compile()
 
 # entry for TOC9.
@@ -287,7 +287,7 @@ TOC9_entry = Struct(
 # Linked-list TOC. Always seems to be in sequence so we can use the "hack" of just repeating until next=0.
 Sub_TOC = Struct(
     ptr=Tell,
-    subtoc_entries=RepeatUntil(construct.obj_.next == 0, TOC_subentry)
+    subtoc_entries=RepeatUntil(construct.obj_.next == 0, TOC_subentry),
 ).compile()
 
 

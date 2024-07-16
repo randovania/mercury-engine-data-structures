@@ -30,23 +30,23 @@ geo_connections_sr = Struct(
 Struct1 = Struct(
     unk0=Int32ul,
     unk1=CVector2D,
-    unk2=CVector2D
+    unk2=CVector2D,
 )
 
 # special paths entities can take that ignore default connections (i.e. chozo robot jumps or wall-traveling enemies).
 # emmi's are in a separate structure.
 # hard-coded to specific entity's sName
 NavigablePath = Struct(
-    path=PrefixedArray(Int32ul, Int32ul)
+    path=PrefixedArray(Int32ul, Int32ul),
 )
 
 EZ_Element = Struct(
     el=Int32ul,
-    unk1=PrefixedArray(Int32ul, Int32ul)
+    unk1=PrefixedArray(Int32ul, Int32ul),
 )
 
 EmmyZone_inner = Struct(
-    elements=PrefixedArray(Int32ul, EZ_Element)
+    elements=PrefixedArray(Int32ul, EZ_Element),
 )
 
 # reference to an "LS_EmmyZone" typically
@@ -79,36 +79,36 @@ Traversal = Struct(
 
 # another prefixed array with an unknown parameter. I think maybe this is done based on the area/room the emmy is in?
 EmmyAreaTraversal = Struct(
-    actions=PrefixedArray(Int32ul, Traversal)
+    actions=PrefixedArray(Int32ul, Traversal),
 )
 
 # emmy-specific traversal (ie where they can hop up on ceilings).
 # includes a bmslink reference and refers to specific actions.
 EmmyTraversals = Struct(
     bmslink=StrId,
-    traversals=make_dict(EmmyAreaTraversal, Int32ul)
+    traversals=make_dict(EmmyAreaTraversal, Int32ul),
 )
 
 PAction = Struct(
     unk0=Int32ul,
-    action=Traversal
+    action=Traversal,
 )
 
 PropActions = Struct(
     name=StrId,
     bmslink=StrId,
-    actions=PrefixedArray(Int32ul, PAction)
+    actions=PrefixedArray(Int32ul, PAction),
 )
 
 # actions around certain props like buttons
 Prop = Struct(
-    actions=PrefixedArray(Int32ul, PrefixedArray(Int32ul, PropActions))
+    actions=PrefixedArray(Int32ul, PrefixedArray(Int32ul, PropActions)),
 )
 
 # a parameter for actor. seems to be sublayers of the navmesh.
 Actor_unk1_param = Struct(
     sName=StrId,
-    unk=Int32ul
+    unk=Int32ul,
 )
 
 # info on an actor

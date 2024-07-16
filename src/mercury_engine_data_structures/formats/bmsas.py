@@ -150,7 +150,7 @@ ArgListSR._emitbuild = _arglist_sr_emitbuild
 EventDread = Struct(
     type=PropertyEnum,
     unk=Int32ul,
-    args=ArgListDread
+    args=ArgListDread,
 )
 EventSR = Struct(
     unk=Int32ul,

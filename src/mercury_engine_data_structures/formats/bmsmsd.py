@@ -24,7 +24,7 @@ TileType = Enum(
     HEAT=2,
     ACID=4,
     ACID_RISE=8,
-    ACID_FALL=12
+    ACID_FALL=12,
 )
 
 IconPriority = Enum(
@@ -35,7 +35,7 @@ IconPriority = Enum(
     ENERGY_CLOUD=2,
     DOOR=3,
     CHOZO_SEAL=4,
-    HIDDEN_ITEM=5
+    HIDDEN_ITEM=5,
 )
 
 # BMSMSD

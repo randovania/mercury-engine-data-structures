@@ -27,8 +27,8 @@ TunableParam = Struct(
             'i': Int32sl,
             'v': CVector3D
         },
-        ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
-    )
+        ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError),
+    ),
 )
 
 TunableClass = Struct(
