@@ -68,7 +68,8 @@ class KeyFramedValuesConstruct(Construct):
         kf_count = Int16ul._parsereport(stream, context, path)
 
         # timings
-        timings = Array(kf_count, Int8ul if timing_type == 8 else Int16ul)._parsereport(stream, context, f"{path} -> Timings")
+        format_field = Int8ul if timing_type == 8 else Int16ul
+        timings = Array(kf_count, format_field)._parsereport(stream, context, f"{path} -> Timings")
         AlignTo(4, b"\xff")._parse(stream, context, path)
 
         values = Array(kf_count, CVector2D)._parsereport(stream, context, f"{path} -> Values")
@@ -198,7 +199,8 @@ class BcsklaData:
                         raise ValueError(f"Track {track.bone_name} ({i}) has unexpected TT!")
 
                     if value.keyframes[-1].time != self.frame_count:
-                        raise ValueError(f"KFV for {track.bone_name}, value {i} does not end on keyframe {self.frame_count}!")
+                        raise ValueError(f"KFV for {track.bone_name}, value {i}"
+                                         f" does not end on keyframe {self.frame_count}!")
 
     def __str__(self) -> str:
         pprint(self)
