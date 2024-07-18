@@ -7,6 +7,7 @@ from construct.core import (
     Construct,
     Container,
     FocusedSeq,
+    If,
     IfThenElse,
     Int8ul,
     Int16ul,
