@@ -91,7 +91,7 @@ BoneTrack_SR = Struct(
         "kfv",
         off = Rebuild(Int32ul, lambda ctx: 0 if isinstance(ctx.kfv, float) else ctx._._._next_kfv_offset),
         kfv = IfThenElse(
-            this.off > 0, 
+            this.off > 0,
             Pointer(this.off, KeyFramedValues_SR),
             IfThenElse(lambda ctx: ctx._index < 6, Computed(0.0), Computed(1.0))
         )
