@@ -2,6 +2,7 @@
 import construct
 from construct.core import (
     Array,
+    Check,
     Computed,
     Const,
     Construct,
@@ -46,10 +47,13 @@ KeyFramedValues_Dread = Struct(
     ),
     _padding=AlignTo(4, b"\xff"),
     values=Array(construct.this.count, Struct(value=Float, derivative=Float)),
+    _integrity_check=Check(construct.len_(this.values) == construct.len_(this.timings)),
     _new_eof=Tell,
     _new_kfv=Computed(_update_next_kfv)
 )
 
+# if data is keyframed, it builds to { count = c, data = [ { timing = t, values = [a, b, c] }, ... ] }
+# if data is constant, it builds to { count = 0, data = { value = x } }
 KeyFramedValues_SR = Struct(
     count=Rebuild(Int16ul, lambda ctx: 0 if isinstance(ctx.data, float) else len(ctx.data)),
     _data_type = Const(2, Int16ul),
@@ -57,12 +61,11 @@ KeyFramedValues_SR = Struct(
         this.count == 0,
         FocusedSeq(
             "value",
-            time = Const(0, Int32ul),
+            timing = Const(0, Int32ul),
             value = Float
         ),
-        Array(this.count,
-            Struct(timing=Float, values=CVector3D)
-        )
+        # guessing on left/right_derivative. they are almost always the same value. 
+        Array(this.count, Struct(timing=Float, value=Float, left_derivative=Float, right_derivative=Float))
     ),
     _new_eof=Tell,
     _new_kfv=Computed(_update_next_kfv)
@@ -70,30 +73,32 @@ KeyFramedValues_SR = Struct(
 )
 
 BoneTrack_Dread = Struct(
+    # guess. almost always the bone names but some values still don't parse after dumping all model data >:(
     bone_name=PropertyEnumDoubleUnsafe,
     flags=Rebuild(Int32ul, _rebuild_flags),
-    offset=Tell,
+    _offset=Tell,
     data=Array(9, IfThenElse(
-        # if the flag for an index is zero, the track
+        # if the flag for an index is zero, the value is keyframed
         2 ** this._index & this.flags == 0,
         Float,
         FocusedSeq(
             "kfv",
-            off = Rebuild(Int32ul, lambda ctx: ctx._._._next_kfv_offset - ctx._.offset),
-            kfv = Pointer(this.off + this._.offset, KeyFramedValues_Dread)
+            # offsets are relative to immediately after the flag field
+            off = Rebuild(Int32ul, lambda ctx: ctx._._._next_kfv_offset - ctx._._offset),
+            kfv = Pointer(this.off + this._._offset, KeyFramedValues_Dread)
         )
     ))
 )
 
 BoneTrack_SR = Struct(
     bone_hash=Int32ul, # TODO have a property CrcAdapter for sr lmao
-    offset=Tell,
     data=Array(9, FocusedSeq(
         "kfv",
         off = Rebuild(Int32ul, lambda ctx: 0 if isinstance(ctx.kfv, float) else ctx._._._next_kfv_offset),
         kfv = IfThenElse(
             this.off > 0,
             Pointer(this.off, KeyFramedValues_SR),
+            # if offset is 0, this is the default value pos/rot=0, scale=1
             IfThenElse(lambda ctx: ctx._index < 6, Computed(0.0), Computed(1.0))
         )
     ))
@@ -102,11 +107,11 @@ BoneTrack_SR = Struct(
 BCSKLA_DREAD = Struct(
     _magic = Const(b"MANM"),
     ver=Const(0x000A0001, Int32ul),
-    unk=Int32ul,
+    unk=Int32ul, # seems to be 0 or 1, possibly determines if anim is looping?
     frame_count=Float,
     track_count=Rebuild(Int32ul, construct.len_(this.tracks)),
     _padding=If(this.track_count > 0, AlignTo(8, b"\xff")),
-    _next_kfv_offset=Computed(this.track_count * 0x30 + 0x18),
+    _next_kfv_offset=Computed(this.track_count * 0x30 + 0x18), # end of BoneTracks, used to rebuild
     tracks=Array(this.track_count, BoneTrack_Dread)
 )
 
