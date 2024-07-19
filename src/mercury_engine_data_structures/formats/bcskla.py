@@ -20,7 +20,7 @@ from construct.core import (
     this,
 )
 
-from mercury_engine_data_structures.common_types import CVector3D, Float
+from mercury_engine_data_structures.common_types import Float
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.property_enum import PropertyEnumDoubleUnsafe
@@ -64,7 +64,7 @@ KeyFramedValues_SR = Struct(
             timing = Const(0, Int32ul),
             value = Float
         ),
-        # guessing on left/right_derivative. they are almost always the same value. 
+        # guessing on left/right_derivative. they are almost always the same value.
         Array(this.count, Struct(timing=Float, value=Float, left_derivative=Float, right_derivative=Float))
     ),
     _new_eof=Tell,
