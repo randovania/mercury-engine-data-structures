@@ -249,7 +249,7 @@ class EnumType(BaseType):
             if __value in name_to_entry:
                 __value = name_to_entry[__value]
 
-        if type(__value) != expected:
+        if type(__value) is not expected:
             return TypeError(f"Expected {self.name}; got {type(__value).__name__}")
 
         return None
@@ -271,7 +271,7 @@ class FlagsetType(BaseType):
         enum_type: EnumType = self.type_lib.get_type(self.enum)
         expected = enum_type.enum_class()
 
-        if type(__value) == expected:
+        if type(__value) is expected:
             return None
 
         if isinstance(__value, int) and not isinstance(__value, enum.IntEnum):
