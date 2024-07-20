@@ -14,7 +14,8 @@ def _const_if_present(con: construct.Construct, value: typing.Any | None) -> con
     return construct.Const(value, con) if value is not None else con
 
 
-def create(name: Optional[str], version: Optional[int | str | tuple[int, int, int]], root_name: Optional[str] = None, explicit_root: bool = False):
+def create(name: Optional[str], version: Optional[int | str | tuple[int, int, int]],
+           root_name: Optional[str] = None, explicit_root: bool = False):
     # this maybe needs to change in the future if SR and Dread have different formats for type using this
     type_lib = get_type_lib_dread()
     if root_name is None:
