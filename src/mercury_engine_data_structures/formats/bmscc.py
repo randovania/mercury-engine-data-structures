@@ -12,7 +12,7 @@ from construct import (
 )
 
 from mercury_engine_data_structures import game_check
-from mercury_engine_data_structures.common_types import StrId, UInt, make_vector
+from mercury_engine_data_structures.common_types import StrId, UInt, make_vector, VersionAdapter
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.collision import collision_formats
@@ -47,8 +47,8 @@ BMSCC = Struct(
     _magic=Const(b"MSCD"),
     _version=IfThenElse(
         game_check.current_game_at_most(Game.SAMUS_RETURNS),
-        Const(0x000D0001, Hex(UInt)),
-        Const(0x00100001, Hex(UInt)),
+        VersionAdapter("1.14.0"),
+        VersionAdapter("1.16.0"),
     ),
     layers=make_vector(CollisionLayer),
     eof=GreedyBytes,

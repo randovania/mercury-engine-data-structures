@@ -22,7 +22,15 @@ from construct.core import (
 from construct.lib.containers import Container, ListContainer
 
 from mercury_engine_data_structures import common_types, type_lib
-from mercury_engine_data_structures.common_types import Char, CVector3D, Float, StrId, make_dict, make_vector
+from mercury_engine_data_structures.common_types import (
+    Char, 
+    CVector3D, 
+    Float, 
+    StrId, 
+    make_dict, 
+    make_vector, 
+    VersionAdapter
+)
 from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
 from mercury_engine_data_structures.construct_extensions.function_complex import ComplexIf, SwitchComplexKey
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
@@ -320,7 +328,7 @@ SRHeader = Struct(
 # BMSAD
 BMSAD_SR = Struct(
     "_magic" / Const(b"MSAD"),
-    "version" / Const(0x002C0001, Hex(Int32ul)),
+    "version" / VersionAdapter("1.44.0"),
 
     "name" / StrId,
 
@@ -349,7 +357,7 @@ BMSAD_SR = Struct(
 
 BMSAD_Dread = Struct(
     "_magic" / Const(b"MSAD"),
-    "version" / Const(0x0200000F, Hex(Int32ul)),
+    "version" / VersionAdapter("15.0.2"),
 
     "name" / StrId,
     "type" / StrId,

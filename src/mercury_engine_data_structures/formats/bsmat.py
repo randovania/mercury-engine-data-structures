@@ -15,7 +15,7 @@ from construct.core import (
     Switch,
 )
 
-from mercury_engine_data_structures.common_types import Char, Float, StrId
+from mercury_engine_data_structures.common_types import Char, Float, StrId, VersionAdapter
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
@@ -222,7 +222,7 @@ shader_stage = Struct(
 
 BSMAT = Struct(
     _magic = Const(b"MSUR"),
-    _ver = Const(0x00110002, Hex(Int32ul)),
+    _ver = VersionAdapter("2.17.0"),
     name = StrId,
 
     # Binary shader data

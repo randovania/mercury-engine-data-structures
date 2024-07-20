@@ -3,7 +3,7 @@ import functools
 import construct
 from construct.core import Const, Construct, Enum, FlagsEnum, Float32l, Hex, Int32sl, Int32ul, Struct
 
-from mercury_engine_data_structures.common_types import CVector2D, CVector3D, StrId, make_vector
+from mercury_engine_data_structures.common_types import CVector2D, CVector3D, StrId, make_vector, VersionAdapter
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
@@ -41,7 +41,7 @@ IconPriority = Enum(
 # BMSMSD
 BMSMSD = Struct(
     "_magic" / Const(b"MMSD"),
-    "version" / Const(0x00070001, Hex(Int32ul)),
+    "version" / VersionAdapter("1.7.0"),
     "scenario" / StrId,
     "tile_size" / construct.Array(2, Float32l),
     "x_tiles" / Int32sl,

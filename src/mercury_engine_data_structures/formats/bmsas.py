@@ -17,7 +17,7 @@ from construct.core import (
     Switch,
 )
 
-from mercury_engine_data_structures.common_types import Char, CVector3D, DictAdapter, Float, make_vector
+from mercury_engine_data_structures.common_types import Char, CVector3D, DictAdapter, Float, make_vector, VersionAdapter
 from mercury_engine_data_structures.common_types import StrId as StrIdSR
 from mercury_engine_data_structures.construct_extensions.strings import PascalStringRobust
 from mercury_engine_data_structures.formats.base_resource import BaseResource
@@ -266,7 +266,7 @@ AnimationSR = Struct(
 
 BMSAS_Dread = Struct(
     _magic=Const(b"MSAS"),
-    _version=Const(0x00170003, Hex(Int32ul)),
+    _version=VersionAdapter("3.23.0"),
     name=StrId,
     unk=Hex(Int32ul),
     animations=make_vector(AnimationDread),

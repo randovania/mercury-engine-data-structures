@@ -12,7 +12,7 @@ from construct.core import (
     Switch,
 )
 
-from mercury_engine_data_structures.common_types import Char, CVector3D, Float, StrId, make_dict
+from mercury_engine_data_structures.common_types import Char, CVector3D, Float, StrId, make_dict, VersionAdapter
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
@@ -40,7 +40,7 @@ TunableClass = Struct(
 # BMTUN
 BMTUN = Struct(
     "_magic" / Const(b"MTUN"),
-    "version" / Const(0x00050001, Hex(Int32ul)),
+    "version" / VersionAdapter("1.5.0"),
     "classes" / make_dict(TunableClass),
     construct.Terminated,
 )

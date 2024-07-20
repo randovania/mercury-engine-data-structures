@@ -9,7 +9,7 @@ from construct import (
     Struct,
 )
 
-from mercury_engine_data_structures.common_types import StrId, make_vector
+from mercury_engine_data_structures.common_types import StrId, make_vector, VersionAdapter
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
@@ -67,8 +67,7 @@ EnemyStruct = Struct(
 
 BMDEFS = Struct(
     _magic=Const(b"MDEF"),
-    major_version=Int16ul,
-    minor_version=Int16ul,
+    version=VersionAdapter(),
     unk1=Int32ul,
     sounds=make_vector(Struct(
         "sound_name" / StrId,

@@ -6,7 +6,7 @@ from mercury_engine_data_structures.formats import standard_format
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
-BMMDEF = standard_format.create('CMinimapDef', 0x02000001)
+BMMDEF = standard_format.create('CMinimapDef', "1.0.2")
 
 
 class Bmmdef(BaseResource):

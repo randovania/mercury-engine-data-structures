@@ -12,7 +12,7 @@ class Brsa(BaseResource):
     @classmethod
     @functools.lru_cache
     def construct_class(cls, target_game: Game) -> Construct:
-        return standard_format.game_model('CSubAreaManager', 0x02010002)
+        return standard_format.game_model('CSubAreaManager', "2.1.2")
 
     @property
     def subarea_setups(self) -> Iterator[Container]:
