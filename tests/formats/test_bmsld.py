@@ -4,36 +4,30 @@ from tests.test_lib import parse_build_compare_editor
 from mercury_engine_data_structures import samus_returns_data
 from mercury_engine_data_structures.formats.bmsld import Bmsld
 
-all_bmsld = [
-    "maps/levels/c10_samus/s000_surface/s000_surface.bmsld",
-    "maps/levels/c10_samus/s010_area1/s010_area1.bmsld",
-    "maps/levels/c10_samus/s020_area2/s020_area2.bmsld",
-    "maps/levels/c10_samus/s025_area2b/s025_area2b.bmsld",
-    "maps/levels/c10_samus/s028_area2c/s028_area2c.bmsld",
-    "maps/levels/c10_samus/s030_area3/s030_area3.bmsld",
-    "maps/levels/c10_samus/s033_area3b/s033_area3b.bmsld",
-    "maps/levels/c10_samus/s036_area3c/s036_area3c.bmsld",
-    "maps/levels/c10_samus/s040_area4/s040_area4.bmsld",
-    "maps/levels/c10_samus/s050_area5/s050_area5.bmsld",
-    "maps/levels/c10_samus/s060_area6/s060_area6.bmsld",
-    "maps/levels/c10_samus/s065_area6b/s065_area6b.bmsld",
-    "maps/levels/c10_samus/s067_area6c/s067_area6c.bmsld",
-    "maps/levels/c10_samus/s070_area7/s070_area7.bmsld",
-    "maps/levels/c10_samus/s090_area9/s090_area9.bmsld",
-    "maps/levels/c10_samus/s090_area9/s090_area9.bmsld",
-    "maps/levels/c10_samus/s100_area10/s100_area10.bmsld",
-    "maps/levels/c10_samus/s110_surfaceb/s110_surfaceb.bmsld",
 
+sr_missing = [
+    "maps/levels/c10_samus/s901_alpha/s901_alpha.bmsld",
+    "maps/levels/c10_samus/s902_gamma/s902_gamma.bmsld",
+    "maps/levels/c10_samus/s903_zeta/s903_zeta.bmsld",
+    "maps/levels/c10_samus/s904_omega/s904_omega.bmsld",
+    "maps/levels/c10_samus/s905_arachnus/s905_arachnus.bmsld",
+    "maps/levels/c10_samus/s905_queen/s905_queen.bmsld",
+    "maps/levels/c10_samus/s906_metroid/s906_metroid.bmsld",
+    "maps/levels/c10_samus/s907_manicminerbot/s907_manicminerbot.bmsld",
+    "maps/levels/c10_samus/s908_manicminerbotrun/s908_manicminerbotrun.bmsld",
+    "maps/levels/c10_samus/s909_ridley/s909_ridley.bmsld",
+    "maps/levels/c10_samus/s910_gym/s910_gym.bmsld",
+    "maps/levels/c10_samus/s911_swarmgym/s911_swarmgym.bmsld",
+    "maps/levels/c10_samus/s920_traininggallery/s920_traininggallery.bmsld",
 ]
-
 
 @pytest.fixture()
 def surface_bmsld(samus_returns_tree) -> Bmsld:
-    return samus_returns_tree.get_parsed_asset(all_bmsld[0], type_hint=Bmsld)
+    return samus_returns_tree.get_parsed_asset("maps/levels/c10_samus/s000_surface/s000_surface.bmsld", type_hint=Bmsld)
 
 @pytest.mark.parametrize("bmsld_path", samus_returns_data.all_files_ending_with(".bmsld"))
 def test_bmsld(samus_returns_tree, bmsld_path):
-    if not samus_returns_tree.does_asset_exists(bmsld_path):
+    if bmsld_path in sr_missing:
         pytest.skip(f"{bmsld_path} does not exist!")
 
     parse_build_compare_editor(Bmsld, samus_returns_tree, bmsld_path)
