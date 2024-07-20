@@ -33,10 +33,10 @@ def surface_bmsld(samus_returns_tree) -> Bmsld:
 
 @pytest.mark.parametrize("bmsld_path", samus_returns_data.all_files_ending_with(".bmsld"))
 def test_bmsld(samus_returns_tree, bmsld_path):
-    try:
-        parse_build_compare_editor(Bmsld, samus_returns_tree, bmsld_path)
-    except FileNotFoundError:
-        pytest.skip()
+    if not samus_returns_tree.does_asset_exists(bmsld_path):
+        pytest.skip(f"{bmsld_path} does not exist!")
+    
+    parse_build_compare_editor(Bmsld, samus_returns_tree, bmsld_path)
 
 def test_all_actor_groups(surface_bmsld: Bmsld):
     all_groups = surface_bmsld.all_actor_groups()

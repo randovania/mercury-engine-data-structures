@@ -1,6 +1,6 @@
 import pytest
 from construct import Container, ListContainer
-from tests.test_lib import parse_and_build_compare
+from tests.test_lib import parse_build_compare_editor
 
 from mercury_engine_data_structures import dread_data, samus_returns_data
 from mercury_engine_data_structures.formats.pkg import Pkg
@@ -35,15 +35,15 @@ wrong_build_sr = [
 ]
 
 @pytest.mark.parametrize("pkg_path", dread_data.all_files_ending_with(".pkg"))
-def test_compare_dread(dread_path, pkg_path):
-    parse_and_build_compare(
-        Pkg.construct_class(Game.DREAD), Game.DREAD, dread_path.joinpath(pkg_path)
-    )
+def test_compare_dread(dread_file_tree, pkg_path):
+    parse_build_compare_editor(Pkg, dread_file_tree, pkg_path)
 
 @pytest.mark.parametrize("pkg_path", samus_returns_data.all_files_ending_with(".pkg"))
-def test_compare_sr(samus_returns_path, pkg_path):
+def test_compare_sr(samus_returns_tree, pkg_path):
+    if not samus_returns_tree.does_asset_exists(pkg_path):
+        pytest.skip(f"{pkg_path} does not exist!")
     if pkg_path in wrong_build_sr:
-        raw = samus_returns_path.joinpath(pkg_path).read_bytes()
+        raw = samus_returns_tree.root.joinpath(pkg_path).read_bytes()
         target_game = Game.SAMUS_RETURNS
 
         module = Pkg.construct_class(target_game)
@@ -59,9 +59,7 @@ def test_compare_sr(samus_returns_path, pkg_path):
         assert raw[5:min_len] == encoded[5:min_len]
         assert abs(len(raw) - len(encoded)) <= 3
     else:
-        parse_and_build_compare(
-            Pkg.construct_class(Game.SAMUS_RETURNS), Game.SAMUS_RETURNS, samus_returns_path.joinpath(pkg_path)
-        )
+        parse_build_compare_editor(Pkg, samus_returns_tree, pkg_path)
 
 def test_build_empty_pkg():
     pkg = Pkg(Container(files=ListContainer()), Game.DREAD)
