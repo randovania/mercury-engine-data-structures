@@ -22,7 +22,7 @@ Construct type definitions for Mercury Engine
 | BLSND     | &check;              | &check;               | &check;      | &check;       |
 | BLUT      | Missing              | Missing               | &cross;      | &cross;       |
 | BMBLS     | Missing              | Missing               | &check;      | &check;       |
-| BMDEFS    | &check;              | &check;               | &cross;      | &cross;       |
+| BMDEFS    | &check;              | &check;               | &check;      | &check;       |
 | BMMAP     | Missing              | Missing               | &check;      | &check;       |
 | BMMDEF    | Missing              | Missing               | &check;      | &check;       |
 | BMSAD     | &check;              | &check;               | &check;      | &check;       |

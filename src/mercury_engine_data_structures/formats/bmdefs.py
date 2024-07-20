@@ -10,6 +10,7 @@ from construct import (
 )
 
 from mercury_engine_data_structures.common_types import StrId, make_vector, VersionAdapter
+from mercury_engine_data_structures.formats import standard_format
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
@@ -67,7 +68,7 @@ EnemyStruct = Struct(
 
 BMDEFS = Struct(
     _magic=Const(b"MDEF"),
-    version=VersionAdapter(),
+    version=VersionAdapter("1.5.0"),
     unk1=Int32ul,
     sounds=make_vector(Struct(
         "sound_name" / StrId,
@@ -91,4 +92,7 @@ BMDEFS = Struct(
 class Bmdefs(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
-        return BMDEFS
+        if target_game == Game.SAMUS_RETURNS:
+            return BMDEFS
+        else:
+            return standard_format.game_model("sound::CMusicManager", "4.0.2")

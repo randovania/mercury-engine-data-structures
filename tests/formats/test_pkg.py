@@ -6,13 +6,8 @@ from mercury_engine_data_structures import dread_data, samus_returns_data
 from mercury_engine_data_structures.formats.pkg import Pkg
 from mercury_engine_data_structures.game_check import Game
 
+
 _EMPTY_DREAD_PKG = (b'\x08\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
-
-all_dread_pkg = [name for name in dread_data.all_name_to_asset_id().keys()
-                   if name.endswith(".pkg")]
-
-all_sr_pkg = [name for name in samus_returns_data.all_name_to_asset_id().keys()
-                   if name.endswith(".pkg")]
 
 wrong_build_sr = [
     # MSCU, no padding in vanilla
@@ -39,13 +34,13 @@ wrong_build_sr = [
     "packs/players/common_fusion.pkg",
 ]
 
-@pytest.mark.parametrize("pkg_path", all_dread_pkg)
+@pytest.mark.parametrize("pkg_path", dread_data.all_files_ending_with(".pkg"))
 def test_compare_dread(dread_path, pkg_path):
     parse_and_build_compare(
         Pkg.construct_class(Game.DREAD), Game.DREAD, dread_path.joinpath(pkg_path)
     )
 
-@pytest.mark.parametrize("pkg_path", all_sr_pkg)
+@pytest.mark.parametrize("pkg_path", samus_returns_data.all_files_ending_with(".pkg"))
 def test_compare_sr(samus_returns_path, pkg_path):
     if pkg_path in wrong_build_sr:
         raw = samus_returns_path.joinpath(pkg_path).read_bytes()

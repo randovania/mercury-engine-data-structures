@@ -1,6 +1,7 @@
 import pytest
 from tests.test_lib import parse_build_compare_editor
 
+from mercury_engine_data_structures import samus_returns_data
 from mercury_engine_data_structures.formats.bmsld import Bmsld
 
 all_bmsld = [
@@ -30,9 +31,12 @@ all_bmsld = [
 def surface_bmsld(samus_returns_tree) -> Bmsld:
     return samus_returns_tree.get_parsed_asset(all_bmsld[0], type_hint=Bmsld)
 
-@pytest.mark.parametrize("bmsld_path", all_bmsld)
+@pytest.mark.parametrize("bmsld_path", samus_returns_data.all_files_ending_with(".bmsld"))
 def test_bmsld(samus_returns_tree, bmsld_path):
-    parse_build_compare_editor(Bmsld, samus_returns_tree, bmsld_path)
+    try:
+        parse_build_compare_editor(Bmsld, samus_returns_tree, bmsld_path)
+    except FileNotFoundError:
+        pytest.skip()
 
 def test_all_actor_groups(surface_bmsld: Bmsld):
     all_groups = surface_bmsld.all_actor_groups()

@@ -5,11 +5,8 @@ from tests.test_lib import parse_build_compare_editor
 from mercury_engine_data_structures import dread_data
 from mercury_engine_data_structures.formats.bsmat import Bsmat
 
-all_dread_bsmat = [name for name in dread_data.all_name_to_asset_id().keys()
-                   if name.endswith(".bsmat")]
 
-
-@pytest.mark.parametrize("bsmat_path", all_dread_bsmat)
+@pytest.mark.parametrize("bsmat_path", dread_data.all_files_ending_with(".bsmat"))
 def test_compare_dread_all(dread_file_tree, bsmat_path):
     parse_build_compare_editor(Bsmat, dread_file_tree, bsmat_path)
 

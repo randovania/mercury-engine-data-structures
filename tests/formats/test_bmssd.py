@@ -7,12 +7,6 @@ from mercury_engine_data_structures.formats.bmssd import Bmssd
 from mercury_engine_data_structures.game_check import Game
 
 
-dread_bmssd = [name for name in dread_data.all_name_to_asset_id().keys()
-                if name.endswith(".bmssd")]
-
-sr_bmssd = [name for name in samus_returns_data.all_name_to_asset_id().keys()
-             if name.endswith(".bmssd")]
-
 expected_sr_failures = [
     "maps/levels/c10_samus/s901_alpha/s901_alpha.bmssd",
     "maps/levels/c10_samus/s902_gamma/s902_gamma.bmssd",
@@ -29,11 +23,11 @@ expected_sr_failures = [
     "maps/levels/c10_samus/s920_traininggallery/s920_traininggallery.bmssd",
 ]
 
-@pytest.mark.parametrize("bmssd_path", dread_bmssd)
+@pytest.mark.parametrize("bmssd_path", dread_data.all_files_ending_with(".bmssd"))
 def test_compare_dread(dread_file_tree, bmssd_path):
     parse_build_compare_editor(Bmssd, dread_file_tree, bmssd_path)
 
-@pytest.mark.parametrize("bmssd_path", sr_bmssd)
+@pytest.mark.parametrize("bmssd_path", samus_returns_data.all_files_ending_with(".bmssd"))
 def test_compare_msr(samus_returns_tree, bmssd_path):
     if bmssd_path in expected_sr_failures:
         expectation = pytest.raises(FileNotFoundError)

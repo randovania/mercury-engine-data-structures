@@ -9,11 +9,6 @@ from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 from mercury_engine_data_structures.formats import dread_types
 from mercury_engine_data_structures.formats.bmsad import ActorDefFunc, Bmsad
 
-all_sr_bmsad = [name for name in samus_returns_data.all_name_to_asset_id().keys()
-                if name.endswith(".bmsad")]
-
-all_dread_bmsad = [name for name in dread_data.all_name_to_asset_id().keys()
-                   if name.endswith(".bmsad")]
 
 expected_dread_failures = {
     "actors/props/pf_mushr_fr/charclasses/pf_mushr_fr.bmsad",
@@ -21,7 +16,7 @@ expected_dread_failures = {
 expected_sr_failures = set()
 
 
-@pytest.mark.parametrize("bmsad_path", all_dread_bmsad)
+@pytest.mark.parametrize("bmsad_path", dread_data.all_files_ending_with(".bmsad"))
 def test_compare_dread_all(dread_file_tree, bmsad_path):
     if bmsad_path in expected_dread_failures:
         expectation = pytest.raises(construct.ConstructError)
@@ -34,7 +29,7 @@ def test_compare_dread_all(dread_file_tree, bmsad_path):
         )
 
 
-@pytest.mark.parametrize("bmsad_path", all_sr_bmsad)
+@pytest.mark.parametrize("bmsad_path", samus_returns_data.all_files_ending_with(".bmsad"))
 def test_compare_sr_all(samus_returns_tree, bmsad_path):
     if not samus_returns_tree.does_asset_exists(bmsad_path):
         return pytest.skip()

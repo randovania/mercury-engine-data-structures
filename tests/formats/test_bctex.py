@@ -12,10 +12,9 @@ def test_compare_dread(dread_path):
         print_data=True,
     )
 
-all_sr_bctex = [name for name in samus_returns_data.all_name_to_asset_id().keys()
-                   if name.endswith(".bctex")]
+#all_sr_bctex = samus_returns_data.all_files_ending_with(".bctex")
 
-@pytest.mark.parametrize("bctex_path", all_sr_bctex)
+@pytest.mark.parametrize("bctex_path", samus_returns_data.all_files_ending_with(".bctex"))
 def test_compare_sr(samus_returns_path, bctex_path):
     parse_and_build_compare_parsed(
         BCTEX_SR, Game.SAMUS_RETURNS, samus_returns_path.joinpath(bctex_path),
