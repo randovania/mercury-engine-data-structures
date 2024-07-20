@@ -35,7 +35,7 @@ def surface_bmsld(samus_returns_tree) -> Bmsld:
 def test_bmsld(samus_returns_tree, bmsld_path):
     if not samus_returns_tree.does_asset_exists(bmsld_path):
         pytest.skip(f"{bmsld_path} does not exist!")
-    
+
     parse_build_compare_editor(Bmsld, samus_returns_tree, bmsld_path)
 
 def test_all_actor_groups(surface_bmsld: Bmsld):

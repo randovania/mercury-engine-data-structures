@@ -63,5 +63,5 @@ def all_property_id_to_name() -> Dict[int, str]:
 def all_files_ending_with(ext: str) -> list[str]:
     if not ext.startswith("."):
         ext = "." + ext
-    
+
     return [name for name in all_name_to_asset_id().keys() if name.endswith(ext)]

@@ -3,7 +3,6 @@ from tests.test_lib import parse_build_compare_editor, parse_build_compare_edito
 
 from mercury_engine_data_structures import dread_data
 from mercury_engine_data_structures.formats.gui_files import Bmscp, Bmssk, Bmsss
-from mercury_engine_data_structures.game_check import Game
 
 
 @pytest.mark.parametrize("bmscp_path", dread_data.all_files_ending_with(".bmscp"))

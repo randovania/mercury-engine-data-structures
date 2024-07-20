@@ -23,13 +23,13 @@ from construct.lib.containers import Container, ListContainer
 
 from mercury_engine_data_structures import common_types, type_lib
 from mercury_engine_data_structures.common_types import (
-    Char, 
-    CVector3D, 
-    Float, 
-    StrId, 
-    make_dict, 
-    make_vector, 
-    VersionAdapter
+    Char,
+    CVector3D,
+    Float,
+    StrId,
+    VersionAdapter,
+    make_dict,
+    make_vector,
 )
 from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
 from mercury_engine_data_structures.construct_extensions.function_complex import ComplexIf, SwitchComplexKey

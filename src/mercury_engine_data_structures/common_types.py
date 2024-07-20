@@ -27,7 +27,7 @@ class VersionAdapter(Adapter):
         elif isinstance(value, int):
             value = struct.pack("<I", value)
             value  = struct.unpack("<HBB", value)
-        
+
         if value is None:
             subcon = construct.Struct(major=construct.Int16ul, minor=construct.Int8ul, patch=construct.Int8ul)
         else:
@@ -41,7 +41,7 @@ class VersionAdapter(Adapter):
 
     def _decode(self, obj, context, path):
         return f"{obj.major}.{obj.minor}.{obj.patch}"
-    
+
     def _encode(self, obj, context, path):
         lst = [int(i) for i in obj.split(".")]
         return {

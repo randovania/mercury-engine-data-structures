@@ -6,7 +6,6 @@ from mercury_engine_data_structures import dread_data, samus_returns_data
 from mercury_engine_data_structures.formats.pkg import Pkg
 from mercury_engine_data_structures.game_check import Game
 
-
 _EMPTY_DREAD_PKG = (b'\x08\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
 
 wrong_build_sr = [

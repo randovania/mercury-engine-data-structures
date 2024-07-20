@@ -17,7 +17,7 @@ from construct.core import (
     Switch,
 )
 
-from mercury_engine_data_structures.common_types import Char, CVector3D, DictAdapter, Float, make_vector, VersionAdapter
+from mercury_engine_data_structures.common_types import Char, CVector3D, DictAdapter, Float, VersionAdapter, make_vector
 from mercury_engine_data_structures.common_types import StrId as StrIdSR
 from mercury_engine_data_structures.construct_extensions.strings import PascalStringRobust
 from mercury_engine_data_structures.formats.base_resource import BaseResource

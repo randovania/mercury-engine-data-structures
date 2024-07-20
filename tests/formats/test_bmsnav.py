@@ -13,5 +13,5 @@ def test_dread_bmsnav(dread_file_tree, bmsnav_path):
 def test_sr_bmsnav(samus_returns_tree, bmsnav_path):
     if not samus_returns_tree.does_asset_exists(bmsnav_path):
         pytest.skip(f"{bmsnav_path} does not exist!")
-    
+
     parse_build_compare_editor(Bmsnav, samus_returns_tree, bmsnav_path)

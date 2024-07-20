@@ -3,7 +3,6 @@ from construct import Construct
 from construct.core import (
     Byte,
     Const,
-    Hex,
     Int32ul,
     LazyBound,
     PrefixedArray,

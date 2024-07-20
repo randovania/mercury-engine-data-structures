@@ -5,7 +5,6 @@ from construct.core import (
     Construct,
     Container,
     Flag,
-    Hex,
     Int32sl,
     Int32ul,
     LazyBound,

@@ -7,7 +7,6 @@ from construct.core import (
     Container,
     Enum,
     Flag,
-    Hex,
     Int32sl,
     Int32ul,
     PrefixedArray,
