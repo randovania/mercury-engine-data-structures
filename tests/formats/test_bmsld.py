@@ -25,11 +25,8 @@ sr_missing = [
 def surface_bmsld(samus_returns_tree) -> Bmsld:
     return samus_returns_tree.get_parsed_asset("maps/levels/c10_samus/s000_surface/s000_surface.bmsld", type_hint=Bmsld)
 
-@pytest.mark.parametrize("bmsld_path", samus_returns_data.all_files_ending_with(".bmsld"))
+@pytest.mark.parametrize("bmsld_path", samus_returns_data.all_files_ending_with(".bmsld", sr_missing))
 def test_bmsld(samus_returns_tree, bmsld_path):
-    if bmsld_path in sr_missing:
-        pytest.skip(f"{bmsld_path} does not exist!")
-
     parse_build_compare_editor(Bmsld, samus_returns_tree, bmsld_path)
 
 def test_all_actor_groups(surface_bmsld: Bmsld):

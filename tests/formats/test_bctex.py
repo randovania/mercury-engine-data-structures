@@ -5,7 +5,7 @@ from mercury_engine_data_structures import dread_data, samus_returns_data
 from mercury_engine_data_structures.formats.bctex import Bctex
 
 
-samus_returns_exclusions = [
+sr_missing = [
     "actors/characters/alpha/models/textures/alphab_a.bctex",
     "actors/characters/alpha/models/textures/alphab_d.bctex",
     "actors/characters/alphacredits/models/textures/alphab_a.bctex",
@@ -183,9 +183,6 @@ samus_returns_exclusions = [
 def test_compare_dread(dread_file_tree, bctex_path):
     parse_build_compare_editor_parsed(Bctex, dread_file_tree, bctex_path)
 
-@pytest.mark.parametrize("bctex_path", samus_returns_data.all_files_ending_with(".bctex"))
+@pytest.mark.parametrize("bctex_path", samus_returns_data.all_files_ending_with(".bctex", sr_missing))
 def test_compare_sr(samus_returns_tree, bctex_path):
-    if bctex_path in samus_returns_exclusions:
-        pytest.skip(f"{bctex_path} does not exist!")
-    
     parse_build_compare_editor_parsed(Bctex, samus_returns_tree, bctex_path)

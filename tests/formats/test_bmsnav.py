@@ -25,9 +25,6 @@ sr_missing = [
 def test_dread_bmsnav(dread_file_tree, bmsnav_path):
     parse_build_compare_editor(Bmsnav, dread_file_tree, bmsnav_path)
 
-@pytest.mark.parametrize("bmsnav_path", samus_returns_data.all_files_ending_with(".bmsnav"))
+@pytest.mark.parametrize("bmsnav_path", samus_returns_data.all_files_ending_with(".bmsnav", sr_missing))
 def test_sr_bmsnav(samus_returns_tree, bmsnav_path):
-    if bmsnav_path in sr_missing:
-        pytest.skip(f"{bmsnav_path} does not exist!")
-
     parse_build_compare_editor(Bmsnav, samus_returns_tree, bmsnav_path)

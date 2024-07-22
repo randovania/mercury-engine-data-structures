@@ -367,11 +367,8 @@ def test_compare_dread_all(dread_file_tree, bmsad_path):
         )
 
 
-@pytest.mark.parametrize("bmsad_path", samus_returns_data.all_files_ending_with(".bmsad"))
+@pytest.mark.parametrize("bmsad_path", samus_returns_data.all_files_ending_with(".bmsad", sr_missing))
 def test_compare_sr_all(samus_returns_tree, bmsad_path):
-    if bmsad_path in sr_missing:
-        pytest.skip(f"{bmsad_path} does not exist!")
-
     parse_build_compare_editor(Bmsad, samus_returns_tree, bmsad_path)
 
 

@@ -12,9 +12,6 @@ sr_missing = [
     "maps/levels/c10_samus/s920_traininggallery/s920_traininggallery.bmsbk",
 ]
 
-@pytest.mark.parametrize("bmsbk_path", samus_returns_data.all_files_ending_with(".bmsbk"))
+@pytest.mark.parametrize("bmsbk_path", samus_returns_data.all_files_ending_with(".bmsbk", sr_missing))
 def test_bmsbk(samus_returns_tree, bmsbk_path):
-    if bmsbk_path in sr_missing:
-        pytest.skip(f"{bmsbk_path} does not exist!")
-
     parse_build_compare_editor(Bmsbk, samus_returns_tree, bmsbk_path)
