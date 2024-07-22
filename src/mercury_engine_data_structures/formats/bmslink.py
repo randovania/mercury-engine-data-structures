@@ -3,14 +3,13 @@ from construct import Construct
 from construct.core import (
     Byte,
     Const,
-    Hex,
     Int32ul,
     LazyBound,
     PrefixedArray,
     Struct,
 )
 
-from mercury_engine_data_structures.common_types import Float, StrId
+from mercury_engine_data_structures.common_types import Float, StrId, VersionAdapter
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
@@ -54,7 +53,7 @@ LocationStruct = Struct(
 
 BMSLINK = Struct(
     _magic = Const(b"LINK"),
-    version = Const(0x001F0001, Hex(Int32ul)),
+    version = VersionAdapter("1.31.0"),
 
     unk_bool = Byte,
     location = LocationStruct,

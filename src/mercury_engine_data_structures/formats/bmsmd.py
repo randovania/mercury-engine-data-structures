@@ -11,13 +11,13 @@ from construct.core import (
     Struct,
 )
 
-from mercury_engine_data_structures.common_types import StrId, make_vector
+from mercury_engine_data_structures.common_types import StrId, VersionAdapter, make_vector
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 BMSMD = Struct(
     "_magic" / Const(b"MSMD"),
-    "version" / Const(0x000D0001, Hex(Int32ul)),
+    "version" / VersionAdapter("1.13.0"),
     "map_data" / make_vector(Struct(
         "icon" / StrId,
         "scenarios" / make_vector(Struct(

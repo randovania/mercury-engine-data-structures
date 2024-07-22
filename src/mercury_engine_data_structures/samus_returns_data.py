@@ -59,3 +59,13 @@ def all_property_id_to_name() -> Dict[int, str]:
         asset_id: name
         for name, asset_id in names.items()
     }
+
+def all_files_ending_with(ext: str, exclusions: Optional[list[str]] = None) -> list[str]:
+    if not ext.startswith("."):
+        ext = "." + ext
+
+    if exclusions is None:
+        exclusions = []
+
+    return [name for name in all_name_to_asset_id().keys()
+            if name.endswith(ext) and name not in exclusions]

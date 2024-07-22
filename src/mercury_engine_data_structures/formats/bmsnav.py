@@ -1,6 +1,6 @@
 from construct.core import Array, Byte, Const, Construct, Flag, Hex, Int32ul, PrefixedArray, Struct, Terminated
 
-from mercury_engine_data_structures.common_types import CVector2D, CVector3D, Float, StrId, make_dict
+from mercury_engine_data_structures.common_types import CVector2D, CVector3D, Float, StrId, VersionAdapter, make_dict
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
@@ -162,7 +162,7 @@ BMSNAV_SR = Struct(
 )
 BMSNAV = Struct(
     _magic=Const(b'MNAV'),
-    version=Const(0x00030002, Hex(Int32ul)),
+    version=VersionAdapter("2.3.0"),
     aNavmeshGeos=PrefixedArray(Int32ul, CVector2D),
     # giant list of all of the navmesh geos in the scenario. referenced by index all over the rest of the format.
     geo_connections=PrefixedArray(Int32ul, geo_connections),  # maybe mapping the geo connections?

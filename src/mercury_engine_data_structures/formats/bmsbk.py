@@ -7,14 +7,13 @@ from construct import (
     Container,
     Flag,
     Float32l,
-    Hex,
     Int32ul,
     Rebuild,
     Struct,
     Terminated,
 )
 
-from mercury_engine_data_structures.common_types import CVector3D, StrId, make_vector
+from mercury_engine_data_structures.common_types import CVector3D, StrId, VersionAdapter, make_vector
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
@@ -45,7 +44,7 @@ BlockGroup = Struct(
 
 BMSBK = Struct(
     "magic" / Const(b"MSBK"),
-    "version" / Hex(Int32ul),
+    "version" / VersionAdapter(),
     "block_groups" / make_vector(BlockGroup),
     "collision_cameras" / make_vector(Struct(
         "name" / StrId,

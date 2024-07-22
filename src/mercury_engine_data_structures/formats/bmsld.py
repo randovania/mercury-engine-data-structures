@@ -4,7 +4,7 @@ from typing import Iterator, Tuple
 import construct
 from construct import Const, Construct, Container, Flag, Float32l, Hex, Int32ul, Struct, Switch
 
-from mercury_engine_data_structures.common_types import CVector3D, Float, StrId, make_dict, make_vector
+from mercury_engine_data_structures.common_types import CVector3D, Float, StrId, VersionAdapter, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.construct_extensions.strings import StaticPaddedString
 from mercury_engine_data_structures.crc import crc32
@@ -81,7 +81,7 @@ CollisionObject = Struct(
 
 BMSLD = Struct(
     _magic=Const(b"MSLD"),
-    version=Const(0x00140001, Hex(Int32ul)),
+    version=VersionAdapter("1.20.0"),
 
     unk1=Int32ul,
     unk2=Int32ul,

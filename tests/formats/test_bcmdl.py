@@ -6,9 +6,6 @@ from tests.test_lib import parse_build_compare_editor
 from mercury_engine_data_structures import dread_data
 from mercury_engine_data_structures.formats.bcmdl import Bcmdl
 
-all_dread_bcmdl = [name for name in dread_data.all_name_to_asset_id().keys()
-                   if name.endswith(".bcmdl")]
-
 dread_bcmdl_expected_failure = [
     'actors/characters/morphball/models/labase.bcmdl',
     'actors/characters/morphball/models/ladamage.bcmdl',
@@ -27,7 +24,7 @@ dread_bcmdl_expected_failure = [
 ]
 
 
-@pytest.mark.parametrize("bcmdl_path", all_dread_bcmdl)
+@pytest.mark.parametrize("bcmdl_path", dread_data.all_files_ending_with(".bcmdl"))
 def test_compare_dread_all(dread_file_tree, bcmdl_path):
     if bcmdl_path in dread_bcmdl_expected_failure:
         expectation = pytest.raises(AssertionError)

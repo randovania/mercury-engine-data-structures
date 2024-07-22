@@ -5,7 +5,6 @@ from construct.core import (
     Construct,
     Container,
     Flag,
-    Hex,
     Int32sl,
     Int32ul,
     LazyBound,
@@ -14,7 +13,7 @@ from construct.core import (
     Switch,
 )
 
-from mercury_engine_data_structures.common_types import Float, StrId
+from mercury_engine_data_structures.common_types import Float, StrId, VersionAdapter
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
@@ -56,7 +55,7 @@ Behavior = Struct(
 
 BMTRE = Struct(
     _magic = Const(b"BTRE"),
-    version = Const(0x00050001, Hex(Int32ul)), # for dread, unsure if it exists in SR
+    version = VersionAdapter("1.5.0"),
     args = PrefixedArray(Int32ul, StrKeyArgument),
     behavior = Behavior,
 )

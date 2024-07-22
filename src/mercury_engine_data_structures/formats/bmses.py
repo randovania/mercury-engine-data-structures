@@ -5,19 +5,17 @@ from construct.core import (
     Const,
     Construct,
     Float32l,
-    Hex,
     Int32sl,
-    Int32ul,
     Struct,
 )
 
-from mercury_engine_data_structures.common_types import StrId, make_vector
+from mercury_engine_data_structures.common_types import StrId, VersionAdapter, make_vector
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 BMSES = Struct(
     "_magic" / Const(b"MSES"),
-    "version" / Const(0x00050001, Hex(Int32ul)),
+    "version" / VersionAdapter("1.5.0"),
     "sounds" / make_vector(Struct(
         "name" / StrId,
         "sound_file" / StrId,
