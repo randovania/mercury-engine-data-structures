@@ -4,7 +4,6 @@ from tests.test_lib import parse_build_compare_editor_parsed
 from mercury_engine_data_structures import dread_data, samus_returns_data
 from mercury_engine_data_structures.formats.bctex import Bctex
 
-
 sr_missing = [
     "actors/characters/alpha/models/textures/alphab_a.bctex",
     "actors/characters/alpha/models/textures/alphab_d.bctex",

@@ -65,6 +65,6 @@ def all_files_ending_with(ext: str, exclusions: Optional[list[str]] = None) -> l
 
     if exclusions is None:
         exclusions = []
-        
+
     return [name for name in all_name_to_asset_id().keys()
             if name.endswith(ext) and name not in exclusions]

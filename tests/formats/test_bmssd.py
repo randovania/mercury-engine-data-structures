@@ -4,7 +4,6 @@ from tests.test_lib import parse_build_compare_editor
 from mercury_engine_data_structures import dread_data, samus_returns_data
 from mercury_engine_data_structures.formats.bmssd import Bmssd
 
-
 sr_missing = [
     "maps/levels/c10_samus/s901_alpha/s901_alpha.bmssd",
     "maps/levels/c10_samus/s902_gamma/s902_gamma.bmssd",

@@ -4,7 +4,6 @@ from tests.test_lib import parse_build_compare_editor
 from mercury_engine_data_structures import samus_returns_data
 from mercury_engine_data_structures.formats.bmsbk import Bmsbk
 
-
 sr_missing = [
     "maps/levels/c10_samus/s908_manicminerbotrun/s908_manicminerbotrun.bmsbk",
     "maps/levels/c10_samus/s910_gym/s910_gym.bmsbk",
