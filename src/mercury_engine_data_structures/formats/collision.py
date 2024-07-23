@@ -49,6 +49,11 @@ collision_formats = {
         value4=Float,
         value5=Float,
     ),
+    "OBOX2D": Struct(
+        position=CVector3D,
+        angle=Float,
+        size=CVector2D,
+    ),
     "POLYCOLLECTION2D": Struct(
         position=CVector3D,
         polys=make_vector(CollisionPoly),
