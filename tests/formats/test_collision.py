@@ -42,10 +42,10 @@ sr_missing_cd = [
     "maps/levels/c10_samus/s920_traininggallery/s920_traininggallery.bmscd"
 ]
 
-@pytest.mark.parametrize("bctex_path", dread_data.all_files_ending_with(".bmscc")
+@pytest.mark.parametrize("file_path", dread_data.all_files_ending_with(".bmscc")
                          + dread_data.all_files_ending_with(".bmscd"))
-def test_compare_dread(dread_file_tree, bctex_path):
-    parse_build_compare_editor_parsed(Bmscc, dread_file_tree, bctex_path)
+def test_compare_dread(dread_file_tree, file_path):
+    parse_build_compare_editor_parsed(Bmscc, dread_file_tree, file_path)
 
 @pytest.mark.parametrize("file_path", samus_returns_data.all_files_ending_with(".bmscc", sr_missing_cc)
                          + samus_returns_data.all_files_ending_with(".bmscd", sr_missing_cd))
