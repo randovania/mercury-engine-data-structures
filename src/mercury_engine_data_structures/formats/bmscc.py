@@ -46,7 +46,7 @@ BMSCC = Struct(
     _magic=Const(b"MSCD"),
     _version=IfThenElse(
         game_check.current_game_at_most(Game.SAMUS_RETURNS),
-        VersionAdapter("1.14.0"),
+        VersionAdapter("1.13.0"),
         VersionAdapter("1.16.0"),
     ),
     layers=make_vector(CollisionLayer),
