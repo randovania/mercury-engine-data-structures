@@ -2,7 +2,6 @@
 import construct
 from construct.core import (
     Array,
-    Check,
     Computed,
     Const,
     Construct,
@@ -13,6 +12,7 @@ from construct.core import (
     Int8ul,
     Int16ul,
     Int32ul,
+    ListContainer,
     Pointer,
     Rebuild,
     Struct,
@@ -20,7 +20,7 @@ from construct.core import (
     this,
 )
 
-from mercury_engine_data_structures.common_types import Float
+from mercury_engine_data_structures.common_types import Float, VersionAdapter
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.property_enum import PropertyEnumDoubleUnsafe
@@ -30,24 +30,57 @@ from mercury_engine_data_structures.game_check import Game
 def _rebuild_flags(ctx):
     flags = 0
     for i, val in enumerate(ctx.data):
-        if isinstance(val, Container):
+        if isinstance(val, ListContainer):
             flags += 2 ** i
     return flags
 
 def _update_next_kfv(ctx):
     ctx._._._._next_kfv_offset = ctx._new_eof
 
-KeyFramedValues_Dread = Struct(
-    timing_type=Int16ul,
-    count=Rebuild(Int16ul, construct.len_(this.timings)),
-    timings=IfThenElse(
-        construct.this.timing_type == 0,
-        Array(construct.this.count, Int16ul),
-        Array(construct.this.count, Int8ul)
-    ),
-    _padding=AlignTo(4, b"\xff"),
-    values=Array(construct.this.count, Struct(value=Float, derivative=Float)),
-    _integrity_check=Check(construct.len_(this.values) == construct.len_(this.timings)),
+class DreadKFVAdapter(construct.Adapter):
+    SUBCON = Struct(
+        timing_type = Int16ul,
+        count = Int16ul,
+        timings = IfThenElse(
+            this.timing_type == 0,
+            Int16ul[this.count],
+            Int8ul[this.count]
+        ),
+        _padding=AlignTo(4, b"\xFF"),
+        values = Array(this.count, Struct(value=Float, derivative=Float)),
+    )
+
+    def __init__(self):
+        super().__init__(self.SUBCON)
+
+    def _decode(self, obj, context, path):
+        res = ListContainer()
+        for i in range(obj.count):
+            res.append(
+                Container(
+                    time = obj.timings[i],
+                    value = obj["values"][i].value,
+                    derivative = obj["values"][i].derivative,
+                )
+            )
+
+        return res
+
+    def _encode(self, obj, context, path):
+        res = Container(
+            timing_type = 0 if obj[-1].time > 0xFF else 8,
+            count = len(obj),
+            timings = ListContainer([v.time for v in obj]),
+            values = ListContainer([Container(value=v.value, derivative=v.derivative) for v in obj])
+        )
+
+        return res
+
+
+
+KeyFramedValues_Dread = FocusedSeq(
+    "data",
+    data = DreadKFVAdapter(),
     _new_eof=Tell,
     _new_kfv=Computed(_update_next_kfv)
 )
@@ -106,7 +139,7 @@ BoneTrack_SR = Struct(
 
 BCSKLA_DREAD = Struct(
     _magic = Const(b"MANM"),
-    ver=Const(0x000A0001, Int32ul),
+    ver=VersionAdapter("1.10.0"),
     unk=Int32ul, # seems to be 0 or 1, possibly determines if anim is looping?
     frame_count=Float,
     track_count=Rebuild(Int32ul, construct.len_(this.tracks)),
@@ -117,7 +150,7 @@ BCSKLA_DREAD = Struct(
 
 BCSKLA_SR = Struct(
     _magic = Const(b"MANM"),
-    ver = Const(0x00060001, Int32ul),
+    ver = VersionAdapter("1.6.0"),
     unk = Int32ul,
     frame_count=Float,
     track_count=Rebuild(Int32ul, construct.len_(this.tracks)),
