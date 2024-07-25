@@ -69,7 +69,7 @@ class Btunda(BaseResource):
     - any key containing EasyMode in Player|CTunablePlayerLifeComponent\n
     - anything in CTunableBossRushManager
 
-    use Btunda.safe_modify_tunable(...) to change tunables safely.
+    use Btunda.set_tunable(...) to change tunables safely.
     """
 
     @classmethod
