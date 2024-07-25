@@ -1,6 +1,8 @@
+from enum import Enum
 
 import construct
 from construct.core import (
+    Adapter,
     Array,
     Computed,
     Const,
@@ -20,6 +22,7 @@ from construct.core import (
     this,
 )
 
+from mercury_engine_data_structures.adapters.enum_adapter import EnumAdapter
 from mercury_engine_data_structures.common_types import Float, VersionAdapter
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
 from mercury_engine_data_structures.formats.base_resource import BaseResource
@@ -27,22 +30,15 @@ from mercury_engine_data_structures.formats.property_enum import PropertyEnumDou
 from mercury_engine_data_structures.game_check import Game
 
 
-def _rebuild_flags(ctx):
-    flags = 0
-    for i, val in enumerate(ctx.data):
-        if isinstance(val, ListContainer):
-            flags += 2 ** i
-    return flags
-
-def _update_next_kfv(ctx):
-    ctx._._._._next_kfv_offset = ctx._new_eof
-
-class DreadKFVAdapter(construct.Adapter):
+class TimingTypeEnum(Enum):
+    ONE_BYTE = 8
+    TWO_BYTE = 0
+class DreadKFVAdapter(Adapter):
     SUBCON = Struct(
-        timing_type = Int16ul,
+        timing_type = EnumAdapter(TimingTypeEnum, Int16ul),
         count = Int16ul,
         timings = IfThenElse(
-            this.timing_type == 0,
+            this.timing_type == TimingTypeEnum.TWO_BYTE,
             Int16ul[this.count],
             Int8ul[this.count]
         ),
@@ -68,7 +64,7 @@ class DreadKFVAdapter(construct.Adapter):
 
     def _encode(self, obj, context, path):
         res = Container(
-            timing_type = 0 if obj[-1].time > 0xFF else 8,
+            timing_type = TimingTypeEnum.TWO_BYTE if obj[-1].time > 0xFF else TimingTypeEnum.ONE_BYTE,
             count = len(obj),
             timings = ListContainer([v.time for v in obj]),
             values = ListContainer([Container(value=v.value, derivative=v.derivative) for v in obj])
@@ -76,7 +72,8 @@ class DreadKFVAdapter(construct.Adapter):
 
         return res
 
-
+def _update_next_kfv(ctx):
+    ctx._._._._next_kfv_offset = ctx._new_eof
 
 KeyFramedValues_Dread = FocusedSeq(
     "data",
@@ -105,7 +102,51 @@ KeyFramedValues_SR = Struct(
 
 )
 
-BoneTrack_Dread = Struct(
+def _rebuild_flags(ctx):
+    flags = 0
+    for i, val in enumerate(ctx.data):
+        if isinstance(val, ListContainer):
+            flags += 2 ** i
+    return flags
+
+class TrackDataAdapter(Adapter):
+    def _decode(self, obj, context, path):
+        return Container(
+            bone_name=obj.bone_name,
+            position=Container(
+                x=obj.data[0],
+                y=obj.data[1],
+                z=obj.data[2]
+            ),
+            rotation=Container(
+                x=obj.data[3],
+                y=obj.data[4],
+                z=obj.data[5]
+            ),
+            scale=Container(
+                x=obj.data[6],
+                y=obj.data[7],
+                z=obj.data[8]
+            )
+        )
+
+    def _encode(self, obj, context, path):
+        return Container(
+            bone_name=obj.bone_name,
+            data=ListContainer([
+                obj.position.x,
+                obj.position.y,
+                obj.position.z,
+                obj.rotation.x,
+                obj.rotation.y,
+                obj.rotation.z,
+                obj.scale.x,
+                obj.scale.y,
+                obj.scale.z
+            ])
+        )
+
+BoneTrack_Dread = TrackDataAdapter(Struct(
     # guess. almost always the bone names but some values still don't parse after dumping all model data >:(
     bone_name=PropertyEnumDoubleUnsafe,
     flags=Rebuild(Int32ul, _rebuild_flags),
@@ -121,10 +162,10 @@ BoneTrack_Dread = Struct(
             kfv = Pointer(this.off + this._._offset, KeyFramedValues_Dread)
         )
     ))
-)
+))
 
-BoneTrack_SR = Struct(
-    bone_hash=Int32ul, # TODO have a property CrcAdapter for sr lmao
+BoneTrack_SR = TrackDataAdapter(Struct(
+    bone_name=PropertyEnumDoubleUnsafe,
     data=Array(9, FocusedSeq(
         "kfv",
         off = Rebuild(Int32ul, lambda ctx: 0 if isinstance(ctx.kfv, float) else ctx._._._next_kfv_offset),
@@ -135,7 +176,7 @@ BoneTrack_SR = Struct(
             IfThenElse(lambda ctx: ctx._index < 6, Computed(0.0), Computed(1.0))
         )
     ))
-)
+))
 
 BCSKLA_DREAD = Struct(
     _magic = Const(b"MANM"),
