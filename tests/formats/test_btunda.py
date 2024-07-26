@@ -15,9 +15,10 @@ def test_btunda_get_tunable(dread_file_tree):
 def test_btunda_set_tunable(dread_file_tree):
     btunda = dread_file_tree.get_parsed_asset(BTUNDA_PATH, type_hint=Btunda)
 
-    btunda.set_tunable(["SubAreaManager|CTunableSubAreaManager", "bKillPlayerOutsideScenario"], False)
-
-    assert btunda.raw.Root.hashTunables["SubAreaManager|CTunableSubAreaManager"]["bKillPlayerOutsideScenario"] is False
+    tunable_path = ["SubAreaManager|CTunableSubAreaManager", "bKillPlayerOutsideScenario"]
+    assert btunda.get_tunable(tunable_path) is True
+    btunda.set_tunable(tunable_path, False)
+    assert btunda.get_tunable(tunable_path) is False
 
 def test_btunda_invalid_tunable(dread_file_tree):
     btunda = dread_file_tree.get_parsed_asset(BTUNDA_PATH, type_hint=Btunda)
