@@ -7,6 +7,7 @@ from mercury_engine_data_structures.formats.bcskla import Bcskla
 from mercury_engine_data_structures.formats.bctex import Bctex
 from mercury_engine_data_structures.formats.bldef import Bldef
 from mercury_engine_data_structures.formats.blsnd import Blsnd
+from mercury_engine_data_structures.formats.blut import Blut
 from mercury_engine_data_structures.formats.bmbls import Bmbls
 from mercury_engine_data_structures.formats.bmdefs import Bmdefs
 from mercury_engine_data_structures.formats.bmmap import Bmmap
@@ -48,6 +49,7 @@ ALL_FORMATS = {
     "BCTEX": Bctex,
     "BLDEF": Bldef,
     "BLSND": Blsnd,
+    "BLUT": Blut,
     "BMBLS": Bmbls,
     "BMMAP": Bmmap,
     "BMMDEF": Bmmdef,
