@@ -64,7 +64,7 @@ Construct type definitions for Mercury Engine
 | BSHDAT    | &cross;              | &cross;               | &cross;      | &cross;       |
 | BSMAT     | Missing              | Missing               | &check;      | &check;       |
 | BTUNDA    | Missing              | Missing               | &check;      | &check;       |
-| BUCT      | &cross;              | &cross;               | &cross;      | &cross;       |
+| BUCT      | &check;              | &check;               | &check;      | &check;       |
 | INI       | Missing              | Missing               | &check;      | &check;       |
 | LC        | &check;              | &check;               | &check;      | &check;       |
 | PKG       | &check;              | &check;               | &check;      | &check;       |
