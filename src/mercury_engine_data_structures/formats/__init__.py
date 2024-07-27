@@ -32,6 +32,7 @@ from mercury_engine_data_structures.formats.bmtre import Bmtre
 from mercury_engine_data_structures.formats.bmtun import Bmtun
 from mercury_engine_data_structures.formats.bnvib import Bnvib
 from mercury_engine_data_structures.formats.bpsi import Bpsi
+from mercury_engine_data_structures.formats.bptdat import Bptdat, Bptdef
 from mercury_engine_data_structures.formats.brem import Brem
 from mercury_engine_data_structures.formats.bres import Bres
 from mercury_engine_data_structures.formats.brev import Brev
@@ -83,6 +84,8 @@ ALL_FORMATS = {
     "BMSLINK": Bmslink,
     "BMSMD": Bmsmd,
     "BPSI": Bpsi,
+    "BPTDAT": Bptdat,
+    "BPTDEF": Bptdef,
     "BMTRE": Bmtre,
     "BNVIB": Bnvib,
     "BRSA": Brsa,
