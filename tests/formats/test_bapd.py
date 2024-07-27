@@ -6,5 +6,5 @@ from mercury_engine_data_structures.formats.bapd import Bapd
 
 
 @pytest.mark.parametrize("bapd_path", dread_data.all_files_ending_with(".bapd"))
-def test_bmtre(dread_file_tree, bapd_path):
+def test_bapd(dread_file_tree, bapd_path):
     parse_build_compare_editor(Bapd, dread_file_tree, bapd_path)

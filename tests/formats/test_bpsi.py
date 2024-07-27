@@ -6,9 +6,9 @@ from mercury_engine_data_structures.formats.bpsi import Bpsi
 
 
 @pytest.mark.parametrize("bpsi_path", dread_data.all_files_ending_with(".bpsi"))
-def test_bmtre_dread(dread_file_tree, bpsi_path):
+def test_bpsi_dread(dread_file_tree, bpsi_path):
     parse_build_compare_editor(Bpsi, dread_file_tree, bpsi_path)
 
 @pytest.mark.parametrize("bpsi_path", samus_returns_data.all_files_ending_with(".bpsi"))
-def test_bmtre_sr(dread_file_tree, bpsi_path):
+def test_bpsi_sr(dread_file_tree, bpsi_path):
     parse_build_compare_editor(Bpsi, dread_file_tree, bpsi_path)
