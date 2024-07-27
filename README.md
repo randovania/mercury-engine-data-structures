@@ -52,7 +52,7 @@ Construct type definitions for Mercury Engine
 | BMTRE     | &cross;              | &cross;               | &check;      | &check;       |
 | BMTUN     | &check;              | &check;               | Missing      | Missing       |
 | BNVIB     | Missing              | Missing               | &check;      | &check;       |
-| BPSI      | &cross;              | &cross;               | &cross;      | &cross;       |
+| BPSI      | &check;              | &check;               | &check;      | &check;       |
 | BPTDAT    | Missing              | Missing               | &cross;      | &cross;       |
 | BPTDEF    | Missing              | Missing               | &cross;      | &cross;       |
 | BREM      | Missing              | Missing               | &check;      | &check;       |
