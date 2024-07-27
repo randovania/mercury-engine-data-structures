@@ -60,7 +60,7 @@ Construct type definitions for Mercury Engine
 | BREV      | Missing              | Missing               | &check;      | &check;       |
 | BRFLD     | Missing              | Missing               | &check;      | &check;       |
 | BRSA      | Missing              | Missing               | &check;      | &check;       |
-| BRSPD     | Missing              | Missing               | &cross;      | &cross;       |
+| BRSPD     | Missing              | Missing               | &check;      | &check;       |
 | BSHDAT    | &cross;              | &cross;               | &cross;      | &cross;       |
 | BSMAT     | Missing              | Missing               | &check;      | &check;       |
 | BTUNDA    | Missing              | Missing               | &check;      | &check;       |
