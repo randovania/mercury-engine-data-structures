@@ -16,7 +16,7 @@ from mercury_engine_data_structures.adapters.enum_adapter import EnumAdapter
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
-# standard switch format. https://switchbrew.org/wiki/BNVIB#Normal_Vibration
+# Standard switch format. https://switchbrew.org/wiki/BNVIB#Normal_Vibration
 
 class VibrationType(Enum):
     NORMAL = 4
