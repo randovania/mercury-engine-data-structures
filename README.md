@@ -27,7 +27,7 @@ Construct type definitions for Mercury Engine
 | BMMDEF    | Missing              | Missing               | &check;      | &check;       |
 | BMSAD     | &check;              | &check;               | &check;      | &check;       |
 | BMSAS     | Missing              | Missing               | &check;      | &check;       |
-| BMSAT     | &cross;              | &cross;               | &cross;      | &cross;       |
+| BMSAT     | &cross;              | &cross;               | &check;      | &check;       |
 | BMSBK     | &check;              | &check;               | Missing      | Missing       |
 | BMSCC     | &check;              | &check;               | &check;      | &check;       |
 | BMSCD     | &check;              | &check;               | &check;      | &check;       |
