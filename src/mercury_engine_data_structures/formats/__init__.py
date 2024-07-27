@@ -37,6 +37,7 @@ from mercury_engine_data_structures.formats.bres import Bres
 from mercury_engine_data_structures.formats.brev import Brev
 from mercury_engine_data_structures.formats.brfld import Brfld
 from mercury_engine_data_structures.formats.brsa import Brsa
+from mercury_engine_data_structures.formats.brspd import Brspd
 from mercury_engine_data_structures.formats.bsmat import Bsmat
 from mercury_engine_data_structures.formats.gui_files import Bmscp, Bmssh, Bmssk, Bmsss
 from mercury_engine_data_structures.formats.ini import Ini
@@ -85,6 +86,7 @@ ALL_FORMATS = {
     "BMTRE": Bmtre,
     "BNVIB": Bnvib,
     "BRSA": Brsa,
+    "BRSPD": Brspd,
     "BREM": Brem,
     "BRES": Bres,
     "BREV": Brev,
