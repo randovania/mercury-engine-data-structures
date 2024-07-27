@@ -14,6 +14,7 @@ from mercury_engine_data_structures.formats.bmmap import Bmmap
 from mercury_engine_data_structures.formats.bmmdef import Bmmdef
 from mercury_engine_data_structures.formats.bmsad import Bmsad
 from mercury_engine_data_structures.formats.bmsas import Bmsas
+from mercury_engine_data_structures.formats.bmsat import Bmsat
 from mercury_engine_data_structures.formats.bmsbk import Bmsbk
 from mercury_engine_data_structures.formats.bmscc import Bmscc
 from mercury_engine_data_structures.formats.bmscu import Bmscu
@@ -34,7 +35,7 @@ from mercury_engine_data_structures.formats.brev import Brev
 from mercury_engine_data_structures.formats.brfld import Brfld
 from mercury_engine_data_structures.formats.brsa import Brsa
 from mercury_engine_data_structures.formats.bsmat import Bsmat
-from mercury_engine_data_structures.formats.gui_files import Bmscp, Bmssk, Bmsss
+from mercury_engine_data_structures.formats.gui_files import Bmscp, Bmssh, Bmssk, Bmsss
 from mercury_engine_data_structures.formats.ini import Ini
 from mercury_engine_data_structures.formats.lua import Lua
 from mercury_engine_data_structures.formats.pkg import Pkg
@@ -56,10 +57,12 @@ ALL_FORMATS = {
     "BMSBK": Bmsbk,
     "BMSCP": Bmscp,
     "BMSSD": Bmssd,
+    "BMSSH": Bmssh,
     "BMSSK": Bmssk,
     "BMSSS": Bmsss,
     "BMSAD": Bmsad,
     "BMSAS": Bmsas,
+    "BMSAT": Bmsat,
     "BMSES": Bmses,
     "BMTUN": Bmtun,
     "BRFLD": Brfld,
