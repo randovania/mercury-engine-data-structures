@@ -15,7 +15,8 @@ if typing.TYPE_CHECKING:
 
 LUA = construct.Struct(
     lua_text = StrId,
-)
+    _eof = construct.Terminated,
+).compile()
 
 
 class Lua(BaseResource):

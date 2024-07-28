@@ -11,49 +11,49 @@ geo_connection = Struct(
     initial_direction=Int32ul,  # 0-4, up-right-down-left typically. i.e. geo(0.0, 0.0).direction(1) = geo(100.0, 0.0)
     destination_geo=Int32ul,
     destination_direction=Int32ul  # see initial_direction
-)
+).compile()
 
 # a list of connections for a geo (essentially, the allowed directions of travel)
 geo_connections = Struct(
     directions=PrefixedArray(Int32ul, Int32ul),
     connections=PrefixedArray(Int32ul, geo_connection),
-)
+).compile()
 
 geo_connections_sr = Struct(
     unk0=Byte,
     unk1=Byte,
     unk2=Byte, # 0?
     gcs = geo_connections
-)
+).compile()
 
 # idk
 Struct1 = Struct(
     unk0=Int32ul,
     unk1=CVector2D,
     unk2=CVector2D
-)
+).compile()
 
 # special paths entities can take that ignore default connections (i.e. chozo robot jumps or wall-traveling enemies).
 # emmi's are in a separate structure.
 # hard-coded to specific entity's sName
 NavigablePath = Struct(
     path=PrefixedArray(Int32ul, Int32ul)
-)
+).compile()
 
 EZ_Element = Struct(
     el=Int32ul,
     unk1=PrefixedArray(Int32ul, Int32ul)
-)
+).compile()
 
 EmmyZone_inner = Struct(
     elements=PrefixedArray(Int32ul, EZ_Element)
-)
+).compile()
 
 # reference to an "LS_EmmyZone" typically
 EmmyZone = Struct(
     elements=Int32ul,
     el1=EmmyZone_inner,
-)
+).compile()
 
 # a specific traversal (ie "emmi can swing across this gap")
 Traversal = Struct(
@@ -75,41 +75,41 @@ Traversal = Struct(
     unk21=Flag,
     unk22=Flag,
     unk23=Float,
-)
+).compile()
 
 # another prefixed array with an unknown parameter. I think maybe this is done based on the area/room the emmy is in?
 EmmyAreaTraversal = Struct(
     actions=PrefixedArray(Int32ul, Traversal)
-)
+).compile()
 
 # emmy-specific traversal (ie where they can hop up on ceilings).
 # includes a bmslink reference and refers to specific actions.
 EmmyTraversals = Struct(
     bmslink=StrId,
     traversals=make_dict(EmmyAreaTraversal, Int32ul)
-)
+).compile()
 
 PAction = Struct(
     unk0=Int32ul,
     action=Traversal
-)
+).compile()
 
 PropActions = Struct(
     name=StrId,
     bmslink=StrId,
     actions=PrefixedArray(Int32ul, PAction)
-)
+).compile()
 
 # actions around certain props like buttons
 Prop = Struct(
     actions=PrefixedArray(Int32ul, PrefixedArray(Int32ul, PropActions))
-)
+).compile()
 
 # a parameter for actor. seems to be sublayers of the navmesh.
 Actor_unk1_param = Struct(
     sName=StrId,
     unk=Int32ul
-)
+).compile()
 
 # info on an actor
 Actor = Struct(
@@ -121,12 +121,12 @@ Actor = Struct(
     unk4=Byte,
     coordinates=CVector2D,
     geos=PrefixedArray(Int32ul, Int32ul),
-)
+).compile()
 
 IntIntStruct = Struct(
     unk1=Int32ul,
     unk2=Int32ul,
-)
+).compile()
 
 Struct3 = Struct(
     unk1=Int32ul,
@@ -134,12 +134,12 @@ Struct3 = Struct(
     unk3=Int32ul,
     pos=CVector2D,
     unk4=PrefixedArray(Int32ul, IntIntStruct),  # seems to be a geo and an enum
-)
+).compile()
 
 Struct2 = Struct(
     unk0=Int32ul,
     unk1=PrefixedArray(Int32ul, Struct3),
-)
+).compile()
 
 sr_unk_struct = Struct(
     bound_start = CVector2D,
@@ -148,7 +148,7 @@ sr_unk_struct = Struct(
     const0 = Int32ul,
     unk2 = Int32ul,
     unk3 = Int32ul
-)
+).compile()
 
 BMSNAV_SR = Struct(
     _magic=Const(b'MNAV'),
@@ -159,7 +159,8 @@ BMSNAV_SR = Struct(
     navigable_paths=make_dict(NavigablePath),  # contains additional paths for certain enemies (ie chozo soldiers)
     unk2 = make_dict(PrefixedArray(Int32ul, sr_unk_struct)),
     _eof = Terminated
-)
+).compile()
+
 BMSNAV = Struct(
     _magic=Const(b'MNAV'),
     version=VersionAdapter("2.3.0"),
@@ -175,7 +176,8 @@ BMSNAV = Struct(
     # seems to contain additional emmi navigation methods, and links to bmslink.
     props=make_dict(Prop),  # seems to change emmi animations around specific props (ie water button)
     actors=make_dict(Actor),  # info on actors' navmeshes
-    unk2=PrefixedArray(Int32ul, Struct2)  # idk on this one
+    unk2=PrefixedArray(Int32ul, Struct2),  # idk on this one
+    _eof=Terminated
 ).compile()
 
 

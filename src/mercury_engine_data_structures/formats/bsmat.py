@@ -147,7 +147,7 @@ blend_state = Struct(
     operation = blend_op,
     source = blend_mode,
     dest = blend_mode
-)
+).compile()
 
 # Stencil test
 # https://docs.unity3d.com/Manual/SL-Stencil.html
@@ -160,7 +160,7 @@ stencil_test = Struct(
     depth_fail = stencil_op,
     depth_success = stencil_op,
     cmp_mode = compare_mode
-)
+).compile()
 
 # alpha test, seems to be deprecated/not exist in HLSL
 # https://docs.unity3d.com/Manual/SL-AlphaTest.html
@@ -168,7 +168,7 @@ alpha_test = Struct(
     enabled=Flag,
     function=compare_mode,
     ref=Float
-)
+).compile()
 
 # depth test
 depth_state = Struct(
@@ -176,7 +176,7 @@ depth_state = Struct(
     depth_write=Byte,
     depth_mode=compare_mode,
     z_prepass=Byte
-)
+).compile()
 
 # uniform params, stuff like "vConstant0" or "fAlbedoEmissiveMultiplier"
 uniform_param = Struct(
@@ -190,7 +190,7 @@ uniform_param = Struct(
             "u": PrefixedArray(Int32ul, Int32ul)
         }
     )
-)
+).compile()
 
 # sampler params, imports texture files typically
 sampler_param = Struct(
@@ -211,13 +211,13 @@ sampler_param = Struct(
     anisotropic=Float,
     max_mip_level=Float,
     max_anisotropy=Float
-)
+).compile()
 
 shader_stage = Struct(
     # there was a Int32ul "type" param in the gist here, that seems to be gone now.
     uniform_params=PrefixedArray(Int32ul, uniform_param),
     sampler_params=PrefixedArray(Int32ul, sampler_param)
-)
+).compile()
 
 BSMAT = Struct(
     _magic = Const(b"MSUR"),
@@ -248,7 +248,7 @@ BSMAT = Struct(
     shader_stages = PrefixedArray(Int32ul, shader_stage),
 
     _end = construct.Terminated
-)
+).compile()
 
 class Bsmat(BaseResource):
     @classmethod

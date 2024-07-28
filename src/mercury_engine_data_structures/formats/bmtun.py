@@ -29,11 +29,11 @@ TunableParam = Struct(
         },
         ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
     )
-)
+).compile()
 
 TunableClass = Struct(
     "tunables" / make_dict(TunableParam),
-)
+).compile()
 
 # BMTUN
 BMTUN = Struct(
@@ -41,7 +41,7 @@ BMTUN = Struct(
     "version" / VersionAdapter("1.5.0"),
     "classes" / make_dict(TunableClass),
     construct.Terminated,
-)
+).compile()
 
 
 class Bmtun(BaseResource):

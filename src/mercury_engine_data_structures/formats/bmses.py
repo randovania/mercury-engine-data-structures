@@ -36,7 +36,7 @@ BMSES = Struct(
             ))),
         ))),
     construct.Terminated,
-)
+).compile()
 
 
 class Bmses(BaseResource):

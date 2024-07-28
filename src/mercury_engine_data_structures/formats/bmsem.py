@@ -28,8 +28,8 @@ BMSEM = Struct(
                 ))
             ))
     )),
-    rest=construct.GreedyBytes,
-)
+    _eof=construct.Terminated,
+).compile()
 
 class Bmsem(BaseResource):
     @classmethod

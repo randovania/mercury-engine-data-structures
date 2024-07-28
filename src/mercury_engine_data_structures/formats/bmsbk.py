@@ -1,6 +1,6 @@
 import functools
 
-from construct import (
+from construct.core import (
     Array,
     Const,
     Construct,
@@ -24,7 +24,7 @@ Block = Struct(
     "respawn_time" / Float32l,
     "model_name" / StrId,
     "vignette_name" / StrId,
-)
+).compile()
 
 def _rebuild_blocks(ctx: Container) -> int:
     return sum(len(group.blocks) for group in ctx.types)
@@ -44,7 +44,7 @@ BlockGroup = Struct(
 
 BMSBK = Struct(
     "magic" / Const(b"MSBK"),
-    "version" / VersionAdapter(),
+    "version" / VersionAdapter("1.10.0"),
     "block_groups" / make_vector(BlockGroup),
     "collision_cameras" / make_vector(Struct(
         "name" / StrId,

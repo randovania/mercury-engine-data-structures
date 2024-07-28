@@ -26,29 +26,29 @@ FunctionArgument = Struct(
         },
         ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
     )
-)
+).compile()
 
 Components = {
     "TRIGGER": Struct(
         command=StrId,
         arguments=make_vector(FunctionArgument),
-    ),
+    ).compile(),
     "SPAWNGROUP": Struct(
         command=StrId,
         arguments=make_vector(FunctionArgument),
-    ),
+    ).compile(),
     "SPAWNPOINT": Struct(
         command=StrId,
         arguments=make_vector(FunctionArgument),
-    ),
+    ).compile(),
     "STARTPOINT": Struct(
         command=StrId,
         arguments=make_vector(FunctionArgument),
-    ),
+    ).compile(),
     "MODELUPDATER": Struct(
         command=StrId,
         arguments=make_vector(FunctionArgument),
-    ),
+    ).compile(),
 }
 
 ProperActor = Struct(
@@ -66,7 +66,7 @@ ProperActor = Struct(
         #     ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx.component_type}", construct.SwitchError),
         # ),
     )),
-)
+).compile()
 
 CollisionObject = Struct(
     object_type=StrId,
@@ -77,7 +77,7 @@ CollisionObject = Struct(
             lambda ctx: f"Type {ctx.type} not known, valid types are {list(collision_formats.keys())}."
         )
     ),
-)
+).compile()
 
 BMSLD = Struct(
     _magic=Const(b"MSLD"),

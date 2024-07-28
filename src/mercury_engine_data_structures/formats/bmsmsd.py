@@ -71,7 +71,7 @@ BMSMSD = Struct(
         )
     ),
     construct.Terminated,
-)
+).compile()
 
 
 class Bmsmsd(BaseResource):

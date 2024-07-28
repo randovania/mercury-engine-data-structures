@@ -28,7 +28,7 @@ XTX_TextureBlock = construct.Struct(
     texture_layout_2=UInt,
     boolean=UInt,
     _terminated=construct.Terminated,
-)
+).compile()
 
 XTX_Block = construct.Struct(
     _start=construct.Tell,

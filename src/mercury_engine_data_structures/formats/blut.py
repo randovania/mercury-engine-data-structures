@@ -8,7 +8,7 @@ BLUT = Struct(
     magic=Const(b"LUT"),
     ver=VersionAdapter("1.1.0"),
     data=PrefixedArray(Int32ul, Float)
-)
+).compile()
 
 class Blut(BaseResource):
     @classmethod

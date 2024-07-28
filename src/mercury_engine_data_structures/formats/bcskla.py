@@ -27,7 +27,7 @@ from mercury_engine_data_structures.common_types import Float, VersionAdapter
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.property_enum import PropertyEnumDoubleUnsafe
-from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.game_check import Game, current_game_at_least, is_sr_or_else
 
 
 class TimingTypeEnum(Enum):
@@ -178,31 +178,27 @@ BoneTrack_SR = TrackDataAdapter(Struct(
     ))
 ))
 
-BCSKLA_DREAD = Struct(
+BCSKLA = Struct(
     _magic = Const(b"MANM"),
-    ver=VersionAdapter("1.10.0"),
+    ver=is_sr_or_else(
+        VersionAdapter("1.6.0"),
+        VersionAdapter("1.10.0"),
+    ),
     unk=Int32ul, # seems to be 0 or 1, possibly determines if anim is looping?
     frame_count=Float,
     track_count=Rebuild(Int32ul, construct.len_(this.tracks)),
-    _padding=If(this.track_count > 0, AlignTo(8, b"\xff")),
-    _next_kfv_offset=Computed(this.track_count * 0x30 + 0x18), # end of BoneTracks, used to rebuild
-    tracks=Array(this.track_count, BoneTrack_Dread)
-)
-
-BCSKLA_SR = Struct(
-    _magic = Const(b"MANM"),
-    ver = VersionAdapter("1.6.0"),
-    unk = Int32ul,
-    frame_count=Float,
-    track_count=Rebuild(Int32ul, construct.len_(this.tracks)),
-    _next_kfv_offset=Computed(this.track_count * 0x28 + 0x14),
-    tracks = Array(this.track_count, BoneTrack_SR)
+    _padding=If(current_game_at_least(Game.DREAD), If(this.track_count > 0, AlignTo(8, b"\xff"))),
+    _next_kfv_offset=is_sr_or_else( # end of BoneTracks, used to rebuild
+        Computed(this.track_count * 0x28 + 0x14),
+        Computed(this.track_count * 0x30 + 0x18)
+    ),
+    tracks=Array(this.track_count, is_sr_or_else(
+        BoneTrack_SR,
+        BoneTrack_Dread
+    ))
 )
 
 class Bcskla(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
-        if target_game == Game.DREAD:
-            return BCSKLA_DREAD
-        elif target_game == Game.SAMUS_RETURNS:
-            return BCSKLA_SR
+        return BCSKLA

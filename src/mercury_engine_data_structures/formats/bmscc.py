@@ -1,9 +1,8 @@
 import construct
-from construct import (
+from construct.core import (
     Const,
     Construct,
     GreedyBytes,
-    IfThenElse,
     Int8ul,
     Int16ul,
     Struct,
@@ -22,11 +21,7 @@ CollisionEntry = Struct(
     prop1=StrId,
     prop2=StrId,
     prop3=StrId,
-    flag=IfThenElse(
-        game_check.current_game_at_most(Game.SAMUS_RETURNS),
-        Int8ul,
-        Int16ul,
-    ),
+    flag=game_check.is_sr_or_else(Int8ul, Int16ul),
     type=StrId,
     data=Switch(
         construct.this.type,
@@ -35,23 +30,22 @@ CollisionEntry = Struct(
             lambda ctx: f"Type {ctx.type} not known, valid types are {list(collision_formats.keys())}."
         )
     ),
-)
+).compile()
 
 CollisionLayer = Struct(
     name=StrId,
     entries=make_vector(CollisionEntry),
-)
+).compile()
 
 BMSCC = Struct(
     _magic=Const(b"MSCD"),
-    _version=IfThenElse(
-        game_check.current_game_at_most(Game.SAMUS_RETURNS),
+    _version=game_check.is_sr_or_else(
         VersionAdapter("1.13.0"),
         VersionAdapter("1.16.0"),
     ),
     layers=make_vector(CollisionLayer),
     eof=GreedyBytes,
-)
+).compile()
 
 
 class Bmscc(BaseResource):

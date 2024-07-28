@@ -26,7 +26,7 @@ UnkStruct = Struct(
         StrId,
     ),
     children = PrefixedArray(Int32ul, LazyBound(lambda: UnkStruct))
-)
+).compile()
 
 Item = Struct(
     name = StrId,
@@ -44,12 +44,12 @@ Item = Struct(
     unk11 = Byte,
     unk12 = Float,
     unk13 = UnkStruct,
-)
+).compile()
 
 LocationStruct = Struct(
     name = StrId,
     items = PrefixedArray(Int32ul, Item)
-)
+).compile()
 
 BMSLINK = Struct(
     _magic = Const(b"LINK"),
@@ -57,7 +57,7 @@ BMSLINK = Struct(
 
     unk_bool = Byte,
     location = LocationStruct,
-)
+).compile()
 
 class Bmslink(BaseResource):
     @classmethod

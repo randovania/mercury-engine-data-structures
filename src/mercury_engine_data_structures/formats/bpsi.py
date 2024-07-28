@@ -1,4 +1,4 @@
-from construct.core import Const, Construct, IfThenElse, Int32ul, PrefixedArray, Struct, Terminated
+from construct.core import Const, Construct, Int32ul, PrefixedArray, Struct, Terminated
 
 from mercury_engine_data_structures import game_check
 from mercury_engine_data_structures.common_types import VersionAdapter
@@ -7,8 +7,7 @@ from mercury_engine_data_structures.formats.base_resource import BaseResource
 
 BPSI = Struct(
     _magic = Const(b"MPSI"),
-    version = IfThenElse(
-        game_check.current_game_at_most(game_check.Game.SAMUS_RETURNS),
+    version = game_check.is_sr_or_else(
         VersionAdapter("1.2.0"),
         VersionAdapter("1.3.0")
     ),
@@ -16,7 +15,7 @@ BPSI = Struct(
         file = PascalStringRobust(Int32ul, "utf-8"),
         in_packages = PrefixedArray(Int32ul, PascalStringRobust(Int32ul, "utf-8"))
     )),
-    _eof=Terminated
+    _eof=Terminated,
 )
 
 class Bpsi(BaseResource):

@@ -4,19 +4,17 @@ import construct
 from construct.core import (
     Const,
     Construct,
-    IfThenElse,
     Int32ul,
     Struct,
 )
 
 from mercury_engine_data_structures.common_types import StrId, VersionAdapter, make_vector
 from mercury_engine_data_structures.formats.base_resource import BaseResource
-from mercury_engine_data_structures.game_check import Game, current_game_at_most
+from mercury_engine_data_structures.game_check import Game, is_sr_or_else
 
 BLSND = Struct(
     "_magic" / Const(b"LSND"),
-    "version" / IfThenElse(
-        current_game_at_most(Game.SAMUS_RETURNS),
+    "version" / is_sr_or_else(
         VersionAdapter("1.11.0"),
         VersionAdapter("1.12.0")
     ),
@@ -26,7 +24,7 @@ BLSND = Struct(
         "value" / Int32ul,
         )),
     construct.Terminated,
-)
+).compile()
 
 
 class Blsnd(BaseResource):

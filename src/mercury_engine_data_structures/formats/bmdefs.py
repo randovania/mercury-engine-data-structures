@@ -1,5 +1,5 @@
 import construct
-from construct import (
+from construct.core import (
     Const,
     Construct,
     Flag,
@@ -63,7 +63,7 @@ EnemyStruct = Struct(
             )),
         )),
     ))
-)
+).compile()
 
 BMDEFS = Struct(
     _magic=Const(b"MDEF"),
@@ -86,7 +86,7 @@ BMDEFS = Struct(
     unk2=Int32ul,
     enemies_list=make_vector(EnemyStruct),
     rest=construct.GreedyBytes,
-)
+).compile()
 
 class Bmdefs(BaseResource):
     @classmethod

@@ -12,12 +12,14 @@ TOC_SR = construct.Struct(
         value=construct.Int32ul,
         key=construct.Int32ul,
     ),
+    _eof=construct.Terminated
 )
 TOC_Dread = construct.Struct(
     files=common_types.make_dict(
         value=construct.Int32ul,
         key=construct.Int64ul,
     ),
+    _eof=construct.Terminated
 )
 
 

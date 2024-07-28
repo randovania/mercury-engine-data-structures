@@ -36,7 +36,7 @@ StrKeyArgument = Struct(
         ArgumentCases,
         construct.Error
     )
-)
+).compile()
 
 CrcKeyArgument = Struct(
     key = PropertyEnum,
@@ -58,6 +58,7 @@ BMTRE = Struct(
     version = VersionAdapter("1.5.0"),
     args = PrefixedArray(Int32ul, StrKeyArgument),
     behavior = Behavior,
+    _eof = construct.Terminated
 )
 
 

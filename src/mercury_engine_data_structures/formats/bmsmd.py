@@ -40,7 +40,7 @@ BMSMD = Struct(
             )),
         )),
     )),
-)
+).compile()
 
 class Bmsmd(BaseResource):
     @classmethod
