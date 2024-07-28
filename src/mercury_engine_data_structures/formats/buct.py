@@ -1,11 +1,9 @@
 import construct
 from construct.core import (
     Array,
-    Computed,
     Const,
     Construct,
     If,
-    IfThenElse,
     Int16ul,
     Int32ul,
     Int64ul,
@@ -20,23 +18,19 @@ from mercury_engine_data_structures.formats.base_resource import BaseResource
 
 BUCT = Struct(
     _magic = Const(b"MUCT"),
-    _is_sr = Computed(game_check.current_game_at_most(game_check.Game.SAMUS_RETURNS)),
-    version = IfThenElse(
-        lambda ctx: ctx._is_sr,
+    version = game_check.is_sr_or_else(
         VersionAdapter("1.3.0"),
         VersionAdapter("1.4.0")
     ),
     size = Rebuild(Int32ul, construct.len_(construct.this.data)),
-    _padding = If(lambda ctx: not ctx._is_sr, Const(0xFFFFFFFF, Int32ul)),
-    _data_start = IfThenElse(
-        lambda ctx: ctx._is_sr,
+    _padding = If(game_check.current_game_at_least(game_check.Game.DREAD), Const(0xFFFFFFFF, Int32ul)),
+    _data_start = game_check.is_sr_or_else(
         Const(0x10, Int32ul),
         Const(0x18, Int64ul)
     ),
     data=Array(construct.this.size, Struct(
         char_maybe = Int16ul, # I think this could be utf8 chars?
-        _padding = IfThenElse(
-            lambda ctx: ctx._._is_sr,
+        _padding = game_check.is_sr_or_else(
             Const(0x0000, Int16ul),
             Const(0xFFFF, Int16ul),
         ),
