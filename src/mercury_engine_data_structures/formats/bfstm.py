@@ -8,6 +8,7 @@ from construct.core import (
     Bytes,
     Const,
     Flag,
+    Int16sl,
     Int16ul,
     Int32ul,
     Pointer,
@@ -39,14 +40,14 @@ def RebuildableOffset(subcon: construct.FormatField = Int32ul) -> Struct:
     )
 
 DspAdpcmInfo = Struct(
-    "coefficients" / Int16ul[8][2],
+    "coefficients" / Int16sl[8][2],
     "pred_scale" / Int16ul,
     "yn_1" / Int16ul,
     "yn_2" / Int16ul,
     "loop_pred_scale" / Int16ul,
     "loop_yn_1" / Int16ul,
     "loop_yn_2" / Int16ul,
-    "unk" / Int16ul,
+    Const(0, Int16ul), # padding
 )
 
 class ReferenceTable(Adapter):
@@ -132,7 +133,8 @@ StreamInfo = Struct(
     "orig_loop_end" / Int32ul, # same as num_frames?
     # no idea what the following 2 are, it's not an int or float unless its a real weird float or real big int.
     # guessing its 2 ushorts and some sort of
-    "unk" / Int32ul, # float maybe? idk what this is, doesn't make sense as a float or int
+    "unk1" / Int16sl,
+    "unk2" / Int16sl,
 )
 
 INFO = Struct(
