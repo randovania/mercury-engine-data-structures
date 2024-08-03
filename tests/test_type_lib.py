@@ -223,4 +223,4 @@ def test_all_children_for(dread_type_lib: TypeLib):
     children = dread_type_lib.get_all_children_for("base::core::CBaseObject")
     for child in children:
         assert dread_type_lib.is_child_of(child, "base::core::CBaseObject")
-    assert len(children) == 1194
+    assert len(children) == 1197
