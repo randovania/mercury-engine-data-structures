@@ -1,8 +1,7 @@
-from enum import Enum
+from enum import IntEnum
 
 import construct
 from construct.core import (
-    Adapter,
     Array,
     Byte,
     Bytes,
@@ -11,33 +10,25 @@ from construct.core import (
     Int16sl,
     Int16ul,
     Int32ul,
-    Pointer,
     Rebuild,
     Struct,
     Tell,
 )
-from construct.expr import Path
-from construct.lib.containers import Container, ListContainer
 
 from mercury_engine_data_structures.adapters.enum_adapter import EnumAdapter
-from mercury_engine_data_structures.common_types import VersionAdapter
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
+from mercury_engine_data_structures.formats.audio_common import (
+    Block,
+    Header,
+    RebuildableOffset,
+    RebuildOffset,
+    ReferenceTableOfOffsets,
+)
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 # source https://mk8.tockdom.com/w/index.php?title=BFSTM_(File_Format)
 
-def RebuildOffset(target_offset: Path, starting_from = 0, subcon = Int32ul):
-    return Struct(
-        "cur_offset" / Tell,
-        "updated" / Pointer(target_offset._offset, Rebuild(subcon, construct.this.cur_offset - starting_from)),
-    )
-
-def RebuildableOffset(subcon: construct.FormatField = Int32ul) -> Struct:
-    return Struct(
-        "_offset" / Tell,
-        "value" / subcon
-    )
 
 DspAdpcmInfo = Struct(
     "coefficients" / Int16sl[8][2],
@@ -50,59 +41,7 @@ DspAdpcmInfo = Struct(
     Const(0, Int16ul), # padding
 )
 
-class ReferenceTable(Adapter):
-    CHANNEL_INFO_FLAG = 0x4102
-    DSPADPCM_CHANNEL_INFO_FLAG = 0x300
-
-    def __init__(self):
-
-        inner_subcon = Struct(
-            "length" / Int32ul,
-            "data" / Array(
-                construct.this.length,
-                Struct(
-                    "CHANNEL_INFO_FLAG" / Const(self.CHANNEL_INFO_FLAG, Int32ul),
-                    "offset" / Int32ul,
-                )
-            ),
-            "info_subcons" / Array(
-                construct.this.length,
-                Struct(
-                    "DSP_ADPCM_CHANNEL_INFO_FLAG" / Const(self.DSPADPCM_CHANNEL_INFO_FLAG, Int32ul),
-                    "offset" / Int32ul,
-                )
-            ),
-            "dsp_adpcm_infos" / Array(construct.this.length, DspAdpcmInfo),
-        ).compile()
-
-        super().__init__(inner_subcon)
-
-    def _decode(self, obj, context, path):
-        return obj.dsp_adpcm_infos
-
-    def _encode(self, obj, context, path):
-        count = len(obj)
-        data_size = 4 + 8 * count
-
-        return Container(
-            length = count,
-            # offsets can be calculated since this is constant
-            data = ListContainer([
-                Container(section_flag = self.CHANNEL_INFO_FLAG, offset = data_size + 8 * i)
-                for i in range(count)
-            ]),
-            # info offsets can also be calculated
-            info_subcons = ListContainer([
-                Container(
-                    section_flag=self.DSPADPCM_CHANNEL_INFO_FLAG,
-                    offset = DspAdpcmInfo.sizeof() * i + 8 * (count - i),
-                )
-                for i in range(count)
-            ]),
-            dsp_adpcm_infos = obj
-        )
-
-class SoundEncodingEnum(Enum):
+class SoundEncodingEnum(IntEnum):
     PCM8 = 0
     PCM16 = 1
     DSP_ADPCM = 2
@@ -125,7 +64,7 @@ StreamInfo = Struct(
     "SEEK_INFO_SIZE" / Const(4, Int32ul),
     "seek_sample_interval" / Int32ul,
     "SAMPLE_DATA_FLAG" / Const(0x1F00, Int32ul),
-    "sample_data_offset" / RebuildableOffset(), # relative to 0x08 in DATA
+    "sample_data_offset" / RebuildableOffset, # relative to 0x08 in DATA
     "REGION_INFO_SIZE" / Const(0x100, Int32ul),
     "REGION_INFO_FLAG" / Const(0, Int32ul),
     "REGION_INFO_OFFSET" / Const(0xFFFFFFFF, Int32ul),
@@ -138,27 +77,24 @@ StreamInfo = Struct(
 )
 
 INFO = Struct(
-    RebuildOffset(construct.this._._.header.info_offset),
-
-    "_start" / Tell,
     Const(b"INFO"),
-    "size" / RebuildableOffset(),
+    "size" / RebuildableOffset,
+    "_checkpoint" / Tell,
     "STREAM_INFO_FLAG" / Const(0x4100, Int32ul),
-    "stream_info_offset" / RebuildableOffset(),
+    "stream_info_offset" / RebuildableOffset,
     "TRACK_INFO_FLAG" / Const(0x0, Int32ul), # unused in basegame files
     "TRACK_INFO_OFFSET" / Const(0xFFFFFFFF, Int32ul), # unused in basegame files
     "CHANNEL_INFO_FLAG" / Const(0x101, Int32ul),
-    "channel_info_offset" / RebuildableOffset(),
+    "channel_info_offset" / RebuildableOffset,
 
-    RebuildOffset(construct.this._.stream_info_offset, construct.this._._start + 8),
+    RebuildOffset(construct.this._.stream_info_offset, construct.this._._checkpoint),
     "stream_info" / StreamInfo,
 
-    RebuildOffset(construct.this._.channel_info_offset, construct.this._._start + 8),
-    "channel_infos" / ReferenceTable(),
+    RebuildOffset(construct.this._.channel_info_offset, construct.this._._checkpoint),
+    "channel_infos" / ReferenceTableOfOffsets(0x4102, 0x300, DspAdpcmInfo),
 
     AlignTo(0x20),
-    RebuildOffset(construct.this._._.header.info_size, construct.this._._start),
-    RebuildOffset(construct.this._.size, construct.this._._start),
+    RebuildOffset(construct.this._.size, construct.this._._._start),
 )
 
 HistoryInfo = Struct(
@@ -167,60 +103,38 @@ HistoryInfo = Struct(
 )
 
 SEEK = Struct(
-    RebuildOffset(construct.this._._.header.seek_offset),
-
-    "_start" / Tell,
     "_magic" / Const(b"SEEK"),
-    "size" / RebuildableOffset(),
+    "size" / RebuildableOffset,
     "history_info" / Array(
-        construct.this._.INFO.stream_info.num_blocks,
-        HistoryInfo[construct.this._.INFO.stream_info.num_channels],
+        construct.this._root.INFO.stream_info.num_blocks,
+        HistoryInfo[construct.this._root.INFO.stream_info.num_channels],
     ),
     AlignTo(0x20),
 
-
-    RebuildOffset(construct.this._._.header.seek_size, construct.this._._start),
-    RebuildOffset(construct.this._.size, construct.this._._start),
+    RebuildOffset(construct.this._.size, construct.this._._._start),
 )
 
 DATA = Struct(
-    RebuildOffset(construct.this._._.header.data_offset),
-
-    "_start" / Tell,
     "_magic" / Const(b"DATA"),
-    "size" / RebuildableOffset(),
-    "data" / Bytes(construct.this.size.value - 8),
-
-    RebuildOffset(construct.this._._.header.data_size, construct.this._._start),
-    RebuildOffset(construct.this._.size, construct.this._._start)
-)
-
-Header = Struct(
-    "_magic" / Const(b"FSTM"),
-    Const(b"\xff\xfe"), # Byte-Order Mark, always uses little endian
-    "_header_size" / Const(0x40, Int16ul),
-    "version" / VersionAdapter("1024.6.0"),
-    "size" / RebuildableOffset(),
-    "_num_datablocks" / Const(3, Int32ul),
-    "INFO_FLAG" / Const(0x4000, Int32ul),
-    "info_offset" / RebuildableOffset(),
-    "info_size" / RebuildableOffset(),
-    "SEEK_FLAG" / Const(0x4001, Int32ul),
-    "seek_offset" / RebuildableOffset(),
-    "seek_size" / RebuildableOffset(),
-    "DATA_FLAG" / Const(0x4002, Int32ul),
-    "data_offset" / RebuildableOffset(),
-    "data_size" / RebuildableOffset(),
-    AlignTo(0x20),
+    "size" / Rebuild(Int32ul, construct.len_(construct.this.data) + 8),
+    "data" / Bytes(construct.this.size - 8),
 )
 
 BFSTM = Struct(
-    "header" / Header,
-    "INFO" / INFO,
-    "SEEK" / SEEK,
-    "DATA" / DATA,
+    "header" / Header(
+        b"FSTM",
+        "4.6.0",
+        {
+            "INFO": 0x4000,
+            "SEEK": 0x4001,
+            "DATA": 0x4002,
+        }
+    ),
+    "INFO" / Block("INFO", INFO),
+    "SEEK" / Block("SEEK", SEEK),
+    "DATA" / Block("DATA", DATA),
 
-    RebuildOffset(construct.this._.header.size)
+    RebuildOffset(construct.this._root.header.size)
 )
 
 class Bfstm(BaseResource):
