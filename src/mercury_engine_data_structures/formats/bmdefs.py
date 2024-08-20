@@ -69,24 +69,27 @@ BMDEFS = Struct(
     _magic=Const(b"MDEF"),
     version=VersionAdapter("1.5.0"),
     unk1=Int32ul,
-    sounds=make_vector(Struct(
-        "sound_name" / StrId,
-        "unk1" / Int32ul,
-        "priority" / Int32ul,
-        "file_path" / StrId,
-        "unk2" / Int32ul,
-        "unk3" / Int32ul,
-        "unk4" / Int32ul,
-        "fade_in" / Float32l,
-        "fade_out" / Float32l,
-        "volume" / Float32l,
-        "unk_bool" / Flag,
-        "environment_sfx_volume" / Float32l
-    )),  # fmt: skip
+    sounds=make_vector(
+        Struct(
+            "sound_name" / StrId,
+            "unk1" / Int32ul,
+            "priority" / Int32ul,
+            "file_path" / StrId,
+            "unk2" / Int32ul,
+            "unk3" / Int32ul,
+            "unk4" / Int32ul,
+            "fade_in" / Float32l,
+            "fade_out" / Float32l,
+            "volume" / Float32l,
+            "unk_bool" / Flag,
+            "environment_sfx_volume" / Float32l,
+        )
+    ),  # fmt: skip
     unk2=Int32ul,
     enemies_list=make_vector(EnemyStruct),
     rest=construct.GreedyBytes,
 )
+
 
 class Bmdefs(BaseResource):
     @classmethod

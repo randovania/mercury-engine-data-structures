@@ -27,15 +27,15 @@ class Object(construct.Construct):
             try:
                 field_construct = self.fields[field_type]
             except KeyError:
-                raise construct.ExplicitError(f"Type {field_type} not known, valid types are {list(self.fields)}.",
-                                              path=field_path)
+                raise construct.ExplicitError(
+                    f"Type {field_type} not known, valid types are {list(self.fields)}.", path=field_path
+                )
 
             field_value = field_construct._parsereport(stream, context, field_path)
             if array_response or field_type in result:
                 if not array_response:
                     result = construct.ListContainer(
-                        construct.Container(type=name, item=value)
-                        for name, value in result.items()
+                        construct.Container(type=name, item=value) for name, value in result.items()
                     )
                     array_response = True
                 result.append(construct.Container(type=field_type, item=field_value))
@@ -48,6 +48,7 @@ class Object(construct.Construct):
         construct.Int32ul._build(len(obj), stream, context, path)
 
         if isinstance(obj, list):
+
             def list_iter():
                 for it in obj:
                     yield it["type"], it["item"]

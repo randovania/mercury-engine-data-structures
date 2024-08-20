@@ -1,6 +1,7 @@
 """
 For checking which game is being parsed
 """
+
 from enum import Enum
 from functools import cached_property
 from typing import Any, Callable
@@ -60,9 +61,11 @@ class Game(Enum):
     def known_hashes_table(self):
         if self == Game.DREAD:
             from mercury_engine_data_structures import dread_data
+
             return dread_data.all_name_to_asset_id()
         elif self == Game.SAMUS_RETURNS:
             from mercury_engine_data_structures import samus_returns_data
+
             return samus_returns_data.all_name_to_asset_id()
         else:
             raise ValueError(f"Unsupported game: {self}")
@@ -107,9 +110,11 @@ def is_at_most(target: Game, subcon_true, subcon_false) -> IfThenElse:
 
     def _emitbuild(code: construct.CodeGen):
         code.append("from mercury_engine_data_structures.game_check import Game")
-        return (f"(({result.thensubcon._compilebuild(code)}) "
-                f"if ({result.condfunc}) "
-                f"else ({result.elsesubcon._compilebuild(code)}))")
+        return (
+            f"(({result.thensubcon._compilebuild(code)}) "
+            f"if ({result.condfunc}) "
+            f"else ({result.elsesubcon._compilebuild(code)}))"
+        )
 
     result._emitbuild = _emitbuild
 
@@ -123,17 +128,13 @@ class GameSpecificStruct(construct.Subconstruct):
 
     def _parse(self, stream, context, path):
         if get_current_game(context) != self.target_game:
-            raise construct.ExplicitError(
-                f"Expected {self.target_game}, got {get_current_game(context)}", path=path
-            )
+            raise construct.ExplicitError(f"Expected {self.target_game}, got {get_current_game(context)}", path=path)
 
         return super()._parse(stream, context, path)
 
     def _build(self, obj, stream, context, path):
         if get_current_game(context) != self.target_game:
-            raise construct.ExplicitError(
-                f"Expected {self.target_game}, got {get_current_game(context)}", path=path
-            )
+            raise construct.ExplicitError(f"Expected {self.target_game}, got {get_current_game(context)}", path=path)
 
         return super()._build(obj, stream, context, path)
 

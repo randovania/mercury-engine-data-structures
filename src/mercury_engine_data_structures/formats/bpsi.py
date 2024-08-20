@@ -6,18 +6,20 @@ from mercury_engine_data_structures.construct_extensions.strings import PascalSt
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 
 BPSI = Struct(
-    _magic = Const(b"MPSI"),
-    version = IfThenElse(
-        game_check.current_game_at_most(game_check.Game.SAMUS_RETURNS),
-        VersionAdapter("1.2.0"),
-        VersionAdapter("1.3.0")
+    _magic=Const(b"MPSI"),
+    version=IfThenElse(
+        game_check.current_game_at_most(game_check.Game.SAMUS_RETURNS), VersionAdapter("1.2.0"), VersionAdapter("1.3.0")
     ),
-    files = PrefixedArray(Int32ul, Struct(
-        file = PascalStringRobust(Int32ul, "utf-8"),
-        in_packages = PrefixedArray(Int32ul, PascalStringRobust(Int32ul, "utf-8"))
-    )),
-    _eof=Terminated
+    files=PrefixedArray(
+        Int32ul,
+        Struct(
+            file=PascalStringRobust(Int32ul, "utf-8"),
+            in_packages=PrefixedArray(Int32ul, PascalStringRobust(Int32ul, "utf-8")),
+        ),
+    ),
+    _eof=Terminated,
 )
+
 
 class Bpsi(BaseResource):
     @classmethod

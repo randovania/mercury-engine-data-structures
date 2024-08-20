@@ -8,17 +8,22 @@ from setuptools.command.build_py import build_py
 
 
 def generate_property_templates():
-    subprocess.run([
-        sys.executable,
-        os.fspath(Path(__file__).parent.joinpath("tools", "create_class_definitions.py")),
-        "dread",
-    ], check=True)
-    subprocess.run([
-        sys.executable,
-        os.fspath(Path(__file__).parent.joinpath("tools", "create_class_definitions.py")),
-        "sr",
-    ], check=True)
-
+    subprocess.run(
+        [
+            sys.executable,
+            os.fspath(Path(__file__).parent.joinpath("tools", "create_class_definitions.py")),
+            "dread",
+        ],
+        check=True,
+    )
+    subprocess.run(
+        [
+            sys.executable,
+            os.fspath(Path(__file__).parent.joinpath("tools", "create_class_definitions.py")),
+            "sr",
+        ],
+        check=True,
+    )
 
 
 class BuildPyCommand(build_py):
@@ -33,6 +38,6 @@ class BuildPyCommand(build_py):
 
 setup(
     cmdclass={
-        'build_py': BuildPyCommand,
+        "build_py": BuildPyCommand,
     },
 )

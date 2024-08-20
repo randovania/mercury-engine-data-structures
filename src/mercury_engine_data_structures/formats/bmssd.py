@@ -55,7 +55,7 @@ BMSSD = Struct(
                     float2=CVector3D,
                     float3=CVector3D,
                 )
-            )
+            ),
         )
     ),
     strings_a=make_vector(StrId),
@@ -97,7 +97,7 @@ BMSSD = Struct(
                 int16=Int32ul,
                 float17=CVector3D,
             )
-        )
+        ),
     ),
     strings_b=make_vector(
         StrId,
@@ -115,9 +115,9 @@ BMSSD = Struct(
                             Struct(
                                 model_id=Int32ul,
                             )
-                        )
+                        ),
                     )
-                )
+                ),
             )
         ),
         make_vector(
@@ -129,12 +129,13 @@ BMSSD = Struct(
                         int1=Int32ul,
                         long3=make_vector(Int64ul),
                     )
-                )
+                ),
             )
-        )
+        ),
     ),
     rest=construct.GreedyBytes,
 ).compile()
+
 
 class Bmssd(BaseResource):
     @classmethod

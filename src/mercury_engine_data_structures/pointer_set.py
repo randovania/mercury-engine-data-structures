@@ -1,6 +1,7 @@
 """
 Helper class to handle objects that contain a pointer to objects of varied types, usually all with the same base type.
 """
+
 import copy
 import struct
 from typing import Dict, Type, Union
@@ -24,14 +25,14 @@ class PointerAdapter(Adapter):
         self.switch_con = Switch(
             construct.this.type,
             types,
-            ErrorWithMessage(lambda ctx: (
-                f"Property {ctx.type} ({get_name(ctx.type)}) without assigned type"
-            )),
+            ErrorWithMessage(lambda ctx: (f"Property {ctx.type} ({get_name(ctx.type)}) without assigned type")),
         )
-        super().__init__(Struct(
-            type=Hex(Int64ul),
-            ptr=self.switch_con,
-        ))
+        super().__init__(
+            Struct(
+                type=Hex(Int64ul),
+                ptr=self.switch_con,
+            )
+        )
         self.types = types
         self.category = category
 

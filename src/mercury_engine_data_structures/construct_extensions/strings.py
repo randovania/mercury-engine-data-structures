@@ -96,8 +96,10 @@ def PascalStringRobust(lengthfield: construct.Construct, encoding):
         i = code.allocateId()
         code.append(f"def add_prefix_{i}(io, obj): return {lengthfield._compilebuild(code)}")
 
-        return (f"reuse(obj.encode({repr(encoding)}),"
-                f" lambda encoded: (add_prefix_{i}(io, len(encoded)), io.write(encoded)))")
+        return (
+            f"reuse(obj.encode({repr(encoding)}),"
+            f" lambda encoded: (add_prefix_{i}(io, len(encoded)), io.write(encoded)))"
+        )
 
     macro._emitbuild = _emitbuild
 
@@ -237,8 +239,10 @@ def StaticPaddedString(length: int, encoding: str) -> construct.Construct:
                 io.write(b"\\x00" * length)
         """)
 
-        return (f"reuse(obj.encode({repr(encoding)}),"
-                f" lambda encoded: (io.write(encoded), write_padding_to({length} - len(encoded), io), obj)[-1])")
+        return (
+            f"reuse(obj.encode({repr(encoding)}),"
+            f" lambda encoded: (io.write(encoded), write_padding_to({length} - len(encoded), io), obj)[-1])"
+        )
 
     macro._emitparse = _emitparse
     macro._emitbuild = _emitbuild

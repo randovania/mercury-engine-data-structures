@@ -1,4 +1,3 @@
-
 import pytest
 from tests.test_lib import parse_build_compare_editor_parsed
 
@@ -18,7 +17,7 @@ sr_missing_cc = [
     "maps/levels/c10_samus/s909_ridley/s909_ridley.bmscc",
     "maps/levels/c10_samus/s910_gym/s910_gym.bmscc",
     "maps/levels/c10_samus/s911_swarmgym/s911_swarmgym.bmscc",
-    "maps/levels/c10_samus/s920_traininggallery/s920_traininggallery.bmscc"
+    "maps/levels/c10_samus/s920_traininggallery/s920_traininggallery.bmscc",
 ]
 
 sr_missing_cd = [
@@ -39,15 +38,21 @@ sr_missing_cd = [
     "maps/levels/c10_samus/s909_ridley/s909_ridley.bmscd",
     "maps/levels/c10_samus/s910_gym/s910_gym.bmscd",
     "maps/levels/c10_samus/s911_swarmgym/s911_swarmgym.bmscd",
-    "maps/levels/c10_samus/s920_traininggallery/s920_traininggallery.bmscd"
+    "maps/levels/c10_samus/s920_traininggallery/s920_traininggallery.bmscd",
 ]
 
-@pytest.mark.parametrize("file_path", dread_data.all_files_ending_with(".bmscc")
-                         + dread_data.all_files_ending_with(".bmscd"))
+
+@pytest.mark.parametrize(
+    "file_path", dread_data.all_files_ending_with(".bmscc") + dread_data.all_files_ending_with(".bmscd")
+)
 def test_compare_dread(dread_file_tree, file_path):
     parse_build_compare_editor_parsed(Bmscc, dread_file_tree, file_path)
 
-@pytest.mark.parametrize("file_path", samus_returns_data.all_files_ending_with(".bmscc", sr_missing_cc)
-                         + samus_returns_data.all_files_ending_with(".bmscd", sr_missing_cd))
+
+@pytest.mark.parametrize(
+    "file_path",
+    samus_returns_data.all_files_ending_with(".bmscc", sr_missing_cc)
+    + samus_returns_data.all_files_ending_with(".bmscd", sr_missing_cd),
+)
 def test_compare_msr(samus_returns_tree, file_path):
     parse_build_compare_editor_parsed(Bmscc, samus_returns_tree, file_path)

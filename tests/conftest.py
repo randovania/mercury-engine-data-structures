@@ -39,8 +39,13 @@ def dread_file_tree(dread_path):
 
 
 def pytest_addoption(parser):
-    parser.addoption('--fail-if-missing', action='store_true', dest="fail_if_missing",
-                     default=False, help="Fails tests instead of skipping, in case any asset is missing")
+    parser.addoption(
+        "--fail-if-missing",
+        action="store_true",
+        dest="fail_if_missing",
+        default=False,
+        help="Fails tests instead of skipping, in case any asset is missing",
+    )
 
 
 def pytest_configure(config: pytest.Config):

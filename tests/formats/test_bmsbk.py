@@ -11,6 +11,7 @@ sr_missing = [
     "maps/levels/c10_samus/s920_traininggallery/s920_traininggallery.bmsbk",
 ]
 
+
 @pytest.mark.parametrize("bmsbk_path", samus_returns_data.all_files_ending_with(".bmsbk", sr_missing))
 def test_bmsbk(samus_returns_tree, bmsbk_path):
     parse_build_compare_editor(Bmsbk, samus_returns_tree, bmsbk_path)

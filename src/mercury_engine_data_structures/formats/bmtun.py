@@ -20,13 +20,7 @@ TunableParam = Struct(
     type=Char,
     value=Switch(
         construct.this.type,
-        {
-            's': StrId,
-            'f': Float,
-            'b': Flag,
-            'i': Int32sl,
-            'v': CVector3D
-        },
+        {"s": StrId, "f": Float, "b": Flag, "i": Int32sl, "v": CVector3D},
         ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError),
     ),
 )

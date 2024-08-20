@@ -24,10 +24,7 @@ class StrictEnum(construct.Adapter):
     def _emitbuild(self, code: construct.CodeGen):
         i = code.allocateId()
 
-        mapping = ", ".join(
-            f"{repr(enum_entry.name)}: {enum_entry.value}"
-            for enum_entry in self.enum_class
-        )
+        mapping = ", ".join(f"{repr(enum_entry.name)}: {enum_entry.value}" for enum_entry in self.enum_class)
 
         code.append(f"""
         _enum_name_to_value_{i} = {{{mapping}}}
@@ -45,5 +42,5 @@ class StrictEnum(construct.Adapter):
 def BitMaskEnum(enum_type: typing.Type[enum.IntEnum]):
     flags = {}
     for enumentry in enum_type:
-        flags[enumentry.name] = 2 ** enumentry.value
+        flags[enumentry.name] = 2**enumentry.value
     return construct.FlagsEnum(construct.Int32ul, **flags)

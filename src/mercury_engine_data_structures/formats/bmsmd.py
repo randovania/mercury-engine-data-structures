@@ -42,6 +42,7 @@ BMSMD = Struct(
     )),
 )  # fmt: skip
 
+
 class Bmsmd(BaseResource):
     @classmethod
     @functools.lru_cache

@@ -34,7 +34,6 @@ known_types_to_construct = {
     "CGameLink<CEntity>": PrimitiveKind.STRING,
     "CGameLink<CSpawnPointComponent>": PrimitiveKind.STRING,
     "base::global::CRntFile": PrimitiveKind.BYTES,
-
     # TODO: test if works
     "base::global::CName": PrimitiveKind.PROPERTY,
     "base::core::CAssetLink": PrimitiveKind.STRING,
@@ -48,26 +47,28 @@ known_flagsets = {
 }
 known_typedefs = {
     "TPatterns": "base::global::CRntVector<COffset>",
-    "CCharClassRodotukAIComponent::TVAbsorbConfigs":
-        ("base::global::CRntVector<CCharClassRodotukAIComponent::SAbsorbConfig>"),
+    "CCharClassRodotukAIComponent::TVAbsorbConfigs": (
+        "base::global::CRntVector<CCharClassRodotukAIComponent::SAbsorbConfig>"
+    ),
     "TLaunchPattern": "base::global::CRntVector<SLaunchPatternStep>",
     "TLaunchConfigs": "base::global::CRntVector<SLaunchConfig>",
     "TBigkranXSpitLaunchPattern": "base::global::CRntVector<SBigkranXSpitLaunchPatternStep>",
-    "CCharClassRodomithonXAIComponent::TVFirePillarConfigs":
-        ("base::global::CRntVector<CCharClassRodomithonXAIComponent::SFirePillarConfig>"),
+    "CCharClassRodomithonXAIComponent::TVFirePillarConfigs": (
+        "base::global::CRntVector<CCharClassRodomithonXAIComponent::SFirePillarConfig>"
+    ),
     "CMinimapDef::TMapLabelDefs": "base::global::CRntDictionary<base::global::CStrId, SMapLabelDef>",
     "CMinimapDef::TMapIconDefs": "base::global::CRntDictionary<base::global::CStrId, SMapIconDef>",
     "CBlackboard::TSectionContainer": "base::global::CRntDictionary<base::global::CStrId, CBlackboard::CSection*>",
-    "CPlaythrough::TDictCheckpointDatas":
-        ("base::global::CRntDictionary<base::global::CStrId, std::unique_ptr<CPlaythrough::SCheckpointData>>"),
+    "CPlaythrough::TDictCheckpointDatas": (
+        "base::global::CRntDictionary<base::global::CStrId, std::unique_ptr<CPlaythrough::SCheckpointData>>"
+    ),
     "TSoundEventRules": "base::global::CRntVector<std::unique_ptr<sound::CSoundEventsDef::SSoundEventsRule>>",
     "CGameBlackboard::TPropDeltaValues": "base::global::CRntSmallDictionary<base::global::CStrId, float>",
     "CMinimapData::TOccludedIcons": "base::global::CRntVector<base::global::CStrId>",
     "CMinimapData::TColliderGeoDatasMap": "base::global::CRntSmallDictionary<uint64, SGeoData>",
-
-    'GUI::CDisplayObjectTrack<bool>::SKey': 'GUI::CDisplayObjectTrackBool::SKey',
-    'GUI::CDisplayObjectTrack<float>::SKey': 'GUI::CDisplayObjectTrackFloat::SKey',
-    'GUI::CDisplayObjectTrack<base::global::CRntString>::SKey': 'GUI::CDisplayObjectTrackString::SKey',
+    "GUI::CDisplayObjectTrack<bool>::SKey": "GUI::CDisplayObjectTrackBool::SKey",
+    "GUI::CDisplayObjectTrack<float>::SKey": "GUI::CDisplayObjectTrackFloat::SKey",
+    "GUI::CDisplayObjectTrack<base::global::CRntString>::SKey": "GUI::CDisplayObjectTrackString::SKey",
 }
 
 vector_re = re.compile(r"base::global::CRntVector<\s*(.*?)(?:, false)?\s*>$")
@@ -97,22 +98,13 @@ def find_ptr_match(type_name: str):
 
 def convert_type(type_name: str, type_data: dict):
     if type_name in known_types_to_construct:
-        return {
-            "kind": TypeKind.PRIMITIVE.value,
-            "primitive_kind": known_types_to_construct[type_name].value
-        }
+        return {"kind": TypeKind.PRIMITIVE.value, "primitive_kind": known_types_to_construct[type_name].value}
 
     if type_name in known_typedefs:
-        return {
-            "kind": TypeKind.TYPEDEF.value,
-            "alias": known_typedefs[type_name]
-        }
+        return {"kind": TypeKind.TYPEDEF.value, "alias": known_typedefs[type_name]}
 
     if type_name in known_flagsets:
-        return {
-            "kind": TypeKind.FLAGSET.value,
-            "enum": known_flagsets[type_name]
-        }
+        return {"kind": TypeKind.FLAGSET.value, "enum": known_flagsets[type_name]}
 
     if type_data["values"] is not None:
         return {
@@ -199,12 +191,7 @@ def convert_old_to_new(old_types: dict[str, dict[str, typing.Any]]):
 hash_str = "HashString"
 register_field = "RegisterField"
 add_enum_value = "(?:FUN_71000148b8|AddEnumValue)"
-prefixes_to_remove = [
-    "(ObjectField *)",
-    "&",
-    "(CClass *)",
-    "Reflection::"
-]
+prefixes_to_remove = ["(ObjectField *)", "&", "(CClass *)", "Reflection::"]
 
 _aliases = {
     # weirdness
@@ -212,23 +199,18 @@ _aliases = {
     "global::CStrId": "base::global::CStrId",
     "global::CFilePathStrId": "base::global::CFilePathStrId",
     "math::CVector3D": "base::math::CVector3D",
-
     # custom names
     "&DAT_7172642b18": "CGameLink<CActor>",
     "&DAT_717275c0d8": "CGameLink<CEntity>",
     "&DAT_7172642ed8": "base::global::CRntVector<CGameLink<CActor>>",
     "&DAT_717275c498": "base::global::CRntVector<CGameLink<CEntity>>",
-
     "&CGameLink_CActor_DAT_7172642b18": "CGameLink<CActor>",
     "&CGameLink<CEntity>::Serializer": "CGameLink<CEntity>",
     "&Vector_GameLink_CActor_7172642ed8": "base::global::CRntVector<CGameLink<CActor>>",
     "&Vector_CGameLink_CEntity_DAT_717275c498": "base::global::CRntVector<CGameLink<CEntity>>",
-
     "&Vector_PtrCTriggerLogicAction_DAT_71726f3930": "base::global::CRntVector<std::unique_ptr<CTriggerLogicAction>>",
-
     "&Vector_CXParasiteBehavior_71726c3030": "base::global::CRntVector<std::unique_ptr<CXParasiteBehavior>>",
     "&base::snd::ELowPassFilter_DAT_7108b13de8": "base::snd::ELowPassFilter",
-
     "&DAT_71726bb4c0": "base::global::CRntVector<CCentralUnitComponent::SStartPointInfo>",
     "&DAT_71726baee8": "base::global::CRntVector<std::unique_ptr<CCentralUnitWeightedEdges>>",
     "&DAT_71729a98a8": "base::global::CRntVector<SFallBackPath>",
@@ -243,8 +225,9 @@ _aliases = {
     "&vectSpawnPoints_DAT_71729aaf30": "base::global::CRntVector<CGameLink<CSpawnPointComponent>>",
     "&Vector_CSpawnerActorBlueprint_DAT_71729aa9d0": "base::global::CRntVector<CSpawnerActorBlueprint>",
     "&Trigger_DAT_71726f4968": "base::global::CRntVector<std::unique_ptr<CTriggerComponent::SActivationCondition>>",
-    "&DictStr_ListStr_DAT_71726f5da0":
-        ("base::global::CRntDictionary<base::global::CStrId, base::global::CRntVector<base::global::CStrId>>"),
+    "&DictStr_ListStr_DAT_71726f5da0": (
+        "base::global::CRntDictionary<base::global::CStrId, base::global::CRntVector<base::global::CStrId>>"
+    ),
     "&VectorStrId_DAT_7101d03998": "base::global::CRntVector<base::global::CStrId>",
     "&DAT_71726f8e78": "base::global::CRntVector<SDoorInfo>",
     "&DAT_71726fd0c0": "base::global::CRntVector<SWorldGraphNode>",
@@ -267,13 +250,13 @@ _aliases = {
 def clean_crc_var(crc_var: str) -> str:
     for prefix in prefixes_to_remove:
         if crc_var.startswith(prefix):
-            crc_var = crc_var[len(prefix):].strip()
+            crc_var = crc_var[len(prefix) :].strip()
     return crc_var
 
 
 def fix_alternative_ghidra_name(name: str) -> str:
     if name.endswith("Ptr"):
-        name = name[:-len("Ptr")] + "*"
+        name = name[: -len("Ptr")] + "*"
     name = name.replace("_const", " const")
     name = name.replace(",_", ", ")
     name = name.replace("_Ptr", " Ptr")
@@ -285,13 +268,19 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
     if fields_function is None:
         return {}
 
-    res = bridge.remote_eval("""
+    res = bridge.remote_eval(
+        """
         ifc.decompileFunction(fields_function, 180, monitor)
-    """, timeout_override=200, fields_function=fields_function, ifc=ifc, monitor=monitor)
+    """,
+        timeout_override=200,
+        fields_function=fields_function,
+        ifc=ifc,
+        monitor=monitor,
+    )
 
     decompiled_code = str(res.getCCodeMarkup())
     hash_call_re = re.compile(hash_str + r'\(([^,]+?),"?([^,]+?)"?,(?:1|true)\);')
-    register_call_re = re.compile(register_field + r'\([^,]+?,([^,]+?),(.+?),([^,]+?),([^,]+?),([^,]+?)\);')
+    register_call_re = re.compile(register_field + r"\([^,]+?,([^,]+?),(.+?),([^,]+?),([^,]+?),([^,]+?)\);")
 
     crc_mapping = collections.defaultdict(list)
     fields = {}
@@ -314,20 +303,20 @@ def get_field_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, fi
 
         if "&" in type_var:
             if "::_" in type_var:
-                type_name = type_var[type_var.find("&") + 1:type_var.find("::_")]
+                type_name = type_var[type_var.find("&") + 1 : type_var.find("::_")]
             else:
                 type_name = type_var
         else:
             i = decompiled_code.rfind(type_var, offset, m.start())
-            end = decompiled_code.find(';', i)
-            type_name = decompiled_code[i + len(type_var) + len(" = "):end]
+            end = decompiled_code.find(";", i)
+            type_name = decompiled_code[i + len(type_var) + len(" = ") : end]
             for prefix in prefixes_to_remove:
                 if type_name.startswith(prefix):
-                    type_name = type_name[len(prefix):].strip()
+                    type_name = type_name[len(prefix) :].strip()
             if type_name.endswith("()"):
-                type_name = type_name[:-len("()")]
+                type_name = type_name[: -len("()")]
             if type_name.endswith("::init"):
-                type_name = type_name[:-len("::init")]
+                type_name = type_name[: -len("::init")]
 
         fields[crc_string] = _aliases.get(type_name, type_name)
 
@@ -338,13 +327,19 @@ def get_value_registrations(bridge: ghidra_bridge.GhidraBridge, ifc, monitor, va
     if values_function is None:
         return None
 
-    res = bridge.remote_eval("""
+    res = bridge.remote_eval(
+        """
         ifc.decompileFunction(values_function, 180, monitor)
-    """, timeout_override=200, values_function=values_function, ifc=ifc, monitor=monitor)
+    """,
+        timeout_override=200,
+        values_function=values_function,
+        ifc=ifc,
+        monitor=monitor,
+    )
 
     decompiled_code = str(res.getCCodeMarkup())
     hash_call_re = re.compile(hash_str + r'\(([^,]+?),"?([^,]+?)"?,(?:1|true)\);')
-    enum_call_re = re.compile(add_enum_value + r'\([^,]+?,([^,]+?),(.+?)\);')
+    enum_call_re = re.compile(add_enum_value + r"\([^,]+?,([^,]+?),(.+?)\);")
 
     crc_mapping = collections.defaultdict(list)
     values = {}
@@ -395,17 +390,17 @@ def get_function_list() -> dict[str, tuple[int, int, int]]:
         values_funcs = {}
         for name, func_id in result_fields + result_init + result_values:
             if name.startswith("Reflection::"):
-                name = name[len("Reflection::"):]
+                name = name[len("Reflection::") :]
 
             if name.startswith("base::reflection::CollectionTypeMapper"):
                 continue
 
             if name.endswith("::init"):
-                init_funcs[name[:-len("::init")]] = func_id
+                init_funcs[name[: -len("::init")]] = func_id
             elif name.endswith("::fields"):
-                fields_funcs[name[:-len("::fields")]] = func_id
+                fields_funcs[name[: -len("::fields")]] = func_id
             elif name.endswith("::values"):
-                values_funcs[name[:-len("::values")]] = func_id
+                values_funcs[name[: -len("::values")]] = func_id
 
         return {
             name: (init_funcs.get(name), fields_funcs.get(name), values_funcs.get(name))
@@ -434,9 +429,9 @@ def initialize_worker():
     ifc.openProgram(flat_api.currentProgram)
 
 
-def decompile_type(type_name: str, init_id: typing.Optional[int], fields_id: typing.Optional[int],
-                   values_id: typing.Optional[int]
-                   ) -> tuple[str, typing.Optional[str], dict[str, str], dict[str, int]]:
+def decompile_type(
+    type_name: str, init_id: typing.Optional[int], fields_id: typing.Optional[int], values_id: typing.Optional[int]
+) -> tuple[str, typing.Optional[str], dict[str, str], dict[str, int]]:
     if bridge is None:
         raise ValueError("Bridge not initialized")
 
@@ -450,35 +445,44 @@ def find_parent(f):
 
     parent_init: typing.Optional[str] = None
     if init_id is not None:
-        parent_init = bridge.remote_eval("""find_parent(
+        parent_init = bridge.remote_eval(
+            """find_parent(
             currentProgram.getFunctionManager().getFunctionAt(
                 currentProgram.getSymbolTable().getSymbol(func_id).getAddress()
             )
-        )""", func_id=init_id)
+        )""",
+            func_id=init_id,
+        )
 
     func = None
     if fields_id is not None:
-        func = bridge.remote_eval("""
+        func = bridge.remote_eval(
+            """
             currentProgram.getFunctionManager().getFunctionAt(
                 currentProgram.getSymbolTable().getSymbol(func_id).getAddress()
             )
-        """, func_id=fields_id)
+        """,
+            func_id=fields_id,
+        )
 
     fields = get_field_registrations(bridge, ifc, monitor, func)
 
     func = None
     if values_id is not None:
-        func = bridge.remote_eval("""
+        func = bridge.remote_eval(
+            """
             currentProgram.getFunctionManager().getFunctionAt(
                 currentProgram.getSymbolTable().getSymbol(func_id).getAddress()
             )
-        """, func_id=values_id)
+        """,
+            func_id=values_id,
+        )
     values = get_value_registrations(bridge, ifc, monitor, func)
 
     if parent_init is not None:
         if parent_init.startswith("Reflection::"):
-            parent_init = parent_init[len("Reflection::"):]
-        parent_init = parent_init[:-len("::init")]
+            parent_init = parent_init[len("Reflection::") :]
+        parent_init = parent_init[: -len("::init")]
 
     return type_name, parent_init, fields, values
 
@@ -507,6 +511,7 @@ def decompile_in_background(all_fields_functions: dict[str, tuple[int, int, int]
 
     if total_count > process_count:
         with multiprocessing.Pool(processes=process_count, initializer=initialize_worker) as pool:
+
             def error_callback(name, e):
                 failed.append(name)
                 msg = "".join(traceback.format_exception(type(e), e, e.__traceback__))
@@ -571,8 +576,12 @@ def is_container_or_ptr(name: str):
     return any(name.endswith(suffix) for suffix in suffixes) or any(name.startswith(prefix) for prefix in prefixes)
 
 
-def main(only_missing: bool = True, ignore_without_hash: bool = True,
-         ignore_container_or_ptr: bool = True, query_ghidra: bool = True):
+def main(
+    only_missing: bool = True,
+    ignore_without_hash: bool = True,
+    ignore_container_or_ptr: bool = True,
+    query_ghidra: bool = True,
+):
     print("Getting function list")
     all_fields_functions = get_function_list() if query_ghidra else {}
     print(f"Got {len(all_fields_functions)} functions!")
@@ -635,10 +644,7 @@ def main(only_missing: bool = True, ignore_without_hash: bool = True,
         old_data[key] = value
 
     with path.open("w") as f:
-        json.dump({
-            key: old_data[key]
-            for key in sorted(old_data.keys())
-        }, f, indent=4)
+        json.dump({key: old_data[key] for key in sorted(old_data.keys())}, f, indent=4)
 
 
 def _merge_split_types(final_results: dict[str, typing.Any]):
@@ -650,8 +656,14 @@ def _merge_split_types(final_results: dict[str, typing.Any]):
             continue
 
         last_part = key.split("::")[-1]
-        if last_part.startswith("E") or last_part in {"SKey", "CParams", "SState", "CDefinition", "SSubState",
-                                                      "CActorDef"}:
+        if last_part.startswith("E") or last_part in {
+            "SKey",
+            "CParams",
+            "SState",
+            "CDefinition",
+            "SSubState",
+            "CActorDef",
+        }:
             continue
 
         similar = [other for other in final_results.keys() if other.endswith(last_part) and other != key]
@@ -690,5 +702,5 @@ def simple_decompile():
     # print(decompile_function(*all_fields_functions[4]))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

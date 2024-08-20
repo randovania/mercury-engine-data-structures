@@ -178,9 +178,11 @@ sr_missing = [
     "system/fx/textures/wind_arc.bctex",
 ]
 
+
 @pytest.mark.parametrize("bctex_path", dread_data.all_files_ending_with(".bctex"))
 def test_compare_dread(dread_file_tree, bctex_path):
     parse_build_compare_editor_parsed(Bctex, dread_file_tree, bctex_path)
+
 
 @pytest.mark.parametrize("bctex_path", samus_returns_data.all_files_ending_with(".bctex", sr_missing))
 def test_compare_sr(samus_returns_tree, bctex_path):

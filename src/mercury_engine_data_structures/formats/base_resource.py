@@ -28,8 +28,7 @@ class BaseResource:
 
     @classmethod
     def parse(cls, data: bytes, target_game: Game, editor: FileTreeEditor | None = None) -> typing_extensions.Self:
-        return cls(cls.construct_class(target_game).parse(data, target_game=target_game),
-                   target_game, editor)
+        return cls(cls.construct_class(target_game).parse(data, target_game=target_game), target_game, editor)
 
     def build(self) -> bytes:
         return self.construct_class(self.target_game).build(self._raw, target_game=self.target_game)

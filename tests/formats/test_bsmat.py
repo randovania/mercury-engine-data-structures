@@ -12,8 +12,9 @@ def test_compare_dread_all(dread_file_tree, bsmat_path):
 
 
 def test_get_uniform(dread_file_tree):
-    mat = dread_file_tree.get_parsed_asset("system/engine/surfaces/mp_accesspointabstractcubesorbital.bsmat",
-                                           type_hint=Bsmat)
+    mat = dread_file_tree.get_parsed_asset(
+        "system/engine/surfaces/mp_accesspointabstractcubesorbital.bsmat", type_hint=Bsmat
+    )
 
     extra_uniform = mat.get_uniform("vConstant0", in_extra=True)
     assert extra_uniform.name == "vConstant0"
@@ -27,8 +28,9 @@ def test_get_uniform(dread_file_tree):
 
 
 def test_get_sampler(dread_file_tree):
-    mat = dread_file_tree.get_parsed_asset("system/engine/surfaces/mp_accesspointabstractcubesorbital.bsmat",
-                                           type_hint=Bsmat)
+    mat = dread_file_tree.get_parsed_asset(
+        "system/engine/surfaces/mp_accesspointabstractcubesorbital.bsmat", type_hint=Bsmat
+    )
 
     extra_sampler = mat.get_sampler("texVoice", in_extra=True)
     assert extra_sampler.name == "texVoice"

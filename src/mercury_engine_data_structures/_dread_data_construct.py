@@ -8,6 +8,7 @@ class CompressedZSTD(construct.Tunnel):
     def __init__(self, subcon, level: int = 3):
         super().__init__(subcon)
         import zstd
+
         self.lib = zstd
         self.level = level
 
@@ -26,7 +27,7 @@ class HashesDict(construct.Construct):
             construct.Sequence(
                 construct.PascalString(construct.Int16un, "ascii"),  # key
                 construct.Int64un,  # hash
-            )
+            ),
         )
 
     def _parse(self, stream, context, path) -> typing.Dict[str, int]:

@@ -10,17 +10,17 @@ from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
 
 VALID_BTUNDA_VERSIONS = [
-    "119.0.2", # 1.0.0
-    "128.0.2", # 2.1.0
+    "119.0.2",  # 1.0.0
+    "128.0.2",  # 2.1.0
 ]
 
 BTUNDA = Struct(
-    _class_crc=construct.Const('base::tunable::CTunableManager', PropertyEnum),
+    _class_crc=construct.Const("base::tunable::CTunableManager", PropertyEnum),
     version=VersionAdapter(),
     _version_check=construct.Check(lambda ctx: ctx.version in VALID_BTUNDA_VERSIONS),
-    root_type=construct.Const('Root', PropertyEnum),
-    Root=type_lib.get_type_lib_dread().get_type('base::tunable::CTunableManager').construct,
-    _end=construct.Terminated
+    root_type=construct.Const("Root", PropertyEnum),
+    Root=type_lib.get_type_lib_dread().get_type("base::tunable::CTunableManager").construct,
+    _end=construct.Terminated,
 )
 
 PLAYER_TUNABLE_LATEST_ONLY = [
@@ -58,6 +58,7 @@ PLAYER_TUNABLE_LATEST_ONLY = [
     "bEasyModeEnemyProjectileOneHit",
     "fEasyModeKraidBouncingCreatureLifeFactor",
 ]
+
 
 class Btunda(BaseResource):
     """

@@ -31,9 +31,7 @@ CollisionEntry = Struct(
     data=Switch(
         construct.this.type,
         collision_formats,
-        ErrorWithMessage(
-            lambda ctx: f"Type {ctx.type} not known, valid types are {list(collision_formats.keys())}."
-        )
+        ErrorWithMessage(lambda ctx: f"Type {ctx.type} not known, valid types are {list(collision_formats.keys())}."),
     ),
 )
 

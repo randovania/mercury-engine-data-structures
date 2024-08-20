@@ -57,8 +57,7 @@ class CRCAdapter(construct.Adapter):
             return self.hash_set.inverted_hashes(context)[obj]
         except KeyError:
             msg = "no mapping for 0x{:08X} ({})".format(
-                obj, obj.to_bytes(self._raw_subcon.sizeof(target_game=context._params.target_game),
-                                  "little")
+                obj, obj.to_bytes(self._raw_subcon.sizeof(target_game=context._params.target_game), "little")
             )
             if self.allow_unknowns:
                 if self.display_warnings:
@@ -83,10 +82,7 @@ class CRCAdapter(construct.Adapter):
                     game: Game = context._params.target_game
                     return game.hash_asset(obj)
 
-            raise construct.MappingError(
-                "building failed, " + msg,
-                path=path
-            )
+            raise construct.MappingError("building failed, " + msg, path=path)
 
     def _emitparse(self, code: construct.CodeGen):
         n = self.hash_set.name

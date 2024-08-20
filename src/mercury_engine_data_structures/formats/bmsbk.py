@@ -26,11 +26,14 @@ Block = Struct(
     "vignette_name" / StrId,
 )  # fmt: skip
 
+
 def _rebuild_blocks(ctx: Container) -> int:
     return sum(len(group.blocks) for group in ctx.types)
 
+
 def _rebuild_types(ctx: Container) -> int:
     return len(ctx.types)
+
 
 BlockGroup = Struct(
     "_num_blocks" / Rebuild(Int32ul, _rebuild_blocks),
@@ -52,6 +55,7 @@ BMSBK = Struct(
     )),
     Terminated,
 )  # fmt: skip
+
 
 class Bmsbk(BaseResource):
     @classmethod

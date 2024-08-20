@@ -15,7 +15,7 @@ class Brfld(BaseResource):
     @classmethod
     @functools.lru_cache
     def construct_class(cls, target_game: Game) -> construct.Construct:
-        return standard_format.game_model('CScenario', "49.0.2")
+        return standard_format.game_model("CScenario", "49.0.2")
 
     def actors_for_layer(self, name: str) -> dict:
         return self.raw.Root.pScenario.rEntitiesLayer.dctSublayers[name].dctActors
@@ -29,7 +29,7 @@ class Brfld(BaseResource):
                 yield layer_name, actor_name, actor
 
     def follow_link(self, link: str):
-        if link != '{EMPTY}':
+        if link != "{EMPTY}":
             result = self.raw
             for part in link.split(":"):
                 result = result[part]
@@ -68,8 +68,9 @@ class Brfld(BaseResource):
         param actor_name: name of the actor to add to the group
         param layer_name: name of the layer the actor belongs to
         """
-        collision_camera_groups = [group for group in self.all_actor_groups()
-                                   if group.startswith(f"eg_{collision_camera_name}")]
+        collision_camera_groups = [
+            group for group in self.all_actor_groups() if group.startswith(f"eg_{collision_camera_name}")
+        ]
         for group in collision_camera_groups:
             logger.debug("Add actor %s to group %s", actor_name, group)
             self.add_actor_to_group(group, actor_name, layer_name)

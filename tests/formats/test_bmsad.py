@@ -354,6 +354,7 @@ sr_missing = [
     "cutscenes/variasuit/takes/05/actors/samus/samus.bmsad",
 ]
 
+
 @pytest.mark.parametrize("bmsad_path", dread_data.all_files_ending_with(".bmsad"))
 def test_compare_dread_all(dread_file_tree, bmsad_path):
     if bmsad_path in expected_dread_failures:
@@ -362,9 +363,7 @@ def test_compare_dread_all(dread_file_tree, bmsad_path):
         expectation = contextlib.nullcontext()
 
     with expectation:
-        parse_build_compare_editor(
-            Bmsad, dread_file_tree, bmsad_path
-        )
+        parse_build_compare_editor(Bmsad, dread_file_tree, bmsad_path)
 
 
 @pytest.mark.parametrize("bmsad_path", samus_returns_data.all_files_ending_with(".bmsad", sr_missing))
@@ -374,8 +373,7 @@ def test_compare_sr_all(samus_returns_tree, bmsad_path):
 
 def test_api_dread_actordef(dread_file_tree: FileTreeEditor):
     bmsad = dread_file_tree.get_parsed_asset(
-        "actors/logic/breakablehint/charclasses/breakablehint.bmsad",
-        type_hint=Bmsad
+        "actors/logic/breakablehint/charclasses/breakablehint.bmsad", type_hint=Bmsad
     )
 
     fakename = "foo"
@@ -410,10 +408,7 @@ def test_api_dread_actordef(dread_file_tree: FileTreeEditor):
 
 
 def test_api_dread_charclass(dread_file_tree: FileTreeEditor):
-    bmsad = dread_file_tree.get_parsed_asset(
-        "actors/props/doorheat/charclasses/doorheat.bmsad",
-        type_hint=Bmsad
-    )
+    bmsad = dread_file_tree.get_parsed_asset("actors/props/doorheat/charclasses/doorheat.bmsad", type_hint=Bmsad)
 
     fakename = "foo"
 
@@ -431,7 +426,7 @@ def test_api_dread_charclass(dread_file_tree: FileTreeEditor):
         ("props/heatdoor/hdoor_open_02.wav", 1),
         ("props/heatdoor/hdoor_close_01.wav", 1),
         ("props/heatdoor/hdoor_init.wav", 1),
-        ("props/heatdoor/hdoor_open_01.wav", 1)
+        ("props/heatdoor/hdoor_open_01.wav", 1),
     ]
 
     navmesh = bmsad.components["NAVMESHITEM"]
@@ -467,11 +462,7 @@ def test_api_dread_charclass(dread_file_tree: FileTreeEditor):
 
     # functions
     funcs = list(navmesh.functions)
-    assert [func.name for func in funcs] == [
-        "CreateStage",
-        "AddStageCollider",
-        "CreateStage"
-    ]
+    assert [func.name for func in funcs] == ["CreateStage", "AddStageCollider", "CreateStage"]
     newfunc = ActorDefFunc.new("CreateStage")
     newfunc.set_param("Stage", "in-between")
     funcs.append(newfunc)

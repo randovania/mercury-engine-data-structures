@@ -7,7 +7,8 @@ from mercury_engine_data_structures.common_types import CVector2D, CVector3D, St
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
-TileBorders = FlagsEnum(Int32sl,
+TileBorders = FlagsEnum(
+    Int32sl,
     TOP=1,
     BOTTOM=2,
     LEFT=4,

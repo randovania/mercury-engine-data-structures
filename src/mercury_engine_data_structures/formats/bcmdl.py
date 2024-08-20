@@ -38,7 +38,7 @@ Ptr = Hex(Int64ul)
 # pad 0xFF bytes to an offset of 8
 PadTo8B = Struct(
     _cur_pos=Tell,
-    padding=construct.Padding((8 - construct.this._cur_pos) % 8, pattern=b'\xff'),
+    padding=construct.Padding((8 - construct.this._cur_pos) % 8, pattern=b"\xff"),
 )
 
 # an entry in a linked-list typically pointed to by TOC.
@@ -58,7 +58,7 @@ Vertex_Info_entry = Struct(
     offset=Int32ul,  # the offset from the start of decompressed Vert_Buffer
     data_type=Int16ul,  # always 3?
     count=Int16ul,  # number of entries
-    unk=Int32ul
+    unk=Int32ul,
 ).compile()
 
 # vertex buffer
@@ -67,9 +67,9 @@ Vert_Buffer = Struct(
     buf=IfThenElse(
         construct.this._gzip_header != 559903,  # gzip header
         Bytes(construct.this._.buffer_size),
-        Bytes(construct.this._.comp_size)  # TODO inflate this and have it correctly deflate
+        Bytes(construct.this._.comp_size),  # TODO inflate this and have it correctly deflate
     ),
-    _padding=PadTo8B
+    _padding=PadTo8B,
 )
 
 # vertex info and buffer ptr
@@ -83,7 +83,7 @@ Vertex_Info = Struct(
     info_count=Int32ul,
     const0=Const(-1, Int32sl),
     infos=Array(construct.this.info_count, Vertex_Info_entry),
-    verts=Pointer(construct.this.buffer_offset, Vert_Buffer)
+    verts=Pointer(construct.this.buffer_offset, Vert_Buffer),
 ).compile()
 
 # triangle(?) buffer
@@ -92,9 +92,9 @@ Tri_Buffer = Struct(
     buf=IfThenElse(
         construct.this._gzip_header != 559903,
         Bytes(construct.this._.idx_count * 2),
-        Bytes(construct.this._.comp_size)  # TODO inflate and have it correctly deflate
+        Bytes(construct.this._.comp_size),  # TODO inflate and have it correctly deflate
     ),
-    _padding=PadTo8B
+    _padding=PadTo8B,
 )
 
 # Triangle info(?) and buffer ptr
@@ -107,7 +107,7 @@ Tri_Info = Struct(
     comp_size=Int32ul,  # if compressed, buffer size comp_size
     const1=Const(-1, Int32sl),
     _tri_buffer_offset=Ptr,
-    tri_buffer_offset=Pointer(construct.this._tri_buffer_offset, Tri_Buffer)
+    tri_buffer_offset=Pointer(construct.this._tri_buffer_offset, Tri_Buffer),
 ).compile()
 
 # submesh info(?) pointed to by TOC2_entry._submesh_info_offsets_ptr
@@ -118,7 +118,7 @@ submesh_info = Struct(
     index_count=Int32ul,
     jMapEntryCount=Int32ul,
     jMapOffset=Ptr,
-    jMap=Pointer(construct.this.jMapOffset, Array(construct.this.jMapEntryCount, Int32ul))
+    jMap=Pointer(construct.this.jMapOffset, Array(construct.this.jMapEntryCount, Int32ul)),
 ).compile()
 
 # TOC2 entry, noe plugin thinks its submesh
@@ -132,14 +132,14 @@ TOC2_entry = Struct(
     const1=Const(-1, Int32sl),
     _submesh_info_offsets_ptr=Ptr,  # submeshInfoOffsets in noe plugin
     transform=Array(3, Float),
-    const2=Const(-1, Int32sl)
+    const2=Const(-1, Int32sl),
 ).compile()
 
 # string padded with 0xFF bytes until an offset of 8
 Padded_String = Struct(
     str=StrId,
     _cur_pos=Tell,
-    _padding=construct.Padding((8 - construct.this._cur_pos) % 8, pattern=b'\xff'),
+    _padding=construct.Padding((8 - construct.this._cur_pos) % 8, pattern=b"\xff"),
 )
 
 # material entry
@@ -174,7 +174,7 @@ MESH_entry = Struct(
     MAT_ptr=Ptr,  # points to MAT_entry
     MESHNAME_ptr=Ptr,  # points to MESHNAME_entry
     visible=Flag,
-    _remainder=Array(7, Byte)
+    _remainder=Array(7, Byte),
 ).compile()
 
 # mesh name, also controls whether mesh is visible
@@ -209,11 +209,8 @@ joint_entry = Struct(
     _parent_name_ptr=Ptr,
     _unk=Int64ul,
     name=Pointer(construct.this._name_ptr, Padded_String),
-    parent=If(
-        construct.this._parent_name_ptr != 0,
-        Pointer(construct.this._parent_name_ptr, Padded_String)
-    ),
-    transform=Pointer(construct.this._transform, transform)
+    parent=If(construct.this._parent_name_ptr != 0, Pointer(construct.this._parent_name_ptr, Padded_String)),
+    transform=Pointer(construct.this._transform, transform),
 ).compile()
 
 # joints TOC since it's not a linked-list
@@ -247,15 +244,9 @@ toc9_subinfo = Struct(
 # BUG: either pointer can be null, and size can be one or two.
 TOC9_info = Struct(
     ptr0=Ptr,
-    ptr0_ref=If(
-        construct.this.ptr0 != 0,
-        Pointer(construct.this.ptr0, toc9_subinfo)
-    ),
+    ptr0_ref=If(construct.this.ptr0 != 0, Pointer(construct.this.ptr0, toc9_subinfo)),
     ptr1=Ptr,
-    ptr1_ref=If(
-        construct.this.ptr1 != 0,
-        Pointer(construct.this.ptr1, toc9_subinfo)
-    )
+    ptr1_ref=If(construct.this.ptr1 != 0, Pointer(construct.this.ptr1, toc9_subinfo)),
 ).compile()
 
 # wrapper struct that takes a pointer and parses a TOC9_info if it's nonzero
@@ -308,7 +299,6 @@ TOC = Struct(
 Header = Struct(
     _magic=Const(b"MMDL"),
     _ver=Const(0x003A0001, Hex(Int32ul)),
-
     toc=TOC,
 ).compile()
 
@@ -401,8 +391,9 @@ class Mdl(Construct):
             smit.submesh_infos = ListContainer()
             for cont in smit.subtoc_entries:
                 stream_seek(stream, cont.ptr, 0, path)
-                smit.submesh_infos.append(submesh_info._parsereport(stream, context,
-                                                                    f"{path} -> submeshes -> TOC -> infos"))
+                smit.submesh_infos.append(
+                    submesh_info._parsereport(stream, context, f"{path} -> submeshes -> TOC -> infos")
+                )
 
         # materials
         materials = ListContainer()
@@ -606,5 +597,7 @@ class Bcmdl(BaseResource):
                     return
                 else:
                     raise ValueError(f"Material path {new_path} is longer than original path {mat.path}!")
-        raise ValueError(f"Material name {mat_name} not found in model! "
-                         "Ensure you are using the material's name rather than its path.")
+        raise ValueError(
+            f"Material name {mat_name} not found in model! "
+            "Ensure you are using the material's name rather than its path."
+        )

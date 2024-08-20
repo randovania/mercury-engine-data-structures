@@ -29,10 +29,7 @@ def all_name_to_asset_id() -> Dict[str, int]:
 
 @functools.lru_cache
 def all_asset_id_to_name() -> Dict[int, str]:
-    return {
-        asset_id: name
-        for name, asset_id in all_name_to_asset_id().items()
-    }
+    return {asset_id: name for name, asset_id in all_name_to_asset_id().items()}
 
 
 def name_for_asset_id(asset_id: int) -> Optional[str]:
@@ -54,10 +51,8 @@ def all_name_to_property_id() -> Dict[str, int]:
 def all_property_id_to_name() -> Dict[int, str]:
     names = all_name_to_property_id()
 
-    return {
-        asset_id: name
-        for name, asset_id in names.items()
-    }
+    return {asset_id: name for name, asset_id in names.items()}
+
 
 def all_files_ending_with(ext: str, exclusions: Optional[list[str]] = None) -> list[str]:
     if not ext.startswith("."):
@@ -66,5 +61,4 @@ def all_files_ending_with(ext: str, exclusions: Optional[list[str]] = None) -> l
     if exclusions is None:
         exclusions = []
 
-    return [name for name in all_name_to_asset_id().keys()
-            if name.endswith(ext) and name not in exclusions]
+    return [name for name in all_name_to_asset_id().keys() if name.endswith(ext) and name not in exclusions]

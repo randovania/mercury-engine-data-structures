@@ -19,19 +19,19 @@ from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
 
 ArgumentCases = {
-    'b': Flag,
-    's': StrId,
-    'f': Float,
-    'u': Int32ul,
-    'i': Int32sl,
-    'e': StrId,
-    'o': Int32ul,
-    'v': Array(3, Float)
+    "b": Flag,
+    "s": StrId,
+    "f": Float,
+    "u": Int32ul,
+    "i": Int32sl,
+    "e": StrId,
+    "o": Int32ul,
+    "v": Array(3, Float),
 }
 
 StrKeyArgument = Struct(
-    key = StrId,
-    val = Switch(
+    key=StrId,
+    val=Switch(
         construct.this.key[0],
         ArgumentCases,
         construct.Error,
@@ -39,8 +39,8 @@ StrKeyArgument = Struct(
 )
 
 CrcKeyArgument = Struct(
-    key = PropertyEnum,
-    val = Switch(
+    key=PropertyEnum,
+    val=Switch(
         construct.this.key[0],
         ArgumentCases,
         construct.Error,
@@ -48,18 +48,17 @@ CrcKeyArgument = Struct(
 )
 
 Behavior = Struct(
-    type = PropertyEnum,
-    args = PrefixedArray(Int32ul, CrcKeyArgument),
-    children = PrefixedArray(Int32ul, LazyBound(lambda: Behavior)),
+    type=PropertyEnum,
+    args=PrefixedArray(Int32ul, CrcKeyArgument),
+    children=PrefixedArray(Int32ul, LazyBound(lambda: Behavior)),
 )
 
 BMTRE = Struct(
-    _magic = Const(b"BTRE"),
-    version = VersionAdapter("1.5.0"),
-    args = PrefixedArray(Int32ul, StrKeyArgument),
-    behavior = Behavior,
+    _magic=Const(b"BTRE"),
+    version=VersionAdapter("1.5.0"),
+    args=PrefixedArray(Int32ul, StrKeyArgument),
+    behavior=Behavior,
 )
-
 
 
 class Bmtre(BaseResource):
@@ -69,7 +68,7 @@ class Bmtre(BaseResource):
 
     # private func to print a line in the pretty printer
     def _pretty_print_line(self, text: str, depth: int) -> None:
-        print('    ' * depth + text)
+        print("    " * depth + text)
 
     # private func to print a string's type and args
     def _type_and_args_string(self, behavior: Container) -> str:
@@ -78,9 +77,9 @@ class Bmtre(BaseResource):
             res += " ("
             for arg in behavior.args:
                 res += f"{arg.key}={arg.val}, "
-            res = res[:-2] # remove the last comma
+            res = res[:-2]  # remove the last comma
             res += ")"
-        res = res[14:] # remove "behaviortree::" from start
+        res = res[14:]  # remove "behaviortree::" from start
         return res
 
     # private func to pretty-print a behaviortree element
@@ -88,35 +87,35 @@ class Bmtre(BaseResource):
         # Repeats the behavior of its child regardless of success or failure
         if behavior.type == "behaviortree::CRepeat":
             self._pretty_print_line("Repeat behavior:", depth)
-            self._pretty_print_behavior(behavior.children[0], depth+1)
+            self._pretty_print_behavior(behavior.children[0], depth + 1)
 
         # if the first child returns success, runs the second child. otherwise runs the third child.
-        elif behavior.type ==  "behaviortree::CIf":
+        elif behavior.type == "behaviortree::CIf":
             self._pretty_print_line("If:", depth)
-            self._pretty_print_behavior(behavior.children[0], depth+1)
+            self._pretty_print_behavior(behavior.children[0], depth + 1)
             self._pretty_print_line("Then:", depth)
-            self._pretty_print_behavior(behavior.children[1], depth+1)
+            self._pretty_print_behavior(behavior.children[1], depth + 1)
             self._pretty_print_line("Else:", depth)
-            self._pretty_print_behavior(behavior.children[2], depth+1)
+            self._pretty_print_behavior(behavior.children[2], depth + 1)
 
         # runs children in sequence until one fails, then returns to parent
-        elif behavior.type ==  "behaviortree::CSequence":
+        elif behavior.type == "behaviortree::CSequence":
             self._pretty_print_line("Sequence:", depth)
             for child in behavior.children:
-                self._pretty_print_behavior(child, depth+1)
+                self._pretty_print_behavior(child, depth + 1)
 
         # runs children in sequence until one succeeds, then returns to parent
-        elif behavior.type ==  "behaviortree::CSelector":
+        elif behavior.type == "behaviortree::CSelector":
             self._pretty_print_line("Selector:", depth)
             for child in behavior.children:
-                self._pretty_print_behavior(child, depth+1)
+                self._pretty_print_behavior(child, depth + 1)
 
         # runs *all* children in parallel until all succeed or one fails.
         # if one fails, it terminates all other children and returns to parent
-        elif behavior.type ==  "behaviortree::CParallel":
+        elif behavior.type == "behaviortree::CParallel":
             self._pretty_print_line("Parallel:", depth)
             for child in behavior.children:
-                self._pretty_print_behavior(child, depth+1)
+                self._pretty_print_behavior(child, depth + 1)
 
         else:
             self._pretty_print_line(self._type_and_args_string(behavior), depth)
