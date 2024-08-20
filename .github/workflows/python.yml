@@ -145,7 +145,7 @@ jobs:
 
       - name: Run Tests
         run:
-          venv/bin/python -m pytest --cov mercury_engine_data_structures --cov-report=xml --fail-if-missing --durations=100 -n 2
+          venv/bin/python -m pytest --cov mercury_engine_data_structures --cov-report=xml --fail-if-missing --durations=100 -n 8
 
       - name: codecov
         uses: codecov/codecov-action@v4
