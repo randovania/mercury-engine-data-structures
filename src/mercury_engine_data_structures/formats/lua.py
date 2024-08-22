@@ -14,7 +14,7 @@ if typing.TYPE_CHECKING:
     from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 
 LUA = construct.Struct(
-    lua_text = StrId,
+    lua_text=StrId,
 )
 
 

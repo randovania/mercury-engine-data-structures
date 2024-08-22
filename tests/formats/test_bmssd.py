@@ -20,9 +20,11 @@ sr_missing = [
     "maps/levels/c10_samus/s920_traininggallery/s920_traininggallery.bmssd",
 ]
 
+
 @pytest.mark.parametrize("bmssd_path", dread_data.all_files_ending_with(".bmssd"))
 def test_compare_dread(dread_file_tree, bmssd_path):
     parse_build_compare_editor(Bmssd, dread_file_tree, bmssd_path)
+
 
 @pytest.mark.parametrize("bmssd_path", samus_returns_data.all_files_ending_with(".bmssd", sr_missing))
 def test_compare_msr(samus_returns_tree, bmssd_path):

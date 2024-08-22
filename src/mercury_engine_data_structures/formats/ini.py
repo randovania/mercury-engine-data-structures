@@ -13,7 +13,7 @@ from mercury_engine_data_structures.game_check import Game
 if typing.TYPE_CHECKING:
     from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 
-INI = Struct('text' / GreedyString('utf-8'))
+INI = Struct("text" / GreedyString("utf-8"))
 
 
 class Ini(BaseResource):
@@ -40,7 +40,7 @@ class Ini(BaseResource):
         if self._config is None:
             self._config = ConfigParser(strict=False)
             self._config.optionxform = lambda option: option
-            self._config.read_string(self.raw.text, source='config.ini')
+            self._config.read_string(self.raw.text, source="config.ini")
         return self._config
 
     def build(self) -> bytes:

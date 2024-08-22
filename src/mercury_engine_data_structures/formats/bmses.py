@@ -36,7 +36,7 @@ BMSES = Struct(
             ))),
         ))),
     construct.Terminated,
-)
+)  # fmt: skip
 
 
 class Bmses(BaseResource):

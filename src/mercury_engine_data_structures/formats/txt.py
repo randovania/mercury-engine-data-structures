@@ -44,7 +44,7 @@ TXT = Struct(
     ),
     "strings" / DictAdapter(_string_range),
     "_end" / construct.Terminated,
-)
+)  # fmt: skip
 
 
 class Txt(BaseResource):

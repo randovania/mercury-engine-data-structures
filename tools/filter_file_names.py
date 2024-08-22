@@ -67,8 +67,9 @@ def main():
     else:
         raise ValueError(f"unsupported game {game}")
 
-    path = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures",
-                                              f"{short_game}_resource_names.json")
+    path = (
+        Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures", f"{short_game}_resource_names.json")
+    )
 
     game_root: Path = args.game_root
     toc = Toc.parse(
@@ -93,16 +94,14 @@ def main():
                     if new_name not in known_names:
                         known_names[new_name] = game.hash_asset(new_name)
 
-    filtered_names = {
-        name: value
-        for name, value in known_names.items()
-        if value in all_asset_id
-    }
-    path.write_text(json.dumps(
-        filtered_names,
-        indent=4,
-        sort_keys=True,
-    ))
+    filtered_names = {name: value for name, value in known_names.items() if value in all_asset_id}
+    path.write_text(
+        json.dumps(
+            filtered_names,
+            indent=4,
+            sort_keys=True,
+        )
+    )
     asset_ids_with_names = set(filtered_names.values())
 
     print(f"Paths in toc: {len(all_asset_id)}")
@@ -110,6 +109,7 @@ def main():
     print("\n\n")
 
     from mercury_engine_data_structures.formats import Pkg
+
     for pkg_path in game_root.rglob("*.pkg"):
         with pkg_path.open("rb") as f:
             # print(f"\n\n=== {pkg_path.relative_to(game_root)}")
@@ -130,5 +130,5 @@ def main():
                 print(f"{pkg_path.relative_to(game_root)}: {known_ids} known ids, {missing_ids} missing ids")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

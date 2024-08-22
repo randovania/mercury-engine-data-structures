@@ -9,13 +9,16 @@ from mercury_engine_data_structures.formats.gui_files import Bmscp, Bmssh, Bmssk
 def test_compare_bmscp_dread(dread_file_tree, bmscp_path):
     parse_build_compare_editor_parsed(Bmscp, dread_file_tree, bmscp_path)
 
+
 @pytest.mark.parametrize("bmssh_path", dread_data.all_files_ending_with(".bmssh"))
 def test_compare_bmssh_dread(dread_file_tree, bmssh_path):
     parse_build_compare_editor(Bmssh, dread_file_tree, bmssh_path)
 
+
 @pytest.mark.parametrize("bmssk_path", dread_data.all_files_ending_with(".bmssk"))
 def test_compare_bmssk_dread(dread_file_tree, bmssk_path):
     parse_build_compare_editor(Bmssk, dread_file_tree, bmssk_path)
+
 
 @pytest.mark.parametrize("bmsss_path", dread_data.all_files_ending_with(".bmsss"))
 def test_compare_bmsss_dread(dread_file_tree, bmsss_path):

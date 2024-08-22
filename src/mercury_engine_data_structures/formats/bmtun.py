@@ -20,15 +20,9 @@ TunableParam = Struct(
     type=Char,
     value=Switch(
         construct.this.type,
-        {
-            's': StrId,
-            'f': Float,
-            'b': Flag,
-            'i': Int32sl,
-            'v': CVector3D
-        },
-        ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
-    )
+        {"s": StrId, "f": Float, "b": Flag, "i": Int32sl, "v": CVector3D},
+        ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError),
+    ),
 )
 
 TunableClass = Struct(
@@ -41,7 +35,7 @@ BMTUN = Struct(
     "version" / VersionAdapter("1.5.0"),
     "classes" / make_dict(TunableClass),
     construct.Terminated,
-)
+)  # fmt: skip
 
 
 class Bmtun(BaseResource):

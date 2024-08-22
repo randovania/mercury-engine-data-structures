@@ -20,28 +20,33 @@ sr_missing = [
     "maps/levels/c10_samus/s920_traininggallery/s920_traininggallery.bmsld",
 ]
 
+
 @pytest.fixture()
 def surface_bmsld(samus_returns_tree) -> Bmsld:
     return samus_returns_tree.get_parsed_asset("maps/levels/c10_samus/s000_surface/s000_surface.bmsld", type_hint=Bmsld)
+
 
 @pytest.mark.parametrize("bmsld_path", samus_returns_data.all_files_ending_with(".bmsld", sr_missing))
 def test_bmsld(samus_returns_tree, bmsld_path):
     parse_build_compare_editor(Bmsld, samus_returns_tree, bmsld_path)
 
+
 def test_all_actor_groups(surface_bmsld: Bmsld):
     all_groups = surface_bmsld.all_actor_groups()
     assert len(list(all_groups)) == 32
 
-@pytest.mark.parametrize(("cc_name", "actor_name", "should_be_present"),
-                            [
-                                ("eg_SubArea_collision_camera_008", "LE_PowerUP_ChargeBeam", True),
-                                ("eg_SubArea_collision_camera_012", "LE_PowerUP_ChargeBeam", False),
-                                ("eg_SubArea_collision_camera_010", "SG_Alpha_001", True),
-                                ("eg_SubArea_collision_camera_020", "SG_Alpha_001", False),
-                                ("eg_SubArea_collision_camera_010", "LE_Item_001", True),
-                                ("eg_SubArea_collision_camera_012", "LE_Item_001", False),
-                            ]
-                         )
+
+@pytest.mark.parametrize(
+    ("cc_name", "actor_name", "should_be_present"),
+    [
+        ("eg_SubArea_collision_camera_008", "LE_PowerUP_ChargeBeam", True),
+        ("eg_SubArea_collision_camera_012", "LE_PowerUP_ChargeBeam", False),
+        ("eg_SubArea_collision_camera_010", "SG_Alpha_001", True),
+        ("eg_SubArea_collision_camera_020", "SG_Alpha_001", False),
+        ("eg_SubArea_collision_camera_010", "LE_Item_001", True),
+        ("eg_SubArea_collision_camera_012", "LE_Item_001", False),
+    ],
+)
 def test_is_actor_in_group(surface_bmsld: Bmsld, cc_name, actor_name, should_be_present):
     in_group = surface_bmsld.is_actor_in_group(cc_name, actor_name)
     assert in_group is should_be_present
@@ -54,17 +59,20 @@ def test_get_actor_group(surface_bmsld: Bmsld):
     with pytest.raises(KeyError):
         surface_bmsld.get_actor_group("blabla")
 
+
 def test_all_actors(surface_bmsld: Bmsld):
     all_actors = list(surface_bmsld.all_actors())
     assert len(all_actors) == 232
 
+
 def test_all_actor_group_names_for_actor(surface_bmsld: Bmsld):
     groups = surface_bmsld.all_actor_group_names_for_actor("LE_EnergyRecharge")
     assert groups == [
-        'eg_SubArea_collision_camera_010',
-        'eg_SubArea_collision_camera_023',
-        'eg_SubArea_PostAlpha_001',
+        "eg_SubArea_collision_camera_010",
+        "eg_SubArea_collision_camera_023",
+        "eg_SubArea_PostAlpha_001",
     ]
+
 
 def test_add_actor_to_entity_groups(surface_bmsld: Bmsld):
     groups = surface_bmsld.all_actor_group_names_for_actor("LE_AmmoRecharge")
@@ -77,6 +85,7 @@ def test_add_actor_to_entity_groups(surface_bmsld: Bmsld):
     surface_bmsld.add_actor_to_entity_groups("collision_camera_011", "LE_AmmoRecharge", True)
     groups = surface_bmsld.all_actor_group_names_for_actor("LE_AmmoRecharge")
     assert len(groups) == 5
+
 
 def test_remove_actor_from_all_groups(surface_bmsld: Bmsld):
     groups = surface_bmsld.all_actor_group_names_for_actor("Moheek_026")

@@ -6,7 +6,7 @@ from construct.core import FocusedSeq, If, IfThenElse, Peek, Prefixed
 
 
 class AlignTo(Construct):
-    def __init__(self, modulus, pattern = b"\x00"):
+    def __init__(self, modulus, pattern=b"\x00"):
         super().__init__()
         self.modulus = modulus
         self.pattern = pattern
@@ -29,7 +29,7 @@ class AlignTo(Construct):
 
 
 class AlignedPrefixed(Subconstruct):
-    def __init__(self, length_field, subcon, modulus, length_size, pad_byte=b"\xFF"):
+    def __init__(self, length_field, subcon, modulus, length_size, pad_byte=b"\xff"):
         super().__init__(subcon)
         self.length_field = length_field
         self.modulus = modulus
@@ -112,13 +112,14 @@ def PrefixedAllowZeroLen(lengthfield, subcon, includelengthfield=False):
     return FocusedSeq(
         "prefixed",
         "len" / Peek(lengthfield),
-        "prefixed" / Prefixed(
+        "prefixed"
+        / Prefixed(
             lengthfield,
             IfThenElse(
                 construct.this._parsing,
                 If(construct.this.len > 0, subcon),
                 If(construct.this.prefixed, subcon),
             ),
-            includelengthfield
-        )
+            includelengthfield,
+        ),
     )

@@ -9,6 +9,7 @@ from mercury_engine_data_structures.formats.bptdat import Bptdat, Bptdef
 def test_bptdat(dread_file_tree, bptdat_path):
     parse_build_compare_editor(Bptdat, dread_file_tree, bptdat_path)
 
+
 @pytest.mark.parametrize("bptdef_path", dread_data.all_files_ending_with(".bptdef"))
 def test_bptdef(dread_file_tree, bptdef_path):
     parse_build_compare_editor(Bptdef, dread_file_tree, bptdef_path)

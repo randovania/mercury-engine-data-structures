@@ -15,21 +15,22 @@ BMSEM = Struct(
     _magic=Const(b"MSEM"),
     _version=VersionAdapter("1.3.0"),
     groups=make_vector(Struct(
-            "group_name" / StrId,
-            "layers" / make_vector(Struct(
-                "layer_name" / StrId,
-                "entries" / make_vector(Struct(
-                    "collision_camera" / StrId,
-                    "song" / StrId,             # Is empty if cc is "default".
-                    "unk1" / Float32l,          # Always either 2.0 or 1.5
-                    "unk2" / Float32l,          # Always same number as unk1
-                    "unk3" / Int32ul,           # Always 1
-                    "unk4" / Int32ul            # Always 0
-                ))
+        "group_name" / StrId,
+        "layers" / make_vector(Struct(
+            "layer_name" / StrId,
+            "entries" / make_vector(Struct(
+                "collision_camera" / StrId,
+                "song" / StrId,  # Is empty if cc is "default".
+                "unk1" / Float32l,  # Always either 2.0 or 1.5
+                "unk2" / Float32l,  # Always same number as unk1
+                "unk3" / Int32ul,  # Always 1
+                "unk4" / Int32ul  # Always 0
             ))
+        ))
     )),
     rest=construct.GreedyBytes,
-)
+)  # fmt: skip
+
 
 class Bmsem(BaseResource):
     @classmethod

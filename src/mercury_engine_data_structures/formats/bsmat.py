@@ -31,7 +31,7 @@ translucency_type = Enum(
     TILING_CLAMPCOLOR=1,
     TILING_REPEAT=2,
     TILING_MIRROR=3,
-    TILING_INVALID=0xffffffff
+    TILING_INVALID=0xFFFFFFFF,
 )
 
 # blend operation
@@ -43,7 +43,7 @@ blend_op = Enum(
     REV_SUB=2,
     MIN=3,
     MAX=4,
-    INVALID=0xffffffff
+    INVALID=0xFFFFFFFF,
 )
 
 # blend mode
@@ -60,32 +60,23 @@ blend_mode = Enum(
     ONE_MINUS_SRC_ALPHA=7,
     DST_ALPHA=8,
     ONE_MINUS_DST_ALPHA=9,
-    INVALID=0xffffffff
+    INVALID=0xFFFFFFFF,
 )
 
 # cull command
 # https://docs.unity3d.com/Manual/SL-Cull.html
 polygon_cull_mode = Enum(
     Int32ul,
-    BACK = 2,
-    FRONT = 3,
-    OFF = 4,
-    INVALID = 0xffffffff
+    BACK=2,
+    FRONT=3,
+    OFF=4,
+    INVALID=0xFFFFFFFF,
 )
 
 # stencil operation value
 # https://docs.unity3d.com/Manual/SL-Stencil.html#stencil-operation-values
 stencil_op = Enum(
-    Int32ul,
-    KEEP=0,
-    ZERO=1,
-    REPLACE=2,
-    INCR_SAT=3,
-    DECR_SAT=4,
-    INVERT=5,
-    INCR_WRAP=6,
-    DECR_WRAP=7,
-    INVALID=0xffffffff
+    Int32ul, KEEP=0, ZERO=1, REPLACE=2, INCR_SAT=3, DECR_SAT=4, INVERT=5, INCR_WRAP=6, DECR_WRAP=7, INVALID=0xFFFFFFFF
 )
 
 compare_mode = Enum(
@@ -99,14 +90,14 @@ compare_mode = Enum(
     CMPMODE_GREATER=6,
     CMPMODE_GREATEREQUAL=7,
     CMPMODE_MAX_COUNT=8,
-    CMPMODE_INVALID=0xffffffff
+    CMPMODE_INVALID=0xFFFFFFFF,
 )
 
 fill_mode = Enum(
     Int32ul,
     SOLID=0,
     WIRE=1,
-    INVALID=0xffffffff
+    INVALID=0xFFFFFFFF,
 )
 
 shader_type = Enum(
@@ -114,7 +105,7 @@ shader_type = Enum(
     VERTEX=0,
     PIXEL=1,
     GEOMETRY=2,
-    INVALID=0xffffffff
+    INVALID=0xFFFFFFFF,
 )
 
 # seems to be a fancier version of point/bilinear/trilinear with extra trilinear/mipmap stuff
@@ -126,57 +117,38 @@ filter_mode = Enum(
     FILTER_NEAREST_MIP_LINEAR=3,
     FILTER_LINEAR_MIP_NEAREST=4,
     FILTER_LINEAR_MIP_LINEAR=5,
-    FILTER_INVALID=0xffffffff
+    FILTER_INVALID=0xFFFFFFFF,
 )
 
 tile_wrap_mode = Enum(
-    Int32ul,
-    TILING_CLAMP=0,
-    TILING_CLAMP_COLOR=1,
-    TILING_REPEAT=2,
-    TILING_MIRROR=3,
-    TILING_INVALID=0xffffffff
+    Int32ul, TILING_CLAMP=0, TILING_CLAMP_COLOR=1, TILING_REPEAT=2, TILING_MIRROR=3, TILING_INVALID=0xFFFFFFFF
 )
 
 # === STRUCTS ===
 
 # seems to be a combo of Blend and BlendOp
 # ie "Blend source dest && BlendOp operation"
-blend_state = Struct(
-    enabled = Flag,
-    operation = blend_op,
-    source = blend_mode,
-    dest = blend_mode
-)
+blend_state = Struct(enabled=Flag, operation=blend_op, source=blend_mode, dest=blend_mode)
 
 # Stencil test
 # https://docs.unity3d.com/Manual/SL-Stencil.html
 stencil_test = Struct(
-    enabled = Flag,
-    mask = Int32ul,
-    ref = Int32ul,
-    fail = stencil_op,
-    success  = stencil_op, # "pass" is from gist, but keywords exist :P
-    depth_fail = stencil_op,
-    depth_success = stencil_op,
-    cmp_mode = compare_mode
+    enabled=Flag,
+    mask=Int32ul,
+    ref=Int32ul,
+    fail=stencil_op,
+    success=stencil_op,  # "pass" is from gist, but keywords exist :P
+    depth_fail=stencil_op,
+    depth_success=stencil_op,
+    cmp_mode=compare_mode,
 )
 
 # alpha test, seems to be deprecated/not exist in HLSL
 # https://docs.unity3d.com/Manual/SL-AlphaTest.html
-alpha_test = Struct(
-    enabled=Flag,
-    function=compare_mode,
-    ref=Float
-)
+alpha_test = Struct(enabled=Flag, function=compare_mode, ref=Float)
 
 # depth test
-depth_state = Struct(
-    depth_test=Byte,
-    depth_write=Byte,
-    depth_mode=compare_mode,
-    z_prepass=Byte
-)
+depth_state = Struct(depth_test=Byte, depth_write=Byte, depth_mode=compare_mode, z_prepass=Byte)
 
 # uniform params, stuff like "vConstant0" or "fAlbedoEmissiveMultiplier"
 uniform_param = Struct(
@@ -187,9 +159,9 @@ uniform_param = Struct(
         {
             "f": PrefixedArray(Int32ul, Float),
             "i": PrefixedArray(Int32ul, Int32sl),
-            "u": PrefixedArray(Int32ul, Int32ul)
-        }
-    )
+            "u": PrefixedArray(Int32ul, Int32ul),
+        },
+    ),
 )
 
 # sampler params, imports texture files typically
@@ -210,45 +182,41 @@ sampler_param = Struct(
     lod_bias=Float,
     anisotropic=Float,
     max_mip_level=Float,
-    max_anisotropy=Float
+    max_anisotropy=Float,
 )
 
 shader_stage = Struct(
     # there was a Int32ul "type" param in the gist here, that seems to be gone now.
     uniform_params=PrefixedArray(Int32ul, uniform_param),
-    sampler_params=PrefixedArray(Int32ul, sampler_param)
+    sampler_params=PrefixedArray(Int32ul, sampler_param),
 )
 
 BSMAT = Struct(
-    _magic = Const(b"MSUR"),
-    _ver = VersionAdapter("2.17.0"),
-    name = StrId,
-
+    _magic=Const(b"MSUR"),
+    _ver=VersionAdapter("2.17.0"),
+    name=StrId,
     # Binary shader data
-    type = translucency_type,
-    render_layer = Int32ul,
-    shader_path = StrId,
-    blendstate = blend_state,
-    cullstate = polygon_cull_mode,
-    stencilstate = stencil_test,
-    alphastate = alpha_test,
-    fillmode = fill_mode,
-    depth = depth_state,
-
+    type=translucency_type,
+    render_layer=Int32ul,
+    shader_path=StrId,
+    blendstate=blend_state,
+    cullstate=polygon_cull_mode,
+    stencilstate=stencil_test,
+    alphastate=alpha_test,
+    fillmode=fill_mode,
+    depth=depth_state,
     # differs from the gist but its const across all files
-    _const0 = Const(0, Int32ul), # 0
-    _const1 = Const(2, Int32ul), # 2
-    _const2 = Const(0, Int32ul), # 0
-
+    _const0=Const(0, Int32ul),  # 0
+    _const1=Const(2, Int32ul),  # 2
+    _const2=Const(0, Int32ul),  # 0
     # these also differ from gist and mostly are only in system shaders, from what I can tell
-    extra_uniforms = PrefixedArray(Int32ul, uniform_param),
-    extra_samplers = PrefixedArray(Int32ul, sampler_param),
-
+    extra_uniforms=PrefixedArray(Int32ul, uniform_param),
+    extra_samplers=PrefixedArray(Int32ul, sampler_param),
     # important stuff here!
-    shader_stages = PrefixedArray(Int32ul, shader_stage),
-
-    _end = construct.Terminated
+    shader_stages=PrefixedArray(Int32ul, shader_stage),
+    _end=construct.Terminated,
 )
+
 
 class Bsmat(BaseResource):
     @classmethod

@@ -177,7 +177,7 @@ def decode_encode_compare_file(file_path: Path, game: Game, file_format: str):
         resource = resource_class.parse(raw, target_game=game)
         encoded = resource.build()
 
-        if raw != encoded and raw.rstrip(b"\xFF") != encoded:
+        if raw != encoded and raw.rstrip(b"\xff") != encoded:
             return f"{file_path}: Results differ (len(raw): {len(raw)}; len(encoded): {len(encoded)})"
         return None
 

@@ -59,6 +59,7 @@ class FileTreeEditor:
     _ensured_asset_ids: mapping of pkg name to assets we'll copy into it when saving
     _modified_resources: mapping of asset id to bytes. When saving, these asset ids are replaced
     """
+
     headers: Dict[str, construct.Container]
     _files_for_asset_id: Dict[AssetId, Set[Optional[str]]]
     _ensured_asset_ids: Dict[str, Set[AssetId]]
@@ -88,15 +89,11 @@ class FileTreeEditor:
         self._files_for_asset_id = {}
         self._name_for_asset_id = copy.copy(_all_asset_id_for_game(self.target_game))
 
-        self._toc = Toc.parse(self.root.joinpath(Toc.system_files_name()).read_bytes(),
-                              target_game=self.target_game)
+        self._toc = Toc.parse(self.root.joinpath(Toc.system_files_name()).read_bytes(), target_game=self.target_game)
         custom_names = self.root.joinpath("custom_names.json")
         if custom_names.is_file():
             with custom_names.open() as f:
-                self._name_for_asset_id.update({
-                    asset_id: name
-                    for name, asset_id in json.load(f).items()
-                })
+                self._name_for_asset_id.update({asset_id: name for name, asset_id in json.load(f).items()})
 
         for f in self.root.rglob("*.*"):
             name = f.relative_to(self.root).as_posix()
@@ -122,8 +119,9 @@ class FileTreeEditor:
             self.headers[name].entries_by_id = {}
             for entry in self.headers[name].file_entries:
                 if self._toc.get_size_for(entry.asset_id) is None:
-                    logger.warning("File with asset id 0x%016x in pkg %s does not have an entry in the TOC",
-                                   entry.asset_id, name)
+                    logger.warning(
+                        "File with asset id 0x%016x in pkg %s does not have an entry in the TOC", entry.asset_id, name
+                    )
                 self._add_pkg_name_for_asset_id(entry.asset_id, name)
                 self.headers[name].entries_by_id[entry.asset_id] = entry
 
@@ -191,8 +189,9 @@ class FileTreeEditor:
 
         raise ValueError(f"Unknown asset_id: {original_name}")
 
-    def get_parsed_asset(self, name: str, *, in_pkg: Optional[str] = None,
-                         type_hint: typing.Type[_T] = BaseResource) -> _T:
+    def get_parsed_asset(
+        self, name: str, *, in_pkg: Optional[str] = None, type_hint: typing.Type[_T] = BaseResource
+    ) -> _T:
         """
         Gets the resource with the given name and decodes it based on the extension.
         """
@@ -215,8 +214,7 @@ class FileTreeEditor:
         """
         return self.get_parsed_asset(path, type_hint=type_hint)
 
-    def add_new_asset(self, name: str, new_data: typing.Union[bytes, BaseResource],
-                      in_pkgs: typing.Iterable[str]):
+    def add_new_asset(self, name: str, new_data: typing.Union[bytes, BaseResource], in_pkgs: typing.Iterable[str]):
         """
         Adds an asset that doesn't already exist.
         """
@@ -225,10 +223,12 @@ class FileTreeEditor:
             if asset_id in self._modified_resources:
                 raise ValueError(f"{name} was already modified")
             else:
-                raise ValueError("Asset already exists in:\n" + "\n".join(
-                    pkg if pkg is not None else "In the RomFS"
-                    for pkg in self._files_for_asset_id[asset_id]
-                ))
+                raise ValueError(
+                    "Asset already exists in:\n"
+                    + "\n".join(
+                        pkg if pkg is not None else "In the RomFS" for pkg in self._files_for_asset_id[asset_id]
+                    )
+                )
 
         in_pkgs = list(in_pkgs)
         files_set = set()
@@ -328,8 +328,7 @@ class FileTreeEditor:
             # We keep system.pkg because .bmmaps don't read properly with exlaunch and it's only 4MB
             # We keep MSR's "_discardables.pkg" as the files are not read from RomFS without the pkg
             modified_pkgs = list(
-                        filter(lambda pkg: pkg == "packs/system/system.pkg" or pkg.endswith("discardables.pkg"),
-                        modified_pkgs)
+                filter(lambda pkg: pkg == "packs/system/system.pkg" or pkg.endswith("discardables.pkg"), modified_pkgs)
             )
 
         # Ensure all pkgs we'll modify is in memory already.
@@ -360,9 +359,9 @@ class FileTreeEditor:
                     if self._files_for_asset_id[asset_id] - {None}:
                         replacements.append(path)
                         if (
-                            output_format == OutputFormat.ROMFS and
-                            asset_id in asset_ids_to_copy and
-                            self.target_game != Game.SAMUS_RETURNS
+                            output_format == OutputFormat.ROMFS
+                            and asset_id in asset_ids_to_copy
+                            and self.target_game != Game.SAMUS_RETURNS
                         ):
                             del asset_ids_to_copy[asset_id]
             else:
@@ -371,8 +370,7 @@ class FileTreeEditor:
         # Update the Toc's own entry and then write
         logger.debug("Updating the system/files.toc")
         self._toc.add_file(Toc.system_files_name(), len(self._toc.build()))
-        _write_to_path(output_path.joinpath(Toc.system_files_name()),
-                       self._toc.build())
+        _write_to_path(output_path.joinpath(Toc.system_files_name()), self._toc.build())
 
         if output_format == OutputFormat.ROMFS:
             logger.debug("Copying to romfs the ensured files")
@@ -382,9 +380,7 @@ class FileTreeEditor:
                 _write_to_path(output_path.joinpath(path), data)
 
             # dread_depackager format
-            replacement_json = json.dumps({
-                "replacements": replacements
-            }, indent=4)
+            replacement_json = json.dumps({"replacements": replacements}, indent=4)
             output_path.joinpath("replacements.json").write_text(replacement_json, "utf-8")
 
         # Update the PKGs
