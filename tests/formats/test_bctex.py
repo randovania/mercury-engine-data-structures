@@ -1404,7 +1404,7 @@ sr_missing = [
 @pytest.mark.parametrize(
     "bctex_path", dread_data.all_files_ending_with(".bctex", dread_210_ignore + dread_210_only + dread_exclusions)
 )
-def test_compare_dread_100(dread_tree_100, bctex_path):
+def test_compare_bctex_dread_100(dread_tree_100, bctex_path):
     parse_build_compare_editor_parsed(Bctex, dread_tree_100, bctex_path)
 
 
@@ -1414,5 +1414,5 @@ def test_compare_dread_210(dread_tree_210, bctex_path):
 
 
 @pytest.mark.parametrize("bctex_path", samus_returns_data.all_files_ending_with(".bctex", sr_missing))
-def test_compare_sr(samus_returns_tree, bctex_path):
+def test_compare_bctex_sr(samus_returns_tree, bctex_path):
     parse_build_compare_editor_parsed(Bctex, samus_returns_tree, bctex_path)

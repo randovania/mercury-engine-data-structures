@@ -74,7 +74,7 @@ sr_missing_cd = [
     dread_data.all_files_ending_with(".bmscc", bossrush_assets)
     + dread_data.all_files_ending_with(".bmscd", bossrush_assets),
 )
-def test_compare_dread_100(dread_tree_100, file_path):
+def test_compare_collision_dread_100(dread_tree_100, file_path):
     parse_build_compare_editor_parsed(Bmscc, dread_tree_100, file_path)
 
 
@@ -88,5 +88,5 @@ def test_compare_dread_210(dread_tree_210, file_path):
     samus_returns_data.all_files_ending_with(".bmscc", sr_missing_cc)
     + samus_returns_data.all_files_ending_with(".bmscd", sr_missing_cd),
 )
-def test_compare_msr(samus_returns_tree, file_path):
+def test_compare_collision_msr(samus_returns_tree, file_path):
     parse_build_compare_editor_parsed(Bmscc, samus_returns_tree, file_path)
