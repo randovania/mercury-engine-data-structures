@@ -12,11 +12,11 @@ Construct type definitions for Mercury Engine
 | BCTEX     | &cross;              | &cross;               | &check;      | &cross;       | Texture File |
 | BCURV     | Missing              | Missing               | &cross;      | &cross;       |             |
 | BCUT      | &cross;              | &cross;               | Missing      | Missing       |	Related to cutscene files |
-| BCWAV     | &cross;              | &cross;               | Missing      | Missing       | Audio File	|
+| BCWAV     | &cross;              | &cross;               | Missing      | Missing       | Common 3DS audio format |
 | BFGRP     | Missing              | Missing               | &cross;      | &cross;       |							|
 | BFONT     | &cross;              | &cross;               | &cross;      | &cross;       | Font File		|
 | BFSAR     | Missing              | Missing               | &cross;      | &cross;       |							|
-| BFSTM     | Missing              | Missing               | &cross;      | &cross;       |							|
+| BFSTM     | Missing              | Missing               | &cross;      | &cross;       | Common Switch audio format |
 | BGSNDS    | Missing              | Missing               | &check;      | &check;       |							|
 | BLDEF     | Missing              | Missing               | &check;      | &check;       |							|
 | BLSND     | &check;              | &check;               | &check;      | &check;       | Sound				|	
@@ -32,7 +32,7 @@ Construct type definitions for Mercury Engine
 | BMSCC     | &check;              | &check;               | &check;      | &check;       | Collision Cameras	|
 | BMSCD     | &check;              | &check;               | &check;      | &check;       | Collision Data / Geometry |
 | BMSCP     | Missing              | Missing               | &check;      | &check;       |							|
-| BMSCU     | &cross;              | &cross;               | &check;      | &check;       | Cutscene Files, called with Game.LaunchCutscene |
+| BMSCU     | &cross;              | &cross;               | &check;      | &check;       | Cutscene Files |
 | BMSEM     | &check;              | &check;               | Missing      | Missing       | Environment Data |
 | BMSES     | &check;              | &check;               | Missing      | Missing       | Environment Data |
 | BMSEV     | &cross;              | &cross;               | Missing      | Missing       | EV (?)			|
@@ -66,7 +66,7 @@ Construct type definitions for Mercury Engine
 | BTUNDA    | Missing              | Missing               | &check;      | &check;       |							|
 | BUCT      | &check;              | &check;               | &check;      | &check;       | Font File (?) |
 | INI       | Missing              | Missing               | &check;      | &check;       |							|
-| LC        | &check;              | &check;               | &check;      | &check;       | Lua Script	|
+| LC        | &check;              | &check;               | &check;      | &check;       | Lua Bytecode|
 | PKG       | &check;              | &check;               | &check;      | &check;       | Packaged Files |
 | TOC       | &check;              | &check;               | &check;      | &check;       | Table of Contents |
 | TXT       | &check;              | &check;               | &check;      | &check;       | Text File	  |
