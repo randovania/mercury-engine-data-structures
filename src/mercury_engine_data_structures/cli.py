@@ -75,14 +75,14 @@ def create_parser():
 
     extract_files_parser = subparser.add_parser("extract-files")
     add_game_argument(extract_files_parser)
-    extract_files_parser.add_argument("--quiet", action="store_true", default=False,
-                                      help="Don't print files as they're extracted")
+    extract_files_parser.add_argument(
+        "--quiet", action="store_true", default=False, help="Don't print files as they're extracted"
+    )
     extract_files_parser.add_argument("root", type=Path, help="Path to the PKG files")
     extract_files_parser.add_argument("output", type=Path, help="Path to where to place output files")
 
     replace_files_parser = subparser.add_parser(
-        "replace-files",
-        help="Adds files to all pkgs in a folder. The results are written to a different path"
+        "replace-files", help="Adds files to all pkgs in a folder. The results are written to a different path"
     )
     add_game_argument(replace_files_parser)
     replace_files_parser.add_argument("root", type=Path, help="Path to the PKG files to read from")
@@ -272,10 +272,7 @@ def replace_files(args: argparse.Namespace) -> None:
 
     for file_name in new_files.rglob("*"):
         if file_name.is_file():
-            pkg_editor.replace_asset(
-                file_name.relative_to(new_files).as_posix(),
-                file_name.read_bytes()
-            )
+            pkg_editor.replace_asset(file_name.relative_to(new_files).as_posix(), file_name.read_bytes())
 
     pkg_editor.save_modifications(output, OutputFormat.PKG)
 
