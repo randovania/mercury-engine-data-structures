@@ -11,7 +11,7 @@ Construct type definitions for Mercury Engine
 | BCSKLA    | &check;              | &check;               | &check;      | &check;       | Skeleton Animation |
 | BCTEX     | &cross;              | &cross;               | &check;      | &cross;       | Texture File |
 | BCURV     | Missing              | Missing               | &cross;      | &cross;       |             |
-| BCUT      | &cross;              | &cross;               | Missing      | Missing       |	UT (?)      |
+| BCUT      | &cross;              | &cross;               | Missing      | Missing       |	Related to cutscene files |
 | BCWAV     | &cross;              | &cross;               | Missing      | Missing       | Audio File	|
 | BFGRP     | Missing              | Missing               | &cross;      | &cross;       |							|
 | BFONT     | &cross;              | &cross;               | &cross;      | &cross;       | Font File		|
@@ -28,11 +28,11 @@ Construct type definitions for Mercury Engine
 | BMSAD     | &check;              | &check;               | &check;      | &check;       | Actor Definitions	| 
 | BMSAS     | Missing              | Missing               | &check;      | &check;       | 						|
 | BMSAT     | &cross;              | &cross;               | &check;      | &check;       | AT (?)			|
-| BMSBK     | &check;              | &check;               | Missing      | Missing       | Blocks (?)	|
+| BMSBK     | &check;              | &check;               | Missing      | Missing       | Blocks, per Scenario |
 | BMSCC     | &check;              | &check;               | &check;      | &check;       | Collision Cameras	|
 | BMSCD     | &check;              | &check;               | &check;      | &check;       | Collision Data, Geometry |
 | BMSCP     | Missing              | Missing               | &check;      | &check;       |							|
-| BMSCU     | &cross;              | &cross;               | &check;      | &check;       | CU (?)			|
+| BMSCU     | &cross;              | &cross;               | &check;      | &check;       | Cutscene Files, called with Game.LaunchCutscene |
 | BMSEM     | &check;              | &check;               | Missing      | Missing       | Environment Data |
 | BMSES     | &check;              | &check;               | Missing      | Missing       | Environment Data |
 | BMSEV     | &cross;              | &cross;               | Missing      | Missing       | EV (?)			|
