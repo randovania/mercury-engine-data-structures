@@ -30,7 +30,7 @@ Construct type definitions for Mercury Engine
 | BMSAT     | &cross;              | &cross;               | &check;      | &check;       | AT (?)			|
 | BMSBK     | &check;              | &check;               | Missing      | Missing       | Blocks, per Scenario |
 | BMSCC     | &check;              | &check;               | &check;      | &check;       | Collision Cameras	|
-| BMSCD     | &check;              | &check;               | &check;      | &check;       | Collision Data, Geometry |
+| BMSCD     | &check;              | &check;               | &check;      | &check;       | Collision Data / Geometry |
 | BMSCP     | Missing              | Missing               | &check;      | &check;       |							|
 | BMSCU     | &cross;              | &cross;               | &check;      | &check;       | Cutscene Files, called with Game.LaunchCutscene |
 | BMSEM     | &check;              | &check;               | Missing      | Missing       | Environment Data |
