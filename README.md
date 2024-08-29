@@ -4,7 +4,7 @@ Construct type definitions for Mercury Engine
 | Format    | Samus Returns (Read) | Samus Returns (Write) | Dread (Read) | Dread (Write) | Purpose     |
 |-----------|----------------------|-----------------------|--------------|---------------|-------------|
 | BAPD      | Missing              | Missing               | &check;      | &check;       | Audio Preset (positional audio data) |
-| BCCAM     | &cross;              | &cross;               | &cross;      | &cross;       | Camera Objects (used exclusively for a shot) |
+| BCCAM     | &cross;              | &cross;               | &cross;      | &cross;       | Cutscene Camera (used exclusively for cutscene takes) |
 | BCLGT     | &cross;              | &cross;               | Missing      | Missing       | Lighting (?) |
 | BCMDL     | &cross;              | &cross;               | &check;      | &cross;       | 3D Models	  |
 | BCPTL     | &cross;              | &cross;               | &cross;      | &cross;       | Particle Effect |
@@ -69,7 +69,7 @@ Construct type definitions for Mercury Engine
 | LC        | &check;              | &check;               | &check;      | &check;       | Lua Bytecode |
 | PKG       | &check;              | &check;               | &check;      | &check;       | Packaged Files |
 | TOC       | &check;              | &check;               | &check;      | &check;       | Table of Contents |
-| TXT       | &check;              | &check;               | &check;      | &check;       | UTF-16 Text File |
+| TXT       | &check;              | &check;               | &check;      | &check;       | UTF-16 Text File (?) |
 | WEBM      | Missing              | Missing               | &cross;      | &cross;       | Standard WEBM |
 
 
