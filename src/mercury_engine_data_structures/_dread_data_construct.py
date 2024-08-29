@@ -7,9 +7,9 @@ import construct
 class CompressedZSTD(construct.Tunnel):
     def __init__(self, subcon, level: int = 3):
         super().__init__(subcon)
-        import zstd
+        import zstandard
 
-        self.lib = zstd
+        self.lib = zstandard
         self.level = level
 
     def _decode(self, data, context, path):

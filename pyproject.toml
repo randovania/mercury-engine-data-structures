@@ -4,7 +4,7 @@ requires = [
     "setuptools_scm[toml]>=3.4.3",
     "construct>=2.10.0",
     "randovania-lupa>=2.0.1",
-    "zstd",
+    "zstandard",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -24,7 +24,7 @@ dynamic = ["version"]
 dependencies = [
     "construct>=2.10.70",  # 2.10.70 includes a fix for compiled structs building
     "randovania-lupa>=2.0.1",
-    "zstd",
+    "zstandard",
 ]
 
 
