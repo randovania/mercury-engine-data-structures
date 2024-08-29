@@ -4,7 +4,7 @@ Construct type definitions for Mercury Engine
 | Format    | Samus Returns (Read) | Samus Returns (Write) | Dread (Read) | Dread (Write) | Purpose     |
 |-----------|----------------------|-----------------------|--------------|---------------|-------------|
 | BAPD      | Missing              | Missing               | &check;      | &check;       | Audio Preset (positional audio data) |
-| BCCAM     | &cross;              | &cross;               | &cross;      | &cross;       | Cutscene Camera (used exclusively for cutscene takes) |
+| BCCAM     | &cross;              | &cross;               | &cross;      | &cross;       | Camera Animation (used exclusively for cutscene takes) |
 | BCLGT     | &cross;              | &cross;               | Missing      | Missing       | Lighting (?) |
 | BCMDL     | &cross;              | &cross;               | &check;      | &cross;       | 3D Models	  |
 | BCPTL     | &cross;              | &cross;               | &cross;      | &cross;       | Particle Effect |
@@ -18,10 +18,10 @@ Construct type definitions for Mercury Engine
 | BFSAR     | Missing              | Missing               | &cross;      | &cross;       | FSAR (?) |
 | BFSTM     | Missing              | Missing               | &cross;      | &cross;       | Common Switch audio format |
 | BGSNDS    | Missing              | Missing               | &check;      | &check;       | BackGround Sounds (?) |
-| BLDEF     | Missing              | Missing               | &check;      | &check;       |							|
+| BLDEF     | Missing              | Missing               | &check;      | &check;       | Actor Lighting Definition |
 | BLSND     | &check;              | &check;               | &check;      | &check;       | Sounds (?) |	
 | BLUT      | Missing              | Missing               | &check;      | &check;       | LookUp Table (used for ADAM animation) |
-| BMBLS     | Missing              | Missing               | &check;      | &check;       |							|
+| BMBLS     | Missing              | Missing               | &check;      | &check;       | Blend Space |
 | BMDEFS    | &check;              | &check;               | &check;      | &check;       | Music Track Definitions & Properties	|
 | BMMAP     | Missing              | Missing               | &check;      | &check;       | MiniMap |
 | BMMDEF    | Missing              | Missing               | &check;      | &check;       | MiniMap Definitions (?) |
@@ -76,7 +76,7 @@ Construct type definitions for Mercury Engine
 ## Example Usage
 
 ```python
-# TODOBMTRE
+# TODO
 ```
 
 ## Colors for Text
