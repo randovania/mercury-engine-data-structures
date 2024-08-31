@@ -17,16 +17,16 @@ class Brfld(BaseResource):
     def construct_class(cls, target_game: Game) -> construct.Construct:
         return standard_format.game_model("CScenario", "49.0.2")
 
-    def actors_for_layer(self, name: str) -> dict:
-        return self.raw.Root.pScenario.rEntitiesLayer.dctSublayers[name].dctActors
+    def actors_for_sublayer(self, sublayer_name: str, layer_name: str = "rEntitiesLayer") -> dict:
+        return self.raw.Root.pScenario[layer_name].dctSublayers[sublayer_name].dctActors
 
-    def all_layers(self) -> Iterator[str]:
-        yield from self.raw.Root.pScenario.rEntitiesLayer.dctSublayers.keys()
+    def sublayers_for_layer(self, layer_name: str) -> Iterator[str]:
+        yield from self.raw.Root.pScenario[layer_name].dctSublayers.keys()
 
-    def all_actors(self) -> Iterator[Tuple[str, str, construct.Container]]:
-        for layer_name, sublayer in self.raw.Root.pScenario.rEntitiesLayer.dctSublayers.items():
+    def all_actors_in_layer(self, layer_name: str = "rEntitiesLayer") -> Iterator[Tuple[str, str, construct.Container]]:
+        for sublayer_name, sublayer in self.raw.Root.pScenario[layer_name].dctSublayers.items():
             for actor_name, actor in sublayer.dctActors.items():
-                yield layer_name, actor_name, actor
+                yield sublayer_name, actor_name, actor
 
     def follow_link(self, link: str):
         if link != "{EMPTY}":
@@ -35,42 +35,43 @@ class Brfld(BaseResource):
                 result = result[part]
             return result
 
-    def link_for_actor(self, actor_name: str, layer_name: str = "default") -> str:
-        return ":".join(["Root", "pScenario", "rEntitiesLayer", "dctSublayers", layer_name, "dctActors", actor_name])
+    def link_for_actor(self, actor_name: str, sublayer_name: str = "default", layer_name: str = "rEntitiesLayer") -> str:
+        return ":".join(["Root", "pScenario", layer_name, "dctSublayers", sublayer_name, "dctActors", actor_name])
 
-    def all_actor_groups(self) -> Iterator[str]:
-        yield from self.raw.Root.pScenario.rEntitiesLayer.dctActorGroups.keys()
+    def actor_groups_for_layer(self, layer_name: str = "rEntitiesLayer") -> Iterator[str]:
+        yield from self.raw.Root.pScenario[layer_name].dctActorGroups.keys()
 
-    def get_actor_group(self, group_name: str) -> List[str]:
-        return self.raw.Root.pScenario.rEntitiesLayer.dctActorGroups[group_name]
+    def get_actor_group(self, group_name: str, layer_name: str = "rEntitiesLayer") -> List[str]:
+        return self.raw.Root.pScenario[layer_name].dctActorGroups[group_name]
 
-    def is_actor_in_group(self, group_name: str, actor_name: str, layer_name: str = "default") -> bool:
-        return self.link_for_actor(actor_name, layer_name) in self.get_actor_group(group_name)
+    def is_actor_in_group(self, group_name: str, actor_name: str, sublayer_name: str = "default", layer_name: str = "rEntitiesLayer") -> bool:
+        return self.link_for_actor(actor_name, sublayer_name, layer_name) in self.get_actor_group(group_name)
 
-    def add_actor_to_group(self, group_name: str, actor_name: str, layer_name: str = "default"):
+    def add_actor_to_group(self, group_name: str, actor_name: str, sublayer_name: str = "default", layer_name: str = "rEntitiesLayer"):
         group = self.get_actor_group(group_name)
-        actor_link = self.link_for_actor(actor_name, layer_name)
+        actor_link = self.link_for_actor(actor_name, sublayer_name, layer_name)
         if actor_link not in group:
             group.append(actor_link)
 
-    def remove_actor_from_group(self, group_name: str, actor_name: str, layer_name: str = "default"):
+    def remove_actor_from_group(self, group_name: str, actor_name: str, sublayer_name: str = "default", layer_name: str = "rEntitiesLayer"):
         group = self.get_actor_group(group_name)
-        actor_link = self.link_for_actor(actor_name, layer_name)
+        actor_link = self.link_for_actor(actor_name, sublayer_name, layer_name)
         if actor_link in group:
             group.remove(actor_link)
 
-    def add_actor_to_entity_groups(self, collision_camera_name: str, actor_name: str, layer_name: str = "default"):
+    def add_actor_to_entity_groups(self, collision_camera_name: str, actor_name: str, sublayer_name: str = "default", layer_name: str = "rEntitiesLayer"):
         """
         adds an actor to all entity groups starting with "eg_" + collision_camera_name
 
         param collision_camera_name: name of the collision camera group
         (prefix "eg_" is added to find the entity groups)
         param actor_name: name of the actor to add to the group
-        param layer_name: name of the layer the actor belongs to
+        param sublayer_name: name of the sublayer the actor belongs to
+        param layer_name: name of the layer the sublayer belongs to
         """
         collision_camera_groups = [
             group for group in self.all_actor_groups() if group.startswith(f"eg_{collision_camera_name}")
         ]
         for group in collision_camera_groups:
             logger.debug("Add actor %s to group %s", actor_name, group)
-            self.add_actor_to_group(group, actor_name, layer_name)
+            self.add_actor_to_group(group, actor_name, sublayer_name, layer_name)
