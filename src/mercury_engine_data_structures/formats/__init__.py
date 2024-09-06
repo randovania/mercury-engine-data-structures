@@ -5,6 +5,7 @@ from mercury_engine_data_structures.formats.base_resource import AssetType, Base
 from mercury_engine_data_structures.formats.bcmdl import Bcmdl
 from mercury_engine_data_structures.formats.bcskla import Bcskla
 from mercury_engine_data_structures.formats.bctex import Bctex
+from mercury_engine_data_structures.formats.bfont import Bfont
 from mercury_engine_data_structures.formats.bgsnds import Bgsnds
 from mercury_engine_data_structures.formats.bldef import Bldef
 from mercury_engine_data_structures.formats.blsnd import Blsnd
@@ -55,6 +56,7 @@ ALL_FORMATS = {
     "BCMDL": Bcmdl,
     "BCSKLA": Bcskla,
     "BCTEX": Bctex,
+    "BFONT": Bfont,
     "BGSNDS": Bgsnds,
     "BLDEF": Bldef,
     "BLSND": Blsnd,
