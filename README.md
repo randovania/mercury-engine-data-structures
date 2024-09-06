@@ -14,7 +14,7 @@ Construct type definitions for Mercury Engine
 | BCUT      | &cross;              | &cross;               | Missing      | Missing       |
 | BCWAV     | &cross;              | &cross;               | Missing      | Missing       |
 | BFGRP     | Missing              | Missing               | &cross;      | &cross;       |
-| BFONT     | &cross;              | &cross;               | &cross;      | &cross;       |
+| BFONT     | &check;              | &check;               | &check;      | &check;       |
 | BFSAR     | Missing              | Missing               | &cross;      | &cross;       |
 | BFSTM     | Missing              | Missing               | &cross;      | &cross;       |
 | BGSNDS    | Missing              | Missing               | &check;      | &check;       |
