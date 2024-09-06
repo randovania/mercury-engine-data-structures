@@ -25,7 +25,7 @@ def samus_returns_path():
 
 @pytest.fixture(scope="session")
 def dread_path():
-    return Path(get_env_or_skip("DREAD_PATH"))
+    return Path(get_env_or_skip("DREAD_1_0_0_PATH"))
 
 
 @pytest.fixture(scope="session")
