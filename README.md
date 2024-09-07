@@ -35,7 +35,7 @@ Construct type definitions for Mercury Engine
 | BMSCU     | &cross;              | &cross;               | &check;      | &check;       |
 | BMSEM     | &check;              | &check;               | Missing      | Missing       |
 | BMSES     | &check;              | &check;               | Missing      | Missing       |
-| BMSEV     | &cross;              | &cross;               | Missing      | Missing       |
+| BMSEV     | &check;              | &check;               | Missing      | Missing       |
 | BMSLD     | &check;              | &check;               | Missing      | Missing       |
 | BMSLGROUP | Missing              | Missing               | &check;      | &check;       |
 | BMSLINK   | Missing              | Missing               | &check;      | &check;       |
