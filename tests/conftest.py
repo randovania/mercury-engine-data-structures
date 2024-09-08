@@ -24,8 +24,13 @@ def samus_returns_path():
 
 
 @pytest.fixture(scope="session")
-def dread_path():
+def dread_path_100():
     return Path(get_env_or_skip("DREAD_1_0_0_PATH"))
+
+
+@pytest.fixture(scope="session")
+def dread_path_210():
+    return Path(get_env_or_skip("DREAD_2_1_0_PATH"))
 
 
 @pytest.fixture(scope="session")
@@ -34,8 +39,13 @@ def samus_returns_tree(samus_returns_path):
 
 
 @pytest.fixture(scope="session")
-def dread_file_tree(dread_path):
-    return FileTreeEditor(dread_path, Game.DREAD)
+def dread_tree_100(dread_path_100):
+    return FileTreeEditor(dread_path_100, Game.DREAD)
+
+
+@pytest.fixture(scope="session")
+def dread_tree_210(dread_path_210):
+    return FileTreeEditor(dread_path_210, Game.DREAD)
 
 
 def pytest_addoption(parser):
