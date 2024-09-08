@@ -351,11 +351,11 @@ sr_missing = [
 
 
 @pytest.mark.parametrize("bmsad_path", dread_data.all_files_ending_with(".bmsad"))
-def test_compare_dread_all(dread_file_tree, bmsad_path):
+def test_compare_dread_all(dread_tree_100, bmsad_path):
     if bmsad_path in dread_must_reencode:
-        parse_build_compare_editor_parsed(Bmsad, dread_file_tree, bmsad_path)
+        parse_build_compare_editor_parsed(Bmsad, dread_tree_100, bmsad_path)
     else:
-        parse_build_compare_editor(Bmsad, dread_file_tree, bmsad_path)
+        parse_build_compare_editor(Bmsad, dread_tree_100, bmsad_path)
 
 
 @pytest.mark.parametrize("bmsad_path", samus_returns_data.all_files_ending_with(".bmsad", sr_missing))
@@ -363,8 +363,8 @@ def test_compare_sr_all(samus_returns_tree, bmsad_path):
     parse_build_compare_editor(Bmsad, samus_returns_tree, bmsad_path)
 
 
-def test_api_dread_actordef(dread_file_tree: FileTreeEditor):
-    bmsad = dread_file_tree.get_parsed_asset(
+def test_api_dread_actordef(dread_tree_100):
+    bmsad = dread_tree_100.get_parsed_asset(
         "actors/logic/breakablehint/charclasses/breakablehint.bmsad", type_hint=Bmsad
     )
 
@@ -399,8 +399,8 @@ def test_api_dread_actordef(dread_file_tree: FileTreeEditor):
     bmsad.build()
 
 
-def test_api_dread_charclass(dread_file_tree: FileTreeEditor):
-    bmsad = dread_file_tree.get_parsed_asset("actors/props/doorheat/charclasses/doorheat.bmsad", type_hint=Bmsad)
+def test_api_dread_charclass(dread_tree_100):
+    bmsad = dread_tree_100.get_parsed_asset("actors/props/doorheat/charclasses/doorheat.bmsad", type_hint=Bmsad)
 
     fakename = "foo"
 

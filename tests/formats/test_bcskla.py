@@ -1204,8 +1204,8 @@ sr_missing = [
 
 
 @pytest.mark.parametrize("bcskla_path", dread_data.all_files_ending_with(".bcskla"))
-def test_bcskla_dread(dread_file_tree, bcskla_path):
-    parse_build_compare_editor(Bcskla, dread_file_tree, bcskla_path)
+def test_bcskla_dread(dread_tree_100, bcskla_path):
+    parse_build_compare_editor(Bcskla, dread_tree_100, bcskla_path)
 
 
 @pytest.mark.parametrize("bcskla_path", samus_returns_data.all_files_ending_with(".bcskla", sr_missing))
