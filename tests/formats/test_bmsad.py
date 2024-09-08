@@ -351,7 +351,7 @@ sr_missing = [
 
 
 @pytest.mark.parametrize("bmsad_path", dread_data.all_files_ending_with(".bmsad"))
-def test_compare_dread_all(dread_tree_100, bmsad_path):
+def test_compare_bmsad_dread_all(dread_tree_100, bmsad_path):
     if bmsad_path in dread_must_reencode:
         parse_build_compare_editor_parsed(Bmsad, dread_tree_100, bmsad_path)
     else:

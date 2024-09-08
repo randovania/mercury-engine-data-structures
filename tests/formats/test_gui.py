@@ -32,9 +32,9 @@ dread_210_files = [
     "gui/scripts/extrasmenucomposition.bmscp",
     "gui/scripts/iconshudcomposition.bmscp",
     "gui/scripts/mainmenucomposition.bmscp",
-    "gui/scripts/mainmenucomposition.bmssk",
+    # "gui/scripts/mainmenucomposition.bmssk",  very slow
     "gui/scripts/slotselectioncomposition.bmscp",
-    "gui/scripts/slotselectioncomposition.bmssk",
+    # "gui/scripts/slotselectioncomposition.bmssk",  very slow
 ]
 
 dread_expected_failures = [

@@ -1,5 +1,3 @@
-from enum import Enum
-
 import construct
 from construct.core import (
     Adapter,
@@ -22,7 +20,6 @@ from construct.core import (
     this,
 )
 
-from mercury_engine_data_structures.adapters.enum_adapter import EnumAdapter
 from mercury_engine_data_structures.common_types import Float, VersionAdapter
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
 from mercury_engine_data_structures.formats.base_resource import BaseResource
@@ -30,42 +27,40 @@ from mercury_engine_data_structures.formats.property_enum import PropertyEnumDou
 from mercury_engine_data_structures.game_check import Game
 
 
-class TimingTypeEnum(Enum):
-    ONE_BYTE = 8
-    TWO_BYTE = 0
-
-
 class DreadKFVAdapter(Adapter):
+    class TimingType:
+        ONE_BYTE = 8
+        TWO_BYTE = 0
+
     SUBCON = Struct(
-        timing_type=EnumAdapter(TimingTypeEnum, Int16ul),
+        timing_type=Int16ul,
         count=Int16ul,
-        timings=IfThenElse(this.timing_type == TimingTypeEnum.TWO_BYTE, Int16ul[this.count], Int8ul[this.count]),
+        timings=IfThenElse(this.timing_type == TimingType.TWO_BYTE, Int16ul[this.count], Int8ul[this.count]),
         _padding=AlignTo(4, b"\xff"),
-        values=Array(this.count, Struct(value=Float, derivative=Float)),
-    )
+        values=Array(this.count, Float[2]),
+    ).compile()
 
     def __init__(self):
         super().__init__(self.SUBCON)
 
     def _decode(self, obj, context, path):
-        res = ListContainer()
-        for i in range(obj.count):
-            res.append(
-                Container(
-                    time=obj.timings[i],
-                    value=obj["values"][i].value,
-                    derivative=obj["values"][i].derivative,
-                )
+        return ListContainer(
+            Container(
+                time=time,
+                value=values[0],
+                derivative=values[1],
             )
-
-        return res
+            for time, values in zip(obj["timings"], obj["values"], strict=True)
+        )
 
     def _encode(self, obj, context, path):
         res = Container(
-            timing_type=TimingTypeEnum.TWO_BYTE if obj[-1].time > 0xFF else TimingTypeEnum.ONE_BYTE,
+            timing_type=DreadKFVAdapter.TimingType.TWO_BYTE
+            if obj[-1].time > 0xFF
+            else DreadKFVAdapter.TimingType.ONE_BYTE,
             count=len(obj),
-            timings=ListContainer([v.time for v in obj]),
-            values=ListContainer([Container(value=v.value, derivative=v.derivative) for v in obj]),
+            timings=[v.time for v in obj],
+            values=[[v.value, v.derivative] for v in obj],
         )
 
         return res
