@@ -12,6 +12,7 @@ from construct.core import (
     Flag,
     Float32l,
     Hex,
+    IfThenElse,
     Int8ul,
     Int16ul,
     Int32sl,
@@ -42,8 +43,9 @@ from mercury_engine_data_structures.type_lib import get_type_lib_dread, get_type
 
 # Functions
 FunctionArgument = Struct(
-    type=Char,
-    value=Switch(
+    "type" / Char,
+    "value"
+    / Switch(
         construct.this.type,
         {
             "s": StrId,
@@ -56,10 +58,11 @@ FunctionArgument = Struct(
 )
 Functions = make_vector(
     Struct(
-        name=StrId,
-        unk1=Flag,
-        unk2=Flag,
-        params=common_types.DictAdapter(
+        "name" / StrId,
+        "unk1" / Flag,
+        "unk2" / Flag,
+        "params"
+        / common_types.DictAdapter(
             common_types.make_vector(
                 common_types.DictElement(
                     FunctionArgument,
@@ -241,7 +244,7 @@ def SRDependencies():
     return Switch(construct.this.type, component_dependencies)
 
 
-FieldsSwitch = construct.Switch(
+FieldsSwitch = Switch(
     lambda ctx: find_charclass_for_type(ctx._._.type),
     fieldtypes(Game.DREAD),
     ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx._._.type}", construct.SwitchError),
@@ -257,32 +260,44 @@ FieldsSwitch._emitbuild = _not_implemented
 
 # Components
 DreadComponent = Struct(
-    type=StrId,
-    unk_1=Int32sl,
-    unk_2=Int32sl,
-    fields=PrefixedAllowZeroLen(
+    "type" / StrId,
+    "unk_1" / Int32sl,
+    "unk_2" / Int32sl,
+    "fields"
+    / PrefixedAllowZeroLen(
         Int32ul,
         Struct(
-            empty_string=PropertyEnum,
-            root=PropertyEnum,
-            fields=FieldsSwitch,
+            "empty_string" / PropertyEnum,
+            "root" / PropertyEnum,
+            "fields"
+            / IfThenElse(
+                # repairs incorrect encoding on actors/props/pf_mushr_fr/charclasses/pf_mushr_fr.bmsad
+                construct.this._parsing and construct.this._.len == 0x1C,
+                Struct(
+                    Const(1, Int32ul),
+                    Const("eDefaultCollisionMaterial", PropertyEnum),
+                    "eDefaultCollisionMaterial" / construct.Computed(0),
+                ),
+                FieldsSwitch,
+            ),
         ),
     ),
-    extra_fields=ComplexIf(
+    "extra_fields"
+    / ComplexIf(
         lambda this: get_type_lib_dread().is_child_of(this.type, "CComponent"),
         ExtraFields,
     ),
-    functions=Functions,
-    dependencies=DreadDependencies(),
+    "functions" / Functions,
+    "dependencies" / DreadDependencies(),
 )
 
 SRComponent = Struct(
-    type=StrId,
-    unk_1=Hex(Int32ul),
-    unk_2=Float32l,
-    functions=Functions,
-    fields=ExtraFields,
-    dependencies=SRDependencies(),
+    "type" / StrId,
+    "unk_1" / Hex(Int32ul),
+    "unk_2" / Float32l,
+    "functions" / Functions,
+    "fields" / ExtraFields,
+    "dependencies" / SRDependencies(),
 )
 
 # Header
@@ -313,25 +328,25 @@ CCharClassHeader = Struct(
 )
 
 SRHeader = Struct(
-    model_name=StrId,
-    ignore_samus=Flag,
-    unk_2a=Float,
-    unk_2b=Float,
-    unk_2c=Float,
-    model_scale=Float,
-    unk_2e=Float,
-    hitbox_dimensions=CVector3D,
-    unk_2g=Float,
-    unk_3=Int8ul,
-    unk_4=Int32ul,
-    other_magic=Int32sl,
-    unk_5=Flag,
-    unk_5b=Flag,
-    unk_6=Flag,
-    category=StrId,
-    unk_7=Flag,
-    sub_actors=make_vector(StrId),
-    unk_8=Int32ul,
+    "model_name" / StrId,
+    "ignore_samus" / Flag,
+    "unk_2a" / Float,
+    "unk_2b" / Float,
+    "unk_2c" / Float,
+    "model_scale" / Float,
+    "unk_2e" / Float,
+    "hitbox_dimensions" / CVector3D,
+    "unk_2g" / Float,
+    "unk_3" / Int8ul,
+    "unk_4" / Int32ul,
+    "other_magic" / Int32sl,
+    "unk_5" / Flag,
+    "unk_5b" / Flag,
+    "unk_6" / Flag,
+    "category" / StrId,
+    "unk_7" / Flag,
+    "sub_actors" / make_vector(StrId),
+    "unk_8" / Int32ul,
 )
 
 # BMSAD
