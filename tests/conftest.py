@@ -5,6 +5,7 @@ import pytest
 
 from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.romfs import ExtractedRomFs
 
 _FAIL_INSTEAD_OF_SKIP = False
 
@@ -35,17 +36,17 @@ def dread_path_210():
 
 @pytest.fixture(scope="session")
 def samus_returns_tree(samus_returns_path):
-    return FileTreeEditor(samus_returns_path, Game.SAMUS_RETURNS)
+    return FileTreeEditor(ExtractedRomFs(samus_returns_path), Game.SAMUS_RETURNS)
 
 
 @pytest.fixture(scope="session")
 def dread_tree_100(dread_path_100):
-    return FileTreeEditor(dread_path_100, Game.DREAD)
+    return FileTreeEditor(ExtractedRomFs(dread_path_100), Game.DREAD)
 
 
 @pytest.fixture(scope="session")
 def dread_tree_210(dread_path_210):
-    return FileTreeEditor(dread_path_210, Game.DREAD)
+    return FileTreeEditor(ExtractedRomFs(dread_path_210), Game.DREAD)
 
 
 def pytest_addoption(parser):
