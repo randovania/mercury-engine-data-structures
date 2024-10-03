@@ -44,7 +44,7 @@ Construct type definitions for Mercury Engine
 | BMSNAV    | &check;              | &check;               | &check;      | &check;       | Navigation Meshes	|
 | BMSND     | &cross;              | &cross;               | Missing      | Missing       | Sound (?)   |
 | BMSSA     | &cross;              | &cross;               | Missing      | Missing       | SSA (?)			|
-| BMSSD     | &cross;              | &cross;               | &check;      | &check;       | Static Scenario Data (background dressing) |	
+| BMSSD     | &check;              | &check;               | &check;      | &check;       | Scene Data (scene blocks, objects, msr lighting) |	
 | BMSSH     | Missing              | Missing               | &check;      | &check;       | GUI Shape |
 | BMSSK     | Missing              | Missing               | &check;      | &check;       | GUI Skin |
 | BMSSS     | Missing              | Missing               | &check;      | &check;       | GUI SpriteSheet |
