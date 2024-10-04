@@ -1,5 +1,4 @@
 from __future__ import annotations
-import contextlib
 
 import pytest
 from tests.test_lib import parse_build_compare_editor_parsed
@@ -39,13 +38,6 @@ sr_missing = [
     "maps/levels/c10_samus/s920_traininggallery/s920_traininggallery.bmssd",
 ]
 
-sr_xfail = [
-    "maps/levels/c10_samus/s000_surface/s000_surface.bmssd",
-    "maps/levels/c10_samus/s020_area2/s020_area2.bmssd",
-    "maps/levels/c10_samus/s050_area5/s050_area5.bmssd",
-    "maps/levels/c10_samus/s110_surfaceb/s110_surfaceb.bmssd",
-]
-
 
 @pytest.mark.parametrize("bmssd_path", dread_data.all_files_ending_with(".bmssd", bossrush_assets))
 def test_compare_bmssd_dread_100(dread_tree_100, bmssd_path):
@@ -59,12 +51,7 @@ def test_compare_dread_210(dread_tree_210, bmssd_path):
 
 @pytest.mark.parametrize("bmssd_path", samus_returns_data.all_files_ending_with(".bmssd", sr_missing))
 def test_compare_bmssd_msr(samus_returns_tree, bmssd_path):
-    if bmssd_path in sr_xfail:
-        expectation = pytest.raises(KeyError)
-    else:
-        expectation = contextlib.nullcontext()
-    with expectation:
-        parse_build_compare_editor_parsed(Bmssd, samus_returns_tree, bmssd_path)
+    parse_build_compare_editor_parsed(Bmssd, samus_returns_tree, bmssd_path)
 
 
 def test_bmssd_dread_functions(dread_tree_100):
@@ -72,9 +59,9 @@ def test_bmssd_dread_functions(dread_tree_100):
 
     # PART 1: Ensure getting an item and accessing scene group for item works
 
-    lshaft03 = bmssd.get_item_by_name("part001_jp6_lshaft03", ItemType.SCENE_BLOCK)
+    lshaft03 = bmssd.get_item("part001_jp6_lshaft03", ItemType.SCENE_BLOCK)
 
-    # check get_item_by_name returned the correct data
+    # check get_item returned the correct data
     assert lshaft03.transform.position[0] == 640.7750244140625
     # check the scene groups are correct
     assert bmssd.scene_groups_for_item(lshaft03, ItemType.SCENE_BLOCK) == [
@@ -107,7 +94,7 @@ def test_bmssd_dread_functions(dread_tree_100):
     }
     new_sb_groups = [f"sg_casca100{x}" for x in [0, 1, 2]]
     bmssd.add_item(new_sb, ItemType.SCENE_BLOCK, new_sb_groups)
-    assert bmssd.get_item_by_name("part420_rdv_newblock", ItemType.SCENE_BLOCK) == new_sb
+    assert bmssd.get_item("part420_rdv_newblock", ItemType.SCENE_BLOCK) == new_sb
     assert bmssd.scene_groups_for_item("part420_rdv_newblock", ItemType.SCENE_BLOCK) == new_sb_groups
 
     # objects
@@ -124,10 +111,14 @@ def test_bmssd_dread_functions(dread_tree_100):
 
     # can't get object by name
     with pytest.raises(ValueError):
-        bmssd.get_item_by_name("theoreticalplandoobj", ItemType.OBJECT)
+        bmssd.get_item("theoreticalplandoobj", ItemType.OBJECT)
+
+    # can get object by index
+    obj = bmssd.get_item(69, ItemType.OBJECT)
+    assert obj.model_name == "chozoskypathroofx1" and obj.transform.position[1] == -2650.0
 
     # non-existant object
-    assert bmssd.get_item_by_name("isweariaddedthis", ItemType.SCENE_BLOCK) is None
+    assert bmssd.get_item("isweariaddedthis", ItemType.SCENE_BLOCK) is None
 
     # actually we changed our mind on where the newblock goes
     bmssd.remove_item_from_group(new_sb, ItemType.SCENE_BLOCK, "sg_casca1002")

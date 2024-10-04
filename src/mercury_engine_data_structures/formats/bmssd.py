@@ -129,7 +129,11 @@ class BmssdAdapter(Adapter):
                     )
                 else:
                     res.scene_groups[sg.sg_name][group_type] = construct.ListContainer(
-                        [res[f"_{group_type}"][block] for block in items]
+                        [
+                            # use raw hash value instead of block value if it doesn't exist above
+                            res[f"_{group_type}"][block] if res[f"_{group_type}"].get(block, None) else block
+                            for block in items
+                        ]
                     )
 
         return res
@@ -183,7 +187,11 @@ class BmssdAdapter(Adapter):
                 if group_type_int == 1:
                     sg_cont.item_groups[group_type_int] = [object_order[obj_to_tuple(o)] for o in items]
                 else:
-                    sg_cont.item_groups[group_type_int] = [crc(o["model_name"]) for o in items]
+                    sg_cont.item_groups[group_type_int] = [
+                        # handle integers (unmatched crc's in decode)
+                        o if isinstance(o, int) else crc(o["model_name"])
+                        for o in items
+                    ]
 
             res.scene_groups.append(sg_cont)
 
@@ -207,19 +215,25 @@ class Bmssd(BaseResource):
     def construct_class(cls, target_game: Game) -> Construct:
         return BmssdAdapter(BMSSD)
 
-    def get_item_by_name(self, item_name: str, item_type: ItemType) -> construct.Container:
+    def get_item(self, item_name_or_id: str | int, item_type: ItemType) -> construct.Container:
+        if isinstance(item_name_or_id, int):
+            if item_type == ItemType.OBJECT:
+                return self.raw._objects[item_name_or_id]
+            else:
+                return self.raw[f"_{item_type.group_name}"].get(item_name_or_id, None)
+
         if item_type == ItemType.OBJECT:
-            raise ValueError("Cannot get objects by name!")
+            raise ValueError("If accessing an Object type item, must use the index!")
 
         crc = crc_func(self.raw)
-        return self.raw[f"_{item_type.group_name}"].get(crc(item_name), None)
+        return self.raw[f"_{item_type.group_name}"].get(crc(item_name_or_id), None)
 
     def get_scene_group(self, scene_group: str) -> construct.Container:
         return self.raw.scene_groups.get(scene_group, None)
 
     def scene_groups_for_item(self, item: str | construct.Container, item_type: str) -> list[str]:
         if isinstance(item, str):
-            item = self.get_item_by_name(item, item_type)
+            item = self.get_item(item, item_type)
 
         return [sg_name for sg_name, sg_val in self.raw.scene_groups.items() if item in sg_val[item_type.group_name]]
 
