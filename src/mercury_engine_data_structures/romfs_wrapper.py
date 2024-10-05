@@ -10,7 +10,7 @@ from mercury_engine_data_structures.formats.Rom3ds import Rom3DS
 class RomFsWrapper(ABC):
     @contextmanager
     @abstractmethod
-    def get_pkg_stream(self, file_path: str):
+    def get_pkg_stream(self, file_path: str) -> Iterator[io.BufferedIOBase]:
         pass
 
     @abstractmethod
@@ -31,7 +31,7 @@ class RomFsAsDir(RomFsWrapper):
         self.root = root
 
     @contextmanager
-    def get_pkg_stream(self, file_path: str):
+    def get_pkg_stream(self, file_path: str) -> Iterator[io.BufferedReader]:
         file_stream = self.root.joinpath(file_path).open("rb")
         try:
             yield file_stream
@@ -62,19 +62,19 @@ class RomFsFromFile(RomFsWrapper):
         self._file_stream.close()
 
     # meds to romfs name (needs leading /)
-    def _to_romfs_name(self, file_path: str):
+    def _to_romfs_name(self, file_path: str) -> str:
         if not file_path.startswith("/"):
             return "/" + file_path
         return file_path
 
     # romfs name to meds (remove leading /)
-    def _from_romfs_name(self, file_path: str):
+    def _from_romfs_name(self, file_path: str) -> str:
         if file_path.startswith("/"):
             return file_path[1:]
         return file_path
 
     @contextmanager
-    def get_pkg_stream(self, file_path: str):
+    def get_pkg_stream(self, file_path: str) -> Iterator[io.BytesIO]:
         romfs_path = self._to_romfs_name(file_path)
         file_stream = io.BytesIO(self.parsed_rom.get_file_binary(romfs_path))
         try:

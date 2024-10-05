@@ -208,35 +208,35 @@ class Rom3DS:
             raise ValueError('Input does not end with ".cia" or ".3ds')
         self.read_rom_fs()
 
-    def get_title_id(self):
+    def get_title_id(self) -> str:
         title_id = self.raw.rom_struct.ncch.program_id[::-1]
         return title_id.hex().upper()
 
-    def is_pal(self):
+    def is_pal(self) -> bool:
         # there is probably a more general method but region info is embedded in the icon. out of scope for now
         return self.get_title_id() == "00040000001BFB00"
 
-    def _is_code_binary_compressed(self):
+    def _is_code_binary_compressed(self) -> bool:
         # first 8 bytes are the name, followed by 5 reserved bytes, followed by a flag byte where the first bit
         # tells if compressed
         self.raw.rom_struct.ncchexheader[13]
         is_compressed = self.raw.rom_struct.ncchexheader[13] & 0x01
         return is_compressed
 
-    def get_file_binary(self, path: str):
+    def get_file_binary(self, path: str) -> bytes:
         entry = self.file_name_to_entry.get(path, None)
         if entry is None:
             raise ValueError(f"Could not find file with path {path}")
         self.file_stream.seek(self.raw.rom_struct._goto_romfs_files + entry.data_offset)
         return self.file_stream.read(entry.data_size)
 
-    def read_rom_fs(self):
-        def get_dir_entry(offset):
+    def read_rom_fs(self) -> None:
+        def get_dir_entry(offset) -> construct.Container:
             start = self.raw.rom_struct.dir_entry_table[offset:]
             result = RomFsDirectoryEntry.parse(start)
             return result
 
-        def get_file_entry(offset):
+        def get_file_entry(offset) -> construct.Container:
             start = self.raw.rom_struct.file_entry_table[offset:]
             result = RomFsFileEntry.parse(start)
             return result
@@ -331,5 +331,5 @@ class Rom3DS:
         else:
             return self.raw.rom_struct.code_binary
 
-    def exheader(self):
+    def exheader(self) -> bytes:
         return self.raw.rom_struct.ncchexheader
