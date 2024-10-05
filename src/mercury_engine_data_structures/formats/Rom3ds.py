@@ -8,6 +8,7 @@ from io import BufferedReader
 
 import construct
 from construct.core import (
+    AlignedStruct,
     Array,
     Bytes,
     Const,
@@ -90,12 +91,7 @@ NCCH = Struct(
     "romfs_super_block_hash" / Bytes(0x20),
 )
 
-ROM3DS = Struct(
-    # in general, we would need to peek the bytes 0x100 - 0x104 first to see if it
-    # is a NCSD or NCCH. (0x0 - 0x100 are the signature)
-    "ncsd" / NCSD,
-    # there is a lot of card data, test data etc. totally irrelevant see https://www.3dbrew.org/wiki/NCSD
-    "_garbage" / Seek(construct.this.ncsd.partitions[0].offset * 0x200),
+ROMStructure = Struct(
     "ncch_offset" / Tell,
     "ncch" / NCCH,
     "ncchexheader" / Bytes(0x800),
@@ -121,6 +117,37 @@ ROM3DS = Struct(
     "file_entry_table" / Bytes(construct.this.romfs_header.file_entry.size),
     # start of romfs files, everything beyond this point is parsed by using the filestream directly
     "_goto_romfs_files" / Seek(construct.this._romfs_header_offset + construct.this.romfs_header.data_offset),
+)
+
+Add3ds = Struct(
+    # in general, we would need to peek the bytes 0x100 - 0x104 first to see if it
+    # is a NCSD or NCCH. (0x0 - 0x100 are the signature)
+    "ncsd" / NCSD,
+    # there is a lot of card data, test data etc. totally irrelevant see https://www.3dbrew.org/wiki/NCSD
+    "_garbage" / Seek(construct.this.ncsd.partitions[0].offset * 0x200),
+    "rom_struct" / ROMStructure,
+)
+
+AddCia = Struct(
+    "header_size" / Int32ul,
+    "type" / Int16ul,
+    "format_version" / Int16ul,
+    "certificate_size" / Int32ul,
+    "ticket_size" / Int32ul,
+    "tmd_size" / Int32ul,
+    "footer_size" / Int32ul,
+    "content_size" / Int32ul,
+    # FIXME: there must be an easier way to skip over these aligned sections
+    "_return_to_start" / Seek(0),
+    "_garbage"
+    / AlignedStruct(
+        64,
+        "header" / Bytes(construct.this._.header_size),
+        "certificate" / Bytes(construct.this._.certificate_size),
+        "ticket" / Bytes(construct.this._.ticket_size),
+        "tmd" / Bytes(construct.this._.tmd_size),
+    ),
+    "rom_struct" / ROMStructure,
 )
 
 LzssFooter = Struct(
@@ -170,14 +197,19 @@ class FileEntry:
 
 
 class Rom3DS:
-    def __init__(self, file_stream: BufferedReader):
+    def __init__(self, file_name: str, file_stream: BufferedReader):
         self.file_name_to_entry = {}
         self.file_stream = file_stream
-        self.raw = ROM3DS.parse_stream(file_stream)
+        if file_name.lower().endswith("cia"):
+            self.raw = AddCia.parse_stream(file_stream)
+        elif file_name.lower().endswith("3ds"):
+            self.raw = Add3ds.parse_stream(file_stream)
+        else:
+            raise ValueError('Input does not end with ".cia" or ".3ds')
         self.read_rom_fs()
 
     def get_title_id(self):
-        title_id = self.raw.ncch.program_id[::-1]
+        title_id = self.raw.rom_struct.ncch.program_id[::-1]
         return title_id.hex().upper()
 
     def is_pal(self):
@@ -187,25 +219,25 @@ class Rom3DS:
     def _is_code_binary_compressed(self):
         # first 8 bytes are the name, followed by 5 reserved bytes, followed by a flag byte where the first bit
         # tells if compressed
-        self.raw.ncchexheader[13]
-        is_compressed = self.raw.ncchexheader[13] & 0x01
+        self.raw.rom_struct.ncchexheader[13]
+        is_compressed = self.raw.rom_struct.ncchexheader[13] & 0x01
         return is_compressed
 
     def get_file_binary(self, path: str):
         entry = self.file_name_to_entry.get(path, None)
         if entry is None:
             raise ValueError(f"Could not find file with path {path}")
-        self.file_stream.seek(self.raw._goto_romfs_files + entry.data_offset)
+        self.file_stream.seek(self.raw.rom_struct._goto_romfs_files + entry.data_offset)
         return self.file_stream.read(entry.data_size)
 
     def read_rom_fs(self):
         def get_dir_entry(offset):
-            start = self.raw.dir_entry_table[offset:]
+            start = self.raw.rom_struct.dir_entry_table[offset:]
             result = RomFsDirectoryEntry.parse(start)
             return result
 
         def get_file_entry(offset):
-            start = self.raw.file_entry_table[offset:]
+            start = self.raw.rom_struct.file_entry_table[offset:]
             result = RomFsFileEntry.parse(start)
             return result
 
@@ -213,7 +245,7 @@ class Rom3DS:
         offset = 0
         offset_to_dir_entry = {}
 
-        while offset < self.raw.romfs_header.dir_entry.size:
+        while offset < self.raw.rom_struct.romfs_header.dir_entry.size:
             current_entry = get_dir_entry(offset)
             # the names are stored in utf-16 in the file, so they take 2 bytes
             size = len(current_entry.name) * 2
@@ -224,7 +256,7 @@ class Rom3DS:
 
         offset = 0
 
-        while offset < self.raw.romfs_header.file_entry.size:
+        while offset < self.raw.rom_struct.romfs_header.file_entry.size:
             current_entry = get_file_entry(offset)
             # the names are stored in utf-16 in the file, so they take 2 bytes
             size = len(current_entry.name) * 2
@@ -238,7 +270,7 @@ class Rom3DS:
         if self._is_code_binary_compressed():
             # copy of citra's `LZSS_Decompress` function
             # see: https://github.com/PabloMK7/citra/blob/7d00f47c5ead75db0a9f24d70aa4b609e85125d8/src/core/file_sys/ncch_container.cpp#L54
-            compressed = self.raw.code_binary
+            compressed = self.raw.rom_struct.code_binary
             compressed_length = len(compressed)
 
             lzss_footer = LzssFooter.parse(compressed[-8:])
@@ -297,7 +329,7 @@ class Rom3DS:
                     control <<= 1
             return decompressed
         else:
-            return self.raw.code_binary
+            return self.raw.rom_struct.code_binary
 
     def exheader(self):
-        return self.raw.ncchexheader
+        return self.raw.rom_struct.ncchexheader

@@ -56,7 +56,7 @@ class RomFsFromFile(RomFsWrapper):
     def __init__(self, root: Path):
         self.root = root
         self._file_stream = self.root.open("rb")
-        self.parsed_rom = Rom3DS(self._file_stream)
+        self.parsed_rom = Rom3DS(self.root.as_posix(), self._file_stream)
 
     def __del__(self):
         self._file_stream.close()
