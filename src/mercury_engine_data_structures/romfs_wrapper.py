@@ -61,37 +61,21 @@ class RomFsFromFile(RomFsWrapper):
     def __del__(self):
         self._file_stream.close()
 
-    # meds to romfs name (needs leading /)
-    def _to_romfs_name(self, file_path: str) -> str:
-        if not file_path.startswith("/"):
-            return "/" + file_path
-        return file_path
-
-    # romfs name to meds (remove leading /)
-    def _from_romfs_name(self, file_path: str) -> str:
-        if file_path.startswith("/"):
-            return file_path[1:]
-        return file_path
-
     @contextmanager
     def get_pkg_stream(self, file_path: str) -> Iterator[io.BytesIO]:
-        romfs_path = self._to_romfs_name(file_path)
-        file_stream = io.BytesIO(self.parsed_rom.get_file_binary(romfs_path))
+        file_stream = io.BytesIO(self.parsed_rom.get_file_binary(file_path))
         try:
             yield file_stream
         finally:
             file_stream.close()
 
     def read_file_with_entry(self, file_path: str, entry) -> bytes:
-        romfs_path = self._to_romfs_name(file_path)
-        with io.BytesIO(self.parsed_rom.get_file_binary(romfs_path)) as f:
+        with io.BytesIO(self.parsed_rom.get_file_binary(file_path)) as f:
             f.seek(entry.start_offset)
             return f.read(entry.end_offset - entry.start_offset)
 
     def get_file(self, file_path: str) -> bytes:
-        romfs_path = self._to_romfs_name(file_path)
-        return self.parsed_rom.get_file_binary(romfs_path)
+        return self.parsed_rom.get_file_binary(file_path)
 
     def all_files(self) -> Iterator[str]:
-        for name in self.parsed_rom.file_name_to_entry.keys():
-            yield self._from_romfs_name(name)
+        yield from self.parsed_rom.file_name_to_entry.keys()

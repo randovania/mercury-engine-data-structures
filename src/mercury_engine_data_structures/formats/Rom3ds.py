@@ -1,7 +1,7 @@
 # Parsing the file and structures is copied from various sources whatever was the easiest to read.
 # Big part is citra source. (current most active fork is pablomk7's https://github.com/PabloMK7/citra/blob/master/src/core/file_sys/ncch_container.h)
 # Lzss structure was taken from GodMode9 https://github.com/d0k3/GodMode9/commit/a6a15eb70d66e3c96bbc164598f9482bb545b3f9
-# Reading the Ivfc container for the RomFS from ctrtool https://github.com/3DSGuy/Project_CTR/tree/master/ctrtool/src
+# Reading the Ivfc container for the RomFS and cia from ctrtool https://github.com/3DSGuy/Project_CTR/tree/master/ctrtool/src
 
 
 from io import BufferedReader
@@ -178,9 +178,7 @@ class DirectoryEntry:
     def __init__(self, parent_path: str, entry: construct.Container):
         self._entry = entry
         if parent_path == "":
-            self.complete_path = "/"
-        elif parent_path == "/":
-            self.complete_path = parent_path + self._entry.name
+            self.complete_path = self._entry.name
         else:
             self.complete_path = parent_path + "/" + self._entry.name
 
@@ -188,8 +186,8 @@ class DirectoryEntry:
 class FileEntry:
     def __init__(self, parent_path: str, entry: construct.Container):
         self._entry = entry
-        if parent_path == "/":
-            self.complete_path = parent_path + self._entry.name
+        if parent_path == "":
+            self.complete_path = self._entry.name
         else:
             self.complete_path = parent_path + "/" + self._entry.name
         self.data_size = entry.data_size
@@ -219,7 +217,6 @@ class Rom3DS:
     def _is_code_binary_compressed(self) -> bool:
         # first 8 bytes are the name, followed by 5 reserved bytes, followed by a flag byte where the first bit
         # tells if compressed
-        self.raw.rom_struct.ncchexheader[13]
         is_compressed = self.raw.rom_struct.ncchexheader[13] & 0x01
         return is_compressed
 
