@@ -7,7 +7,7 @@ from typing import Iterator
 from mercury_engine_data_structures.formats.Rom3ds import Rom3DS
 
 
-class RomFsWrapper(ABC):
+class RomFs(ABC):
     @contextmanager
     @abstractmethod
     def get_pkg_stream(self, file_path: str) -> Iterator[io.BufferedIOBase]:
@@ -26,7 +26,7 @@ class RomFsWrapper(ABC):
         pass
 
 
-class RomFsAsDir(RomFsWrapper):
+class ExtractedRomFs(RomFs):
     def __init__(self, root: Path):
         self.root = root
 
@@ -52,7 +52,7 @@ class RomFsAsDir(RomFsWrapper):
             yield name
 
 
-class RomFsFromFile(RomFsWrapper):
+class PackedRomFs(RomFs):
     def __init__(self, root: Path):
         self.root = root
         self._file_stream = self.root.open("rb")
