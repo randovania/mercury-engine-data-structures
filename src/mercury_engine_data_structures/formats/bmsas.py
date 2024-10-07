@@ -1,10 +1,11 @@
+import functools
+
 import construct
 from construct.core import (
     Array,
     Byte,
     Const,
     Construct,
-    Error,
     Flag,
     Hex,
     If,
@@ -22,7 +23,7 @@ from mercury_engine_data_structures.common_types import StrId as StrIdSR
 from mercury_engine_data_structures.construct_extensions.strings import PascalStringRobust
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum, PropertyEnumDoubleUnsafe
-from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.game_check import Game, GameSpecificStruct
 
 StrId = PascalStringRobust(Int16ul, "utf-8")
 
@@ -294,9 +295,12 @@ BMSAS_SR = Struct(
 
 class Bmsas(BaseResource):
     @classmethod
+    @functools.lru_cache
     def construct_class(cls, target_game: Game) -> Construct:
-        if target_game == Game.DREAD:
-            return BMSAS_Dread
-        if target_game == Game.SAMUS_RETURNS:
-            return BMSAS_SR
-        return Error
+        return GameSpecificStruct(
+            {
+                Game.SAMUS_RETURNS: BMSAS_SR,
+                Game.DREAD: BMSAS_Dread,
+            }[target_game],
+            target_game,
+        ).compile()

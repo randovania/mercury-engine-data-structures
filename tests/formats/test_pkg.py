@@ -102,12 +102,12 @@ sr_missing = [
 
 
 @pytest.mark.parametrize("pkg_path", dread_data.all_files_ending_with(".pkg"))
-def test_compare_dread(dread_path, pkg_path):
-    parse_and_build_compare(Pkg.construct_class(Game.DREAD), Game.DREAD, dread_path.joinpath(pkg_path))
+def test_compare_pkg_dread(dread_path_100, pkg_path):
+    parse_and_build_compare(Pkg.construct_class(Game.DREAD), Game.DREAD, dread_path_100.joinpath(pkg_path))
 
 
 @pytest.mark.parametrize("pkg_path", samus_returns_data.all_files_ending_with(".pkg", sr_missing))
-def test_compare_sr(samus_returns_path, pkg_path):
+def test_compare_pkg_sr(samus_returns_path, pkg_path):
     if pkg_path in wrong_build_sr:
         raw = samus_returns_path.joinpath(pkg_path).read_bytes()
         target_game = Game.SAMUS_RETURNS
