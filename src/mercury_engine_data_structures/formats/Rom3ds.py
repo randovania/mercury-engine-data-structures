@@ -150,6 +150,10 @@ AddCia = Struct(
     "rom_struct" / ROMStructure,
 )
 
+AddCxi = Struct(
+    "rom_struct" / ROMStructure,
+)
+
 LzssFooter = Struct(
     "off_size_comp" / Int32ul,  # 0xOOSSSSSS, where O == reverse offset and S == size
     "addsize_dec" / Int32ul,  # decompressed size - compressed size
@@ -202,6 +206,8 @@ class Rom3DS:
             self.raw = AddCia.parse_stream(file_stream)
         elif file_name.lower().endswith("3ds"):
             self.raw = Add3ds.parse_stream(file_stream)
+        elif file_name.lower().endswith("app") or file_name.lower().endswith("cxi"):
+            self.raw = AddCxi.parse_stream(file_stream)
         else:
             raise ValueError('Input does not end with ".cia" or ".3ds')
         self.read_rom_fs()
