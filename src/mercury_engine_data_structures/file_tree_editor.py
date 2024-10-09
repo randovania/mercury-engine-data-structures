@@ -1,4 +1,3 @@
-import copy
 import enum
 import json
 import logging
@@ -17,6 +16,23 @@ from mercury_engine_data_structures.game_check import Game
 
 _T = typing.TypeVar("_T", bound=BaseResource)
 logger = logging.getLogger(__name__)
+_root = Path(__file__).parent
+
+
+class GameVersion(enum.Enum):
+    UNIDENTIFIED = 0, "", 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+    MSR = 1, "msr-manifest.bin", 0xE9F1963CCCD5002CF6DE6E844528DF46
+    DREAD_1_0_0 = 2, "dread-1.0.0-manifest.bin", 0x8DEC0C18622C6DAC370F84CF3A3AC0B4  # 1.0.2, 1.0.3 are identical
+    DREAD_1_0_1 = 3, "dread-1.0.1-manifest.bin", 0x35309081AF05C60CEBC476F78F3609B6
+    DREAD_2_0_0 = 4, "dread-2.0.0-manifest.bin", 0xB36FB05261F2E4EAF0408760E1B983FD
+    DREAD_2_1_0 = 5, "dread-2.1.0-manifest.bin", 0x782820635AC434A18DF11DE3D4052DD1
+
+    def __new__(cls, value: int, file_name: str, toc_hash: int):
+        member = object.__new__(cls)
+        member._value_ = value
+        member.manifest = _root.joinpath("version_manifests", file_name)
+        member.toc_hash = toc_hash
+        return member
 
 
 class OutputFormat(enum.Enum):
@@ -61,6 +77,7 @@ class FileTreeEditor:
     """
 
     headers: Dict[str, construct.Container]
+    version: GameVersion
     _files_for_asset_id: Dict[AssetId, Set[Optional[str]]]
     _ensured_asset_ids: Dict[str, Set[AssetId]]
     _modified_resources: Dict[AssetId, Optional[bytes]]
@@ -83,11 +100,19 @@ class FileTreeEditor:
         self._files_for_asset_id[asset_id].add(pkg_name)
 
     def _update_headers(self):
+        from mercury_engine_data_structures.version_validation import check_version, get_expected_assetids
+
+        retval, ver = check_version(self)
+        if retval:
+            self.version = ver
+        else:
+            raise ValueError("Invalid version!")
+
         self.all_pkgs = []
         self.headers = {}
         self._ensured_asset_ids = {}
         self._files_for_asset_id = {}
-        self._name_for_asset_id = copy.copy(_all_asset_id_for_game(self.target_game))
+        self._name_for_asset_id = get_expected_assetids(self)
 
         self._toc = Toc.parse(self.root.joinpath(Toc.system_files_name()).read_bytes(), target_game=self.target_game)
         custom_names = self.root.joinpath("custom_names.json")
