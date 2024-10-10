@@ -17,6 +17,7 @@ from mercury_engine_data_structures import samus_returns_data
 from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 from mercury_engine_data_structures.formats import Bmscc, Bmsld
 from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.romfs import ExtractedRomFs
 
 world_names = {
     "maps/levels/c10_samus/s000_surface/s000_surface.bmsld": "Surface - East",
@@ -549,7 +550,7 @@ def decode_world(
     all_names = samus_returns_data.all_asset_id_to_name()
     game = Game.SAMUS_RETURNS
 
-    pkg_editor = FileTreeEditor(root, target_game=game)
+    pkg_editor = FileTreeEditor(ExtractedRomFs(root), target_game=game)
 
     for asset_id, name in all_names.items():
         if target_level not in name:

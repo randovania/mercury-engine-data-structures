@@ -14,6 +14,7 @@ from mercury_engine_data_structures.formats import Toc
 from mercury_engine_data_structures.formats.base_resource import AssetId, BaseResource, NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.formats.pkg import Pkg
 from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.romfs import RomFs
 
 _T = typing.TypeVar("_T", bound=BaseResource)
 logger = logging.getLogger(__name__)
@@ -29,12 +30,6 @@ class OutputFormat(enum.Enum):
 
     PKG = enum.auto()
     ROMFS = enum.auto()
-
-
-def _read_file_with_entry(path: Path, entry):
-    with path.open("rb") as f:
-        f.seek(entry.start_offset)
-        return f.read(entry.end_offset - entry.start_offset)
 
 
 def _write_to_path(output: Path, data: bytes):
@@ -67,16 +62,13 @@ class FileTreeEditor:
     _in_memory_pkgs: Dict[str, Pkg]
     _toc: Toc
 
-    def __init__(self, root: Path, target_game: Game):
-        self.root = root
+    def __init__(self, romfs: RomFs, target_game: Game):
+        self.romfs = romfs
         self.target_game = target_game
         self._modified_resources = {}
         self._in_memory_pkgs = {}
 
         self._update_headers()
-
-    def path_for_pkg(self, pkg_name: str) -> Path:
-        return self.root.joinpath(pkg_name)
 
     def _add_pkg_name_for_asset_id(self, asset_id: AssetId, pkg_name: Optional[str]):
         self._files_for_asset_id[asset_id] = self._files_for_asset_id.get(asset_id, set())
@@ -89,18 +81,13 @@ class FileTreeEditor:
         self._files_for_asset_id = {}
         self._name_for_asset_id = copy.copy(_all_asset_id_for_game(self.target_game))
 
-        self._toc = Toc.parse(self.root.joinpath(Toc.system_files_name()).read_bytes(), target_game=self.target_game)
-        custom_names = self.root.joinpath("custom_names.json")
-        if custom_names.is_file():
-            with custom_names.open() as f:
-                self._name_for_asset_id.update({asset_id: name for name, asset_id in json.load(f).items()})
+        self._toc = Toc.parse(self.romfs.get_file(Toc.system_files_name()), target_game=self.target_game)
 
-        for f in self.root.rglob("*.*"):
-            name = f.relative_to(self.root).as_posix()
+        for name in self.romfs.all_files():
             asset_id = resolve_asset_id(name, self.target_game)
             self._name_for_asset_id[asset_id] = name
 
-            if f.suffix == ".pkg":
+            if name.endswith(".pkg"):
                 self.all_pkgs.append(name)
 
             elif self._toc.get_size_for(asset_id) is None:
@@ -111,7 +98,7 @@ class FileTreeEditor:
                 self._add_pkg_name_for_asset_id(asset_id, None)
 
         for name in self.all_pkgs:
-            with self.path_for_pkg(name).open("rb") as f:
+            with self.romfs.get_pkg_stream(name) as f:
                 self.headers[name] = Pkg.header_class(self.target_game).parse_stream(f, target_game=self.target_game)
 
             self._ensured_asset_ids[name] = set()
@@ -181,11 +168,11 @@ class FileTreeEditor:
             entry = header.entries_by_id.get(asset_id)
             if entry is not None:
                 logger.info("Reading asset %s from pkg %s", str(original_name), name)
-                return _read_file_with_entry(self.path_for_pkg(name), entry)
+                return self.romfs.read_file_with_entry(name, entry)
 
         if in_pkg is None and asset_id in self._name_for_asset_id:
             name = self._name_for_asset_id[asset_id]
-            return self.root.joinpath(name).read_bytes()
+            return self.romfs.get_file(name)
 
         raise ValueError(f"Unknown asset_id: {original_name}")
 
@@ -296,7 +283,7 @@ class FileTreeEditor:
 
         if pkg_name not in self._in_memory_pkgs:
             logger.info("Reading %s", pkg_name)
-            with self.path_for_pkg(pkg_name).open("rb") as f:
+            with self.romfs.get_pkg_stream(pkg_name) as f:
                 self._in_memory_pkgs[pkg_name] = Pkg.parse_stream(f, target_game=self.target_game)
 
         return self._in_memory_pkgs[pkg_name]
@@ -405,18 +392,6 @@ class FileTreeEditor:
             out_pkg_path.parent.mkdir(parents=True, exist_ok=True)
             with out_pkg_path.open("wb") as f:
                 pkg.build_stream(f)
-
-        custom_names = output_path.joinpath("custom_names.json")
-        with custom_names.open("w") as f:
-            json.dump(
-                {
-                    name: asset_id
-                    for asset_id, name in self._name_for_asset_id.items()
-                    if asset_id not in _all_asset_id_for_game(self.target_game)
-                },
-                f,
-                indent=4,
-            )
 
         self._modified_resources = {}
         if finalize_editor:
