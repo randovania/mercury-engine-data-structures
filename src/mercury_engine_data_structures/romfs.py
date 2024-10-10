@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator
 
-from mercury_engine_data_structures.formats.Rom3ds import Rom3DS
+from mercury_engine_data_structures.formats.rom3ds import Rom3DS
 
 
 class RomFs(ABC):

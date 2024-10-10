@@ -25,6 +25,11 @@ def samus_returns_path():
 
 
 @pytest.fixture(scope="session")
+def samus_returns_roms_path():
+    return Path(get_env_or_skip("SAMUS_RETURNS_PATH_ROMS"))
+
+
+@pytest.fixture(scope="session")
 def dread_path_100():
     return Path(get_env_or_skip("DREAD_1_0_0_PATH"))
 
