@@ -1,10 +1,10 @@
 # Parsing the file and structures is copied from various sources whatever was the easiest to read.
 # Big part is citra source. (current most active fork is pablomk7's https://github.com/PabloMK7/citra/blob/master/src/core/file_sys/ncch_container.h)
-# Lzss structure was taken from GodMode9 https://github.com/d0k3/GodMode9/commit/a6a15eb70d66e3c96bbc164598f9482bb545b3f9
 # Reading the Ivfc container for the RomFS and cia from ctrtool https://github.com/3DSGuy/Project_CTR/tree/master/ctrtool/src
 
 
 from io import BufferedReader
+from pathlib import Path
 
 import construct
 from construct.core import (
@@ -21,6 +21,8 @@ from construct.core import (
     Struct,
     Tell,
 )
+
+from mercury_engine_data_structures.lzss import lzss_decompress
 
 SectionGeometry = Struct(
     "offset" / Int32ul,
@@ -154,11 +156,6 @@ AddCxi = Struct(
     "rom_struct" / ROMStructure,
 )
 
-LzssFooter = Struct(
-    "off_size_comp" / Int32ul,  # 0xOOSSSSSS, where O == reverse offset and S == size
-    "addsize_dec" / Int32ul,  # decompressed size - compressed size
-)
-
 RomFsDirectoryEntry = Struct(
     "parent_offset" / Int32ul,
     "sibling_offset" / Int32ul,
@@ -178,7 +175,27 @@ RomFsFileEntry = Struct(
 )
 
 
+def parse_rom_file(file_path: Path, file_stream: BufferedReader) -> construct.Container:
+    try:
+        if file_path.suffix == ".cia":
+            raw = AddCia.parse_stream(file_stream)
+            return raw
+        elif file_path.suffix == ".3ds":
+            raw = Add3ds.parse_stream(file_stream)
+            return raw
+        elif file_path.suffix == ".app" or file_path.suffix == ".cxi":
+            raw = AddCxi.parse_stream(file_stream)
+            return raw
+        else:
+            raise ValueError('Input does not end with ".cia", ".3ds", ".app" or ".cxi"')
+        # encrypted files should throw a ConstError because the ".code" string is encrypted and parsing fails
+    except construct.core.ConstError:
+        raise ValueError("Rom file could not be parsed. Make sure that you use a decrypted supported file format.")
+
+
 class DirectoryEntry:
+    complete_path: str
+
     def __init__(self, parent_path: str, entry: construct.Container):
         self._entry = entry
         if parent_path == "":
@@ -188,6 +205,10 @@ class DirectoryEntry:
 
 
 class FileEntry:
+    complete_path: str
+    data_size: int
+    data_offset: int
+
     def __init__(self, parent_path: str, entry: construct.Container):
         self._entry = entry
         if parent_path == "":
@@ -199,21 +220,14 @@ class FileEntry:
 
 
 class Rom3DS:
-    def __init__(self, file_name: str, file_stream: BufferedReader):
+    raw: construct.Container
+    file_stream: BufferedReader
+    file_name_to_entry: dict[str, FileEntry]
+
+    def __init__(self, raw: construct.Container, file_stream: BufferedReader):
         self.file_name_to_entry = {}
         self.file_stream = file_stream
-        try:
-            if file_name.lower().endswith("cia"):
-                self.raw = AddCia.parse_stream(file_stream)
-            elif file_name.lower().endswith("3ds"):
-                self.raw = Add3ds.parse_stream(file_stream)
-            elif file_name.lower().endswith("app") or file_name.lower().endswith("cxi"):
-                self.raw = AddCxi.parse_stream(file_stream)
-            else:
-                raise ValueError('Input does not end with ".cia", ".3ds", ".app" or ".cxi"')
-        # encrypted files should throw a ConstError because the ".code" string is encrypted and parsing fails
-        except construct.core.ConstError:
-            raise ValueError("Rom file could not be parsed. Make sure that you use a decrypted supported file format.")
+        self.raw = raw
         self.read_rom_fs()
 
     def get_title_id(self) -> str:
@@ -231,9 +245,7 @@ class Rom3DS:
         return is_compressed
 
     def get_file_binary(self, path: str) -> bytes:
-        entry = self.file_name_to_entry.get(path, None)
-        if entry is None:
-            raise ValueError(f"Could not find file with path {path}")
+        entry = self.file_name_to_entry[path]
         self.file_stream.seek(self.raw.rom_struct._goto_romfs_files + entry.data_offset)
         return self.file_stream.read(entry.data_size)
 
@@ -273,68 +285,10 @@ class Rom3DS:
             # size of the entry + aligned name
             offset = offset + 0x20 + (-size % 4) + size
 
-    def decompress_code(self) -> bytearray | None:
+    def get_code_binary(self) -> bytearray | None:
         if self._is_code_binary_compressed():
-            # copy of citra's `LZSS_Decompress` function
-            # see: https://github.com/PabloMK7/citra/blob/7d00f47c5ead75db0a9f24d70aa4b609e85125d8/src/core/file_sys/ncch_container.cpp#L54
             compressed = self.raw.rom_struct.code_binary
-            compressed_length = len(compressed)
-
-            lzss_footer = LzssFooter.parse(compressed[-8:])
-
-            decompressed_length = compressed_length + lzss_footer.addsize_dec
-            decompressed = bytearray(decompressed_length)
-
-            out = decompressed_length
-            index = compressed_length - ((lzss_footer.off_size_comp >> 24) & 0xFF)
-            stop_index = compressed_length - (lzss_footer.off_size_comp & 0xFFFFFF)
-
-            decompressed[0:compressed_length] = compressed
-            while index > stop_index:
-                index -= 1
-                control = compressed[index]
-
-                for i in range(8):
-                    if index <= stop_index:
-                        break
-                    if index <= 0:
-                        break
-                    if out <= 0:
-                        break
-
-                    if control & 0x80:
-                        # Check if compression is out of bounds
-                        if index < 2:
-                            return None
-                        index -= 2
-
-                        segment_offset = compressed[index] | (compressed[index + 1] << 8)
-                        segment_size = ((segment_offset >> 12) & 15) + 3
-                        segment_offset &= 0x0FFF
-                        segment_offset += 2
-
-                        # Check if compression is out of bounds
-                        if out < segment_size:
-                            return None
-
-                        for j in range(segment_size):
-                            # Check if compression is out of bounds
-                            if out + segment_offset >= decompressed_length:
-                                return None
-
-                            data = decompressed[out + segment_offset]
-                            out -= 1
-                            decompressed[out] = data
-                    else:
-                        # Check if compression is out of bounds
-                        if out < 1:
-                            return None
-                        out -= 1
-                        index -= 1
-                        decompressed[out] = compressed[index]
-
-                    control <<= 1
-            return decompressed
+            return lzss_decompress(compressed)
         else:
             return self.raw.rom_struct.code_binary
 

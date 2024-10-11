@@ -11,18 +11,32 @@ class RomFs(ABC):
     @contextmanager
     @abstractmethod
     def get_pkg_stream(self, file_path: str) -> Iterator[io.BufferedIOBase]:
+        """Returns a package file stream which should be used in a "with" context.
+
+        :param file_path: File path to the pkg file
+        """
         pass
 
     @abstractmethod
     def read_file_with_entry(self, file_path: str, entry) -> bytes:
+        """Reads and returns a file within a pkg file.
+
+        :param file_path: File path to the pkg file
+        :param entry: A entry object containing the end_offset and start_offset within the pkg
+        """
         pass
 
     @abstractmethod
-    def get_file(self, path_as_str: str) -> bytes:
+    def get_file(self, file_path: str) -> bytes:
+        """Reads and returns a file.
+
+        :param file_path: Path to the file
+        """
         pass
 
     @abstractmethod
     def all_files(self) -> Iterator[str]:
+        """Returns an Iterator for all files within the RomFS"""
         pass
 
 
@@ -56,7 +70,7 @@ class PackedRomFs(RomFs):
     def __init__(self, root: Path):
         self.root = root
         self._file_stream = self.root.open("rb")
-        self.parsed_rom = Rom3DS(self.root.as_posix(), self._file_stream)
+        self.parsed_rom = Rom3DS(self.root, self._file_stream)
 
     def __del__(self):
         self._file_stream.close()
