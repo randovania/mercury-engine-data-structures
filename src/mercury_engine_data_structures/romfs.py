@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator
 
-from mercury_engine_data_structures.formats.rom3ds import Rom3DS
+from mercury_engine_data_structures.formats.rom3ds import Rom3DS, parse_rom_file
 
 
 class RomFs(ABC):
@@ -22,7 +22,7 @@ class RomFs(ABC):
         """Reads and returns a file within a pkg file.
 
         :param file_path: File path to the pkg file
-        :param entry: A entry object containing the end_offset and start_offset within the pkg
+        :param entry: An entry object containing the end_offset and start_offset within the pkg
         """
         pass
 
@@ -70,7 +70,7 @@ class PackedRomFs(RomFs):
     def __init__(self, root: Path):
         self.root = root
         self._file_stream = self.root.open("rb")
-        self.parsed_rom = Rom3DS(self.root, self._file_stream)
+        self.parsed_rom = Rom3DS(parse_rom_file(root, self._file_stream), self._file_stream)
 
     def __del__(self):
         self._file_stream.close()
