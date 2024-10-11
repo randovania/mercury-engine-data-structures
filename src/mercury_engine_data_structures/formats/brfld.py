@@ -13,9 +13,9 @@ logger = logging.getLogger(__name__)
 
 
 class ActorLayer(Enum):
-    ENTITIES = auto
-    SOUNDS = auto
-    LIGHTS = auto
+    ENTITIES = "rEntitiesLayer"
+    SOUNDS = "rSoundsLayer"
+    LIGHTS = "rLightsLayer"
 
 
 class Brfld(BaseResource):
