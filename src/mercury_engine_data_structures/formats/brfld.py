@@ -1,6 +1,6 @@
 import functools
 import logging
-from enum import Enum, auto
+from enum import Enum
 from typing import Iterator, List, Tuple
 
 import construct
