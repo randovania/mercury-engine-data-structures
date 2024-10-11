@@ -202,14 +202,18 @@ class Rom3DS:
     def __init__(self, file_name: str, file_stream: BufferedReader):
         self.file_name_to_entry = {}
         self.file_stream = file_stream
-        if file_name.lower().endswith("cia"):
-            self.raw = AddCia.parse_stream(file_stream)
-        elif file_name.lower().endswith("3ds"):
-            self.raw = Add3ds.parse_stream(file_stream)
-        elif file_name.lower().endswith("app") or file_name.lower().endswith("cxi"):
-            self.raw = AddCxi.parse_stream(file_stream)
-        else:
-            raise ValueError('Input does not end with ".cia" or ".3ds')
+        try:
+            if file_name.lower().endswith("cia"):
+                self.raw = AddCia.parse_stream(file_stream)
+            elif file_name.lower().endswith("3ds"):
+                self.raw = Add3ds.parse_stream(file_stream)
+            elif file_name.lower().endswith("app") or file_name.lower().endswith("cxi"):
+                self.raw = AddCxi.parse_stream(file_stream)
+            else:
+                raise ValueError('Input does not end with ".cia" or ".3ds')
+        # encrypted files should throw a ConstError because the ".code" string is encrypted and parsing fails
+        except construct.core.ConstError:
+            raise ValueError("Rom file could not be parsed. Make sure that you use a decrypted supported file format.")
         self.read_rom_fs()
 
     def get_title_id(self) -> str:
