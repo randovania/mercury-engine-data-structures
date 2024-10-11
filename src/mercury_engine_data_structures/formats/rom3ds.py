@@ -210,7 +210,7 @@ class Rom3DS:
             elif file_name.lower().endswith("app") or file_name.lower().endswith("cxi"):
                 self.raw = AddCxi.parse_stream(file_stream)
             else:
-                raise ValueError('Input does not end with ".cia" or ".3ds')
+                raise ValueError('Input does not end with ".cia", ".3ds", ".app" or ".cxi"')
         # encrypted files should throw a ConstError because the ".code" string is encrypted and parsing fails
         except construct.core.ConstError:
             raise ValueError("Rom file could not be parsed. Make sure that you use a decrypted supported file format.")
