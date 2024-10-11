@@ -71,7 +71,7 @@ class Brfld(BaseResource):
         sublayer_name: str = "default",
         actor_layer_name: ActorLayer = ActorLayer.ENTITIES,
     ):
-        group = self.get_actor_group(group_name)
+        group = self.get_actor_group(group_name, actor_layer_name)
         actor_link = self.link_for_actor(actor_name, sublayer_name, actor_layer_name)
         if actor_link not in group:
             group.append(actor_link)
@@ -83,7 +83,7 @@ class Brfld(BaseResource):
         sublayer_name: str = "default",
         actor_layer_name: ActorLayer = ActorLayer.ENTITIES,
     ):
-        group = self.get_actor_group(group_name)
+        group = self.get_actor_group(group_name, actor_layer_name)
         actor_link = self.link_for_actor(actor_name, sublayer_name, actor_layer_name)
         if actor_link in group:
             group.remove(actor_link)
