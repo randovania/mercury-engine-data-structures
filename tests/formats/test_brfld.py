@@ -2,7 +2,7 @@ import pytest
 from tests.test_lib import parse_build_compare_editor
 
 from mercury_engine_data_structures import dread_data
-from mercury_engine_data_structures.formats.brfld import Brfld
+from mercury_engine_data_structures.formats.brfld import ActorLayer, Brfld
 
 bossrush_assets = [
     "maps/levels/c10_samus/s201_bossrush_scorpius/s201_bossrush_scorpius.brfld",
@@ -28,3 +28,24 @@ def test_dread_brfld_100(dread_tree_100, brfld_path):
 @pytest.mark.parametrize("brfld_path", bossrush_assets)
 def test_dread_brfld_210(dread_tree_210, brfld_path):
     parse_build_compare_editor(Brfld, dread_tree_210, brfld_path)
+
+
+def test_add_actor_to_actor_groups(dread_tree_100):
+    scenario = dread_tree_100.get_file("maps/levels/c10_samus/s010_cave/s010_cave.brfld", Brfld)
+
+    scenario.add_actor_to_entity_groups("collision_camera_000", "breakabletilegroup_000", "breakables")
+    assert scenario.is_actor_in_group("eg_collision_camera_000", "breakabletilegroup_000", "breakables")
+
+    scenario.add_actor_to_actor_groups(
+        "ssg_collision_camera_000_Default", "Pos_C_LavaWindow_06", actor_layer_name=ActorLayer.SOUNDS
+    )
+    assert scenario.is_actor_in_group(
+        "ssg_collision_camera_000_Default", "Pos_C_LavaWindow_06", actor_layer_name=ActorLayer.SOUNDS
+    )
+
+    scenario.add_actor_to_actor_groups(
+        "lg_collision_camera_000", "cubemap_006_1_bake", "emmy_006_light", ActorLayer.LIGHTS
+    )
+    assert scenario.is_actor_in_group(
+        "lg_collision_camera_000", "cubemap_006_1_bake", "emmy_006_light", ActorLayer.LIGHTS
+    )
