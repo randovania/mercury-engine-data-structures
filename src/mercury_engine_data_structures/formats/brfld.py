@@ -104,7 +104,7 @@ class Brfld(BaseResource):
         param actor_layer: the actor layer the sublayer belongs to
         """
         collision_camera_groups = [
-            group for group in self.all_actor_groups() if group.startswith(collision_camera_name)
+            group for group in self.actor_groups_for_actor_layer(actor_layer) if group.startswith(collision_camera_name)
         ]
         for group in collision_camera_groups:
             logger.debug("Add actor %s to group %s", actor_name, group)
