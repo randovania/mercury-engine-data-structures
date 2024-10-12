@@ -36,9 +36,7 @@ def test_add_actor_to_actor_groups(dread_tree_100):
     scenario.add_actor_to_actor_groups("eg_collision_camera_000", "breakabletilegroup_000", "breakables")
     assert scenario.is_actor_in_group("eg_collision_camera_000_Default", "breakabletilegroup_000", "breakables")
 
-    scenario.add_actor_to_actor_groups(
-        "ssg_collision_camera_000", "Pos_C_LavaWindow_06", actor_layer=ActorLayer.SOUNDS
-    )
+    scenario.add_actor_to_actor_groups("ssg_collision_camera_000", "Pos_C_LavaWindow_06", actor_layer=ActorLayer.SOUNDS)
     assert scenario.is_actor_in_group(
         "ssg_collision_camera_000_Default", "Pos_C_LavaWindow_06", actor_layer=ActorLayer.SOUNDS
     )

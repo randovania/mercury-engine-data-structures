@@ -75,7 +75,9 @@ class Brfld(BaseResource):
         sublayer_name: the name of the sublayer the actor is in
         actor_layer: the actor layer the actor is in
         returns: a string representing where in the BRFLD the actor is"""
-        return ":".join(["Root", "pScenario", actor_layer.value, "dctSublayers", sublayer_name, "dctActors", actor_name])
+        return ":".join(
+            ["Root", "pScenario", actor_layer.value, "dctSublayers", sublayer_name, "dctActors", actor_name]
+        )
 
     def actor_groups_for_actor_layer(self, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> Iterator[str]:
         """
@@ -109,7 +111,9 @@ class Brfld(BaseResource):
         param sublayer_name: the name of the sublayer the actor is in
         param actor_layer: the actor layer the actor is in
         returns: true if the actor is in the actor group, false otherwise"""
-        return self.link_for_actor(actor_name, sublayer_name, actor_layer) in self.get_actor_group(group_name, actor_layer)
+        return self.link_for_actor(actor_name, sublayer_name, actor_layer) in self.get_actor_group(
+            group_name, actor_layer
+        )
 
     def add_actor_to_group(
         self,
