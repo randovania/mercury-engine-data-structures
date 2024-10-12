@@ -39,9 +39,9 @@ world_names = {
 }
 id_to_name = {os.path.splitext(path.split("/")[-1])[0]: name for path, name in world_names.items()}
 pickup_index = 0
-bmscc: typing.Optional[Bmscc] = None
+bmscc: Bmscc | None = None
 # brsa: typing.Optional[Brsa] = None
-bmsld: typing.Optional[Bmsld] = None
+bmsld: Bmsld | None = None
 bmsld_path: str = None
 events: dict[str, dict] = {}
 
@@ -398,7 +398,7 @@ class ActorDetails:
         self,
         node_type: str,
         default_name: str,
-        existing_data: typing.Optional[dict[str, NodeDefinition]],
+        existing_data: dict[str, NodeDefinition] | None,
     ) -> NodeDefinition:
         result: dict = {
             "node_type": node_type,

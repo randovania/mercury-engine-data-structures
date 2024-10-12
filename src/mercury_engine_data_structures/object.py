@@ -1,6 +1,3 @@
-import typing
-from typing import Dict, Type, Union
-
 import construct
 
 from mercury_engine_data_structures.construct_extensions.function_complex import (
@@ -11,11 +8,11 @@ from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 
 
 class Object(construct.Construct):
-    def __init__(self, fields: Dict[str, Union[construct.Construct, Type[construct.Construct]]]):
+    def __init__(self, fields: dict[str, construct.Construct | type[construct.Construct]]):
         super().__init__()
         self.fields = fields
 
-    def _parse(self, stream, context, path) -> typing.Union[construct.Container, construct.ListContainer]:
+    def _parse(self, stream, context, path) -> construct.Container | construct.ListContainer:
         field_count = construct.Int32ul._parsereport(stream, context, path)
 
         array_response = False
@@ -44,7 +41,7 @@ class Object(construct.Construct):
 
         return result
 
-    def _build(self, obj: typing.Union[construct.Container, construct.ListContainer], stream, context, path):
+    def _build(self, obj: construct.Container | construct.ListContainer, stream, context, path):
         construct.Int32ul._build(len(obj), stream, context, path)
 
         if isinstance(obj, list):

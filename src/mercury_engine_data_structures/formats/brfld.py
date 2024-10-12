@@ -1,6 +1,6 @@
 import functools
 import logging
-from typing import Iterator, List, Tuple
+from collections.abc import Iterator
 
 import construct
 
@@ -23,7 +23,7 @@ class Brfld(BaseResource):
     def all_layers(self) -> Iterator[str]:
         yield from self.raw.Root.pScenario.rEntitiesLayer.dctSublayers.keys()
 
-    def all_actors(self) -> Iterator[Tuple[str, str, construct.Container]]:
+    def all_actors(self) -> Iterator[tuple[str, str, construct.Container]]:
         for layer_name, sublayer in self.raw.Root.pScenario.rEntitiesLayer.dctSublayers.items():
             for actor_name, actor in sublayer.dctActors.items():
                 yield layer_name, actor_name, actor
@@ -41,7 +41,7 @@ class Brfld(BaseResource):
     def all_actor_groups(self) -> Iterator[str]:
         yield from self.raw.Root.pScenario.rEntitiesLayer.dctActorGroups.keys()
 
-    def get_actor_group(self, group_name: str) -> List[str]:
+    def get_actor_group(self, group_name: str) -> list[str]:
         return self.raw.Root.pScenario.rEntitiesLayer.dctActorGroups[group_name]
 
     def is_actor_in_group(self, group_name: str, actor_name: str, layer_name: str = "default") -> bool:

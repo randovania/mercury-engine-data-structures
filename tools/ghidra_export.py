@@ -408,7 +408,7 @@ def get_function_list() -> dict[str, tuple[int, int, int]]:
         }
 
 
-bridge: typing.Optional[ghidra_bridge.GhidraBridge] = None
+bridge: ghidra_bridge.GhidraBridge | None = None
 
 
 def initialize_worker():
@@ -430,8 +430,8 @@ def initialize_worker():
 
 
 def decompile_type(
-    type_name: str, init_id: typing.Optional[int], fields_id: typing.Optional[int], values_id: typing.Optional[int]
-) -> tuple[str, typing.Optional[str], dict[str, str], dict[str, int]]:
+    type_name: str, init_id: int | None, fields_id: int | None, values_id: int | None
+) -> tuple[str, str | None, dict[str, str], dict[str, int]]:
     if bridge is None:
         raise ValueError("Bridge not initialized")
 
@@ -443,7 +443,7 @@ def find_parent(f):
             return other.getName(True)
     """)
 
-    parent_init: typing.Optional[str] = None
+    parent_init: str | None = None
     if init_id is not None:
         parent_init = bridge.remote_eval(
             """find_parent(

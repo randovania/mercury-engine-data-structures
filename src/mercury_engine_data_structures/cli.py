@@ -6,7 +6,6 @@ import logging
 import typing
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
-from typing import Optional
 
 from mercury_engine_data_structures import formats
 from mercury_engine_data_structures.construct_extensions.json import convert_to_raw_python
@@ -205,7 +204,7 @@ async def compare_all_files_in_path(args):
     input_path: Path = args.input_path
     file_format: str = args.format
     game: Game = args.game
-    limit: Optional[int] = args.limit
+    limit: int | None = args.limit
 
     def apply_limit(it):
         if limit is None:

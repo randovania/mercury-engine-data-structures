@@ -40,7 +40,7 @@ class BaseResource:
 
 AssetType = str
 AssetId = int
-NameOrAssetId = typing.Union[str, AssetId]
+NameOrAssetId = str | AssetId
 
 
 def resolve_asset_id(value: NameOrAssetId, game: Game) -> AssetId:
