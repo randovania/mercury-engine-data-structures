@@ -109,18 +109,3 @@ class Brfld(BaseResource):
         for group in collision_camera_groups:
             logger.debug("Add actor %s to group %s", actor_name, group)
             self.add_actor_to_group(group, actor_name, sublayer_name, actor_layer_name)
-
-    def add_actor_to_entity_groups(
-        self,
-        collision_camera_name: str,
-        actor_name: str,
-        sublayer_name: str = "default",
-    ):
-        """
-        adds an actor to all entity groups starting with "eg_" + collision_camera_name
-
-        param collision_camera_name: name of the collision camera group (prefix "eg_" is added)
-        param actor_name: name of the actor to add to the group
-        param sublayer_name: name of the sublayer the actor belongs to
-        """
-        self.add_actor_to_actor_groups(f"eg_{collision_camera_name}", actor_name, sublayer_name, ActorLayer.ENTITIES)
