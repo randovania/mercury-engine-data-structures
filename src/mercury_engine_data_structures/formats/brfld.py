@@ -25,19 +25,40 @@ class Brfld(BaseResource):
         return standard_format.game_model("CScenario", "49.0.2")
 
     def actors_for_sublayer(self, sublayer_name: str, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> dict:
+        """
+        Gets the actors in a sublayer
+
+        param sublayer_name: the name of the sublayer to get the actors of
+        param actor_layer: the actor_layer the sublayer is in
+        returns: the actors in the sublayer"""
         return self.raw.Root.pScenario[actor_layer.value].dctSublayers[sublayer_name].dctActors
 
     def sublayers_for_actor_layer(self, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> Iterator[str]:
+        """
+        Iterably gets the names of every sublayer in an actor layer
+
+        param actor_layer: the actor layer to get the sublayers of
+        returns: the name of each sublayer"""
         yield from self.raw.Root.pScenario[actor_layer.value].dctSublayers.keys()
 
     def all_actors_in_actor_layer(
         self, actor_layer: ActorLayer = ActorLayer.ENTITIES
     ) -> Iterator[Tuple[str, str, construct.Container]]:
+        """
+        Iterably gets every actor in an actor layer
+
+        param actor_layer: the actor layer to get the actors of
+        returns: each actor in the actor layer"""
         for sublayer_name, sublayer in self.raw.Root.pScenario[actor_layer.value].dctSublayers.items():
             for actor_name, actor in sublayer.dctActors.items():
                 yield sublayer_name, actor_name, actor
 
     def follow_link(self, link: str) -> Any | None:
+        """
+        Gets the object a link is referencing
+
+        param link: the link to follow
+        returns: the part of the BRFLD link is referencing"""
         if link != "{EMPTY}":
             result = self.raw
             for part in link.split(":"):
@@ -47,12 +68,30 @@ class Brfld(BaseResource):
     def link_for_actor(
         self, actor_name: str, sublayer_name: str = "default", actor_layer: ActorLayer = ActorLayer.ENTITIES
     ) -> str:
+        """
+        Builds a link for an actor
+
+        param actor_name: the name of the actor
+        sublayer_name: the name of the sublayer the actor is in
+        actor_layer: the actor layer the actor is in
+        returns: a string representing where in the BRFLD the actor is"""
         return ":".join(["Root", "pScenario", actor_layer.value, "dctSublayers", sublayer_name, "dctActors", actor_name])
 
     def actor_groups_for_actor_layer(self, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> Iterator[str]:
+        """
+        Iterably gets every actor group in an actor layer
+
+        param actor_layer: the actor layer to get the actor groups of
+        returns: each actor group in the actor layer"""
         yield from self.raw.Root.pScenario[actor_layer.value].dctActorGroups.keys()
 
     def get_actor_group(self, group_name: str, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> List[str]:
+        """
+        Gets an actor group
+
+        param group_name: the name of the actor group
+        param actor_layer: the actor layer the actor group is in
+        returns: a list of links to actors"""
         return self.raw.Root.pScenario[actor_layer.value].dctActorGroups[group_name]
 
     def is_actor_in_group(
@@ -62,6 +101,14 @@ class Brfld(BaseResource):
         sublayer_name: str = "default",
         actor_layer: ActorLayer = ActorLayer.ENTITIES,
     ) -> bool:
+        """
+        Checks if an actor is in an actor group
+
+        param group_name: the name of the actor group
+        param actor_name: the name of the actor
+        param sublayer_name: the name of the sublayer the actor is in
+        param actor_layer: the actor layer the actor is in
+        returns: true if the actor is in the actor group, false otherwise"""
         return self.link_for_actor(actor_name, sublayer_name, actor_layer) in self.get_actor_group(group_name, actor_layer)
 
     def add_actor_to_group(
@@ -71,6 +118,13 @@ class Brfld(BaseResource):
         sublayer_name: str = "default",
         actor_layer: ActorLayer = ActorLayer.ENTITIES,
     ) -> None:
+        """
+        Adds an actor to an actor group
+
+        param group_name: the name of the actor group
+        param actor_name: the name of the actor
+        param sublayer_name: the name of the sublayer the actor is in
+        param actor_layer: the actor layer the actor is in"""
         group = self.get_actor_group(group_name, actor_layer)
         actor_link = self.link_for_actor(actor_name, sublayer_name, actor_layer)
         if actor_link not in group:
@@ -83,6 +137,13 @@ class Brfld(BaseResource):
         sublayer_name: str = "default",
         actor_layer: ActorLayer = ActorLayer.ENTITIES,
     ) -> None:
+        """
+        Removes an actor from an actor group
+
+        param group_name: the name of the actor group
+        param actor_name: the name of the actor
+        param sublayer_name: the name of the sublayer the actor is in
+        param actor_layer: the actor layer the actor is in"""
         group = self.get_actor_group(group_name, actor_layer)
         actor_link = self.link_for_actor(actor_name, sublayer_name, actor_layer)
         if actor_link in group:
@@ -96,11 +157,11 @@ class Brfld(BaseResource):
         actor_layer: ActorLayer = ActorLayer.ENTITIES,
     ) -> None:
         """
-        adds an actor to all actor groups starting with collision_camera_name
+        Adds an actor to all actor groups starting with collision_camera_name
 
-        param collision_camera_name: name of the collision camera group
-        param actor_name: name of the actor to add to the group
-        param sublayer_name: name of the sublayer the actor belongs to
+        param collision_camera_name: the name of the collision camera group
+        param actor_name: the name of the actor to add to the group
+        param sublayer_name: the name of the sublayer the actor belongs to
         param actor_layer: the actor layer the sublayer belongs to
         """
         collision_camera_groups = [
