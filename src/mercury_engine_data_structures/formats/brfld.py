@@ -62,7 +62,7 @@ class Brfld(BaseResource):
         sublayer_name: str = "default",
         actor_layer: ActorLayer = ActorLayer.ENTITIES,
     ) -> bool:
-        return self.link_for_actor(actor_name, sublayer_name, actor_layer) in self.get_actor_group(group_name)
+        return self.link_for_actor(actor_name, sublayer_name, actor_layer) in self.get_actor_group(group_name, actor_layer)
 
     def add_actor_to_group(
         self,
