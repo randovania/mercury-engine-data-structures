@@ -1,7 +1,7 @@
 import functools
 import logging
 from enum import Enum
-from typing import Iterator, List, Tuple
+from typing import Any, Iterator, List, Tuple
 
 import construct
 
@@ -37,7 +37,7 @@ class Brfld(BaseResource):
             for actor_name, actor in sublayer.dctActors.items():
                 yield sublayer_name, actor_name, actor
 
-    def follow_link(self, link: str):
+    def follow_link(self, link: str) -> Any | None:
         if link != "{EMPTY}":
             result = self.raw
             for part in link.split(":"):
@@ -70,7 +70,7 @@ class Brfld(BaseResource):
         actor_name: str,
         sublayer_name: str = "default",
         actor_layer: ActorLayer = ActorLayer.ENTITIES,
-    ):
+    ) -> None:
         group = self.get_actor_group(group_name, actor_layer)
         actor_link = self.link_for_actor(actor_name, sublayer_name, actor_layer)
         if actor_link not in group:
@@ -82,7 +82,7 @@ class Brfld(BaseResource):
         actor_name: str,
         sublayer_name: str = "default",
         actor_layer: ActorLayer = ActorLayer.ENTITIES,
-    ):
+    ) -> None:
         group = self.get_actor_group(group_name, actor_layer)
         actor_link = self.link_for_actor(actor_name, sublayer_name, actor_layer)
         if actor_link in group:
@@ -94,7 +94,7 @@ class Brfld(BaseResource):
         actor_name: str,
         sublayer_name: str = "default",
         actor_layer: ActorLayer = ActorLayer.ENTITIES,
-    ):
+    ) -> None:
         """
         adds an actor to all actor groups starting with collision_camera_name
 
