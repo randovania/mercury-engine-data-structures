@@ -28,9 +28,9 @@ world_names = {
 }
 id_to_name = {os.path.splitext(path.split("/")[-1])[0]: name for path, name in world_names.items()}
 pickup_index = 0
-bmscc: typing.Optional[Bmscc] = None
-brsa: typing.Optional[Brsa] = None
-brfld: typing.Optional[Brfld] = None
+bmscc: Bmscc | None = None
+brsa: Brsa | None = None
+brfld: Brfld | None = None
 brfld_path: str = None
 events: dict[str, dict] = {}
 
@@ -3134,7 +3134,7 @@ class ActorDetails:
         self,
         node_type: str,
         default_name: str,
-        existing_data: typing.Optional[dict[str, NodeDefinition]],
+        existing_data: dict[str, NodeDefinition] | None,
     ) -> NodeDefinition:
         result: dict = {
             "node_type": node_type,
@@ -3212,7 +3212,7 @@ def _find_room_orientation(world: dict, room_a: str, room_b: str):
         raise ValueError(f"{room_a} and {room_b} are aligned")
 
 
-def get_def_link_for_entity(actor_ref: str) -> typing.Optional[str]:
+def get_def_link_for_entity(actor_ref: str) -> str | None:
     a = brfld.follow_link(actor_ref)
     if a is not None:
         return a.oActorDefLink
@@ -3396,7 +3396,7 @@ def decode_world(  # noqa: C901
         world["areas"][target_area]["nodes"][node_def.name] = node_def.data
         actor_to_area[get_actor_name_for_node(node_def.data)] = target_area
 
-    def get_node_def_for_actor(actor_name: str) -> typing.Optional[NodeDefinition]:
+    def get_node_def_for_actor(actor_name: str) -> NodeDefinition | None:
         actor_area = actor_to_area.get(actor_name)
         if actor_area is not None:
             for existing_name, existing_node in world["areas"][actor_area]["nodes"].items():

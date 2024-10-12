@@ -2,8 +2,6 @@
 Module for calculating CRC hashes with the algorithm and data used by Mercury Engine.
 """
 
-import typing
-
 _crc32_constants = [
     0x00000000,
     0x77073096,
@@ -523,7 +521,7 @@ _crc64_constants = [
 ]
 
 
-def _algorithm(data: typing.Union[bytes, str], constants: typing.List[int], checksum: int) -> int:
+def _algorithm(data: bytes | str, constants: list[int], checksum: int) -> int:
     if isinstance(data, str):
         data = data.encode("utf-8")
 
@@ -533,7 +531,7 @@ def _algorithm(data: typing.Union[bytes, str], constants: typing.List[int], chec
     return checksum
 
 
-def crc32(data: typing.Union[bytes, str]) -> int:
+def crc32(data: bytes | str) -> int:
     return _algorithm(
         data,
         _crc32_constants,
@@ -541,7 +539,7 @@ def crc32(data: typing.Union[bytes, str]) -> int:
     )
 
 
-def crc64(data: typing.Union[bytes, str]) -> int:
+def crc64(data: bytes | str) -> int:
     return _algorithm(
         data,
         _crc64_constants,

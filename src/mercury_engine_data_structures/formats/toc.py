@@ -1,5 +1,5 @@
 import functools
-from typing import Iterator, Optional
+from collections.abc import Iterator
 
 import construct
 
@@ -34,7 +34,7 @@ class Toc(BaseResource):
     def system_files_name(cls) -> str:
         return "system/files.toc"
 
-    def get_size_for(self, asset_id: NameOrAssetId) -> Optional[int]:
+    def get_size_for(self, asset_id: NameOrAssetId) -> int | None:
         asset_id = resolve_asset_id(asset_id, self.target_game)
         return self._raw.files.get(asset_id)
 

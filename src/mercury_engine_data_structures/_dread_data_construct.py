@@ -1,5 +1,4 @@
 import struct
-import typing
 
 import construct
 
@@ -30,7 +29,7 @@ class HashesDict(construct.Construct):
             ),
         )
 
-    def _parse(self, stream, context, path) -> typing.Dict[str, int]:
+    def _parse(self, stream, context, path) -> dict[str, int]:
         key_struct = struct.Struct("=H")
         value_struct = struct.Struct("=Q")
 
@@ -44,7 +43,7 @@ class HashesDict(construct.Construct):
 
         return result
 
-    def _build(self, obj: typing.Dict[str, int], stream, context, path):
+    def _build(self, obj: dict[str, int], stream, context, path):
         return self._build_construct._build(list(obj.items()), stream, context, path)
 
 

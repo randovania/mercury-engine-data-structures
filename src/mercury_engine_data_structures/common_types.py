@@ -402,7 +402,7 @@ def make_vector(value: construct.Construct):
     return result
 
 
-def make_enum(values: typing.Union[typing.List[str], typing.Dict[str, int]], *, add_invalid: bool = True):
+def make_enum(values: list[str] | dict[str, int], *, add_invalid: bool = True):
     if isinstance(values, dict):
         mapping = copy.copy(values)
     else:
