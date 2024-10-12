@@ -88,7 +88,7 @@ class Brfld(BaseResource):
         if actor_link in group:
             group.remove(actor_link)
 
-    def add_actor_to_entity_groups(
+    def add_actor_to_actor_groups(
         self,
         collision_camera_name: str,
         actor_name: str,
@@ -96,17 +96,31 @@ class Brfld(BaseResource):
         actor_layer_name: ActorLayer = ActorLayer.ENTITIES,
     ):
         """
-        adds an actor to all entity groups starting with "eg_" + collision_camera_name
+        adds an actor to all actor groups starting with collision_camera_name
 
         param collision_camera_name: name of the collision camera group
-        (prefix "eg_" is added to find the entity groups)
         param actor_name: name of the actor to add to the group
         param sublayer_name: name of the sublayer the actor belongs to
         param actor_layer_name: the actor layer the sublayer belongs to
         """
         collision_camera_groups = [
-            group for group in self.all_actor_groups() if group.startswith(f"eg_{collision_camera_name}")
+            group for group in self.all_actor_groups() if group.startswith(collision_camera_name)
         ]
         for group in collision_camera_groups:
             logger.debug("Add actor %s to group %s", actor_name, group)
             self.add_actor_to_group(group, actor_name, sublayer_name, actor_layer_name)
+
+    def add_actor_to_entity_groups(
+        self,
+        collision_camera_name: str,
+        actor_name: str,
+        sublayer_name: str = "default",
+    ):
+        """
+        adds an actor to all entity groups starting with "eg_" + collision_camera_name
+
+        param collision_camera_name: name of the collision camera group (prefix "eg_" is added)
+        param actor_name: name of the actor to add to the group
+        param sublayer_name: name of the sublayer the actor belongs to
+        """
+        self.add_actor_to_actor_groups(f"eg_{collision_camera_name}", actor_name, sublayer_name, ActorLayer.ENTITIES)
