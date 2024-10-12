@@ -25,15 +25,15 @@ class Brfld(BaseResource):
         return standard_format.game_model("CScenario", "49.0.2")
 
     def actors_for_sublayer(self, sublayer_name: str, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> dict:
-        return self.raw.Root.pScenario[actor_layer].dctSublayers[sublayer_name].dctActors
+        return self.raw.Root.pScenario[actor_layer.value].dctSublayers[sublayer_name].dctActors
 
     def sublayers_for_actor_layer(self, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> Iterator[str]:
-        yield from self.raw.Root.pScenario[actor_layer].dctSublayers.keys()
+        yield from self.raw.Root.pScenario[actor_layer.value].dctSublayers.keys()
 
     def all_actors_in_actor_layer(
         self, actor_layer: ActorLayer = ActorLayer.ENTITIES
     ) -> Iterator[Tuple[str, str, construct.Container]]:
-        for sublayer_name, sublayer in self.raw.Root.pScenario[actor_layer].dctSublayers.items():
+        for sublayer_name, sublayer in self.raw.Root.pScenario[actor_layer.value].dctSublayers.items():
             for actor_name, actor in sublayer.dctActors.items():
                 yield sublayer_name, actor_name, actor
 
@@ -47,13 +47,13 @@ class Brfld(BaseResource):
     def link_for_actor(
         self, actor_name: str, sublayer_name: str = "default", actor_layer: ActorLayer = ActorLayer.ENTITIES
     ) -> str:
-        return ":".join(["Root", "pScenario", actor_layer, "dctSublayers", sublayer_name, "dctActors", actor_name])
+        return ":".join(["Root", "pScenario", actor_layer.value, "dctSublayers", sublayer_name, "dctActors", actor_name])
 
     def actor_groups_for_actor_layer(self, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> Iterator[str]:
-        yield from self.raw.Root.pScenario[actor_layer].dctActorGroups.keys()
+        yield from self.raw.Root.pScenario[actor_layer.value].dctActorGroups.keys()
 
     def get_actor_group(self, group_name: str, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> List[str]:
-        return self.raw.Root.pScenario[actor_layer].dctActorGroups[group_name]
+        return self.raw.Root.pScenario[actor_layer.value].dctActorGroups[group_name]
 
     def is_actor_in_group(
         self,
