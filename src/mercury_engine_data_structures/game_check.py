@@ -2,9 +2,10 @@
 For checking which game is being parsed
 """
 
+from collections.abc import Callable
 from enum import Enum
 from functools import cached_property
-from typing import Any, Callable
+from typing import Any
 
 import construct
 from construct.core import IfThenElse

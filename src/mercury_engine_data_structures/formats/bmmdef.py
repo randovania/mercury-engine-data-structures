@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from construct import Construct, Container
 
 from mercury_engine_data_structures.formats import standard_format
@@ -25,7 +23,7 @@ class Bmmdef(BaseResource):
         uSpriteCol: int,
         sInspectorLabel: str,
         sDisabledIconId: str = "",
-        vAnchorOffset: Tuple[int, int] = (0, 0),
+        vAnchorOffset: tuple[int, int] = (0, 0),
         bAutoScale: bool = True,
         **kwargs,
     ):

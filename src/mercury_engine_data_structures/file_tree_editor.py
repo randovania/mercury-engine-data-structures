@@ -4,8 +4,8 @@ import json
 import logging
 import os.path
 import typing
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Dict, Iterator, Optional, Set
 
 import construct
 
@@ -55,11 +55,11 @@ class FileTreeEditor:
     _modified_resources: mapping of asset id to bytes. When saving, these asset ids are replaced
     """
 
-    headers: Dict[str, construct.Container]
-    _files_for_asset_id: Dict[AssetId, Set[Optional[str]]]
-    _ensured_asset_ids: Dict[str, Set[AssetId]]
-    _modified_resources: Dict[AssetId, Optional[bytes]]
-    _in_memory_pkgs: Dict[str, Pkg]
+    headers: dict[str, construct.Container]
+    _files_for_asset_id: dict[AssetId, set[str | None]]
+    _ensured_asset_ids: dict[str, set[AssetId]]
+    _modified_resources: dict[AssetId, bytes | None]
+    _in_memory_pkgs: dict[str, Pkg]
     _toc: Toc
 
     def __init__(self, romfs: RomFs, target_game: Game):
@@ -70,7 +70,7 @@ class FileTreeEditor:
 
         self._update_headers()
 
-    def _add_pkg_name_for_asset_id(self, asset_id: AssetId, pkg_name: Optional[str]):
+    def _add_pkg_name_for_asset_id(self, asset_id: AssetId, pkg_name: str | None):
         self._files_for_asset_id[asset_id] = self._files_for_asset_id.get(asset_id, set())
         self._files_for_asset_id[asset_id].add(pkg_name)
 
@@ -141,7 +141,7 @@ class FileTreeEditor:
 
         return asset_id in self._files_for_asset_id
 
-    def get_raw_asset(self, asset_id: NameOrAssetId, *, in_pkg: Optional[str] = None) -> bytes:
+    def get_raw_asset(self, asset_id: NameOrAssetId, *, in_pkg: str | None = None) -> bytes:
         """
         Gets the bytes data for the given asset name/id, optionally restricting from which pkg.
         :raises ValueError if the asset doesn't exist.
@@ -176,9 +176,7 @@ class FileTreeEditor:
 
         raise ValueError(f"Unknown asset_id: {original_name}")
 
-    def get_parsed_asset(
-        self, name: str, *, in_pkg: Optional[str] = None, type_hint: typing.Type[_T] = BaseResource
-    ) -> _T:
+    def get_parsed_asset(self, name: str, *, in_pkg: str | None = None, type_hint: type[_T] = BaseResource) -> _T:
         """
         Gets the resource with the given name and decodes it based on the extension.
         """
@@ -201,7 +199,7 @@ class FileTreeEditor:
         """
         return self.get_parsed_asset(path, type_hint=type_hint)
 
-    def add_new_asset(self, name: str, new_data: typing.Union[bytes, BaseResource], in_pkgs: typing.Iterable[str]):
+    def add_new_asset(self, name: str, new_data: bytes | BaseResource, in_pkgs: typing.Iterable[str]):
         """
         Adds an asset that doesn't already exist.
         """
@@ -228,7 +226,7 @@ class FileTreeEditor:
         for pkg_name in in_pkgs:
             self.ensure_present(pkg_name, asset_id)
 
-    def replace_asset(self, asset_id: NameOrAssetId, new_data: typing.Union[bytes, BaseResource]):
+    def replace_asset(self, asset_id: NameOrAssetId, new_data: bytes | BaseResource):
         """
         Replaces an existing asset.
         See `add_new_asset` for new assets.

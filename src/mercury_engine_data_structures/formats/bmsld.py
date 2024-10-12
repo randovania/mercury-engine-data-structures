@@ -1,5 +1,5 @@
 import logging
-from typing import Iterator, Tuple
+from collections.abc import Iterator
 
 import construct
 from construct import Const, Construct, Container, Flag, Float32l, Hex, Int32ul, Struct, Switch
@@ -145,7 +145,7 @@ class Bmsld(BaseResource):
     def construct_class(cls, target_game: Game) -> Construct:
         return BMSLD
 
-    def all_actors(self) -> Iterator[Tuple[int, str, construct.Container]]:
+    def all_actors(self) -> Iterator[tuple[int, str, construct.Container]]:
         for layer in self.raw.actors:
             for actor_name, actor in layer.items():
                 yield layer, actor_name, actor

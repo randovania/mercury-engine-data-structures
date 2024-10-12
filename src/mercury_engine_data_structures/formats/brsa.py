@@ -1,5 +1,5 @@
 import functools
-from typing import Iterator
+from collections.abc import Iterator
 
 from construct import Construct, Container
 

@@ -1,6 +1,5 @@
 import functools
 import typing
-from typing import Optional
 
 import construct
 
@@ -15,9 +14,9 @@ def _const_if_present(con: construct.Construct, value: typing.Any | None) -> con
 
 
 def create(
-    name: Optional[str],
-    version: Optional[int | str | tuple[int, int, int]],
-    root_name: Optional[str] = None,
+    name: str | None,
+    version: int | str | tuple[int, int, int] | None,
+    root_name: str | None = None,
     explicit_root: bool = False,
 ):
     # this maybe needs to change in the future if SR and Dread have different formats for type using this
@@ -49,9 +48,9 @@ def create(
 
 
 @functools.lru_cache
-def _cached_game_model(name: Optional[str], version: Optional[int | str | tuple[int, int, int]]):
+def _cached_game_model(name: str | None, version: int | str | tuple[int, int, int] | None):
     return create(name, version, "gameeditor::CGameModelRoot").compile()
 
 
-def game_model(name: Optional[str], version: Optional[int | str | tuple[int, int, int]]):
+def game_model(name: str | None, version: int | str | tuple[int, int, int] | None):
     return _cached_game_model(name, version)

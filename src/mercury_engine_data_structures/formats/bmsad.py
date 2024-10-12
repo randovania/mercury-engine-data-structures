@@ -497,7 +497,7 @@ class ActorDefFuncParam(typing.Generic[T]):
 
 
 Vec3 = list
-FieldType = typing.Union[bool, str, float, int, Vec3]
+FieldType = bool | str | float | int | Vec3
 
 
 class ComponentFields:

@@ -1,8 +1,6 @@
 import enum
 import functools
-import typing
 import warnings
-from typing import Dict
 
 import construct
 
@@ -24,7 +22,7 @@ class HashSet(enum.Enum):
     PROPERTY = enum.auto()
     FILE_NAME = enum.auto()
 
-    def known_hashes(self, context) -> Dict[str, int]:
+    def known_hashes(self, context) -> dict[str, int]:
         if self == HashSet.PROPERTY:
             return _correct_data(context._params.target_game).all_name_to_property_id()
         elif self == HashSet.FILE_NAME:
@@ -32,7 +30,7 @@ class HashSet(enum.Enum):
         else:
             raise ValueError("Unknown")
 
-    def inverted_hashes(self, context) -> Dict[int, str]:
+    def inverted_hashes(self, context) -> dict[int, str]:
         if self == HashSet.PROPERTY:
             return _correct_data(context._params.target_game).all_property_id_to_name()
         elif self == HashSet.FILE_NAME:
@@ -41,7 +39,7 @@ class HashSet(enum.Enum):
             raise ValueError("Unknown")
 
 
-HashedName = typing.Union[str, int]
+HashedName = str | int
 
 
 class CRCAdapter(construct.Adapter):
