@@ -59,19 +59,13 @@ def test_remove_actor_from_actor_group(dread_tree_100):
     scenario.remove_actor_from_group("eg_collision_camera_000_Default", "breakabletilegroup_052", "breakables")
     assert not scenario.is_actor_in_group("eg_collision_camera_000_Default", "breakabletilegroup_052", "breakables")
 
-    scenario.remove_actor_from_group(
-        "ssg_collision_camera_000_Default", "Pos_C_Trees_R", actor_layer=ActorLayer.SOUNDS
-    )
+    scenario.remove_actor_from_group("ssg_collision_camera_000_Default", "Pos_C_Trees_R", actor_layer=ActorLayer.SOUNDS)
     assert not scenario.is_actor_in_group(
         "ssg_collision_camera_000_Default", "Pos_C_Trees_R", actor_layer=ActorLayer.SOUNDS
     )
 
-    scenario.remove_actor_from_group(
-        "lg_collision_camera_000", "cave_000_light", "spot_000_1", ActorLayer.LIGHTS
-    )
-    assert not scenario.is_actor_in_group(
-        "lg_collision_camera_000", "cave_000_light", "spot_000_1", ActorLayer.LIGHTS
-    )
+    scenario.remove_actor_from_group("lg_collision_camera_000", "cave_000_light", "spot_000_1", ActorLayer.LIGHTS)
+    assert not scenario.is_actor_in_group("lg_collision_camera_000", "cave_000_light", "spot_000_1", ActorLayer.LIGHTS)
 
 
 def test_add_actor_to_actor_groups(dread_tree_100):
