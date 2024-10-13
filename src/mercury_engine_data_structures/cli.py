@@ -11,6 +11,7 @@ from mercury_engine_data_structures import formats
 from mercury_engine_data_structures.construct_extensions.json import convert_to_raw_python
 from mercury_engine_data_structures.file_tree_editor import FileTreeEditor, OutputFormat
 from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.romfs import ExtractedRomFs
 
 
 def game_argument_type(s: str) -> Game:
@@ -134,7 +135,7 @@ def do_decode_from_pkg(args):
     root: Path = args.root
     asset_name: str = args.asset_name
 
-    pkg_editor = FileTreeEditor(root, args.game)
+    pkg_editor = FileTreeEditor(ExtractedRomFs(root), args.game)
     asset = pkg_editor.get_parsed_asset(asset_name)
     print(asset.raw)
 
@@ -173,7 +174,7 @@ def find_pkg_for(args):
     asset_id: int = args.asset_id
     asset_name: str = args.asset_name
 
-    pkg_editor = FileTreeEditor(root, args.game)
+    pkg_editor = FileTreeEditor(ExtractedRomFs(root), args.game)
     if asset_id is not None:
         items = list(pkg_editor.find_pkgs(asset_id))
     else:
@@ -251,7 +252,7 @@ def extract_files(args: argparse.Namespace) -> None:
     root: Path = args.root
     output_root: Path = args.output
 
-    pkg_editor = FileTreeEditor(root, args.game)
+    pkg_editor = FileTreeEditor(ExtractedRomFs(root), args.game)
 
     output_root.mkdir(parents=True, exist_ok=True)
     for file_name in pkg_editor.all_asset_names():
@@ -267,7 +268,7 @@ def replace_files(args: argparse.Namespace) -> None:
     new_files: Path = args.new_files
     output: Path = args.output
 
-    pkg_editor = FileTreeEditor(root, args.game)
+    pkg_editor = FileTreeEditor(ExtractedRomFs(root), args.game)
 
     for file_name in new_files.rglob("*"):
         if file_name.is_file():

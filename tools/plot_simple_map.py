@@ -14,6 +14,7 @@ from mercury_engine_data_structures import dread_data
 from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 from mercury_engine_data_structures.formats import Bmscc, Brfld, Brsa
 from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.romfs import ExtractedRomFs
 
 world_names = {
     "maps/levels/c10_samus/s010_cave/s010_cave.brfld": "Artaria",
@@ -3276,7 +3277,7 @@ def decode_world(  # noqa: C901
     all_names = dread_data.all_asset_id_to_name()
     game = Game.DREAD
 
-    pkg_editor = FileTreeEditor(root, Game.DREAD)
+    pkg_editor = FileTreeEditor(ExtractedRomFs(root), Game.DREAD)
 
     for asset_id, name in all_names.items():
         if target_level not in name:
