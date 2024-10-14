@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from construct.core import Const, Construct, Int32ul, PrefixedArray, Struct
 
 from mercury_engine_data_structures.common_types import Float, VersionAdapter

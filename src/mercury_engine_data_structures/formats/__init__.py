@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from mercury_engine_data_structures.formats.bapd import Bapd
 from mercury_engine_data_structures.formats.base_resource import AssetType, BaseResource
 from mercury_engine_data_structures.formats.bcmdl import Bcmdl

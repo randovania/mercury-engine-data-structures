@@ -2,6 +2,8 @@
 For checking which game is being parsed
 """
 
+from __future__ import annotations
+
 from collections.abc import Callable
 from enum import Enum
 from functools import cached_property

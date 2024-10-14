@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import functools
 import typing
@@ -501,7 +503,7 @@ FieldType = bool | str | float | int | Vec3
 
 
 class ComponentFields:
-    def __init__(self, parent: "Component") -> None:
+    def __init__(self, parent: Component) -> None:
         self.parent = parent
 
     def _get_extra_field(self, fields: Container, name: str) -> FieldType:

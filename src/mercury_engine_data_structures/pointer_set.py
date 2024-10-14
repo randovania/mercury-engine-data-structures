@@ -2,6 +2,8 @@
 Helper class to handle objects that contain a pointer to objects of varied types, usually all with the same base type.
 """
 
+from __future__ import annotations
+
 import copy
 import struct
 

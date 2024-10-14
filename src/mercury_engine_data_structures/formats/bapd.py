@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import construct
 
 from mercury_engine_data_structures.formats.base_resource import BaseResource

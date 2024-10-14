@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from construct.core import Const, Construct, IfThenElse, Int32ul, PrefixedArray, Struct, Terminated
 
 from mercury_engine_data_structures import game_check

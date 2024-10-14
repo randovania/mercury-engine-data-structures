@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from construct import Construct
 
 from mercury_engine_data_structures.formats import standard_format

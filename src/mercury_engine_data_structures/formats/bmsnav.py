@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from construct.core import Array, Byte, Const, Construct, Flag, Hex, Int32ul, PrefixedArray, Struct, Terminated
 
 from mercury_engine_data_structures.common_types import CVector2D, CVector3D, Float, StrId, VersionAdapter, make_dict

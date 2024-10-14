@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 all_levels = [
     "s000_surface",
     "s010_area1",

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from mercury_engine_data_structures import common_types
 from mercury_engine_data_structures.common_types import Float
 

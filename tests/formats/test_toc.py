@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from mercury_engine_data_structures.formats.toc import Toc
 from mercury_engine_data_structures.game_check import Game
 
