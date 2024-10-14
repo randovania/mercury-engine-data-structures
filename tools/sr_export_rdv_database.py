@@ -1,3 +1,12 @@
+# /// script
+# dependencies = [
+#   "numpy",
+#   "matplotlib",
+#   "shapely",
+#   "mercury-engine-data-structures",
+# ]
+# ///
+
 from __future__ import annotations
 
 import argparse
@@ -20,6 +29,8 @@ from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 from mercury_engine_data_structures.formats import Bmscc, Bmsld
 from mercury_engine_data_structures.game_check import Game
 from mercury_engine_data_structures.romfs import ExtractedRomFs
+
+# ruff: noqa: PLW0603
 
 world_names = {
     "maps/levels/c10_samus/s000_surface/s000_surface.bmsld": "Surface - East",

@@ -62,5 +62,5 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config: pytest.Config):
-    global _FAIL_INSTEAD_OF_SKIP
+    global _FAIL_INSTEAD_OF_SKIP  # noqa: PLW0603
     _FAIL_INSTEAD_OF_SKIP = config.option.fail_if_missing

@@ -1,3 +1,10 @@
+# /// script
+# dependencies = [
+#   "ghidra_bridge",
+#   "mercury-engine-data-structures",
+# ]
+# ///
+
 from __future__ import annotations
 
 import collections
@@ -14,6 +21,8 @@ import ghidra_bridge
 
 from mercury_engine_data_structures import dread_data
 from mercury_engine_data_structures.type_lib import PrimitiveKind, TypeKind
+
+# ruff: noqa: PLW0603
 
 # New JSON Format
 known_types_to_construct = {
