@@ -1,5 +1,4 @@
 import functools
-from typing import Dict
 
 import construct
 from construct.core import Const, Construct, GreedyRange, Struct
@@ -54,7 +53,7 @@ class Txt(BaseResource):
         return TXT.compile()
 
     @property
-    def strings(self) -> Dict[str, str]:
+    def strings(self) -> dict[str, str]:
         return self._raw.strings
 
     @strings.setter

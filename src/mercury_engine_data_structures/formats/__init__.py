@@ -1,5 +1,3 @@
-from typing import Type
-
 from mercury_engine_data_structures.formats.bapd import Bapd
 from mercury_engine_data_structures.formats.base_resource import AssetType, BaseResource
 from mercury_engine_data_structures.formats.bcmdl import Bcmdl
@@ -105,5 +103,5 @@ ALL_FORMATS = {
 }
 
 
-def format_for(type_name: AssetType) -> Type[BaseResource]:
+def format_for(type_name: AssetType) -> type[BaseResource]:
     return ALL_FORMATS[type_name.upper()]

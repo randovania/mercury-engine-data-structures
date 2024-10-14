@@ -17,6 +17,7 @@ from mercury_engine_data_structures import samus_returns_data
 from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 from mercury_engine_data_structures.formats import Bmscc, Bmsld
 from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.romfs import ExtractedRomFs
 
 world_names = {
     "maps/levels/c10_samus/s000_surface/s000_surface.bmsld": "Surface - East",
@@ -39,9 +40,9 @@ world_names = {
 }
 id_to_name = {os.path.splitext(path.split("/")[-1])[0]: name for path, name in world_names.items()}
 pickup_index = 0
-bmscc: typing.Optional[Bmscc] = None
+bmscc: Bmscc | None = None
 # brsa: typing.Optional[Brsa] = None
-bmsld: typing.Optional[Bmsld] = None
+bmsld: Bmsld | None = None
 bmsld_path: str = None
 events: dict[str, dict] = {}
 
@@ -398,7 +399,7 @@ class ActorDetails:
         self,
         node_type: str,
         default_name: str,
-        existing_data: typing.Optional[dict[str, NodeDefinition]],
+        existing_data: dict[str, NodeDefinition] | None,
     ) -> NodeDefinition:
         result: dict = {
             "node_type": node_type,
@@ -549,7 +550,7 @@ def decode_world(
     all_names = samus_returns_data.all_asset_id_to_name()
     game = Game.SAMUS_RETURNS
 
-    pkg_editor = FileTreeEditor(root, target_game=game)
+    pkg_editor = FileTreeEditor(ExtractedRomFs(root), target_game=game)
 
     for asset_id, name in all_names.items():
         if target_level not in name:

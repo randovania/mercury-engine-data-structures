@@ -1,7 +1,7 @@
 import functools
 import logging
 from enum import Enum
-from typing import Any, Iterator, List, Tuple
+from collections.abc import Iterator
 
 import construct
 
@@ -43,7 +43,7 @@ class Brfld(BaseResource):
 
     def all_actors_in_actor_layer(
         self, actor_layer: ActorLayer = ActorLayer.ENTITIES
-    ) -> Iterator[Tuple[str, str, construct.Container]]:
+    ) -> Iterator[tuple[str, str, construct.Container]]:
         """
         Iterably gets every actor in an actor layer
 
@@ -87,7 +87,7 @@ class Brfld(BaseResource):
         returns: each actor group in the actor layer"""
         yield from self.raw.Root.pScenario[actor_layer.value].dctActorGroups.keys()
 
-    def get_actor_group(self, group_name: str, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> List[str]:
+    def get_actor_group(self, group_name: str, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> list[str]:
         """
         Gets an actor group
 
