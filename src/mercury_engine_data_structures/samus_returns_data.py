@@ -10,7 +10,7 @@ from mercury_engine_data_structures.game_check import Game, GameVersion
 
 _root = Path(__file__).parent
 MSR_VERSIONS = GameVersion.versions_for_game(Game.SAMUS_RETURNS)
-ALL_VERSIONS_BITMASK = sum([v.bitmask for v in MSR_VERSIONS.values()])
+ALL_VERSIONS_BITMASK = -1
 
 
 @functools.lru_cache

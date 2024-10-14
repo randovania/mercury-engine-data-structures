@@ -78,7 +78,7 @@ class FileTreeEditor:
         self._ensured_asset_ids = {}
         self._files_for_asset_id = {}
         self.version = version_validation.identify_version(self)
-        self._name_for_asset_id = copy.copy(version_validation.all_asset_id_for_version(self.version))
+        self._name_for_asset_id = copy.copy(self.version.all_asset_id_for_version())
 
         self._toc = Toc.parse(self.romfs.get_file(Toc.system_files_name()), target_game=self.target_game)
 
