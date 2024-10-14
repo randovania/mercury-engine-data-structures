@@ -1,7 +1,7 @@
 import functools
 import logging
-from enum import Enum
 from collections.abc import Iterator
+from enum import Enum
 
 import construct
 
