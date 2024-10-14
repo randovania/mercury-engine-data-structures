@@ -4,8 +4,6 @@ import struct
 
 import construct
 
-from mercury_engine_data_structures.game_check import GameVersion
-
 
 class CompressedZSTD(construct.Tunnel):
     def __init__(self, subcon, level: int = 3):
@@ -78,12 +76,12 @@ class VersionedHashesDict(construct.Construct):
         return result
 
     def _build(self, obj: dict[str, dict], stream, context, path):
-        ver_to_val = GameVersion.versions_for_game(context.target_game)
-        all_vers = sum([v.bitmask for v in ver_to_val.values()])
+        ver_to_val = context.versions
+        all_vers = sum([v for v in ver_to_val.values()])
         for a in obj.values():
             vers = a.get("versions")
             if vers is not None:
-                a["versions"] = sum([ver_to_val[v].bitmask for v in vers])
+                a["versions"] = sum([ver_to_val[v] for v in vers])
             else:
                 a["versions"] = all_vers
 
