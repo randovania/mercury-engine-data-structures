@@ -76,6 +76,44 @@ class Game(Enum):
             raise ValueError(f"Unsupported game: {self}")
 
 
+class GameVersion(Enum):
+    as_string: str
+    game: Game
+    bitmask: int
+    toc_hash: bytes
+    all_files_hash: bytes
+
+    MSR = (0, "1.0.0", Game.SAMUS_RETURNS, 1, "E9F1963CCCD5002CF6DE6E844528DF46", "83E382FB3E95061185184CE7FCB45AF8")
+    DREAD_1_0_0 = (1, "1.0.0", Game.DREAD, 1, "8DEC0C18622C6DAC370F84CF3A3AC0B4", "862EB0111C28082F5730FACF583CEF7B")
+    DREAD_1_0_1 = (2, "1.0.1", Game.DREAD, 2, "35309081AF05C60CEBC476F78F3609B6", "00")
+    DREAD_2_0_0 = (3, "2.0.0", Game.DREAD, 4, "B36FB05261F2E4EAF0408760E1B983FD", "00")
+    DREAD_2_1_0 = (4, "2.1.0", Game.DREAD, 8, "782820635AC434A18DF11DE3D4052DD1", "F1A3ABE49305A16F4671E9E64EBCA119")
+    UNDEFINED = (-1, "UNDEFINED", None, 2**15, "", "")
+
+    def __new__(cls, value: int, string: str, game: Game, bitmask: int, toc_hash: str, all_files_hash: str):
+        member = object.__new__(cls)
+        member._value_ = value
+        member.as_string = string
+        member.game = game
+        member.bitmask = bitmask
+        member.toc_hash = bytes.fromhex(toc_hash)
+        member.all_files_hash = bytes.fromhex(all_files_hash)
+
+        return member
+
+    @classmethod
+    def get_value(cls, game: Game, version: str):
+        for gv in cls:
+            if gv.game == game and gv.version == version:
+                return gv.value
+
+        return -1
+
+    @classmethod
+    def versions_for_game(cls, game: Game) -> dict[str, GameVersion]:
+        return {gv.as_string: gv for gv in cls if gv.game == game}
+
+
 def get_current_game(ctx):
     result = ctx["_params"]["target_game"]
     if not isinstance(result, Game):

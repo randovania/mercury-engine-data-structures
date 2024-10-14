@@ -4,6 +4,8 @@ import struct
 
 import construct
 
+from mercury_engine_data_structures.game_check import GameVersion
+
 
 class CompressedZSTD(construct.Tunnel):
     def __init__(self, subcon, level: int = 3):
@@ -49,4 +51,46 @@ class HashesDict(construct.Construct):
         return self._build_construct._build(list(obj.items()), stream, context, path)
 
 
+class VersionedHashesDict(construct.Construct):
+    def __init__(self):
+        super().__init__()
+        self._build_construct = construct.PrefixedArray(
+            construct.Int32un,
+            construct.Sequence(
+                construct.PascalString(construct.Int16un, "ascii"),  # key
+                construct.Int64un,  # hash
+                construct.Int16un,  # versions
+            ),
+        )
+
+    def _parse(self, stream, context, path) -> dict[str, int]:
+        key_struct = struct.Struct("=H")
+        value_struct = struct.Struct("=QH")
+
+        count = construct.Int32un._parse(stream, None, "")
+
+        result = {}
+        for _ in range(count):
+            key = stream.read(key_struct.unpack(stream.read(2))[0]).decode()
+            value, versions = value_struct.unpack(stream.read(10))
+            result[key] = {"crc": value, "versions": versions}
+
+        return result
+
+    def _build(self, obj: dict[str, dict], stream, context, path):
+        ver_to_val = GameVersion.versions_for_game(context.target_game)
+        all_vers = sum([v.bitmask for v in ver_to_val.values()])
+        for a in obj.values():
+            vers = a.get("versions")
+            if vers is not None:
+                a["versions"] = sum([ver_to_val[v].bitmask for v in vers])
+            else:
+                a["versions"] = all_vers
+
+        return self._build_construct._build(
+            list([(k, v["crc"], v["versions"]) for k, v in obj.items()]), stream, context, path
+        )
+
+
 KnownHashes = CompressedZSTD(HashesDict(), 15)
+VersionedHashes = CompressedZSTD(VersionedHashesDict(), 15)

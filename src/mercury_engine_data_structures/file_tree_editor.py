@@ -7,11 +7,12 @@ import logging
 import os.path
 import typing
 
-from mercury_engine_data_structures import dread_data, formats, samus_returns_data
+from mercury_engine_data_structures import formats, version_validation
 from mercury_engine_data_structures.base_resource import AssetId, BaseResource, NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.formats import Toc
 from mercury_engine_data_structures.formats.pkg import Pkg
-from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.game_check import Game, GameVersion
+from mercury_engine_data_structures.romfs import RomFs
 
 if typing.TYPE_CHECKING:
     from collections.abc import Iterator
@@ -42,15 +43,6 @@ def _write_to_path(output: Path, data: bytes):
     output.write_bytes(data)
 
 
-def _all_asset_id_for_game(game: Game):
-    if game == Game.DREAD:
-        return dread_data.all_asset_id_to_name()
-    elif game == Game.SAMUS_RETURNS:
-        return samus_returns_data.all_asset_id_to_name()
-    else:
-        raise ValueError(f"Unsupported game {game}")
-
-
 class FileTreeEditor:
     """
     Manages efficiently reading all PKGs in the game and writing out modifications to a new path.
@@ -60,6 +52,7 @@ class FileTreeEditor:
     _modified_resources: mapping of asset id to bytes. When saving, these asset ids are replaced
     """
 
+    version: GameVersion
     headers: dict[str, construct.Container]
     _files_for_asset_id: dict[AssetId, set[str | None]]
     _ensured_asset_ids: dict[str, set[AssetId]]
@@ -84,7 +77,8 @@ class FileTreeEditor:
         self.headers = {}
         self._ensured_asset_ids = {}
         self._files_for_asset_id = {}
-        self._name_for_asset_id = copy.copy(_all_asset_id_for_game(self.target_game))
+        self.version = version_validation.identify_version(self)
+        self._name_for_asset_id = copy.copy(version_validation.all_asset_id_for_version(self.version))
 
         self._toc = Toc.parse(self.romfs.get_file(Toc.system_files_name()), target_game=self.target_game)
 

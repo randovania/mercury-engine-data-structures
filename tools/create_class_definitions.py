@@ -4,10 +4,12 @@ import argparse
 import collections
 import copy
 import json
+import typing
 from pathlib import Path
-from typing import Any
 
 import construct
+
+from mercury_engine_data_structures.game_check import Game
 
 meds_root = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures")
 
@@ -28,7 +30,7 @@ def _type_name_to_python_identifier(type_name: str):
 
 
 class TypeExporter:
-    def __init__(self, all_types: dict[str, Any], primitive_to_construct, type_lib):
+    def __init__(self, all_types: dict[str, typing.Any], primitive_to_construct, type_lib):
         self.all_types = all_types
         self._exported_types = {}
         self._types_with_pointer = set()
@@ -216,27 +218,39 @@ from mercury_engine_data_structures.construct_extensions.enum import StrictEnum,
         return code
 
 
-def game_argument_type(s: str) -> str:
-    if s not in ["dread", "sr"]:
+def game_argument_type(s: str) -> Game:
+    try:
+        return Game(int(s))
+    except ValueError:
+        # not a number, look by name
+        for g in Game:
+            g = typing.cast(Game, g)
+            if g.name.lower() == s.lower():
+                return g
         raise ValueError(f"No enum named {s} found")
-    return s
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "game", help="The game to create the class definitions for", type=game_argument_type, choices=["dread", "sr"]
-    )
-    args = parser.parse_args()
 
-    if args.game == "dread":
+    choices = []
+    for g in Game:
+        g = typing.cast(Game, g)
+        choices.append(g.value)
+        choices.append(g.name)
+
+    parser.add_argument("game", help="The game of the file", type=game_argument_type, choices=list(Game))
+    args = parser.parse_args()
+    if args.game == Game.DREAD:
         types_path = meds_root.joinpath("dread_types.json")
         output_name = "dread_types.py"
-        file_names = ["dread_resource_names", "dread_property_names"]
+        resource_name = "dread_resource_names"
+        property_name = "dread_property_names"
     else:
         types_path = meds_root.joinpath("samus_returns_types.json")
         output_name = "sr_types.py"
-        file_names = ["sr_resource_names", "sr_property_names"]
+        resource_name = "sr_resource_names"
+        property_name = "sr_property_names"
 
     game_types = json.loads(types_path.read_text())
 
@@ -262,7 +276,7 @@ def main():
     output_path = meds_root.joinpath("formats", output_name)
 
     # Skip it for sr as it has some errors in its types json
-    if args.game != "sr":
+    if args.game != Game.SAMUS_RETURNS:
         all_types: dict[str, type_lib.BaseType] = copy.copy(type_lib.TypeLib(game_types, 11).all_types())
 
         type_exporter = TypeExporter(all_types, primitive_to_construct, type_lib)
@@ -271,11 +285,17 @@ def main():
 
         output_path.write_text(type_exporter.export_code())
 
-    for file_name in file_names:
-        with meds_root.joinpath(f"{file_name}.json").open() as f:
-            file_data: dict[str, int] = json.load(f)
+    with meds_root.joinpath(f"{property_name}.json").open() as f:
+        property_data: dict[str, int] = json.load(f)
 
-        data_construct.KnownHashes.build_file(file_data, meds_root.joinpath(f"{file_name}.bin"))
+    data_construct.KnownHashes.build_file(property_data, meds_root.joinpath(f"{property_name}.bin"))
+
+    with meds_root.joinpath(f"{resource_name}.json").open() as f:
+        resource_data: dict[str, dict] = json.load(f)
+
+    data_construct.VersionedHashes.build_file(
+        resource_data, meds_root.joinpath(f"{resource_name}.bin"), target_game=Game(args.game)
+    )
 
 
 if __name__ == "__main__":
