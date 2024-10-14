@@ -9,13 +9,13 @@ from pathlib import Path
 
 import construct
 
-from mercury_engine_data_structures.game_check import Game
-
 meds_root = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures")
 
 dread_data_construct_path = meds_root.joinpath("_dread_data_construct.py")
+game_check_path = meds_root.joinpath("game_check.py")
 data_construct = construct.Container()
 exec(compile(dread_data_construct_path.read_text(), dread_data_construct_path, "exec"), data_construct)
+exec(compile(game_check_path.read_text(), game_check_path, "exec"), data_construct)
 
 
 def _type_name_to_python_identifier(type_name: str):
@@ -218,13 +218,13 @@ from mercury_engine_data_structures.construct_extensions.enum import StrictEnum,
         return code
 
 
-def game_argument_type(s: str) -> Game:
+def game_argument_type(s: str):
     try:
-        return Game(int(s))
+        return data_construct.Game(int(s))
     except ValueError:
         # not a number, look by name
-        for g in Game:
-            g = typing.cast(Game, g)
+        for g in data_construct.Game:
+            g = typing.cast(data_construct.Game, g)
             if g.name.lower() == s.lower():
                 return g
         raise ValueError(f"No enum named {s} found")
@@ -234,14 +234,14 @@ def main():
     parser = argparse.ArgumentParser()
 
     choices = []
-    for g in Game:
-        g = typing.cast(Game, g)
+    for g in data_construct.Game:
+        g = typing.cast(data_construct.Game, g)
         choices.append(g.value)
         choices.append(g.name)
 
-    parser.add_argument("game", help="The game of the file", type=game_argument_type, choices=list(Game))
+    parser.add_argument("game", help="The game of the file", type=game_argument_type, choices=list(data_construct.Game))
     args = parser.parse_args()
-    if args.game == Game.DREAD:
+    if args.game == data_construct.Game.DREAD:
         types_path = meds_root.joinpath("dread_types.json")
         output_name = "dread_types.py"
         resource_name = "dread_resource_names"
@@ -276,7 +276,7 @@ def main():
     output_path = meds_root.joinpath("formats", output_name)
 
     # Skip it for sr as it has some errors in its types json
-    if args.game != Game.SAMUS_RETURNS:
+    if args.game != data_construct.Game.SAMUS_RETURNS:
         all_types: dict[str, type_lib.BaseType] = copy.copy(type_lib.TypeLib(game_types, 11).all_types())
 
         type_exporter = TypeExporter(all_types, primitive_to_construct, type_lib)
@@ -294,7 +294,7 @@ def main():
         resource_data: dict[str, dict] = json.load(f)
 
     data_construct.VersionedHashes.build_file(
-        resource_data, meds_root.joinpath(f"{resource_name}.bin"), target_game=Game(args.game)
+        resource_data, meds_root.joinpath(f"{resource_name}.bin"), target_game=data_construct.Game(args.game)
     )
 
 
