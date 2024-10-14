@@ -73,9 +73,7 @@ def all_property_id_to_name() -> dict[int, str]:
     return {asset_id: name for name, asset_id in names.items()}
 
 
-def all_files_ending_with(
-    ext: str, exclusions: list[str] = None, ver: GameVersion | None = None
-) -> list[str]:
+def all_files_ending_with(ext: str, exclusions: list[str] = None, ver: GameVersion | None = None) -> list[str]:
     if not ext.startswith("."):
         ext = "." + ext
 
