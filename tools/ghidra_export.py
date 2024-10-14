@@ -23,6 +23,7 @@ from mercury_engine_data_structures import dread_data
 from mercury_engine_data_structures.type_lib import PrimitiveKind, TypeKind
 
 # ruff: noqa: PLW0603
+# ruff: noqa: PLW2901
 
 # New JSON Format
 known_types_to_construct = {

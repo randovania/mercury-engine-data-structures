@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-import io
 from abc import ABC, abstractmethod
-from collections.abc import Iterator
 from contextlib import contextmanager
-from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import io
+    from collections.abc import Iterator
+    from pathlib import Path
 
 
 class RomFs(ABC):
@@ -15,7 +18,6 @@ class RomFs(ABC):
 
         :param file_path: File path to the pkg file
         """
-        pass
 
     @abstractmethod
     def read_file_with_entry(self, file_path: str, entry) -> bytes:
@@ -24,7 +26,6 @@ class RomFs(ABC):
         :param file_path: File path to the pkg file
         :param entry: An entry object containing the end_offset and start_offset within the pkg
         """
-        pass
 
     @abstractmethod
     def get_file(self, file_path: str) -> bytes:
@@ -32,12 +33,10 @@ class RomFs(ABC):
 
         :param file_path: Path to the file
         """
-        pass
 
     @abstractmethod
     def all_files(self) -> Iterator[str]:
         """Returns an Iterator for all files within the RomFS"""
-        pass
 
 
 class ExtractedRomFs(RomFs):

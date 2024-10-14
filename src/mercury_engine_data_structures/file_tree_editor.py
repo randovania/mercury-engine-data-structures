@@ -6,17 +6,20 @@ import json
 import logging
 import os.path
 import typing
-from collections.abc import Iterator
-from pathlib import Path
-
-import construct
 
 from mercury_engine_data_structures import dread_data, formats, samus_returns_data
+from mercury_engine_data_structures.base_resource import AssetId, BaseResource, NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.formats import Toc
-from mercury_engine_data_structures.formats.base_resource import AssetId, BaseResource, NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.formats.pkg import Pkg
 from mercury_engine_data_structures.game_check import Game
-from mercury_engine_data_structures.romfs import RomFs
+
+if typing.TYPE_CHECKING:
+    from collections.abc import Iterator
+    from pathlib import Path
+
+    import construct
+
+    from mercury_engine_data_structures.romfs import RomFs
 
 _T = typing.TypeVar("_T", bound=BaseResource)
 logger = logging.getLogger(__name__)

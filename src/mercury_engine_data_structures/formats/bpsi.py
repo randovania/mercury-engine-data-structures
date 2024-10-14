@@ -3,9 +3,9 @@ from __future__ import annotations
 from construct.core import Const, Construct, IfThenElse, Int32ul, PrefixedArray, Struct, Terminated
 
 from mercury_engine_data_structures import game_check
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import VersionAdapter
 from mercury_engine_data_structures.construct_extensions.strings import PascalStringRobust
-from mercury_engine_data_structures.formats.base_resource import BaseResource
 
 BPSI = Struct(
     _magic=Const(b"MPSI"),

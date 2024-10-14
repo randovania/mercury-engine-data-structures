@@ -4,15 +4,17 @@ For checking which game is being parsed
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from enum import Enum
 from functools import cached_property
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import construct
 from construct.core import IfThenElse
 
 from mercury_engine_data_structures import crc
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class Game(Enum):

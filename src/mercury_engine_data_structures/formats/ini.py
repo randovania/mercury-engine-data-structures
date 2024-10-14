@@ -7,11 +7,11 @@ from typing import Any
 
 from construct import Construct, Container, GreedyString, Struct
 
-from mercury_engine_data_structures.formats.base_resource import BaseResource
-from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.base_resource import BaseResource
 
 if typing.TYPE_CHECKING:
     from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
+    from mercury_engine_data_structures.game_check import Game
 
 INI = Struct("text" / GreedyString("utf-8"))
 

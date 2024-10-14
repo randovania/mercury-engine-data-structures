@@ -3,7 +3,6 @@ from __future__ import annotations
 import copy
 import functools
 import typing
-from collections.abc import Sequence
 
 import construct
 from construct.core import (
@@ -25,6 +24,7 @@ from construct.core import (
 from construct.lib.containers import Container, ListContainer
 
 from mercury_engine_data_structures import common_types, type_lib
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import (
     Char,
     CVector3D,
@@ -37,11 +37,13 @@ from mercury_engine_data_structures.common_types import (
 from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
 from mercury_engine_data_structures.construct_extensions.function_complex import ComplexIf, SwitchComplexKey
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
-from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.bmsas import BMSAS_SR, Bmsas
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game, GameSpecificStruct
 from mercury_engine_data_structures.type_lib import get_type_lib_dread, get_type_lib_for_game
+
+if typing.TYPE_CHECKING:
+    from collections.abc import Sequence
 
 # Functions
 FunctionArgument = Struct(

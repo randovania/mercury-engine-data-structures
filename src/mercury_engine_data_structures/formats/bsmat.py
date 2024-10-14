@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import construct
 from construct.core import (
     Array,
@@ -16,9 +18,11 @@ from construct.core import (
     Switch,
 )
 
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import Char, Float, StrId, VersionAdapter
-from mercury_engine_data_structures.formats.base_resource import BaseResource
-from mercury_engine_data_structures.game_check import Game
+
+if TYPE_CHECKING:
+    from mercury_engine_data_structures.game_check import Game
 
 # these seem to be using Unity ShaderLab, or at least the gist I borrowed this from uses similar teminology
 # source for most binary info: https://gist.github.com/KillzXGaming/9817455559544cb3613f99184aa3ed68

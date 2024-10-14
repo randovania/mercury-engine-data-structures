@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from tests.test_lib import parse_build_compare_editor, parse_build_compare_editor_parsed
 
 from mercury_engine_data_structures import dread_data, samus_returns_data
-from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 from mercury_engine_data_structures.formats import dread_types
 from mercury_engine_data_structures.formats.bmsad import ActorDefFunc, Bmsad
+
+if TYPE_CHECKING:
+    from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 
 dread_must_reencode = ["actors/props/pf_mushr_fr/charclasses/pf_mushr_fr.bmsad"]
 expected_sr_failures = set()

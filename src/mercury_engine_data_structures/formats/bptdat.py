@@ -1,10 +1,14 @@
 from __future__ import annotations
 
-import construct
+from typing import TYPE_CHECKING
 
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.formats import standard_format
-from mercury_engine_data_structures.formats.base_resource import BaseResource
-from mercury_engine_data_structures.game_check import Game
+
+if TYPE_CHECKING:
+    import construct
+
+    from mercury_engine_data_structures.game_check import Game
 
 BPTDAT = standard_format.create("CPlaythrough", "1.0.2")
 BPTDEF = standard_format.create("CPlaythroughDef", "1.0.2")

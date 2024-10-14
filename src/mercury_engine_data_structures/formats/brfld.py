@@ -2,13 +2,17 @@ from __future__ import annotations
 
 import functools
 import logging
-from collections.abc import Iterator
+from typing import TYPE_CHECKING
 
-import construct
-
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.formats import standard_format
-from mercury_engine_data_structures.formats.base_resource import BaseResource
-from mercury_engine_data_structures.game_check import Game
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    import construct
+
+    from mercury_engine_data_structures.game_check import Game
 
 logger = logging.getLogger(__name__)
 

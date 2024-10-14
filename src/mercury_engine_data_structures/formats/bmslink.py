@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import construct
 from construct import Construct
 from construct.core import (
@@ -11,9 +13,11 @@ from construct.core import (
     Struct,
 )
 
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import Float, StrId, VersionAdapter
-from mercury_engine_data_structures.formats.base_resource import BaseResource
-from mercury_engine_data_structures.game_check import Game
+
+if TYPE_CHECKING:
+    from mercury_engine_data_structures.game_check import Game
 
 UnkStruct = Struct(
     unk1=StrId,

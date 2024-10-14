@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+from typing import TYPE_CHECKING
 
 from construct import (
     Array,
@@ -15,9 +16,11 @@ from construct import (
     Terminated,
 )
 
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import CVector3D, StrId, VersionAdapter, make_vector
-from mercury_engine_data_structures.formats.base_resource import BaseResource
-from mercury_engine_data_structures.game_check import Game
+
+if TYPE_CHECKING:
+    from mercury_engine_data_structures.game_check import Game
 
 Block = Struct(
     "pos" / CVector3D,

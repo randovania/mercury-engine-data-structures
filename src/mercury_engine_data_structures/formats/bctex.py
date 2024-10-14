@@ -5,8 +5,8 @@ from enum import Enum
 import construct
 from construct.core import Error
 
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import StrId, UInt
-from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 BlockType = construct.Enum(
