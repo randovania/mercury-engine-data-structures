@@ -31,12 +31,6 @@ def verify_file_structure(editor: FileTreeEditor) -> GameVersion:
         if not editor.does_asset_exists(assetid):
             raise ValueError(f"Missing asset {assetid}")
 
-    # TODO verify no extra files exist
-    # for file in editor.root.rglob("*.*"):
-    #     path = file.relative_to(editor.root).as_posix()
-    #     if not editor.does_asset_exists(path):
-    #         raise ValueError(f"Extra asset {path}")
-
     return ver
 
 

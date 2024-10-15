@@ -63,7 +63,7 @@ class Game(Enum):
         return func(msg)
 
     @cached_property
-    def known_hashes_table(self):
+    def known_hashes_table(self) -> dict[str, int]:
         if self == Game.DREAD:
             from mercury_engine_data_structures import dread_data
 
