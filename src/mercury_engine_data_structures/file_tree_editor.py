@@ -58,6 +58,7 @@ class FileTreeEditor:
     _ensured_asset_ids: dict[str, set[AssetId]]
     _modified_resources: dict[AssetId, bytes | None]
     _in_memory_pkgs: dict[str, Pkg]
+    _name_for_asset_id: dict[int, str]
     _toc: Toc
 
     def __init__(self, romfs: RomFs, target_game: Game):
@@ -121,8 +122,17 @@ class FileTreeEditor:
         """
         Returns an iterator of all known names of the present asset ids.
         """
-        for asset_id in self.all_asset_ids():
-            yield self._name_for_asset_id[asset_id]
+        return (self._name_for_asset_id[asset_id] for asset_id in self.all_asset_ids())
+
+    def all_asset_names_in_folder(self, folder: str) -> Iterator[str]:
+        """
+        returns an iterator of all known asset names in a folder
+        """
+        return (
+            self._name_for_asset_id[asset_name]
+            for asset_name in self.all_asset_names()
+            if asset_name.startswith(folder)
+        )
 
     def find_pkgs(self, asset_id: NameOrAssetId) -> Iterator[str]:
         for pkg_name in self._files_for_asset_id[resolve_asset_id(asset_id, self.target_game)]:
