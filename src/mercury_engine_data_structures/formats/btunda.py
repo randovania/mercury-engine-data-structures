@@ -1,13 +1,17 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 import construct
 from construct import Struct
 
 from mercury_engine_data_structures import type_lib
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import VersionAdapter
-from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
-from mercury_engine_data_structures.game_check import Game
+
+if TYPE_CHECKING:
+    from mercury_engine_data_structures.game_check import Game
 
 VALID_BTUNDA_VERSIONS = [
     "119.0.2",  # 1.0.0

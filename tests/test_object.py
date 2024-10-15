@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from mercury_engine_data_structures import common_types

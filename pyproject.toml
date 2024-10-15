@@ -64,11 +64,34 @@ filterwarnings = [
 
 [tool.ruff]
 line-length = 120
-lint.select = ["E", "F", "W", "C90", "I", "UP"]
 src = ["src"]
 
-# Version to target for generated code.
-target-version = "py310"
+[tool.ruff.lint]
+select = [
+    "E", "F", "W", "C90", "I", "UP", "C4",
+    "RSE",
+    "TCH",
+    # "PTH",
+    "COM818", "COM819",
+    "ISC",
+    "PIE",
+    # "PT",
+
+    "PLC",
+    "PLC0208",  # iterating over set is also not deterministic, so we shouldn't do that!
+
+    "PLE",
+    "PLR0402", "PLR1711", "PLR1722", "PLR0206", "PLR0133", "PLR0124",
+    "PLW",
+    "SIM101",
+]
+extend-ignore = [
+    "ISC001",  # may cause conflicts with formatter
+    "PLW2901",  # `for` loop variable `key` overwritten by assignment target
+]
+
+[tool.ruff.lint.isort]
+required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.lint.mccabe]
 # Flag errors (`C901`) whenever the complexity level exceeds 25.

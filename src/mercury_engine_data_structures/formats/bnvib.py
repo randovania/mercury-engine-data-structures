@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from enum import Enum
+from typing import TYPE_CHECKING
 
 import construct
 from construct.core import (
@@ -13,8 +16,10 @@ from construct.core import (
 )
 
 from mercury_engine_data_structures.adapters.enum_adapter import EnumAdapter
-from mercury_engine_data_structures.formats.base_resource import BaseResource
-from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.base_resource import BaseResource
+
+if TYPE_CHECKING:
+    from mercury_engine_data_structures.game_check import Game
 
 # Standard switch format. https://switchbrew.org/wiki/BNVIB#Normal_Vibration
 

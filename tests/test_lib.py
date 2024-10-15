@@ -1,11 +1,18 @@
-from pathlib import Path
+from __future__ import annotations
 
-import construct
+from typing import TYPE_CHECKING
+
 import pytest
 
-from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
-from mercury_engine_data_structures.formats import BaseResource
 from mercury_engine_data_structures.game_check import Game, GameSpecificStruct
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import construct
+
+    from mercury_engine_data_structures.base_resource import BaseResource
+    from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 
 
 def parse_and_build_compare(module, game: Game, file_path: Path, print_data=False, save_file=None):

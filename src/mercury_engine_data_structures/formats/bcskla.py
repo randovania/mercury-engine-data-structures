@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import construct
 from construct.core import (
     Adapter,
@@ -20,9 +22,9 @@ from construct.core import (
     this,
 )
 
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import Float, VersionAdapter
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
-from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.property_enum import PropertyEnumDoubleUnsafe
 from mercury_engine_data_structures.game_check import Game
 

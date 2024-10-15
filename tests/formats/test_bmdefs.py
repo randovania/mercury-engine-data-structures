@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from tests.test_lib import parse_build_compare_editor
 
 from mercury_engine_data_structures.formats.bmdefs import Bmdefs

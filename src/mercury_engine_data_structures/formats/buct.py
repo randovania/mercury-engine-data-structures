@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import construct
 from construct.core import (
     Array,
@@ -13,8 +15,8 @@ from construct.core import (
 )
 
 from mercury_engine_data_structures import game_check
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import VersionAdapter
-from mercury_engine_data_structures.formats.base_resource import BaseResource
 
 BUCT = Struct(
     _magic=Const(b"MUCT"),

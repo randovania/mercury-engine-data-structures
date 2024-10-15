@@ -1,16 +1,22 @@
+from __future__ import annotations
+
 import logging
-from collections.abc import Iterator
+from typing import TYPE_CHECKING
 
 import construct
 from construct import Const, Construct, Container, Flag, Float32l, Hex, Int32ul, Struct, Switch
 
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import CVector3D, Float, StrId, VersionAdapter, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.construct_extensions.strings import StaticPaddedString
 from mercury_engine_data_structures.crc import crc32
-from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.collision import collision_formats
-from mercury_engine_data_structures.game_check import Game
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from mercury_engine_data_structures.game_check import Game
 
 logger = logging.getLogger(__name__)
 

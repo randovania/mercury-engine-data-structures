@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 from construct import Container, ListContainer
 from tests.test_lib import parse_and_build_compare

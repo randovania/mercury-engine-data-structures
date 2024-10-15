@@ -1,3 +1,13 @@
+# /// script
+# dependencies = [
+#   "numpy",
+#   "shapely",
+#   "mercury-engine-data-structures",
+# ]
+# ///
+
+from __future__ import annotations
+
 import copy
 import json
 import os
@@ -5,7 +15,6 @@ import sys
 import typing
 from pathlib import Path
 
-import construct
 import numpy
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
@@ -15,6 +24,12 @@ from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 from mercury_engine_data_structures.formats import Bmscc, Brfld, Brsa
 from mercury_engine_data_structures.game_check import Game
 from mercury_engine_data_structures.romfs import ExtractedRomFs
+
+if typing.TYPE_CHECKING:
+    import construct
+
+# ruff: noqa: PLW0603
+# ruff: noqa: PLW2901
 
 world_names = {
     "maps/levels/c10_samus/s010_cave/s010_cave.brfld": "Artaria",
