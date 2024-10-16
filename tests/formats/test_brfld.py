@@ -68,6 +68,13 @@ def test_remove_actor_from_actor_group(dread_tree_100, actor_group, actor_name, 
     assert not scenario.is_actor_in_group(actor_group, actor_name, sublayer_name, actor_layer)
 
 
+def test_remove_actor_from_actor_group_raises_exception(dread_tree_100):
+    scenario = dread_tree_100.get_file("maps/levels/c10_samus/s010_cave/s010_cave.brfld", Brfld)
+
+    with pytest.raises(ValueError, match=r"Actor .+ is not in actor group .+"):
+        scenario.remove_actor_from_group("eg_collision_camera_000_Default", "StartPoint0")
+
+
 to_add_to_actor_groups = [
     ["eg_collision_camera_000_Default", "breakabletilegroup_000", "breakables", ActorLayer.ENTITIES],
     ["ssg_collision_camera_000_Default", "Pos_C_LavaWindow_06", "default", ActorLayer.SOUNDS],
@@ -81,3 +88,10 @@ def test_add_actor_to_actor_group(dread_tree_100, actor_group, actor_name, subla
 
     scenario.add_actor_to_actor_groups(actor_group, actor_name, sublayer_name, actor_layer)
     assert scenario.is_actor_in_group(actor_group, actor_name, sublayer_name, actor_layer)
+
+
+def test_add_actor_to_actor_group_raises_exception(dread_tree_100):
+    scenario = dread_tree_100.get_file("maps/levels/c10_samus/s010_cave/s010_cave.brfld", Brfld)
+
+    with pytest.raises(ValueError, match=r"Actor .+ is already in actor group .+"):
+        scenario.add_actor_to_group("eg_collision_camera_000_Default", "PRP_DB_CV_006")

@@ -134,6 +134,8 @@ class Brfld(BaseResource):
         actor_link = self.link_for_actor(actor_name, sublayer_name, actor_layer)
         if actor_link not in group:
             group.append(actor_link)
+        else:
+            raise ValueError(f"Actor {actor_link} is already in actor group {group_name}")
 
     def remove_actor_from_group(
         self,
@@ -153,6 +155,8 @@ class Brfld(BaseResource):
         actor_link = self.link_for_actor(actor_name, sublayer_name, actor_layer)
         if actor_link in group:
             group.remove(actor_link)
+        else:
+            raise ValueError(f"Actor {actor_link} is not in actor group {group_name}")
 
     def add_actor_to_actor_groups(
         self,
