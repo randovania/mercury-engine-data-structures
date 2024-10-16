@@ -32,6 +32,22 @@ def test_dread_brfld_210(dread_tree_210, brfld_path):
     parse_build_compare_editor(Brfld, dread_tree_210, brfld_path)
 
 
+@pytest.mark.parametrize("brfld_path", dread_data.all_files_ending_with(".brfld", bossrush_assets))
+def test_get_name(dread_tree_100, brfld_path):
+    scenario = dread_tree_100.get_file(brfld_path, Brfld)
+    scenario_name = brfld_path.split("/")[3]
+
+    assert scenario.name == scenario_name
+
+
+@pytest.mark.parametrize("brfld_path", dread_data.all_files_ending_with(".brfld", bossrush_assets))
+def test_get_level(dread_tree_100, brfld_path):
+    scenario = dread_tree_100.get_file(brfld_path, Brfld)
+    level_name = brfld_path.split("/")[2]
+
+    assert scenario.level == level_name
+
+
 def test_get_actors_methods(dread_tree_100):
     scenario = dread_tree_100.get_file("maps/levels/c10_samus/s010_cave/s010_cave.brfld", Brfld)
 

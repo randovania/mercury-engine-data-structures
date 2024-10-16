@@ -35,6 +35,14 @@ class Brfld(BaseResource):
     def construct_class(cls, target_game: Game) -> construct.Construct:
         return standard_format.game_model("CScenario", "49.0.2")
 
+    @property
+    def level(self) -> str:
+        return self.raw.Root.pScenario.sLevelID
+
+    @property
+    def name(self) -> str:
+        return self.raw.Root.pScenario.sScenarioID
+
     def actors_for_sublayer(self, sublayer_name: str, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> dict:
         """
         Gets the actors in a sublayer
