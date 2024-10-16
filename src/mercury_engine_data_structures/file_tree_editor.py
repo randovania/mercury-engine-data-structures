@@ -78,7 +78,7 @@ class FileTreeEditor:
         self.headers = {}
         self._ensured_asset_ids = {}
         self._files_for_asset_id = {}
-        self.version = version_validation.identify_version(self)
+        self.version = version_validation.identify_version(self.romfs)
         self._name_for_asset_id = copy.copy(self.version.all_asset_id_for_version())
 
         self._toc = Toc.parse(self.romfs.get_file(Toc.system_files_name()), target_game=self.target_game)
@@ -128,11 +128,7 @@ class FileTreeEditor:
         """
         returns an iterator of all known asset names in a folder
         """
-        return (
-            self._name_for_asset_id[asset_name]
-            for asset_name in self.all_asset_names()
-            if asset_name.startswith(folder)
-        )
+        return (asset_name for asset_name in self.all_asset_names() if asset_name.startswith(folder))
 
     def find_pkgs(self, asset_id: NameOrAssetId) -> Iterator[str]:
         for pkg_name in self._files_for_asset_id[resolve_asset_id(asset_id, self.target_game)]:

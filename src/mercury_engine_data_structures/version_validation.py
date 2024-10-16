@@ -7,15 +7,14 @@ from mercury_engine_data_structures.formats.toc import Toc
 from mercury_engine_data_structures.game_check import GameVersion
 
 if TYPE_CHECKING:
-    from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
+    from mercury_engine_data_structures.romfs import RomFs
 
 
 def _get_md5(data: bytes) -> bytes:
     return md5(data, usedforsecurity=False).digest()
 
 
-def identify_version(editor: FileTreeEditor) -> GameVersion:
-    romfs = editor.romfs
+def identify_version(romfs: RomFs) -> GameVersion:
     toc = romfs.get_file(Toc.system_files_name())
     toc_hash = _get_md5(toc)
     for ver in GameVersion:
@@ -23,26 +22,3 @@ def identify_version(editor: FileTreeEditor) -> GameVersion:
             return ver
 
     raise ValueError("Not a valid version!")
-
-
-def verify_file_structure(editor: FileTreeEditor) -> GameVersion:
-    ver = identify_version(editor)
-    for assetid in editor.version.all_asset_id_for_version():
-        if not editor.does_asset_exists(assetid):
-            raise ValueError(f"Missing asset {assetid}")
-
-    return ver
-
-
-def verify_file_integrity(editor: FileTreeEditor) -> GameVersion:
-    ver = identify_version(editor)
-    all_hashes = b""
-    for assetid in editor.version.all_asset_id_for_version():
-        if not editor.does_asset_exists(assetid):
-            raise ValueError(f"Missing asset {assetid}")
-        all_hashes += _get_md5(editor.get_raw_asset(assetid))
-
-    if _get_md5(all_hashes) == ver.all_files_hash:
-        return ver
-    else:
-        raise ValueError(f"Invalid hash {_get_md5(all_hashes).hex()}!")
