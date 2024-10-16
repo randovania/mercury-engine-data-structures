@@ -13,7 +13,7 @@ from mercury_engine_data_structures.game_check import Game
 logger = logging.getLogger(__name__)
 
 
-class ActorLayer(Enum):
+class ActorLayer(str, Enum):
     ENTITIES = "rEntitiesLayer"
     SOUNDS = "rSoundsLayer"
     LIGHTS = "rLightsLayer"
@@ -32,7 +32,7 @@ class Brfld(BaseResource):
         param sublayer_name: the name of the sublayer to get the actors of
         param actor_layer: the actor_layer the sublayer is in
         returns: the actors in the sublayer"""
-        return self.raw.Root.pScenario[actor_layer.value].dctSublayers[sublayer_name].dctActors
+        return self.raw.Root.pScenario[actor_layer].dctSublayers[sublayer_name].dctActors
 
     def sublayers_for_actor_layer(self, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> Iterator[str]:
         """
@@ -40,7 +40,7 @@ class Brfld(BaseResource):
 
         param actor_layer: the actor layer to get the sublayers of
         returns: the name of each sublayer"""
-        yield from self.raw.Root.pScenario[actor_layer.value].dctSublayers.keys()
+        yield from self.raw.Root.pScenario[actor_layer].dctSublayers.keys()
 
     def all_actors_in_actor_layer(
         self, actor_layer: ActorLayer = ActorLayer.ENTITIES
@@ -50,7 +50,7 @@ class Brfld(BaseResource):
 
         param actor_layer: the actor layer to get the actors of
         returns: each actor in the actor layer"""
-        for sublayer_name, sublayer in self.raw.Root.pScenario[actor_layer.value].dctSublayers.items():
+        for sublayer_name, sublayer in self.raw.Root.pScenario[actor_layer].dctSublayers.items():
             for actor_name, actor in sublayer.dctActors.items():
                 yield sublayer_name, actor_name, actor
 
@@ -77,7 +77,7 @@ class Brfld(BaseResource):
         actor_layer: the actor layer the actor is in
         returns: a string representing where in the BRFLD the actor is"""
         return ":".join(
-            ["Root", "pScenario", actor_layer.value, "dctSublayers", sublayer_name, "dctActors", actor_name]
+            ["Root", "pScenario", actor_layer, "dctSublayers", sublayer_name, "dctActors", actor_name]
         )
 
     def actor_groups_for_actor_layer(self, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> Iterator[str]:
@@ -86,7 +86,7 @@ class Brfld(BaseResource):
 
         param actor_layer: the actor layer to get the actor groups of
         returns: each actor group in the actor layer"""
-        yield from self.raw.Root.pScenario[actor_layer.value].dctActorGroups.keys()
+        yield from self.raw.Root.pScenario[actor_layer].dctActorGroups.keys()
 
     def get_actor_group(self, group_name: str, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> list[str]:
         """
@@ -95,7 +95,7 @@ class Brfld(BaseResource):
         param group_name: the name of the actor group
         param actor_layer: the actor layer the actor group is in
         returns: a list of links to actors"""
-        return self.raw.Root.pScenario[actor_layer.value].dctActorGroups[group_name]
+        return self.raw.Root.pScenario[actor_layer].dctActorGroups[group_name]
 
     def is_actor_in_group(
         self,
