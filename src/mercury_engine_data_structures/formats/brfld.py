@@ -12,6 +12,8 @@ from mercury_engine_data_structures.game_check import Game
 
 logger = logging.getLogger(__name__)
 
+ActorLink = str
+
 
 class ActorLayer(str, Enum):
     ENTITIES = "rEntitiesLayer"
@@ -68,7 +70,7 @@ class Brfld(BaseResource):
 
     def link_for_actor(
         self, actor_name: str, sublayer_name: str = "default", actor_layer: ActorLayer = ActorLayer.ENTITIES
-    ) -> str:
+    ) -> ActorLink:
         """
         Builds a link for an actor
 
@@ -88,7 +90,7 @@ class Brfld(BaseResource):
         returns: each actor group in the actor layer"""
         yield from self.raw.Root.pScenario[actor_layer].dctActorGroups.keys()
 
-    def get_actor_group(self, group_name: str, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> list[str]:
+    def get_actor_group(self, group_name: str, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> list[ActorLink]:
         """
         Gets an actor group
 
