@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import construct
 from construct import (
     Const,
@@ -8,9 +10,9 @@ from construct import (
     Struct,
 )
 
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import StrId, VersionAdapter, make_vector
 from mercury_engine_data_structures.formats import standard_format
-from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 EnemyStruct = Struct(

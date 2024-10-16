@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from construct import Adapter, Enum, Int32ub
 
 

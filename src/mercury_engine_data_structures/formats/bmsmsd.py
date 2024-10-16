@@ -1,11 +1,16 @@
+from __future__ import annotations
+
 import functools
+from typing import TYPE_CHECKING
 
 import construct
 from construct.core import Const, Construct, Enum, FlagsEnum, Float32l, Int32sl, Int32ul, Struct
 
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import CVector2D, CVector3D, StrId, VersionAdapter, make_vector
-from mercury_engine_data_structures.formats.base_resource import BaseResource
-from mercury_engine_data_structures.game_check import Game
+
+if TYPE_CHECKING:
+    from mercury_engine_data_structures.game_check import Game
 
 TileBorders = FlagsEnum(
     Int32sl,

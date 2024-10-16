@@ -1,3 +1,14 @@
+# /// script
+# dependencies = [
+#   "numpy",
+#   "matplotlib",
+#   "shapely",
+#   "mercury-engine-data-structures",
+# ]
+# ///
+
+from __future__ import annotations
+
 import argparse
 import copy
 import hashlib
@@ -7,7 +18,6 @@ import re
 import typing
 from pathlib import Path
 
-import construct
 import numpy
 from matplotlib.patches import Polygon as mtPolygon
 from shapely.geometry import Point
@@ -18,6 +28,11 @@ from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 from mercury_engine_data_structures.formats import Bmscc, Bmsld
 from mercury_engine_data_structures.game_check import Game
 from mercury_engine_data_structures.romfs import ExtractedRomFs
+
+if typing.TYPE_CHECKING:
+    import construct
+
+# ruff: noqa: PLW0603
 
 world_names = {
     "maps/levels/c10_samus/s000_surface/s000_surface.bmsld": "Surface - East",
@@ -713,7 +728,7 @@ def decode_world(
             raise ValueError("What kind of actor is this?!")
 
     handles_by_label = {}
-    handles_by_label = {key: value for key, value in sorted(handles_by_label.items(), key=lambda it: it[0])}
+    handles_by_label = dict(sorted(handles_by_label.items(), key=lambda it: it[0]))
     plt.legend(handles_by_label.values(), handles_by_label.keys())
 
     plt.plot()

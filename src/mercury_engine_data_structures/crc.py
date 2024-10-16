@@ -2,6 +2,8 @@
 Module for calculating CRC hashes with the algorithm and data used by Mercury Engine.
 """
 
+from __future__ import annotations
+
 _crc32_constants = [
     0x00000000,
     0x77073096,

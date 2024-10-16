@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import collections
 import copy
@@ -12,6 +14,19 @@ meds_root = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_struc
 dread_data_construct_path = meds_root.joinpath("_dread_data_construct.py")
 data_construct = construct.Container()
 exec(compile(dread_data_construct_path.read_text(), dread_data_construct_path, "exec"), data_construct)
+
+# This must be updated along with src/mercury_engine_data_structures/game_check.py!
+GAME_VERSION_BUILD_DATA = {
+    "sr": {
+        "1.0.0": 1,
+    },
+    "dread": {
+        "1.0.0": 1,
+        "1.0.1": 2,
+        "2.0.0": 4,
+        "2.1.0": 8,
+    },
+}
 
 
 def _type_name_to_python_identifier(type_name: str):
@@ -230,11 +245,13 @@ def main():
     if args.game == "dread":
         types_path = meds_root.joinpath("dread_types.json")
         output_name = "dread_types.py"
-        file_names = ["dread_resource_names", "dread_property_names"]
+        resource_name = "dread_resource_names"
+        property_name = "dread_property_names"
     else:
         types_path = meds_root.joinpath("samus_returns_types.json")
         output_name = "sr_types.py"
-        file_names = ["sr_resource_names", "sr_property_names"]
+        resource_name = "sr_resource_names"
+        property_name = "sr_property_names"
 
     game_types = json.loads(types_path.read_text())
 
@@ -269,11 +286,17 @@ def main():
 
         output_path.write_text(type_exporter.export_code())
 
-    for file_name in file_names:
-        with meds_root.joinpath(f"{file_name}.json").open() as f:
-            file_data: dict[str, int] = json.load(f)
+    with meds_root.joinpath(f"{property_name}.json").open() as f:
+        property_data: dict[str, int] = json.load(f)
 
-        data_construct.KnownHashes.build_file(file_data, meds_root.joinpath(f"{file_name}.bin"))
+    data_construct.KnownHashes.build_file(property_data, meds_root.joinpath(f"{property_name}.bin"))
+
+    with meds_root.joinpath(f"{resource_name}.json").open() as f:
+        resource_data: dict[str, dict] = json.load(f)
+
+    data_construct.VersionedHashes.build_file(
+        resource_data, meds_root.joinpath(f"{resource_name}.bin"), versions=GAME_VERSION_BUILD_DATA[args.game]
+    )
 
 
 if __name__ == "__main__":

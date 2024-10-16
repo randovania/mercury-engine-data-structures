@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import construct
 from construct import Array, Flag, Hex, Int16ul, Rebuild, Struct
 
