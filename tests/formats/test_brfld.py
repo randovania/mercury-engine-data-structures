@@ -53,35 +53,31 @@ def test_follow_link(dread_tree_100):
     assert scenario.follow_link(actor_link).sName == "cubemap_fr.2_cave_ini"
 
 
-def test_remove_actor_from_actor_group(dread_tree_100):
+to_remove_from_actor_groups = [
+    ["eg_collision_camera_000_Default", "breakabletilegroup_052", "breakables", ActorLayer.ENTITIES],
+    ["ssg_collision_camera_000_Default", "Pos_C_Trees_R", "default", ActorLayer.SOUNDS],
+    ["lg_collision_camera_000", "spot_000_1", "cave_000_light", ActorLayer.LIGHTS],
+]
+
+
+@pytest.mark.parametrize(["actor_group", "actor_name", "sublayer_name", "actor_layer"], to_remove_from_actor_groups)
+def test_remove_actor_from_actor_group(dread_tree_100, actor_group, actor_name, sublayer_name, actor_layer):
     scenario = dread_tree_100.get_file("maps/levels/c10_samus/s010_cave/s010_cave.brfld", Brfld)
 
-    scenario.remove_actor_from_group("eg_collision_camera_000_Default", "breakabletilegroup_052", "breakables")
-    assert not scenario.is_actor_in_group("eg_collision_camera_000_Default", "breakabletilegroup_052", "breakables")
-
-    scenario.remove_actor_from_group("ssg_collision_camera_000_Default", "Pos_C_Trees_R", actor_layer=ActorLayer.SOUNDS)
-    assert not scenario.is_actor_in_group(
-        "ssg_collision_camera_000_Default", "Pos_C_Trees_R", actor_layer=ActorLayer.SOUNDS
-    )
-
-    scenario.remove_actor_from_group("lg_collision_camera_000", "cave_000_light", "spot_000_1", ActorLayer.LIGHTS)
-    assert not scenario.is_actor_in_group("lg_collision_camera_000", "cave_000_light", "spot_000_1", ActorLayer.LIGHTS)
+    scenario.remove_actor_from_group(actor_group, actor_name, sublayer_name, actor_layer)
+    assert not scenario.is_actor_in_group(actor_group, actor_name, sublayer_name, actor_layer)
 
 
-def test_add_actor_to_actor_groups(dread_tree_100):
+to_add_to_actor_groups = [
+    ["eg_collision_camera_000_Default", "breakabletilegroup_000", "breakables", ActorLayer.ENTITIES],
+    ["ssg_collision_camera_000_Default", "Pos_C_LavaWindow_06", "default", ActorLayer.SOUNDS],
+    ["lg_collision_camera_000", "cubemap_006_1_bake", "emmy_006_light", ActorLayer.LIGHTS],
+]
+
+
+@pytest.mark.parametrize(["actor_group", "actor_name", "sublayer_name", "actor_layer"], to_add_to_actor_groups)
+def test_add_actor_to_actor_group(dread_tree_100, actor_group, actor_name, sublayer_name, actor_layer):
     scenario = dread_tree_100.get_file("maps/levels/c10_samus/s010_cave/s010_cave.brfld", Brfld)
 
-    scenario.add_actor_to_actor_groups("eg_collision_camera_000", "breakabletilegroup_000", "breakables")
-    assert scenario.is_actor_in_group("eg_collision_camera_000_Default", "breakabletilegroup_000", "breakables")
-
-    scenario.add_actor_to_actor_groups("ssg_collision_camera_000", "Pos_C_LavaWindow_06", actor_layer=ActorLayer.SOUNDS)
-    assert scenario.is_actor_in_group(
-        "ssg_collision_camera_000_Default", "Pos_C_LavaWindow_06", actor_layer=ActorLayer.SOUNDS
-    )
-
-    scenario.add_actor_to_actor_groups(
-        "lg_collision_camera_000", "cubemap_006_1_bake", "emmy_006_light", ActorLayer.LIGHTS
-    )
-    assert scenario.is_actor_in_group(
-        "lg_collision_camera_000", "cubemap_006_1_bake", "emmy_006_light", ActorLayer.LIGHTS
-    )
+    scenario.add_actor_to_actor_groups(actor_group, actor_name, sublayer_name, actor_layer)
+    assert scenario.is_actor_in_group(actor_group, actor_name, sublayer_name, actor_layer)
