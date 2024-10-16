@@ -77,7 +77,7 @@ class VersionedHashesDict(construct.Construct):
 
     def _build(self, obj: dict[str, dict], stream, context, path):
         ver_to_val = context.versions
-        all_vers = sum([v for v in ver_to_val.values()])
+        all_vers = sum(ver_to_val.values())
         for a in obj.values():
             vers = a.get("versions")
             if vers is not None:
@@ -86,7 +86,7 @@ class VersionedHashesDict(construct.Construct):
                 a["versions"] = all_vers
 
         return self._build_construct._build(
-            list([(k, v["crc"], v["versions"]) for k, v in obj.items()]), stream, context, path
+            [(k, v["crc"], v["versions"]) for k, v in obj.items()], stream, context, path
         )
 
 
