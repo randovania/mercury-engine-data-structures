@@ -7,11 +7,12 @@ import logging
 import os.path
 import typing
 
-from mercury_engine_data_structures import dread_data, formats, samus_returns_data
+from mercury_engine_data_structures import formats, version_validation
 from mercury_engine_data_structures.base_resource import AssetId, BaseResource, NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.formats import Toc
 from mercury_engine_data_structures.formats.pkg import Pkg
-from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.game_check import Game, GameVersion
+from mercury_engine_data_structures.romfs import RomFs
 
 if typing.TYPE_CHECKING:
     from collections.abc import Iterator
@@ -42,15 +43,6 @@ def _write_to_path(output: Path, data: bytes):
     output.write_bytes(data)
 
 
-def _all_asset_id_for_game(game: Game):
-    if game == Game.DREAD:
-        return dread_data.all_asset_id_to_name()
-    elif game == Game.SAMUS_RETURNS:
-        return samus_returns_data.all_asset_id_to_name()
-    else:
-        raise ValueError(f"Unsupported game {game}")
-
-
 class FileTreeEditor:
     """
     Manages efficiently reading all PKGs in the game and writing out modifications to a new path.
@@ -60,11 +52,13 @@ class FileTreeEditor:
     _modified_resources: mapping of asset id to bytes. When saving, these asset ids are replaced
     """
 
+    version: GameVersion
     headers: dict[str, construct.Container]
     _files_for_asset_id: dict[AssetId, set[str | None]]
     _ensured_asset_ids: dict[str, set[AssetId]]
     _modified_resources: dict[AssetId, bytes | None]
     _in_memory_pkgs: dict[str, Pkg]
+    _name_for_asset_id: dict[int, str]
     _toc: Toc
 
     def __init__(self, romfs: RomFs, target_game: Game):
@@ -84,7 +78,8 @@ class FileTreeEditor:
         self.headers = {}
         self._ensured_asset_ids = {}
         self._files_for_asset_id = {}
-        self._name_for_asset_id = copy.copy(_all_asset_id_for_game(self.target_game))
+        self.version = version_validation.identify_version(self.romfs)
+        self._name_for_asset_id = copy.copy(self.version.all_asset_id_for_version())
 
         self._toc = Toc.parse(self.romfs.get_file(Toc.system_files_name()), target_game=self.target_game)
 
@@ -127,8 +122,13 @@ class FileTreeEditor:
         """
         Returns an iterator of all known names of the present asset ids.
         """
-        for asset_id in self.all_asset_ids():
-            yield self._name_for_asset_id[asset_id]
+        return (self._name_for_asset_id[asset_id] for asset_id in self.all_asset_ids())
+
+    def all_asset_names_in_folder(self, folder: str) -> Iterator[str]:
+        """
+        returns an iterator of all known asset names in a folder
+        """
+        return (asset_name for asset_name in self.all_asset_names() if asset_name.startswith(folder))
 
     def find_pkgs(self, asset_id: NameOrAssetId) -> Iterator[str]:
         for pkg_name in self._files_for_asset_id[resolve_asset_id(asset_id, self.target_game)]:
