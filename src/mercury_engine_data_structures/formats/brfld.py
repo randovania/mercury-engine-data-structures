@@ -4,7 +4,6 @@ import functools
 import logging
 from collections.abc import Iterator
 from enum import Enum
-from typing import Any
 from typing import TYPE_CHECKING, Any
 
 import construct
