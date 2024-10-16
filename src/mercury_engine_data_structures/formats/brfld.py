@@ -51,7 +51,7 @@ class Brfld(BaseResource):
         Iterably gets every actor in an actor layer
 
         param actor_layer: the actor layer to get the actors of
-        returns: each actor in the actor layer"""
+        returns: for each actor in the actor layer: sublayer name, actor name, actor"""
         for sublayer_name, sublayer in self.raw.Root.pScenario[actor_layer].dctSublayers.items():
             for actor_name, actor in sublayer.dctActors.items():
                 yield sublayer_name, actor_name, actor
