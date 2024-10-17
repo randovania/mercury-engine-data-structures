@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-ActorLink = str
+BrfldLink = str
 
 
 class ActorLayer(str, Enum):
@@ -72,7 +72,7 @@ class Brfld(BaseResource):
             for actor_name, actor in sublayer.dctActors.items():
                 yield sublayer_name, actor_name, actor
 
-    def follow_link(self, link: str) -> Any | None:
+    def follow_link(self, link: BrfldLink) -> Any | None:
         """
         Gets the object a link is referencing
 
@@ -86,7 +86,7 @@ class Brfld(BaseResource):
 
     def link_for_actor(
         self, actor_name: str, sublayer_name: str = "default", actor_layer: ActorLayer = ActorLayer.ENTITIES
-    ) -> ActorLink:
+    ) -> BrfldLink:
         """
         Builds a link for an actor
 
@@ -104,7 +104,7 @@ class Brfld(BaseResource):
         returns: each actor group in the actor layer"""
         yield from self.raw.Root.pScenario[actor_layer].dctActorGroups.keys()
 
-    def get_actor_group(self, group_name: str, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> list[ActorLink]:
+    def get_actor_group(self, group_name: str, actor_layer: ActorLayer = ActorLayer.ENTITIES) -> list[BrfldLink]:
         """
         Gets an actor group
 
