@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from collections import defaultdict
 from enum import Enum
 
@@ -19,7 +20,6 @@ from mercury_engine_data_structures import game_check
 from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import CVector3D, StrId, VersionAdapter, make_dict, make_vector
 from mercury_engine_data_structures.crc import crc32, crc64
-from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 TransformStruct = Struct("position" / CVector3D, "rotation" / CVector3D, "scale" / CVector3D)
