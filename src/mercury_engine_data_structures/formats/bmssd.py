@@ -12,7 +12,6 @@ from construct.core import (
     Int8ul,
     Int32ul,
     Int64ul,
-    Rebuild,
     Struct,
 )
 
@@ -82,12 +81,12 @@ BMSSD = Struct(
     / make_vector(
         Struct(
             "sg_name" / StrId,
-            "item_count" / Rebuild(Int32ul, lambda ctx: sum([len(g) for g in ctx.item_groups.values()])),
+            "item_count" / Int32ul,
             "item_groups" / make_dict(make_vector(game_check.is_sr_or_else(Int32ul, Int64ul)), Int32ul),
         )
     ),
     construct.Terminated,
-)
+).compile()
 
 
 def crc_func(obj):
@@ -179,9 +178,11 @@ class BmssdAdapter(Adapter):
 
         for sg_name, sg in obj.scene_groups.items():
             sg_cont = construct.Container(sg_name=sg_name, item_groups=construct.Container())
+            item_count = 0
 
             for group_type, items in sg.items():
                 group_type_int = [it for it in self.ItemTypes if self.ItemTypes[it] == group_type][0]
+                item_count += len(items)
 
                 if group_type_int == 1:
                     sg_cont.item_groups[group_type_int] = [object_order[obj_to_tuple(o)] for o in items]
@@ -192,6 +193,7 @@ class BmssdAdapter(Adapter):
                         for o in items
                     ]
 
+            sg_cont["item_count"] = item_count
             res.scene_groups.append(sg_cont)
 
         return res
