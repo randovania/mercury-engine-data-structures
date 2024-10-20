@@ -20,7 +20,6 @@ from mercury_engine_data_structures import game_check
 from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import CVector3D, StrId, VersionAdapter, make_dict, make_vector
 from mercury_engine_data_structures.crc import crc32, crc64
-from mercury_engine_data_structures.game_check import Game
 
 TransformStruct = Struct("position" / CVector3D, "rotation" / CVector3D, "scale" / CVector3D)
 
@@ -157,7 +156,7 @@ class BmssdAdapter(Adapter):
         for o in obj._objects:
             objects[o["model_name"]].append(o)
 
-        object_order = dict()
+        object_order = {}
         object_containers = construct.ListContainer()
         i = 0
         for name, objs in objects.items():
@@ -172,9 +171,9 @@ class BmssdAdapter(Adapter):
 
         res = construct.Container(
             _version=obj._version,
-            scene_blocks=[blk for blk in obj._scene_blocks.values()],
+            scene_blocks=obj._scene_blocks.values(),
             objects=object_containers,
-            lights=[lgt for lgt in obj._lights.values()],
+            lights=obj._lights.values(),
             scene_groups=construct.ListContainer(),
         )
 
@@ -212,7 +211,7 @@ class ItemType(Enum):
 
 class Bmssd(BaseResource):
     @classmethod
-    def construct_class(cls, target_game: Game) -> Construct:
+    def construct_class(cls, target_game: game_check.Game) -> Construct:
         return BmssdAdapter(BMSSD)
 
     def get_item(self, item_name_or_id: str | int, item_type: ItemType) -> construct.Container:
