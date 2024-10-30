@@ -12,11 +12,11 @@ from construct.core import (
     Int32ul,
     Int64ul,
     PaddedString,
-    PrefixedArray,
     Rebuild,
     Struct,
 )
 
+from mercury_engine_data_structures.common_types import make_vector
 from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game
@@ -41,8 +41,7 @@ WaveArchiveData = Struct(
     "wav_name" / PropertyEnum,
     "file_id" / FileId,
     "warc_index" / Int32ul,  # index of the WARC listed in BFSAR (starts offset from 0)
-    "idx" / Rebuild(Int32ul, lambda ctx: ctx._index),  # 0 to max wave archives
-    Check(construct.this._index == construct.this.idx),
+    "idx" / Rebuild(Int32ul, construct.this._index),  # 0 to max wave archives
     Const(0, Int32ul),
     Const(0, Int32ul),
     Const(0, Int32ul),
@@ -74,9 +73,9 @@ GroupData = Struct(
 )
 
 BMSSTOC = Struct(
-    "wave_archives" / PrefixedArray(Int32ul, WaveArchiveData),
-    "sound_streams" / PrefixedArray(Int32ul, SoundStreams),
-    "groups" / PrefixedArray(Int32ul, GroupData),
+    "wave_archives" / make_vector(WaveArchiveData),
+    "sound_streams" / make_vector(SoundStreams),
+    "groups" / make_vector(GroupData),
     construct.Terminated,
 )
 
