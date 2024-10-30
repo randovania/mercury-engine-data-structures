@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import enum
+from typing import TYPE_CHECKING
 
 import construct
 from construct.core import (
@@ -16,10 +19,12 @@ from construct.core import (
     Struct,
 )
 
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import make_vector
-from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
-from mercury_engine_data_structures.game_check import Game
+
+if TYPE_CHECKING:
+    from mercury_engine_data_structures.game_check import Game
 
 
 class FileTypeEnum(enum.Enum):
