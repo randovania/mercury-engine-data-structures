@@ -17,10 +17,15 @@ from construct.core import (
 
 from mercury_engine_data_structures import game_check
 from mercury_engine_data_structures.base_resource import BaseResource
-from mercury_engine_data_structures.common_types import CVector3D, StrId, VersionAdapter, make_dict, make_vector
+from mercury_engine_data_structures.common_types import (
+    CVector3D,
+    StrId,
+    Transform3D,
+    VersionAdapter,
+    make_dict,
+    make_vector,
+)
 from mercury_engine_data_structures.crc import crc32, crc64
-
-TransformStruct = Struct("position" / CVector3D, "rotation" / CVector3D, "scale" / CVector3D)
 
 BMSSD = Struct(
     "_magic" / Const(b"MSSD"),
@@ -52,12 +57,12 @@ BMSSD = Struct(
                 "byte2" / Const(1, Byte),
                 "int3" / Const(1, Int32ul),
                 "byte4" / Const(1, Byte),
-                "transform" / TransformStruct,
+                "transform" / Transform3D,
             )
         ),
     ),
     # map objects (bcmdl, bsmat and bcskla), stored in the standard actor format in maps/objects/
-    "objects" / make_vector(Struct("model_name" / StrId, "transforms" / make_vector(TransformStruct))),
+    "objects" / make_vector(Struct("model_name" / StrId, "transforms" / make_vector(Transform3D))),
     Const(0, Int32ul),  # likely unused array
     "lights"
     / make_vector(  # only used in MSR
@@ -93,13 +98,21 @@ def crc_func(obj):
     return crc32 if obj._version == "1.12.0" else crc64
 
 
-class BmssdAdapter(Adapter):
-    ItemTypes = {
-        0: "scene_blocks",
-        1: "objects",
-        2: "lights",
-    }
+class ItemType(Enum):
+    group_name: str
 
+    SCENE_BLOCK = 0, "scene_blocks"
+    OBJECT = 1, "objects"
+    LIGHT = 2, "lights"
+
+    def __new__(cls, value: int, group_name: str):
+        member = object.__new__(cls)
+        member._value_ = value
+        member.group_name = group_name
+        return member
+
+
+class BmssdAdapter(Adapter):
     def _decode(self, obj, context, path):
         crc = crc_func(obj)
 
@@ -117,7 +130,7 @@ class BmssdAdapter(Adapter):
             res.scene_groups[sg.sg_name] = construct.Container()
 
             for ig_value, items in sg.item_groups.items():
-                group_type = self.ItemTypes[ig_value]
+                group_type = ItemType(ig_value)
                 res.scene_groups[sg.sg_name][group_type] = construct.ListContainer()
 
                 # objects are indexed and not hashed
@@ -129,7 +142,9 @@ class BmssdAdapter(Adapter):
                     res.scene_groups[sg.sg_name][group_type] = construct.ListContainer(
                         [
                             # use raw hash value instead of block value if it doesn't exist above
-                            res[f"_{group_type}"][block] if res[f"_{group_type}"].get(block, None) else block
+                            res[f"_{group_type.group_name}"][block]
+                            if res[f"_{group_type.group_name}"].get(block, None)
+                            else block
                             for block in items
                         ]
                     )
@@ -181,13 +196,12 @@ class BmssdAdapter(Adapter):
             item_count = 0
 
             for group_type, items in sg.items():
-                group_type_int = [it for it in self.ItemTypes if self.ItemTypes[it] == group_type][0]
                 item_count += len(items)
 
-                if group_type_int == 1:
-                    sg_cont.item_groups[group_type_int] = [object_order[obj_to_tuple(o)] for o in items]
+                if group_type == ItemType.OBJECT:
+                    sg_cont.item_groups[group_type.value] = [object_order[obj_to_tuple(o)] for o in items]
                 else:
-                    sg_cont.item_groups[group_type_int] = [
+                    sg_cont.item_groups[group_type.value] = [
                         # handle integers (unmatched crc's in decode)
                         o if isinstance(o, int) else crc(o["model_name"])
                         for o in items
@@ -197,18 +211,6 @@ class BmssdAdapter(Adapter):
             res.scene_groups.append(sg_cont)
 
         return res
-
-
-class ItemType(Enum):
-    SCENE_BLOCK = 0, "scene_blocks"
-    OBJECT = 1, "objects"
-    LIGHT = 2, "lights"
-
-    def __new__(cls, value: int, group_name: str):
-        member = object.__new__(cls)
-        member._value_ = value
-        member.group_name = group_name
-        return member
 
 
 class Bmssd(BaseResource):
@@ -232,11 +234,11 @@ class Bmssd(BaseResource):
     def get_scene_group(self, scene_group: str) -> construct.Container:
         return self.raw.scene_groups.get(scene_group, None)
 
-    def scene_groups_for_item(self, item: str | construct.Container, item_type: str) -> list[str]:
+    def scene_groups_for_item(self, item: str | construct.Container, item_type: ItemType) -> list[str]:
         if isinstance(item, str):
             item = self.get_item(item, item_type)
 
-        return [sg_name for sg_name, sg_val in self.raw.scene_groups.items() if item in sg_val[item_type.group_name]]
+        return [sg_name for sg_name, sg_val in self.raw.scene_groups.items() if item in sg_val[item_type]]
 
     def add_item(self, item: construct.Container, item_type: ItemType, scene_groups: list[str] = None):
         if item_type == ItemType.OBJECT:
@@ -246,12 +248,12 @@ class Bmssd(BaseResource):
             self.raw[f"_{item_type.group_name}"][crc(item["model_name"])] = item
 
         for sg_name in scene_groups:
-            self.get_scene_group(sg_name)[item_type.group_name].append(item)
+            self.get_scene_group(sg_name)[item_type].append(item)
 
     def remove_item_from_group(self, item: construct.Container, item_type: ItemType, scene_group: str):
         sg = self.get_scene_group(scene_group)
-        if sg and item_type.group_name in sg and item in sg[item_type.group_name]:
-            sg[item_type.group_name].remove(item)
+        if sg and item_type in sg and item in sg[item_type]:
+            sg[item_type].remove(item)
 
     def remove_item(self, item: construct.Container, item_type: ItemType):
         groups = self.scene_groups_for_item(item, item_type)

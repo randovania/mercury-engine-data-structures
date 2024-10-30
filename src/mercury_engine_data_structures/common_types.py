@@ -21,6 +21,7 @@ Float: construct.FormatField = typing.cast(construct.FormatField, construct.Floa
 CVector2D = construct.Array(2, Float)
 CVector3D = construct.Array(3, Float)
 CVector4D = construct.Array(4, Float)
+Transform3D = construct.Struct("position" / CVector3D, "rotation" / CVector3D, "scale" / CVector3D)
 
 
 class VersionAdapter(Adapter):
