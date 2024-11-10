@@ -98,18 +98,28 @@ def crc_func(obj):
     return crc32 if obj._version == "1.12.0" else crc64
 
 
-class ItemType(Enum):
-    group_name: str
+class ItemType(str, Enum):
+    group_index: int
 
-    SCENE_BLOCK = 0, "scene_blocks"
-    OBJECT = 1, "objects"
-    LIGHT = 2, "lights"
+    SCENE_BLOCK = "scene_blocks", 0
+    OBJECT = "objects", 1
+    LIGHT = "lights", 2
 
-    def __new__(cls, value: int, group_name: str):
-        member = object.__new__(cls)
-        member._value_ = value
-        member.group_name = group_name
+    def __new__(cls, name: int, index: str):
+        member = str.__new__(cls, name)
+        member._value_ = name
+        member.group_index = index
         return member
+
+    @classmethod
+    def from_index(cls, val: int):
+        for it in cls:
+            if it.group_index == val:
+                return it
+        return ValueError(f"Value {val} is not a valid index of ItemType")
+
+    def __format__(self, format_spec: str) -> str:
+        return self.value.__format__(format_spec)
 
 
 class BmssdAdapter(Adapter):
@@ -130,8 +140,7 @@ class BmssdAdapter(Adapter):
             res.scene_groups[sg.sg_name] = construct.Container()
 
             for ig_value, items in sg.item_groups.items():
-                group_type = ItemType(ig_value)
-                res.scene_groups[sg.sg_name][group_type] = construct.ListContainer()
+                group_type = ItemType.from_index(ig_value)
 
                 # objects are indexed and not hashed
                 if ig_value == 1:
@@ -142,9 +151,7 @@ class BmssdAdapter(Adapter):
                     res.scene_groups[sg.sg_name][group_type] = construct.ListContainer(
                         [
                             # use raw hash value instead of block value if it doesn't exist above
-                            res[f"_{group_type.group_name}"][block]
-                            if res[f"_{group_type.group_name}"].get(block, None)
-                            else block
+                            res[f"_{group_type}"][block] if res[f"_{group_type}"].get(block, None) else block
                             for block in items
                         ]
                     )
@@ -199,9 +206,9 @@ class BmssdAdapter(Adapter):
                 item_count += len(items)
 
                 if group_type == ItemType.OBJECT:
-                    sg_cont.item_groups[group_type.value] = [object_order[obj_to_tuple(o)] for o in items]
+                    sg_cont.item_groups[group_type.group_index] = [object_order[obj_to_tuple(o)] for o in items]
                 else:
-                    sg_cont.item_groups[group_type.value] = [
+                    sg_cont.item_groups[group_type.group_index] = [
                         # handle integers (unmatched crc's in decode)
                         o if isinstance(o, int) else crc(o["model_name"])
                         for o in items
@@ -223,13 +230,13 @@ class Bmssd(BaseResource):
             if item_type == ItemType.OBJECT:
                 return self.raw._objects[item_name_or_id]
             else:
-                return self.raw[f"_{item_type.group_name}"].get(item_name_or_id, None)
+                return self.raw[f"_{item_type}"].get(item_name_or_id, None)
 
         if item_type == ItemType.OBJECT:
             raise ValueError("If accessing an Object type item, must use the index!")
 
         crc = crc_func(self.raw)
-        return self.raw[f"_{item_type.group_name}"].get(crc(item_name_or_id), None)
+        return self.raw[f"_{item_type}"].get(crc(item_name_or_id), None)
 
     def get_scene_group(self, scene_group: str) -> construct.Container:
         return self.raw.scene_groups.get(scene_group, None)
@@ -245,7 +252,7 @@ class Bmssd(BaseResource):
             self.raw._objects.append(item)
         else:
             crc = crc_func(self.raw)
-            self.raw[f"_{item_type.group_name}"][crc(item["model_name"])] = item
+            self.raw[f"_{item_type}"][crc(item["model_name"])] = item
 
         for sg_name in scene_groups:
             self.get_scene_group(sg_name)[item_type].append(item)
@@ -260,4 +267,4 @@ class Bmssd(BaseResource):
         for sg in groups:
             self.remove_item_from_group(item, item_type, sg)
 
-        self.raw[f"_{item_type.group_name}"].remove(item)
+        self.raw[f"_{item_type}"].remove(item)
