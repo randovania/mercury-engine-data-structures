@@ -27,6 +27,7 @@ dependencies = [
     "construct>=2.10.70",  # 2.10.70 includes a fix for compiled structs building
     "randovania-lupa>=2.0.1",
     "zstandard",
+    "py-tegra-swizzle>=0.1.0",
 ]
 
 [project.readme]
