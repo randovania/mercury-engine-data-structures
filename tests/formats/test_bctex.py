@@ -1440,6 +1440,10 @@ dread_dds_exports = [
         "textures/maps/cubemaps/airport_cubemapdiffusehdr.bctex",
         "f0c8ae58d39389283fc967ba9a477c37634a21a186acae84ee9908ed90770bfa",
     ),
+    (
+        "textures/system/minimap/icons/icons.bctex",
+        "1f20a0e812a0fee9b173f2bd73de03cfe2f2397ce8cb1d20f1dacd697ecd04d0",
+    ),
 ]
 
 
