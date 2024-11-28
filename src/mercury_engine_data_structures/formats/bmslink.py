@@ -7,6 +7,7 @@ from construct import Construct
 from construct.core import (
     Byte,
     Const,
+    Flag,
     Int32ul,
     LazyBound,
     PrefixedArray,
@@ -20,16 +21,16 @@ if TYPE_CHECKING:
     from mercury_engine_data_structures.game_check import Game
 
 UnkStruct = Struct(
-    unk1=StrId,
-    unk2=Byte,
-    unk3=Float,
-    unk4=StrId,
-    unk5=StrId,
-    unk6=Float,
-    unk7=Byte,
-    unk8=construct.core.If(
-        construct.this.unk5 != "Portal",
-        StrId,
+    dir=StrId,  # 16 directions (i.e. RIGHT, RIGHT_UP_27, RIGHT_UP_45, RIGHT_UP_63, UP, ...)
+    unk2=Flag,
+    distance=Float,
+    func=StrId,  # empty string, Min or Equals
+    edge_type=StrId,  # Portal, Forbidden, Solid, Stitched or Any
+    unk6=Float,  # 0 or 51?
+    unk7=Flag,
+    other_dir=construct.core.If(
+        construct.this.edge_type != "Portal",
+        StrId,  # right or left, usually opposite of dir
     ),
     children=PrefixedArray(Int32ul, LazyBound(lambda: UnkStruct)),
 )
@@ -37,19 +38,19 @@ UnkStruct = Struct(
 Item = Struct(
     name=StrId,
     type=StrId,
-    unk1=StrId,
-    unk2=Float,
-    unk3=StrId,
-    unk4=Float,
-    unk5=StrId,
-    unk6=Byte,
-    unk7=Byte,
-    unk8=StrId,
-    unk9=Byte,
-    unk10=Byte,
-    unk11=Byte,
-    unk12=Float,
-    unk13=UnkStruct,
+    unk1=Const("", StrId),  # possibly empty string?
+    unk2=Float,  # 0-300
+    unk3=StrId,  # empty or 'tunnel'
+    unk4=Float,  # 0-300
+    unk5=StrId,  # empty or 'tunnel'
+    unk6=Flag,
+    unk7=Flag,
+    unk8=StrId,  # name of action?
+    unk9=Flag,
+    unk10=Flag,
+    unk11=Flag,
+    unk12=Float,  # 0 or 50
+    actions=UnkStruct,
 )
 
 LocationStruct = Struct(name=StrId, items=PrefixedArray(Int32ul, Item))
