@@ -14,7 +14,7 @@ def test_bmsmsd(samus_returns_tree, bmsmsd_path):
 @pytest.fixture()
 def surface_bmsmsd(samus_returns_tree) -> Bmsmsd:
     return samus_returns_tree.get_parsed_asset(
-        "maps/levels/c10_samus/s000_surface/s000_surface.bmsmsd", type_hint=Bmsmsd
+        "gui/minimaps/c10_samus/s000_surface.bmsmsd", type_hint=Bmsmsd
     )
 
 def test_get_tile(surface_bmsmsd: Bmsmsd):
