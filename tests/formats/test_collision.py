@@ -92,3 +92,16 @@ def test_compare_dread_210(dread_tree_210, file_path):
 )
 def test_compare_collision_msr(samus_returns_tree, file_path):
     parse_build_compare_editor_parsed(Bmscc, samus_returns_tree, file_path)
+
+@pytest.fixture()
+def surface_bmscc(samus_returns_tree) -> Bmscc:
+    return samus_returns_tree.get_parsed_asset("maps/levels/c10_samus/s000_surface/s000_surface.bmscc", type_hint=Bmscc)
+
+def test_get_data(surface_bmscc: Bmscc):
+    data = surface_bmscc.get_data()
+    assert data[2] == surface_bmscc.get_total_boundings()
+
+def test_modifying_collision(surface_bmscc: Bmscc):
+    point = surface_bmscc.get_point(2, 9)
+    assert point["x"] == -800.0
+    assert point["y"] == -7000.0
