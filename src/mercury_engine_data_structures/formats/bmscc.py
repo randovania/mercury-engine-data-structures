@@ -20,7 +20,6 @@ from mercury_engine_data_structures.common_types import (
     VersionAdapter,
     make_vector,
 )
-from mercury_engine_data_structures.construct_extensions.function_complex import ComplexIf
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats.collision import collision_formats
 
@@ -42,9 +41,7 @@ CollisionEntry = Struct(
     / Switch(
         construct.this.type,
         collision_formats,
-        ErrorWithMessage(
-            lambda ctx: f"Type {ctx.type} not known, valid types are {list(collision_formats.keys())}."
-        ),
+        ErrorWithMessage(lambda ctx: f"Type {ctx.type} not known, valid types are {list(collision_formats.keys())}."),
     ),
 )
 
@@ -66,10 +63,7 @@ BMSCC = Struct(
         VersionAdapter("1.16.0"),
     ),
     "layers" / make_vector(CollisionLayer),
-    "parts" / game_check.is_sr_or_else(
-        construct.Terminated,
-        make_vector(PartsComponent)
-    ),
+    "parts" / game_check.is_sr_or_else(construct.Terminated, make_vector(PartsComponent)),
     construct.Terminated,
 )
 
