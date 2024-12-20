@@ -20,6 +20,7 @@ from mercury_engine_data_structures.common_types import (
     VersionAdapter,
     make_vector,
 )
+from mercury_engine_data_structures.construct_extensions.function_complex import ComplexIf
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats.collision import collision_formats
 
@@ -63,7 +64,14 @@ BMSCC = Struct(
         VersionAdapter("1.16.0"),
     ),
     "layers" / make_vector(CollisionLayer),
-    "parts" / game_check.is_sr_or_else(construct.Terminated, make_vector(PartsComponent)),
+    "_remaining" / construct.Peek(construct.GreedyBytes),
+    "parts" / ComplexIf(
+        lambda this: (
+                (this._parsing and this._remaining)
+                or (this._building and (this.parts is not None))
+        ),
+        make_vector(PartsComponent)
+    ),
     construct.Terminated,
 )
 
