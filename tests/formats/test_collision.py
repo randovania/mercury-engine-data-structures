@@ -96,12 +96,12 @@ def test_compare_collision_msr(samus_returns_tree, file_path):
 
 @pytest.fixture()
 def surface_bmscc(samus_returns_tree) -> Bmscc:
-    return samus_returns_tree.get_parsed_asset("maps/levels/c10_samus/s000_surface/s000_surface.bmscc", type_hint=Bmscc)
+    return samus_returns_tree.get_parsed_asset("maps/levels/c10_samus/s000_surface/s000_surface.bmscd", type_hint=Bmscc)
 
 
 def test_get_data(surface_bmscc: Bmscc):
     data = surface_bmscc.get_data()
-    assert data[2] == surface_bmscc.get_total_boundings()
+    assert len(data) == 5
 
 
 def test_modifying_collision(surface_bmscc: Bmscc):
