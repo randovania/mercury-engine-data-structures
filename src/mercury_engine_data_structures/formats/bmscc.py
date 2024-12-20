@@ -65,12 +65,10 @@ BMSCC = Struct(
     ),
     "layers" / make_vector(CollisionLayer),
     "_remaining" / construct.Peek(construct.GreedyBytes),
-    "parts" / ComplexIf(
-        lambda this: (
-                (this._parsing and this._remaining)
-                or (this._building and (this.parts is not None))
-        ),
-        make_vector(PartsComponent)
+    "parts"
+    / ComplexIf(
+        lambda this: ((this._parsing and this._remaining) or (this._building and (this.parts is not None))),
+        make_vector(PartsComponent),
     ),
     construct.Terminated,
 )
