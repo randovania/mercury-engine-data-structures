@@ -20,7 +20,6 @@ from mercury_engine_data_structures.common_types import (
     VersionAdapter,
     make_vector,
 )
-from mercury_engine_data_structures.construct_extensions.function_complex import ComplexIf
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.formats.collision import collision_formats
 
