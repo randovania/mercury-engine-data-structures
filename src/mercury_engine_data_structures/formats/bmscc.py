@@ -64,12 +64,7 @@ BMSCC = Struct(
         VersionAdapter("1.16.0"),
     ),
     "layers" / make_vector(CollisionLayer),
-    "_remaining" / construct.Peek(construct.GreedyBytes),
-    "parts"
-    / ComplexIf(
-        lambda this: ((this._parsing and this._remaining) or (this._building and (this.parts is not None))),
-        make_vector(PartsComponent),
-    ),
+    "parts" / construct.Optional(make_vector(PartsComponent)),
     construct.Terminated,
 )
 
@@ -79,14 +74,22 @@ class Bmscc(BaseResource):
     def construct_class(cls, target_game: Game) -> Construct:
         return BMSCC
 
-    def get_data(self) -> Container:
-        return self.raw.layers[0].entries[0].data
+    # Bmscc has an entry per collision_camera, Bmscd has one entry per file
+    def get_data(self, layer_idx: int = 0, entry_idx: int = 0) -> Container:
+        return self.raw.layers[layer_idx].entries[entry_idx].data
 
+    # Returns all data associated with a poly (points, boundings)
     def get_poly(self, poly_idx: int) -> Container:
         return self.get_data().polys[poly_idx]
 
+    # Returns a specific point in a poly
     def get_point(self, poly_idx: int, point_idx: int) -> Container:
         return self.get_poly(poly_idx).points[point_idx]
 
+    # Returns the total boundary of collision/collision_camera
     def get_total_boundings(self) -> Container:
         return self.get_data().total_boundings
+
+    # Returns the boundary of a poly
+    def get_poly_boundings(self, poly_idx: int) -> Container:
+        return self.get_poly(poly_idx).boundings
