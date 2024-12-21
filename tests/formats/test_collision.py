@@ -108,3 +108,18 @@ def test_modifying_collision(surface_bmscc: Bmscc):
     point = surface_bmscc.get_point(2, 9)
     assert point["x"] == -800.0
     assert point["y"] == -7000.0
+
+
+def test_get_boundings(surface_bmscc: Bmscc):
+    total_boundings = surface_bmscc.get_total_boundings()
+    polys = surface_bmscc.get_data().polys
+    for poly in polys:
+        poly_boundings = surface_bmscc.get_poly_boundings(poly)
+        # x1
+        assert poly_boundings[0] >= total_boundings[0]
+        # y1
+        assert poly_boundings[1] >= total_boundings[1]
+        # x2
+        assert poly_boundings[2] <= total_boundings[2]
+        # y2
+        assert poly_boundings[3] <= total_boundings[3]
