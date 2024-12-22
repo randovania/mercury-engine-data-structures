@@ -74,21 +74,21 @@ class Bmscc(BaseResource):
         return BMSCC
 
     # Bmscc has an entry per collision_camera, Bmscd has one entry per file
-    def get_data(self, layer_idx: int = 0, entry_idx: int = 0) -> Container:
-        return self.raw.layers[layer_idx].entries[entry_idx].data
+    def get_data(self, entry_idx: int = 0) -> Container:
+        return self.raw.layers[0].entries[entry_idx].data
 
-    # Returns all data associated with a poly (points, boundings)
-    def get_poly(self, poly_idx: int) -> Container:
-        return self.get_data().polys[poly_idx]
+    """Returns all data associated with a poly (points, boundings)"""
+    def get_poly(self, entry_idx: int = 0, poly_idx: int = 0) -> Container:
+        return self.get_data(entry_idx).polys[poly_idx]
 
-    # Returns a specific point in a poly
-    def get_point(self, poly_idx: int, point_idx: int) -> Container:
-        return self.get_poly(poly_idx).points[point_idx]
+    """Returns a specific point in a poly"""
+    def get_point(self, entry_idx: int = 0, poly_idx: int = 0, point_idx: int = 0) -> Container:
+        return self.get_poly(entry_idx, poly_idx).points[point_idx]
 
-    # Returns the total boundary of collision/collision_camera
-    def get_total_boundings(self) -> Container:
-        return self.get_data().total_boundings
+    """Returns the total boundary of collision/collision_camera"""
+    def get_total_boundings(self, entry_idx: int = 0) -> Container:
+        return self.get_data(entry_idx).total_boundings
 
-    # Returns the boundary of a poly
-    def get_poly_boundings(self, poly_idx: int) -> Container:
-        return self.get_poly(poly_idx).boundings
+    """Returns the boundary of a poly"""
+    def get_poly_boundings(self, entry_idx: int = 0, poly_idx: int = 0) -> Container:
+        return self.get_poly(entry_idx, poly_idx).boundings
