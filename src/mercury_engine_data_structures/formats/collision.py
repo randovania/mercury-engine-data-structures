@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import construct
-from construct import Array, Flag, Hex, Int16ul, Rebuild, Struct
+from construct import Array, BitsInteger, BitStruct, ByteSwapped, Flag, Hex, Rebuild, Struct
 
 from mercury_engine_data_structures import game_check
 from mercury_engine_data_structures.common_types import CVector2D, CVector3D, Float, UInt, make_vector
@@ -30,8 +30,13 @@ CollisionPolyDread = Struct(
 CollisionPoly = game_check.is_at_most(Game.SAMUS_RETURNS, CollisionPolySR, CollisionPolyDread)
 
 BinarySearchTree = Struct(
-    binary_search_index1=Int16ul,
-    binary_search_index2=Int16ul,
+    test=ByteSwapped(
+        BitStruct(
+            "is_leaf" / Flag,
+            "pass" / BitsInteger(15),
+            "fail" / BitsInteger(16),
+        )
+    ),
     boundings=Array(4, Float),
 )
 
