@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import functools
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import construct
 from construct.core import (
     Const,
     Construct,
+    Container,
     Flag,
     Int32sl,
     Struct,
@@ -48,3 +49,15 @@ class Bmtun(BaseResource):
     @functools.lru_cache
     def construct_class(cls, target_game: Game) -> Construct:
         return BMTUN
+
+    def get_tunable(self, tunable: str, param: str) -> Container:
+        classes = self.raw.classes
+        if tunable not in classes:
+            raise ValueError(f"Unknown tunable: {tunable}!")
+        if param not in classes[tunable].tunables:
+            raise ValueError(f"Unknown tunable param: {param}!")
+        return self.raw.classes[tunable].tunables[param]
+
+    def set_tunable(self, tunable_name: str, param: str, value: Any) -> None:
+        tunable = self.get_tunable(tunable_name, param)
+        tunable.value = value
