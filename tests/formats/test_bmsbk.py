@@ -30,8 +30,9 @@ def test_get_block(surface_bmsbk: Bmsbk):
 
 
 def test_changing_weakness(surface_bmsbk: Bmsbk):
-    surface_bmsbk.set_block_type(1, "bomb")
-    assert surface_bmsbk.get_block_group(1).type == "bomb"
+    original_type = surface_bmsbk.get_block_group(1).types[0].block_type
+    new_type = surface_bmsbk.set_block_type(1, "bomb")
+    assert original_type != new_type
 
 
 def test_respawn_time(surface_bmsbk: Bmsbk):
