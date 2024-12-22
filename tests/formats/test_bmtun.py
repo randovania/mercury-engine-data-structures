@@ -18,12 +18,12 @@ def bmtun(samus_returns_tree) -> Bmtun:
 
 
 def test_get_tunable(bmtun):
-    assert bmtun.get_tunable("Amiibo|CTunableReserveTanks", "fLifeTankSize").value == 299.0
+    assert bmtun.get_tunable("Amiibo|CTunableReserveTanks", "fLifeTankSize") == 299.0
 
 
 def test_set_tunable(bmtun):
     bmtun.set_tunable("Amiibo|CTunableReserveTanks", "fLifeTankSize", 199.0)
     assert bmtun.get_tunable("Amiibo|CTunableReserveTanks", "fLifeTankSize") == 199.0
 
-    with pytest.raises(ValueError):
-        bmtun.set_tunable("Amiibo|CTunableReserveTanks", "fSETankSize", True)
+    bmtun.set_tunable("CTunableMissile", "sDamageSource", "BOMB")
+    assert bmtun.get_tunable("CTunableMissile", "sDamageSource") == "BOMB"
