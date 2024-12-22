@@ -113,13 +113,13 @@ def test_modifying_collision(surface_bmscc: Bmscc):
 def test_get_boundings(surface_bmscc: Bmscc):
     total_boundings = surface_bmscc.get_total_boundings()
     polys = surface_bmscc.get_data().polys
-    for poly in polys:
-        poly_boundings = surface_bmscc.get_poly_boundings(poly)
+    for i, poly in enumerate(polys):
+        poly_boundings = surface_bmscc.get_poly_boundings(i)
         # x1
-        assert poly_boundings[0] >= total_boundings[0]
+        assert poly_boundings[i][0] >= total_boundings[i][0]
         # y1
-        assert poly_boundings[1] >= total_boundings[1]
+        assert poly_boundings[i][1] >= total_boundings[i][1]
         # x2
-        assert poly_boundings[2] <= total_boundings[2]
+        assert poly_boundings[i][2] <= total_boundings[i][2]
         # y2
-        assert poly_boundings[3] <= total_boundings[3]
+        assert poly_boundings[i][3] <= total_boundings[i][3]
