@@ -3,7 +3,8 @@ from __future__ import annotations
 import functools
 from typing import TYPE_CHECKING
 
-from construct import (
+import construct
+from construct.core import (
     Array,
     Const,
     Construct,
@@ -13,7 +14,6 @@ from construct import (
     Int32ul,
     Rebuild,
     Struct,
-    Terminated,
 )
 
 from mercury_engine_data_structures.base_resource import BaseResource
@@ -43,7 +43,7 @@ def _rebuild_types(ctx: Container) -> int:
 BlockGroup = Struct(
     "_num_blocks" / Rebuild(Int32ul, _rebuild_blocks),
     "_num_types" / Rebuild(Int32ul, _rebuild_types),
-    "unk_bool" / Flag, # always true?
+    "is_enabled" / Flag, # always true?
     "types" / Array(lambda this: this._num_types, Struct(
         "block_type" / StrId,
         "blocks" / make_vector(Block),
@@ -52,13 +52,13 @@ BlockGroup = Struct(
 
 BMSBK = Struct(
     "magic" / Const(b"MSBK"),
-    "version" / VersionAdapter(),
+    "version" / VersionAdapter("1.10.0"),
     "block_groups" / make_vector(BlockGroup),
     "collision_cameras" / make_vector(Struct(
         "name" / StrId,
         "entries" / make_vector(Int32ul),
     )),
-    Terminated,
+    construct.Terminated,
 )  # fmt: skip
 
 
@@ -67,3 +67,17 @@ class Bmsbk(BaseResource):
     @functools.lru_cache
     def construct_class(cls, target_game: Game) -> Construct:
         return BMSBK
+
+    def get_block_group(self, block_group: int) -> Container:
+        return self.raw.block_groups[block_group]
+
+    def set_block_type(self, block_group: int, block_type: str) -> Container:
+        weakness = self.get_block_group(block_group).types[0]
+        weakness.block_type = block_type
+
+    def get_block(self, block_group: int, block_idx: int = 0) -> Container:
+        return self.get_block_group(block_group).types[0].blocks[block_idx]
+
+    def set_respawn_time(self, block_group: int, block_idx: int = 0, respawn_time: float = 0.0) -> Container:
+        block = self.get_block(block_group)
+        block.respawn_time = respawn_time
