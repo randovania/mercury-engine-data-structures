@@ -121,6 +121,9 @@ def test_bmssd_dread_functions(dread_tree_100):
     bmssd.remove_item(random_obj, ItemType.SCENE_BLOCK)
     assert bmssd.scene_groups_for_item(random_obj, ItemType.SCENE_BLOCK) == []
 
+    # try to get a non-existent object
+    assert bmssd.scene_groups_for_item("foo", ItemType.LIGHT) == []
+
     # PART 4: make sure it can actually build and parse lol
     con = Bmssd.construct_class(target_game=Game.DREAD)
     built = con.build(bmssd.raw, target_game=Game.DREAD)
