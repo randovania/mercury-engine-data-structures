@@ -115,6 +115,15 @@ def test_bmssd_dread_functions(dread_tree_100):
     assert roof not in bmssd.get_scene_group("sg_SubArea_collision_camera_003")[ItemType.OBJECT]
     assert roof not in bmssd.get_scene_group("sg_SubArea_collision_camera_002")[ItemType.OBJECT]
 
+    # remove from an ItemType which uses a dict
+    random_obj = bmssd.get_item("part001_jp6_mapmodel04", ItemType.SCENE_BLOCK)
+    assert bmssd.scene_groups_for_item(random_obj, ItemType.SCENE_BLOCK) == ["sg_SubArea_collision_camera_002"]
+    bmssd.remove_item(random_obj, ItemType.SCENE_BLOCK)
+    assert bmssd.scene_groups_for_item(random_obj, ItemType.SCENE_BLOCK) == []
+
+    # try to get a non-existent object
+    assert bmssd.scene_groups_for_item("foo", ItemType.LIGHT) == []
+
     # PART 4: make sure it can actually build and parse lol
     con = Bmssd.construct_class(target_game=Game.DREAD)
     built = con.build(bmssd.raw, target_game=Game.DREAD)
