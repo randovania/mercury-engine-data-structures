@@ -72,7 +72,6 @@ class CollisionEntry:
     def __init__(self, raw: Container):
         self._raw = raw
 
-    # Bmscc has an entry per collision_camera, Bmscd has one entry per file
     def get_data(self) -> Container:
         """Returns all data of collision/collision_camera"""
         return self._raw.data
@@ -99,5 +98,6 @@ class Bmscc(BaseResource):
     def construct_class(cls, target_game: Game) -> Construct:
         return BMSCC
 
+    # Bmscc has an entry per collision_camera, Bmscd has one entry per file
     def get_entry(self, entry_idx: int = 0) -> CollisionEntry:
         return CollisionEntry(self.raw.layers[0].entries[entry_idx])
