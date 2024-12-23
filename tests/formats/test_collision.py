@@ -100,21 +100,21 @@ def surface_bmscc(samus_returns_tree) -> Bmscc:
 
 
 def test_get_data(surface_bmscc: Bmscc):
-    data = surface_bmscc.get_data()
+    data = surface_bmscc.get_entry().get_data()
     assert len(data) == 5
 
 
 def test_modifying_collision(surface_bmscc: Bmscc):
-    point = surface_bmscc.get_point(0, 2, 9)
+    point = surface_bmscc.get_entry().get_point(2, 9)
     assert point["x"] == -800.0
     assert point["y"] == -7000.0
 
 
 def test_get_boundings(surface_bmscc: Bmscc):
-    total_boundings = surface_bmscc.get_total_boundings()
-    polys = surface_bmscc.get_data().polys
+    total_boundings = surface_bmscc.get_entry().get_total_boundings()
+    polys = surface_bmscc.get_entry().get_data().polys
     for i, poly in enumerate(polys):
-        poly_boundings = surface_bmscc.get_poly_boundings(0, i)
+        poly_boundings = surface_bmscc.get_entry().get_poly_boundings(i)
         # Boundings for polygons are in the order: x1, y1, x2, y2
         # Assert that the boundings are confined within the total bounds of the collision_camera
         assert poly_boundings[0] >= total_boundings[0]
