@@ -31,5 +31,7 @@ def test_set_tunable(bmtun):
     bmtun.set_tunable("CTunableMissile", "sDamageSource", "BOMB")
     assert bmtun.get_tunable("CTunableMissile", "sDamageSource") == "BOMB"
 
-    with pytest.raises(KeyError):
-        bmtun.set_tunable("Amiibo|CTunableReserveTanks", "fPBTankSize", 10.0)
+    with pytest.raises(KeyError, match="Unknown tunable name for Amiibo|CTunableReserveTanks: FakeTunable!"):
+        bmtun.set_tunable("Amiibo|CTunableReserveTanks", "FakeTunable", 10.0)
+    with pytest.raises(KeyError, match="Unknown class name: FakeClass!"):
+        bmtun.set_tunable("FakeClass", "FakeTunable", 10.0)

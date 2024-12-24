@@ -54,7 +54,7 @@ class Bmtun(BaseResource):
         if class_name not in classes:
             raise KeyError(f"Unknown class name: {class_name}!")
         if tunable_name not in classes[class_name].tunables:
-            raise KeyError(f"Unknown tunable name: {tunable_name}!")
+            raise KeyError(f"Unknown tunable name for {class_name}: {tunable_name}!")
 
     Tunable = str | float | bool | int | list[float]
 
