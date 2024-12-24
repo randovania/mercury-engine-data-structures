@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+from enum import Enum
 from typing import TYPE_CHECKING
 
 import construct
@@ -62,6 +63,17 @@ BMSBK = Struct(
 )  # fmt: skip
 
 
+class BlockType(Enum):
+    POWER_BEAM = "power_beam"
+    BOMB = "bomb"
+    MISSILE = "missile"
+    SUPER_MISSILE = "super_missile"
+    POWER_BOMB = "power_bomb"
+    BABY = "baby"
+    SCREW_ATTACK = "screw_attack"
+    WEIGHT = "weight"
+
+
 class Bmsbk(BaseResource):
     @classmethod
     @functools.lru_cache
@@ -69,15 +81,22 @@ class Bmsbk(BaseResource):
         return BMSBK
 
     def get_block_group(self, block_group: int) -> Container:
+        """Returns a block group by index"""
         return self.raw.block_groups[block_group]
 
-    def set_block_type(self, block_group: int, block_type: str) -> Container:
-        weakness = self.get_block_group(block_group).types[0]
-        weakness.block_type = block_type
+    def set_block_type(self, block_group: int, block_type: BlockType) -> None:
+        """Change a given block's block_type into another"""
+        if block_type not in BlockType:
+            raise KeyError(f"{block_type} is not a valid block type!")
+        assert len(self.get_block_group(block_group).types) == 1
+        self.get_block_group(block_group).types[0].block_type = block_type
 
-    def get_block(self, block_group: int, block_idx: int = 0) -> Container:
+    def get_block(self, block_group: int, block_idx: int) -> Container:
+        """Returns a block from a block group by index"""
+        assert len(self.get_block_group(block_group).types) == 1
         return self.get_block_group(block_group).types[0].blocks[block_idx]
 
-    def set_respawn_time(self, block_group: int, block_idx: int = 0, respawn_time: float = 0.0) -> Container:
-        block = self.get_block(block_group)
+    def set_respawn_time(self, block_group: int, block_idx: int, respawn_time: float) -> None:
+        """Change the respawn time of a given block"""
+        block = self.get_block(block_group, block_idx)
         block.respawn_time = respawn_time
