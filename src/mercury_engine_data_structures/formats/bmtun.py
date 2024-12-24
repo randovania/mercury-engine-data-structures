@@ -52,9 +52,9 @@ class Bmtun(BaseResource):
     def _check_tunable_exists(self, class_name: str, tunable_name: str) -> None:
         classes = self.raw.classes
         if class_name not in classes:
-            raise KeyError(f"Unknown tunable: {class_name}!")
+            raise KeyError(f"Unknown class name: {class_name}!")
         if tunable_name not in classes[class_name].tunables:
-            raise KeyError(f"Unknown tunable param: {tunable_name}!")
+            raise KeyError(f"Unknown tunable name: {tunable_name}!")
 
     Tunable = str | float | bool | int | list[float]
 
