@@ -86,8 +86,6 @@ class Bmsbk(BaseResource):
 
     def set_block_type(self, block_group: int, block_type: BlockType) -> None:
         """Change a given block's block_type into another"""
-        if block_type not in BlockType:
-            raise KeyError(f"{block_type} is not a valid block type!")
         assert len(self.get_block_group(block_group).types) == 1
         self.get_block_group(block_group).types[0].block_type = block_type
 
