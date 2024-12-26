@@ -21,8 +21,8 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 FunctionArgument = Struct(
-    type=StaticPaddedString(4, "ascii"),
-    value=construct.Switch(
+    "type" / StaticPaddedString(4, "ascii"),
+    "value" / construct.Switch(
         construct.this.type,
         {
             "s": StrId,
@@ -36,36 +36,36 @@ FunctionArgument = Struct(
 
 Components = {
     "TRIGGER": Struct(
-        command=StrId,
-        arguments=make_vector(FunctionArgument),
+        "command" / StrId,
+        "arguments" / make_vector(FunctionArgument),
     ),
     "SPAWNGROUP": Struct(
-        command=StrId,
-        arguments=make_vector(FunctionArgument),
+        "command" / StrId,
+        "arguments" / make_vector(FunctionArgument),
     ),
     "SPAWNPOINT": Struct(
-        command=StrId,
-        arguments=make_vector(FunctionArgument),
+        "command" / StrId,
+        "arguments" / make_vector(FunctionArgument),
     ),
     "STARTPOINT": Struct(
-        command=StrId,
-        arguments=make_vector(FunctionArgument),
+        "command" / StrId,
+        "arguments" / make_vector(FunctionArgument),
     ),
     "MODELUPDATER": Struct(
-        command=StrId,
-        arguments=make_vector(FunctionArgument),
+        "command" / StrId,
+        "arguments" / make_vector(FunctionArgument),
     ),
 }
 
 ProperActor = Struct(
-    type=StrId,
-    position=CVector3D,
-    rotation=CVector3D,
-    components=make_vector(
+    "type" / StrId,
+    "position" / CVector3D,
+    "rotation" / CVector3D,
+    "components" / make_vector(
         Struct(
-            component_type=StrId,
-            command=StrId,
-            arguments=make_vector(FunctionArgument),
+            "component_type" / StrId,
+            "command" / StrId,
+            "arguments" / make_vector(FunctionArgument),
             # data=construct.Switch(
             #     construct.this.component_type,
             #     Components,
@@ -76,8 +76,8 @@ ProperActor = Struct(
 )
 
 CollisionObject = Struct(
-    object_type=StrId,
-    data=Switch(
+    "object_type" / StrId,
+    "data" / Switch(
         construct.this.object_type,
         collision_formats,
         ErrorWithMessage(lambda ctx: f"Type {ctx.type} not known, valid types are {list(collision_formats.keys())}."),
@@ -85,64 +85,56 @@ CollisionObject = Struct(
 )
 
 BMSLD = Struct(
-    _magic=Const(b"MSLD"),
-    version=VersionAdapter("1.20.0"),
-    unk1=Int32ul,
-    unk2=Int32ul,
-    unk3=Int32ul,
-    unk4=Int32ul,
-    objects_a=make_vector(
+    "_magic" / Const(b"MSLD"),
+    "version" / VersionAdapter("1.20.0"),
+    "unk1" / Int32ul,
+    "unk2" / Int32ul,
+    "unk3" / Int32ul,
+    "unk4" / Int32ul,
+    "objects_a" / make_vector(
         Struct(
-            name=StrId,
-            unk1=Hex(Int32ul),
-            unk2=Hex(Int32ul),
-            unk3=Hex(Int32ul),
-            unk4=Hex(Int32ul),
-            unk5=Hex(Int32ul),
-            unk6=Hex(Int32ul),
+            "name" / StrId,
+            "unk1" / Hex(Int32ul),
+            "unk2" / Hex(Int32ul),
+            "unk3" / Hex(Int32ul),
+            "unk4" / Hex(Int32ul),
+            "unk5" / Hex(Int32ul),
+            "unk6" / Hex(Int32ul),
         )
     ),
-    object_b=make_vector(
+    "enemy_paths" / make_vector(
         Struct(
-            name=StrId,
-            unk01=Hex(Int32ul),
-            unk02=make_vector(
-                Struct(
-                    x=Float32l,
-                    y=Float32l,
-                    z=Float32l,
-                )
-            ),
+            "name" / StrId,
+            "unk01" / Hex(Int32ul),
+            "coordinates" / make_vector(CVector3D),
         )
     ),
-    objects_c=make_dict(CollisionObject),
-    objects_d=make_dict(CollisionObject),
-    objects_e=make_vector(
+    "logic_shapes" / make_dict(CollisionObject),
+    "spawn_groups" / make_dict(CollisionObject),
+    "bosses" / make_vector(
         Struct(
-            name=StrId,
-            unk01=StrId,
-            unk02=Hex(Int32ul),
-            unk03=Hex(Int32ul),
-            unk04=Hex(Int32ul),
-            unk05=Hex(Int32ul),
-            unk06=Hex(Int32ul),
-            unk07=Hex(Int32ul),
-            unk08=Hex(Int32ul),
-            unk09=Float,
-            unk10=Float,
-            unk11=Hex(Int32ul),
-            unk13=StrId,
-            unk14=Hex(Int32ul),
+            "name" / StrId,
+            "unk01" / StrId,
+            "unk02" / Hex(Int32ul),
+            "unk03" / Hex(Int32ul),
+            "unk04" / Hex(Int32ul),
+            "unk05" / Hex(Int32ul),
+            "unk06" / Hex(Int32ul),
+            "unk07" / Hex(Int32ul),
+            "unk08" / Hex(Int32ul),
+            "position?" / CVector3D,
+            "type" / StrId,
+            "unk14" / Hex(Int32ul),
         )
     ),
-    actors=make_dict(ProperActor)[18],
-    sub_areas=make_vector(
+    "actors" / make_dict(ProperActor)[18],
+    "sub_areas" / make_vector(
         Struct(
-            name=StrId,
-            names=make_vector(StrId),
+            "name" / StrId,
+            "objects" / make_vector(StrId),
         )
     ),
-    rest=construct.GreedyBytes,
+    construct.Terminated,
 ).compile()
 
 
