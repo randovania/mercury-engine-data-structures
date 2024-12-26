@@ -4,7 +4,7 @@ import logging
 from typing import TYPE_CHECKING
 
 import construct
-from construct import Const, Construct, Container, Flag, Float32l, Hex, Int32ul, Struct, Switch
+from construct import Const, Construct, Container, Flag, Hex, Int32ul, Struct, Switch
 
 from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import CVector3D, Float, StrId, VersionAdapter, make_dict, make_vector
@@ -22,7 +22,8 @@ logger = logging.getLogger(__name__)
 
 FunctionArgument = Struct(
     "type" / StaticPaddedString(4, "ascii"),
-    "value" / construct.Switch(
+    "value"
+    / construct.Switch(
         construct.this.type,
         {
             "s": StrId,
@@ -61,7 +62,8 @@ ProperActor = Struct(
     "type" / StrId,
     "position" / CVector3D,
     "rotation" / CVector3D,
-    "components" / make_vector(
+    "components"
+    / make_vector(
         Struct(
             "component_type" / StrId,
             "command" / StrId,
@@ -77,7 +79,8 @@ ProperActor = Struct(
 
 CollisionObject = Struct(
     "object_type" / StrId,
-    "data" / Switch(
+    "data"
+    / Switch(
         construct.this.object_type,
         collision_formats,
         ErrorWithMessage(lambda ctx: f"Type {ctx.type} not known, valid types are {list(collision_formats.keys())}."),
@@ -91,7 +94,8 @@ BMSLD = Struct(
     "unk2" / Int32ul,
     "unk3" / Int32ul,
     "unk4" / Int32ul,
-    "objects_a" / make_vector(
+    "objects_a"
+    / make_vector(
         Struct(
             "name" / StrId,
             "unk1" / Hex(Int32ul),
@@ -102,7 +106,8 @@ BMSLD = Struct(
             "unk6" / Hex(Int32ul),
         )
     ),
-    "enemy_paths" / make_vector(
+    "enemy_paths"
+    / make_vector(
         Struct(
             "name" / StrId,
             "unk01" / Hex(Int32ul),
@@ -111,7 +116,8 @@ BMSLD = Struct(
     ),
     "logic_shapes" / make_dict(CollisionObject),
     "spawn_groups" / make_dict(CollisionObject),
-    "bosses" / make_vector(
+    "bosses"
+    / make_vector(
         Struct(
             "name" / StrId,
             "unk01" / StrId,
@@ -128,7 +134,8 @@ BMSLD = Struct(
         )
     ),
     "actors" / make_dict(ProperActor)[18],
-    "sub_areas" / make_vector(
+    "sub_areas"
+    / make_vector(
         Struct(
             "name" / StrId,
             "objects" / make_vector(StrId),
