@@ -201,7 +201,8 @@ class Bmsld(BaseResource):
         sub_area.objects.append(name_to_add)
         sub_area.objects.sort(key=crc32)
 
-    def get_layer(self, layer_index=int) -> Container:
+    def get_layer(self, layer_index: int) -> Container:
+        """Returns a layer of actors given an index"""
         return self.raw.actors[layer_index]
 
     def resolve_actor_reference(self, ref: dict) -> Container:
@@ -209,12 +210,16 @@ class Bmsld(BaseResource):
         layer = int(ref.get("layer", "default"))
         return self.raw.actors[layer][ref["actor"]]
 
-    def get_actor(self, layer_index=int, actor_name=str) -> Container:
+    def get_actor(self, layer_index: int, actor_name: str) -> Container:
+        """Returns an actor given a layer index and actor name"""
+        if layer_index < 0 or layer_index > 17:
+            raise ValueError(f"Invalid layer: {layer_index}! Layer indices range from 0-17!")
         return self.raw.actors[layer_index][actor_name]
 
     def copy_actor(
         self, coords: list[float], template_actor: Container, new_name: str, layer_index: int, offset: tuple = (0, 0, 0)
     ) -> Container:
+        """Copies an actor to a new position"""
         new_actor = copy.deepcopy(template_actor)
         self.raw.actors[layer_index][new_name] = new_actor
         for i in range(2):
@@ -223,8 +228,12 @@ class Bmsld(BaseResource):
         return new_actor
 
     def remove_entity(self, reference: dict) -> None:
+        """Deletes an actor given a layer index and actor name"""
         layer = reference["layer"]
         actor_name = reference["actor"]
+
+        if actor_name not in self.get_layer(layer):
+            raise KeyError(f"Unable to remove entity '{actor_name}!' Entity does not exist!")
 
         self.raw.actors[layer].pop(actor_name)
         self.remove_actor_from_all_groups(actor_name)
