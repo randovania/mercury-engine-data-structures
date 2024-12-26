@@ -101,9 +101,11 @@ def test_remove_actor_from_all_groups(surface_bmsld: Bmsld):
     groups = surface_bmsld.all_actor_group_names_for_actor("Moheek_026")
     assert len(groups) == 0
 
+
 def test_get_layer(surface_bmsld: Bmsld):
     layer = surface_bmsld.get_layer(17)
     assert len(layer) == 1
+
 
 def test_get_actor(surface_bmsld: Bmsld):
     actor = surface_bmsld.get_actor(9, "LE_Item_001")
@@ -115,11 +117,13 @@ def test_get_actor(surface_bmsld: Bmsld):
     with pytest.raises(ValueError, match="Invalid layer: 18! Layer indices range from 0-17!"):
         surface_bmsld.get_actor(18, "FakeActor")
 
+
 def test_copy_actor(surface_bmsld: Bmsld):
     actor = surface_bmsld.get_actor(9, "LE_Item_001")
     surface_bmsld.copy_actor([1000.0, 340.0, 0.0], actor, "CopiedActor", 9)
     surface_bmsld.add_actor_to_entity_groups("collision_camera_000", "CopiedActor")
     assert surface_bmsld.is_actor_in_group("eg_SubArea_collision_camera_000", "CopiedActor") is True
+
 
 def test_remove_entity(surface_bmsld: Bmsld):
     actor = "SP_Moheekwall_B_006"
