@@ -36,29 +36,6 @@ FunctionArgument = Struct(
     ),
 )
 
-Components = {
-    "TRIGGER": Struct(
-        "command" / StrId,
-        "arguments" / make_vector(FunctionArgument),
-    ),
-    "SPAWNGROUP": Struct(
-        "command" / StrId,
-        "arguments" / make_vector(FunctionArgument),
-    ),
-    "SPAWNPOINT": Struct(
-        "command" / StrId,
-        "arguments" / make_vector(FunctionArgument),
-    ),
-    "STARTPOINT": Struct(
-        "command" / StrId,
-        "arguments" / make_vector(FunctionArgument),
-    ),
-    "MODELUPDATER": Struct(
-        "command" / StrId,
-        "arguments" / make_vector(FunctionArgument),
-    ),
-}
-
 ProperActor = Struct(
     "type" / StrId,
     "position" / CVector3D,
@@ -69,11 +46,6 @@ ProperActor = Struct(
             "component_type" / StrId,
             "command" / StrId,
             "arguments" / make_vector(FunctionArgument),
-            # data=construct.Switch(
-            #     construct.this.component_type,
-            #     Components,
-            #     ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx.component_type}", construct.SwitchError),
-            # ),
         )
     ),
 )
