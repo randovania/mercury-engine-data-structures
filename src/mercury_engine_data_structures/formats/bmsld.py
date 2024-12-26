@@ -223,7 +223,7 @@ class Bmsld(BaseResource):
         sub_area.objects.append(name_to_add)
         sub_area.objects.sort(key=crc32)
 
-    def get_layer(self, layer_index = int) -> Container:
+    def get_layer(self, layer_index=int) -> Container:
         return self.raw.actors[layer_index]
 
     def resolve_actor_reference(self, ref: dict) -> Container:
@@ -231,11 +231,12 @@ class Bmsld(BaseResource):
         layer = int(ref.get("layer", "default"))
         return self.raw.actors[layer][ref["actor"]]
 
-    def get_actor(self, layer_index = int, actor_name = str) -> Container:
+    def get_actor(self, layer_index=int, actor_name=str) -> Container:
         return self.raw.actors[layer_index][actor_name]
 
-    def copy_actor(self, coords: list[float], template_actor: Container, new_name: str,
-                   layer_index: int, offset: tuple = (0, 0, 0)) -> Container:
+    def copy_actor(
+        self, coords: list[float], template_actor: Container, new_name: str, layer_index: int, offset: tuple = (0, 0, 0)
+    ) -> Container:
         new_actor = copy.deepcopy(template_actor)
         self.raw.actors[layer_index][new_name] = new_actor
         for i in range(2):
