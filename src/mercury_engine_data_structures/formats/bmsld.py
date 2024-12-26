@@ -60,6 +60,11 @@ CollisionObject = Struct(
     ),
 )
 
+ExtraActors = Struct(
+    "group" / StrId,
+    "actors" / make_vector(Struct("name" / StrId)),
+)
+
 BMSLD = Struct(
     "_magic" / Const(b"MSLD"),
     "version" / VersionAdapter("1.20.0"),
@@ -114,6 +119,7 @@ BMSLD = Struct(
             "objects" / make_vector(StrId),
         )
     ),
+    "extra_sub_area" / construct.Optional(make_vector(ExtraActors)),
     construct.Terminated,
 ).compile()
 
