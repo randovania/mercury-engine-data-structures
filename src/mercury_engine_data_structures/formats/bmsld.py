@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import logging
 from typing import TYPE_CHECKING
 
@@ -155,7 +156,7 @@ class Bmsld(BaseResource):
     def is_actor_in_group(self, group_name: str, actor_name: str) -> bool:
         generator = (area for area in self.raw.sub_areas if area.name == group_name)
         for area in generator:
-            return actor_name in area.names
+            return actor_name in area.objects
         return False
 
     def get_actor_group(self, group_name: str) -> Container:
@@ -170,13 +171,13 @@ class Bmsld(BaseResource):
         return [
             actor_group_name
             for actor_group_name, actor_group in self.all_actor_groups()
-            if actor_name in actor_group.names
+            if actor_name in actor_group.objects
         ]
 
     def remove_actor_from_group(self, group_name: str, actor_name: str):
         logger.debug("Remove actor %s from group %s", actor_name, group_name)
         group = self.get_actor_group(group_name)
-        group.names.remove(actor_name)
+        group.objects.remove(actor_name)
 
     def remove_actor_from_all_groups(self, actor_name: str):
         group_names = self.all_actor_group_names_for_actor(actor_name)
@@ -212,5 +213,32 @@ class Bmsld(BaseResource):
 
     def insert_into_entity_group(self, sub_area: Container, name_to_add: str) -> None:
         # MSR requires to have the names in the sub area list sorted by their crc32 value
-        sub_area.names.append(name_to_add)
-        sub_area.names.sort(key=crc32)
+        sub_area.objects.append(name_to_add)
+        sub_area.objects.sort(key=crc32)
+
+    def get_layer(self, layer_index = int) -> Container:
+        return self.raw.actors[layer_index]
+
+    def resolve_actor_reference(self, ref: dict) -> Container:
+        # FIXME: There is no "default" as layer in SR
+        layer = int(ref.get("layer", "default"))
+        return self.raw.actors[layer][ref["actor"]]
+
+    def get_actor(self, layer_index = int, actor_name = str) -> Container:
+        return self.raw.actors[layer_index][actor_name]
+
+    def copy_actor(self, coords: list[float], template_actor: Container, new_name: str,
+                   layer_index: int, offset: tuple = (0, 0, 0)) -> Container:
+        new_actor = copy.deepcopy(template_actor)
+        self.raw.actors[layer_index][new_name] = new_actor
+        for i in range(2):
+            new_actor["position"][i] = coords[i] + offset[i]
+
+        return new_actor
+
+    def remove_entity(self, reference: dict) -> None:
+        layer = reference["layer"]
+        actor_name = reference["actor"]
+
+        self.raw.actors[layer].pop(actor_name)
+        self.remove_actor_from_all_groups(actor_name)
