@@ -231,3 +231,23 @@ class Bmsld(BaseResource):
 
         self.raw.actors[layer].pop(actor_name)
         self.remove_actor_from_all_groups(actor_name)
+
+    def get_logic_shape(self, logic_shape_idx: int) -> Container:
+        """Returns a logic shape given an index"""
+        return self.raw["logic_shapes"][logic_shape_idx]    
+
+    ArgumentValue = int | float | str | bool
+
+    def set_argument(self, layer_idx: int, actor_name: str, component_idx: int, argument_idx: int, value: ArgumentValue):
+        """
+        Modify the value of an argument for an actor's component field
+
+        param layer_idx: the layer the actor is in, numbered 0-17
+        param actor_name: the actor to be modified
+        param component_idx: the index for the list of components of the actor
+        param argument_idx: the index of argument for the the component
+        param value: the value of the specified argument. can be an integer, float, string, or bool
+
+        """
+        actor = self.get_actor(layer_idx, actor_name)
+        actor["components"][component_idx]["arguments"][argument_idx]["value"] = value
