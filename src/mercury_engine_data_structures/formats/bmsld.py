@@ -68,20 +68,14 @@ ExtraActors = Struct(
 BMSLD = Struct(
     "_magic" / Const(b"MSLD"),
     "version" / VersionAdapter("1.20.0"),
-    "unk1" / Int32ul,
-    "unk2" / Int32ul,
-    "unk3" / Int32ul,
-    "unk4" / Int32ul,
+    "unk1" / CVector3D,
+    "unk2" / Float,
     "objects_a"
     / make_vector(
         Struct(
             "name" / StrId,
-            "unk1" / Hex(Int32ul),
-            "unk2" / Hex(Int32ul),
-            "unk3" / Hex(Int32ul),
-            "unk4" / Hex(Int32ul),
-            "unk5" / Hex(Int32ul),
-            "unk6" / Hex(Int32ul),
+            "position" / CVector3D,
+            "rotation" / CVector3D,
         )
     ),
     "enemy_paths"
