@@ -6,7 +6,6 @@ import construct
 from construct.core import (
     Const,
     Construct,
-    Container,
     Int8ul,
     Int16ul,
     Struct,
@@ -21,7 +20,7 @@ from mercury_engine_data_structures.common_types import (
     make_vector,
 )
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
-from mercury_engine_data_structures.formats.collision import collision_formats
+from mercury_engine_data_structures.formats.collision import CollisionEntry, collision_formats
 
 if TYPE_CHECKING:
     from mercury_engine_data_structures.game_check import Game
@@ -68,36 +67,11 @@ BMSCC = Struct(
 )
 
 
-class CollisionEntry:
-    def __init__(self, raw: Container):
-        self._raw = raw
-
-    def get_data(self) -> Container:
-        """Returns all data of collision/collision_camera"""
-        return self._raw.data
-
-    def get_poly(self, poly_idx: int):
-        """Returns all data associated with a poly (points, boundings)"""
-        return self.get_data().polys[poly_idx]
-
-    def get_point(self, poly_idx: int, point_idx: int) -> Container:
-        """Returns a specific point in a poly"""
-        return self.get_poly(poly_idx).points[point_idx]
-
-    def get_total_boundings(self) -> Container:
-        """Returns the total boundary of collision/collision_camera"""
-        return self.get_data().total_boundings
-
-    def get_poly_boundings(self, poly_idx: int) -> Container:
-        """Returns the boundary of a poly"""
-        return self.get_poly(poly_idx).boundings
-
-
 class Bmscc(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
         return BMSCC
 
-    # Bmscc has an entry per collision_camera, Bmscd has one entry per file
+    # Bmscc has one entry per collision_camera, Bmscd has one entry per file
     def get_entry(self, entry_idx: int = 0) -> CollisionEntry:
         return CollisionEntry(self.raw.layers[0].entries[entry_idx])
