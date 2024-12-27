@@ -234,11 +234,13 @@ class Bmsld(BaseResource):
 
     def get_logic_shape(self, logic_shape_idx: int) -> Container:
         """Returns a logic shape given an index"""
-        return self.raw["logic_shapes"][logic_shape_idx]    
+        return self.raw["logic_shapes"][logic_shape_idx]
 
     ArgumentValue = int | float | str | bool
 
-    def set_argument(self, layer_idx: int, actor_name: str, component_idx: int, argument_idx: int, value: ArgumentValue):
+    def set_argument(
+        self, layer_idx: int, actor_name: str, component_idx: int, argument_idx: int, value: ArgumentValue
+    ):
         """
         Modify the value of an argument for an actor's component field
 
