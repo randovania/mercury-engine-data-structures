@@ -33,9 +33,7 @@ CollisionPolyDread = Struct(
     "loop" / Flag,
     "boundings" / Array(4, Float),
 )
-CollisionPoly = game_check.is_at_most(
-    Game.SAMUS_RETURNS, CollisionPolySR, CollisionPolyDread
-)
+CollisionPoly = game_check.is_at_most(Game.SAMUS_RETURNS, CollisionPolySR, CollisionPolyDread)
 
 BinarySearchTree = Struct(
     "binary_search_index1" / Int16ul,
@@ -71,6 +69,7 @@ collision_formats = {
         "binary_search_trees" / OptionalValue(make_vector(BinarySearchTree)),
     ),
 }
+
 
 class CollisionEntry:
     def __init__(self, raw: Container):
