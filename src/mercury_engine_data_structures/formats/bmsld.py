@@ -232,9 +232,9 @@ class Bmsld(BaseResource):
         self.raw.actors[layer].pop(actor_name)
         self.remove_actor_from_all_groups(actor_name)
 
-    def get_logic_shape(self, logic_shape_idx: int) -> Container:
-        """Returns a logic shape given an index"""
-        return self.raw["logic_shapes"][logic_shape_idx]
+    def get_logic_shape(self, logic_shape: str) -> Container:
+        """Returns a logic shape by name"""
+        return self.raw["logic_shapes"][logic_shape]
 
     ArgumentValue = int | float | str | bool
 
