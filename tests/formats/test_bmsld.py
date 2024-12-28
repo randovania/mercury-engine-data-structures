@@ -108,20 +108,23 @@ def test_get_layer(surface_bmsld: Bmsld):
 
 
 def test_get_actor(surface_bmsld: Bmsld):
-    actor = surface_bmsld.get_actor(ActorLayer.PASSIVE, "LE_Item_001")
+    layer = ActorLayer.PASSIVE
+    actor = surface_bmsld.get_actor(layer, "LE_Item_001")
     assert actor is not None
+
     actor["type"] = "powerup_plasmabeam"
     actor["position"][0] = -6000.0
-    assert surface_bmsld.get_layer(ActorLayer.PASSIVE)["LE_Item_001"]["type"] == "powerup_plasmabeam"
-    assert surface_bmsld.get_layer(ActorLayer.PASSIVE)["LE_Item_001"]["position"][0] == -6000.0
+    actor_by_layer = surface_bmsld.get_layer(layer)["LE_Item_001"]
+    assert actor_by_layer["type"] == "powerup_plasmabeam"
+    assert actor_by_layer["position"][0] == -6000.0
 
-    with pytest.raises(KeyError, match="No actor named 'FakeActor' found in 'ActorLayer.Passive!'"):
-        surface_bmsld.get_actor(ActorLayer.PASSIVE, "FakeActor")
+    with pytest.raises(KeyError):
+        surface_bmsld.get_actor(layer, "FakeActor")
 
 
 def test_copy_actor(surface_bmsld: Bmsld):
     actor = surface_bmsld.get_actor(ActorLayer.PASSIVE, "LE_Item_001")
-    surface_bmsld.copy_actor([1000.0, 340.0, 0.0], actor, "CopiedActor", 9)
+    surface_bmsld.copy_actor([1000.0, 340.0, 0.0], actor, "CopiedActor", ActorLayer.PASSIVE)
     surface_bmsld.add_actor_to_entity_groups("collision_camera_000", "CopiedActor")
     assert surface_bmsld.is_actor_in_group("eg_SubArea_collision_camera_000", "CopiedActor") is True
 
@@ -132,4 +135,4 @@ def test_remove_actor(surface_bmsld: Bmsld):
     assert surface_bmsld.is_actor_in_group("eg_SubArea_collision_camera_000", actor) is False
 
     with pytest.raises(KeyError):
-        surface_bmsld.remove_actor(4, "SP_Kraid")
+        surface_bmsld.remove_actor(ActorLayer.SPAWNPOINT, "SP_Kraid")

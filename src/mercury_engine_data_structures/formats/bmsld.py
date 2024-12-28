@@ -85,7 +85,8 @@ BMSLD = Struct(
     "version" / VersionAdapter("1.20.0"),
     "unk1" / CVector3D,
     "unk2" / Float,
-    "objects_a"
+    # locations where Samus gets repositioned after a cutscene/collecting dna, etc
+    "landmarks"
     / make_vector(
         Struct(
             "name" / StrId,
@@ -93,6 +94,7 @@ BMSLD = Struct(
             "rotation" / CVector3D,
         )
     ),
+    # paths that enemies follow (could be bounds?)
     "enemy_paths"
     / make_vector(
         Struct(
@@ -101,9 +103,12 @@ BMSLD = Struct(
             "coordinates" / make_vector(CVector3D),
         )
     ),
+    # areas of influence for enemies
     "logic_shapes" / make_dict(CollisionObject),
+    # areas for spawngroups
     "spawn_groups" / make_dict(CollisionObject),
-    "bosses"
+    # boss camera data
+    "boss_cameras"
     / make_vector(
         Struct(
             "name" / StrId,
@@ -115,12 +120,14 @@ BMSLD = Struct(
             "unk06" / Hex(Int32ul),
             "unk07" / Hex(Int32ul),
             "unk08" / Hex(Int32ul),
-            "position?" / CVector3D,
+            "position" / CVector3D,
             "type" / StrId,
             "unk14" / Hex(Int32ul),
         )
     ),
+    # layers for actors
     "actor_layers" / make_dict(ProperActor)[18],
+    # collision_cameras and groups
     "sub_areas"
     / make_vector(
         Struct(
@@ -128,7 +135,8 @@ BMSLD = Struct(
             "objects" / make_vector(StrId),
         )
     ),
-    "extra_sub_area" / construct.Optional(make_vector(ExtraActors)),
+    # only used in s000_mainmenu, s010_cockpit, s020_credits
+    "extra_data" / construct.Optional(make_vector(ExtraActors)),
     construct.Terminated,
 ).compile()
 
@@ -211,7 +219,7 @@ class Bmsld(BaseResource):
         sub_area.objects.sort(key=crc32)
 
     def get_layer(self, layer: ActorLayer) -> Container:
-        """Returns a layer of actors using an enum"""
+        """Returns a layer of actors"""
         return self.raw.actor_layers[layer]
 
     def _check_if_actor_exists(self, layer: ActorLayer, actor_name: str) -> None:
@@ -219,12 +227,12 @@ class Bmsld(BaseResource):
             raise KeyError(f"No actor named '{actor_name}' found in '{layer}!'")
 
     def get_actor(self, layer: ActorLayer, actor_name: str) -> Container:
-        """Returns an actor given a layer using an enum and an actor name"""
+        """Returns an actor given a layer and an actor name"""
         self._check_if_actor_exists(layer, actor_name)
         return self.raw.actor_layers[layer][actor_name]
 
     def remove_actor(self, layer: ActorLayer, actor_name: str) -> None:
-        """Deletes an actor given a layer using an enum and an actor name"""
+        """Deletes an actor given a layer and an actor name"""
         self._check_if_actor_exists(layer, actor_name)
         self.get_layer(layer).pop(actor_name)
         self.remove_actor_from_all_groups(actor_name)
@@ -237,7 +245,16 @@ class Bmsld(BaseResource):
         layer: ActorLayer,
         offset: tuple = (0, 0, 0),
     ) -> Container:
-        """Copies an actor to a new position"""
+        """
+        Copies an actor to a new position
+
+        param coords: the x, y, z position for the copied actor
+        param template_actor: the actor being copied
+        param new_name: the name for the copied actor
+        param layer: the layer the copied actor will be added to
+        param offset: adds an additional offset the copied actor's coordinates
+
+        """
         new_actor = copy.deepcopy(template_actor)
         self.raw.actor_layers[layer][new_name] = new_actor
         for i in range(2):
@@ -248,21 +265,21 @@ class Bmsld(BaseResource):
     def get_logic_shape(self, logic_shape: str) -> Container:
         """Returns a logic shape by name"""
         return self.raw["logic_shapes"][logic_shape]
-
     ArgumentValue = int | float | str | bool
 
     def set_argument(
-        self, layer_idx: int, actor_name: str, component_idx: int, argument_idx: int, value: ArgumentValue
-    ):
+        self, layer: ActorLayer, actor_name: str, component_idx: int, argument_idx: int, value: ArgumentValue
+    ) -> None:
         """
         Modify the value of an argument for an actor's component field
 
-        param layer_idx: the layer the actor is in, numbered 0-17
+        param layer: the layer the actor exists in
         param actor_name: the actor to be modified
         param component_idx: the index for the list of components of the actor
         param argument_idx: the index of argument for the the component
         param value: the value of the specified argument. can be an integer, float, string, or bool
 
         """
-        actor = self.get_actor(layer_idx, actor_name)
+        actor = self.get_actor(layer, actor_name)
         actor["components"][component_idx]["arguments"][argument_idx]["value"] = value
+    #     return CollisionEntry(self.raw["logic_shapes"][logic_shape])
