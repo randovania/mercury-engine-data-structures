@@ -265,6 +265,7 @@ class Bmsld(BaseResource):
     def get_logic_shape(self, logic_shape: str) -> Container:
         """Returns a logic shape by name"""
         return self.raw["logic_shapes"][logic_shape]
+
     ArgumentValue = int | float | str | bool
 
     def set_argument(
@@ -282,4 +283,5 @@ class Bmsld(BaseResource):
         """
         actor = self.get_actor(layer, actor_name)
         actor["components"][component_idx]["arguments"][argument_idx]["value"] = value
+
     #     return CollisionEntry(self.raw["logic_shapes"][logic_shape])
