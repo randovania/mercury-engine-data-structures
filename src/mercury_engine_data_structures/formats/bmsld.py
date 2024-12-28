@@ -283,5 +283,3 @@ class Bmsld(BaseResource):
         """
         actor = self.get_actor(layer, actor_name)
         actor["components"][component_idx]["arguments"][argument_idx]["value"] = value
-
-    #     return CollisionEntry(self.raw["logic_shapes"][logic_shape])
