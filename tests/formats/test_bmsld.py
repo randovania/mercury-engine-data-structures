@@ -4,7 +4,7 @@ import pytest
 from tests.test_lib import parse_build_compare_editor
 
 from mercury_engine_data_structures import samus_returns_data
-from mercury_engine_data_structures.formats.bmsld import Bmsld
+from mercury_engine_data_structures.formats.bmsld import ActorLayer, Bmsld
 
 sr_missing = [
     "maps/levels/c10_samus/s901_alpha/s901_alpha.bmsld",
@@ -103,27 +103,24 @@ def test_remove_actor_from_all_groups(surface_bmsld: Bmsld):
 
 
 def test_get_layer(surface_bmsld: Bmsld):
-    layer = surface_bmsld.get_layer(17)
+    layer = surface_bmsld.get_layer(ActorLayer.HIDDEN_POWERUP)
     assert len(layer) == 1
-
-    with pytest.raises(KeyError, match="Invalid layer: 18! Layer indices range from 0-17!"):
-        surface_bmsld.get_layer(18)
 
 
 def test_get_actor(surface_bmsld: Bmsld):
-    actor = surface_bmsld.get_actor(9, "LE_Item_001")
+    actor = surface_bmsld.get_actor(ActorLayer.PASSIVE, "LE_Item_001")
     assert actor is not None
     actor["type"] = "powerup_plasmabeam"
     actor["position"][0] = -6000.0
-    assert surface_bmsld.get_layer(9)["LE_Item_001"]["type"] == "powerup_plasmabeam"
-    assert surface_bmsld.get_layer(9)["LE_Item_001"]["position"][0] == -6000.0
+    assert surface_bmsld.get_layer(ActorLayer.PASSIVE)["LE_Item_001"]["type"] == "powerup_plasmabeam"
+    assert surface_bmsld.get_layer(ActorLayer.PASSIVE)["LE_Item_001"]["position"][0] == -6000.0
 
-    with pytest.raises(KeyError, match="No actor named 'FakeActor' found in Layer 9!"):
-        surface_bmsld.get_actor(9, "FakeActor")
+    with pytest.raises(KeyError, match="No actor named 'FakeActor' found in 'ActorLayer.Passive!'"):
+        surface_bmsld.get_actor(ActorLayer.PASSIVE, "FakeActor")
 
 
 def test_copy_actor(surface_bmsld: Bmsld):
-    actor = surface_bmsld.get_actor(9, "LE_Item_001")
+    actor = surface_bmsld.get_actor(ActorLayer.PASSIVE, "LE_Item_001")
     surface_bmsld.copy_actor([1000.0, 340.0, 0.0], actor, "CopiedActor", 9)
     surface_bmsld.add_actor_to_entity_groups("collision_camera_000", "CopiedActor")
     assert surface_bmsld.is_actor_in_group("eg_SubArea_collision_camera_000", "CopiedActor") is True
@@ -131,7 +128,7 @@ def test_copy_actor(surface_bmsld: Bmsld):
 
 def test_remove_actor(surface_bmsld: Bmsld):
     actor = "SP_Moheekwall_B_006"
-    surface_bmsld.remove_actor(4, actor)
+    surface_bmsld.remove_actor(ActorLayer.SPAWNPOINT, actor)
     assert surface_bmsld.is_actor_in_group("eg_SubArea_collision_camera_000", actor) is False
 
     with pytest.raises(KeyError):
