@@ -66,6 +66,7 @@ ExtraActors = Struct(
     "actors" / make_vector(Struct("name" / StrId)),
 )
 
+
 class ActorLayer(IntEnum):
     TRIGGER = 0
     ENV_TRIGGER = 2
@@ -77,6 +78,7 @@ class ActorLayer(IntEnum):
     DOOR = 15
     CHOZO_SEAL = 16
     HIDDEN_POWERUP = 17
+
 
 BMSLD = Struct(
     "_magic" / Const(b"MSLD"),
@@ -228,7 +230,12 @@ class Bmsld(BaseResource):
         self.remove_actor_from_all_groups(actor_name)
 
     def copy_actor(
-        self, coords: list[float], template_actor: Container, new_name: str, layer: ActorLayer, offset: tuple = (0, 0, 0)
+        self,
+        coords: list[float],
+        template_actor: Container,
+        new_name: str,
+        layer: ActorLayer,
+        offset: tuple = (0, 0, 0),
     ) -> Container:
         """Copies an actor to a new position"""
         new_actor = copy.deepcopy(template_actor)
