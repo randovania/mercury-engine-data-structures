@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import logging
+from enum import IntEnum
 from typing import TYPE_CHECKING
 
 import construct
@@ -65,6 +66,18 @@ ExtraActors = Struct(
     "actors" / make_vector(Struct("name" / StrId)),
 )
 
+class ActorLayer(IntEnum):
+    TRIGGER = 0
+    ENV_TRIGGER = 2
+    SPAWNGROUP = 3
+    SPAWNPOINT = 4
+    STARTPOINT = 5
+    PASSIVE = 9
+    PLATFORM = 10
+    DOOR = 15
+    CHOZO_SEAL = 16
+    HIDDEN_POWERUP = 17
+
 BMSLD = Struct(
     "_magic" / Const(b"MSLD"),
     "version" / VersionAdapter("1.20.0"),
@@ -105,7 +118,7 @@ BMSLD = Struct(
             "unk14" / Hex(Int32ul),
         )
     ),
-    "actors" / make_dict(ProperActor)[18],
+    "actor_layers" / make_dict(ProperActor)[18],
     "sub_areas"
     / make_vector(
         Struct(
@@ -124,7 +137,7 @@ class Bmsld(BaseResource):
         return BMSLD
 
     def all_actors(self) -> Iterator[tuple[int, str, construct.Container]]:
-        for layer in self.raw.actors:
+        for layer in self.raw.actor_layers:
             for actor_name, actor in layer.items():
                 yield layer, actor_name, actor
 
@@ -195,33 +208,31 @@ class Bmsld(BaseResource):
         sub_area.objects.append(name_to_add)
         sub_area.objects.sort(key=crc32)
 
-    def get_layer(self, layer_index: int) -> Container:
-        """Returns a layer of actors given an index"""
-        if layer_index < 0 or layer_index > 17:
-            raise KeyError(f"Invalid layer: {layer_index}! Layer indices range from 0-17!")
-        return self.raw.actors[layer_index]
+    def get_layer(self, layer: ActorLayer) -> Container:
+        """Returns a layer of actors using an enum"""
+        return self.raw.actor_layers[layer]
 
-    def _check_if_actor_exists(self, layer_index: int, actor_name: str) -> None:
-        if actor_name not in self.get_layer(layer_index):
-            raise KeyError(f"No actor named '{actor_name}' found in Layer {layer_index}!")
+    def _check_if_actor_exists(self, layer: ActorLayer, actor_name: str) -> None:
+        if actor_name not in self.get_layer(layer):
+            raise KeyError(f"No actor named '{actor_name}' found in '{layer}!'")
 
-    def get_actor(self, layer_index: int, actor_name: str) -> Container:
-        """Returns an actor given a layer index and actor name"""
-        self._check_if_actor_exists(layer_index, actor_name)
-        return self.raw.actors[layer_index][actor_name]
+    def get_actor(self, layer: ActorLayer, actor_name: str) -> Container:
+        """Returns an actor given a layer using an enum and an actor name"""
+        self._check_if_actor_exists(layer, actor_name)
+        return self.raw.actor_layers[layer][actor_name]
 
-    def remove_actor(self, layer_index: int, actor_name: str) -> None:
-        """Deletes an actor given a layer index and actor name"""
-        self._check_if_actor_exists(layer_index, actor_name)
-        self.get_layer(layer_index).pop(actor_name)
+    def remove_actor(self, layer: ActorLayer, actor_name: str) -> None:
+        """Deletes an actor given a layer using an enum and an actor name"""
+        self._check_if_actor_exists(layer, actor_name)
+        self.get_layer(layer).pop(actor_name)
         self.remove_actor_from_all_groups(actor_name)
 
     def copy_actor(
-        self, coords: list[float], template_actor: Container, new_name: str, layer_index: int, offset: tuple = (0, 0, 0)
+        self, coords: list[float], template_actor: Container, new_name: str, layer: ActorLayer, offset: tuple = (0, 0, 0)
     ) -> Container:
         """Copies an actor to a new position"""
         new_actor = copy.deepcopy(template_actor)
-        self.raw.actors[layer_index][new_name] = new_actor
+        self.raw.actor_layers[layer][new_name] = new_actor
         for i in range(2):
             new_actor["position"][i] = coords[i] + offset[i]
 
