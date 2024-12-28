@@ -197,18 +197,24 @@ class Bmsld(BaseResource):
 
     def get_layer(self, layer_index: int) -> Container:
         """Returns a layer of actors given an index"""
+        if layer_index < 0 or layer_index > 17:
+            raise KeyError(f"Invalid layer: {layer_index}! Layer indices range from 0-17!")
         return self.raw.actors[layer_index]
 
-    def resolve_actor_reference(self, ref: dict) -> Container:
-        # FIXME: There is no "default" as layer in SR
-        layer = int(ref.get("layer", "default"))
-        return self.raw.actors[layer][ref["actor"]]
+    def _check_if_actor_exists(self, layer_index: int, actor_name: str) -> None:
+        if actor_name not in self.get_layer(layer_index):
+            raise KeyError(f"No actor named '{actor_name}' found in Layer {layer_index}!")
 
     def get_actor(self, layer_index: int, actor_name: str) -> Container:
         """Returns an actor given a layer index and actor name"""
-        if layer_index < 0 or layer_index > 17:
-            raise ValueError(f"Invalid layer: {layer_index}! Layer indices range from 0-17!")
+        self._check_if_actor_exists(layer_index, actor_name)
         return self.raw.actors[layer_index][actor_name]
+
+    def remove_actor(self, layer_index: int, actor_name: str) -> None:
+        """Deletes an actor given a layer index and actor name"""
+        self._check_if_actor_exists(layer_index, actor_name)
+        self.get_layer(layer_index).pop(actor_name)
+        self.remove_actor_from_all_groups(actor_name)
 
     def copy_actor(
         self, coords: list[float], template_actor: Container, new_name: str, layer_index: int, offset: tuple = (0, 0, 0)
@@ -220,17 +226,6 @@ class Bmsld(BaseResource):
             new_actor["position"][i] = coords[i] + offset[i]
 
         return new_actor
-
-    def remove_entity(self, reference: dict) -> None:
-        """Deletes an actor given a layer index and actor name"""
-        layer = reference["layer"]
-        actor_name = reference["actor"]
-
-        if actor_name not in self.get_layer(layer):
-            raise KeyError(f"Unable to remove entity '{actor_name}!' Entity does not exist!")
-
-        self.raw.actors[layer].pop(actor_name)
-        self.remove_actor_from_all_groups(actor_name)
 
     def get_logic_shape(self, logic_shape: str) -> Container:
         """Returns a logic shape by name"""

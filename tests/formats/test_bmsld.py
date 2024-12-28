@@ -106,16 +106,20 @@ def test_get_layer(surface_bmsld: Bmsld):
     layer = surface_bmsld.get_layer(17)
     assert len(layer) == 1
 
+    with pytest.raises(KeyError, match="Invalid layer: 18! Layer indices range from 0-17!"):
+        surface_bmsld.get_layer(18)
+
 
 def test_get_actor(surface_bmsld: Bmsld):
     actor = surface_bmsld.get_actor(9, "LE_Item_001")
+    assert actor is not None
     actor["type"] = "powerup_plasmabeam"
     actor["position"][0] = -6000.0
     assert surface_bmsld.get_layer(9)["LE_Item_001"]["type"] == "powerup_plasmabeam"
     assert surface_bmsld.get_layer(9)["LE_Item_001"]["position"][0] == -6000.0
 
-    with pytest.raises(ValueError, match="Invalid layer: 18! Layer indices range from 0-17!"):
-        surface_bmsld.get_actor(18, "FakeActor")
+    with pytest.raises(KeyError, match="No actor named 'FakeActor' found in Layer 9!"):
+        surface_bmsld.get_actor(9, "FakeActor")
 
 
 def test_copy_actor(surface_bmsld: Bmsld):
@@ -125,10 +129,10 @@ def test_copy_actor(surface_bmsld: Bmsld):
     assert surface_bmsld.is_actor_in_group("eg_SubArea_collision_camera_000", "CopiedActor") is True
 
 
-def test_remove_entity(surface_bmsld: Bmsld):
+def test_remove_actor(surface_bmsld: Bmsld):
     actor = "SP_Moheekwall_B_006"
-    surface_bmsld.remove_entity({"layer": 4, "actor": actor})
+    surface_bmsld.remove_actor(4, actor)
     assert surface_bmsld.is_actor_in_group("eg_SubArea_collision_camera_000", actor) is False
 
-    with pytest.raises(KeyError, match="Unable to remove entity 'Kraid!' Entity does not exist!"):
-        surface_bmsld.remove_entity({"layer": 4, "actor": "Kraid"})
+    with pytest.raises(KeyError):
+        surface_bmsld.remove_actor(4, "SP_Kraid")
