@@ -4,7 +4,7 @@ import pytest
 from tests.test_lib import parse_build_compare_editor
 
 from mercury_engine_data_structures import samus_returns_data
-from mercury_engine_data_structures.formats.bmsld import Bmsld
+from mercury_engine_data_structures.formats.bmsld import ActorLayer, Bmsld
 
 sr_missing = [
     "maps/levels/c10_samus/s901_alpha/s901_alpha.bmsld",
@@ -100,3 +100,39 @@ def test_remove_actor_from_all_groups(surface_bmsld: Bmsld):
     surface_bmsld.remove_actor_from_all_groups("Moheek_026")
     groups = surface_bmsld.all_actor_group_names_for_actor("Moheek_026")
     assert len(groups) == 0
+
+
+def test_get_layer(surface_bmsld: Bmsld):
+    layer = surface_bmsld._get_layer(ActorLayer.HIDDEN_POWERUP)
+    assert len(layer) == 1
+
+
+def test_get_actor(surface_bmsld: Bmsld):
+    layer = ActorLayer.PASSIVE
+    actor = surface_bmsld.get_actor(layer, "LE_Item_001")
+    assert actor is not None
+
+    actor["type"] = "powerup_plasmabeam"
+    actor["position"][0] = -6000.0
+    actor_by_layer = surface_bmsld._get_layer(layer)["LE_Item_001"]
+    assert actor_by_layer["type"] == "powerup_plasmabeam"
+    assert actor_by_layer["position"][0] == -6000.0
+
+    with pytest.raises(KeyError):
+        surface_bmsld.get_actor(layer, "FakeActor")
+
+
+def test_copy_actor(surface_bmsld: Bmsld):
+    actor = surface_bmsld.get_actor(ActorLayer.PASSIVE, "LE_Item_001")
+    surface_bmsld.copy_actor([1000.0, 340.0, 0.0], actor, "CopiedActor", ActorLayer.PASSIVE)
+    surface_bmsld.add_actor_to_entity_groups("collision_camera_000", "CopiedActor")
+    assert surface_bmsld.is_actor_in_group("eg_SubArea_collision_camera_000", "CopiedActor") is True
+
+
+def test_remove_actor(surface_bmsld: Bmsld):
+    actor = "SP_Moheekwall_B_006"
+    surface_bmsld.remove_actor(ActorLayer.SPAWNPOINT, actor)
+    assert surface_bmsld.is_actor_in_group("eg_SubArea_collision_camera_000", actor) is False
+
+    with pytest.raises(KeyError):
+        surface_bmsld.remove_actor(ActorLayer.SPAWNPOINT, "SP_Kraid")
