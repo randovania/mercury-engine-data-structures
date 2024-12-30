@@ -13,6 +13,7 @@ from mercury_engine_data_structures.construct_extensions.strings import (
     StaticPaddedString,
 )
 
+
 class Vec2:
     raw: list[float]
 
