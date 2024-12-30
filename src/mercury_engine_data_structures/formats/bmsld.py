@@ -6,7 +6,7 @@ from enum import IntEnum
 from typing import TYPE_CHECKING
 
 import construct
-from construct import Const, Construct, Container, Flag, Hex, Int32ul, Struct, Switch
+from construct import Const, Construct, Container, Flag, Hex, Int32ul, ListContainer, Struct, Switch
 
 from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import (
@@ -183,15 +183,23 @@ class BmsldActor:
 
 ArgumentType = int | float | str | bool
 
+ARGUMENT_TYPES = {
+    "s": str,
+    "f": float,
+    "b": bool,
+    "i": int,
+}
 
 class ComponentFunction:
     def __init__(self, raw: Container) -> None:
         self._raw = raw
 
     def set_argument(self, argument_idx: int, value: ArgumentType) -> None:
-        if not isinstance(value, ArgumentType):
-            raise TypeError(f"Invalid type {type(value)} for field {value}")
-        self._raw.arguments[argument_idx].value = value
+        argument = self._raw.arguments[argument_idx]
+        expected_type = ARGUMENT_TYPES[argument.type]
+        if not isinstance(value, expected_type):
+            raise TypeError(f"Invalid argument type: expected {expected_type}, got {type(value)} ({value})")
+        argument.value = value
 
 
 class Bmsld(BaseResource):
@@ -271,12 +279,12 @@ class Bmsld(BaseResource):
         sub_area.objects.append(name_to_add)
         sub_area.objects.sort(key=crc32)
 
-    def get_layer(self, layer: ActorLayer) -> Container:
+    def _get_layer(self, layer: ActorLayer) -> ListContainer:
         """Returns a layer of actors"""
         return self.raw.actor_layers[layer]
 
     def _check_if_actor_exists(self, layer: ActorLayer, actor_name: str) -> None:
-        if actor_name not in self.get_layer(layer):
+        if actor_name not in self._get_layer(layer):
             raise KeyError(f"No actor named '{actor_name}' found in '{layer}!'")
 
     def get_actor(self, layer: ActorLayer, actor_name: str) -> BmsldActor:
@@ -287,7 +295,7 @@ class Bmsld(BaseResource):
     def remove_actor(self, layer: ActorLayer, actor_name: str) -> None:
         """Deletes an actor given a layer and an actor name"""
         self._check_if_actor_exists(layer, actor_name)
-        self.get_layer(layer).pop(actor_name)
+        self._get_layer(layer).pop(actor_name)
         self.remove_actor_from_all_groups(actor_name)
 
     def copy_actor(
@@ -297,7 +305,7 @@ class Bmsld(BaseResource):
         new_name: str,
         layer: ActorLayer,
         offset: tuple = (0, 0, 0),
-    ) -> Container:
+    ) -> BmsldActor:
         """
         Copies an actor to a new position
 
@@ -309,7 +317,7 @@ class Bmsld(BaseResource):
 
         """
         new_actor = BmsldActor(copy.deepcopy(template_actor))
-        self.raw.actor_layers[layer][new_name] = new_actor
+        self.raw.actor_layers[layer][new_name] = new_actor._raw
         new_actor.position = Vec3([p + o for p, o in zip(position, offset)])
 
         return new_actor

@@ -103,7 +103,7 @@ def test_remove_actor_from_all_groups(surface_bmsld: Bmsld):
 
 
 def test_get_layer(surface_bmsld: Bmsld):
-    layer = surface_bmsld.get_layer(ActorLayer.HIDDEN_POWERUP)
+    layer = surface_bmsld._get_layer(ActorLayer.HIDDEN_POWERUP)
     assert len(layer) == 1
 
 
@@ -114,7 +114,7 @@ def test_get_actor(surface_bmsld: Bmsld):
 
     actor["type"] = "powerup_plasmabeam"
     actor["position"][0] = -6000.0
-    actor_by_layer = surface_bmsld.get_layer(layer)["LE_Item_001"]
+    actor_by_layer = surface_bmsld._get_layer(layer)["LE_Item_001"]
     assert actor_by_layer["type"] == "powerup_plasmabeam"
     assert actor_by_layer["position"][0] == -6000.0
 
