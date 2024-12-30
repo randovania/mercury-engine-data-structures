@@ -9,7 +9,7 @@ import construct
 from construct import Const, Construct, Container, Flag, Hex, Int32ul, ListContainer, Struct, Switch
 
 from mercury_engine_data_structures.base_resource import BaseResource
-from mercury_engine_data_structures.common_types import CVector3D, Float, StrId, VersionAdapter, make_dict, make_vector
+from mercury_engine_data_structures.common_types import CVector3D, Float, StrId, VersionAdapter, Vec3, make_dict, make_vector
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.construct_extensions.strings import StaticPaddedString
 from mercury_engine_data_structures.crc import crc32
@@ -41,7 +41,7 @@ ProperActor = Struct(
     "type" / StrId,
     "position" / CVector3D,
     "rotation" / CVector3D,
-    "components"
+    "component_functions"
     / make_vector(
         Struct(
             "component_type" / StrId,
@@ -142,34 +142,6 @@ class ActorLayer(IntEnum):
 
 
 class Vec3:
-    def __init__(self, raw: ListContainer) -> None:
-        self.raw = raw
-
-    @property
-    def x(self) -> float:
-        return self.raw[0]
-
-    @x.setter
-    def x(self, value: float) -> None:
-        self.raw[0] = value
-
-    @property
-    def y(self) -> float:
-        return self.raw[1]
-
-    @y.setter
-    def y(self, value: float) -> None:
-        self.raw[1] = value
-
-    @property
-    def z(self) -> float:
-        return self.raw[2]
-
-    @z.setter
-    def z(self, value: float) -> None:
-        self.raw[2] = value
-
-
 class BmsldActor:
     def __init__(self, raw: Container) -> None:
         self._raw = raw
@@ -201,12 +173,15 @@ class BmsldActor:
     def get_component(self, component_idx: int = 0) -> Container:
         return ComponentFunction(self._raw.components[component_idx])
 
+ArgumentType = int | float | str | bool
 
 class ComponentFunction:
     def __init__(self, raw: Container) -> None:
         self._raw = raw
 
-    def set_argument(self, argument_idx: int, value: int | float | str | bool) -> None:
+    def set_argument(self, argument_idx: int, value: ArgumentType) -> None:
+        if not isinstance(value, ArgumentType):
+            raise TypeError(f"Invalid type {type(value)} for field {value}")
         self._raw.arguments[argument_idx].value = value
 
 
@@ -295,7 +270,7 @@ class Bmsld(BaseResource):
         if actor_name not in self.get_layer(layer):
             raise KeyError(f"No actor named '{actor_name}' found in '{layer}!'")
 
-    def get_actor(self, layer: ActorLayer, actor_name: str) -> Container:
+    def get_actor(self, layer: ActorLayer, actor_name: str) -> BmsldActor:
         """Returns an actor given a layer and an actor name"""
         self._check_if_actor_exists(layer, actor_name)
         return BmsldActor(self.raw.actor_layers[layer][actor_name])
@@ -308,8 +283,8 @@ class Bmsld(BaseResource):
 
     def copy_actor(
         self,
-        coords: list[float],
-        template_actor: Container,
+        position: list[float],
+        template_actor: BmsldActor,
         new_name: str,
         layer: ActorLayer,
         offset: tuple = (0, 0, 0),
@@ -317,17 +292,16 @@ class Bmsld(BaseResource):
         """
         Copies an actor to a new position
 
-        param coords: the x, y, z position for the copied actor
+        param position: the x, y, z position for the copied actor
         param template_actor: the actor being copied
         param new_name: the name for the copied actor
         param layer: the layer the copied actor will be added to
         param offset: adds an additional offset the copied actor's coordinates
 
         """
-        new_actor = copy.deepcopy(template_actor)
+        new_actor = BmsldActor(copy.deepcopy(template_actor))
         self.raw.actor_layers[layer][new_name] = new_actor
-        for i in range(2):
-            new_actor["position"][i] = coords[i] + offset[i]
+        new_actor.position = Vec3([p + o for p, o in zip(position, offset)])
 
         return new_actor
 
