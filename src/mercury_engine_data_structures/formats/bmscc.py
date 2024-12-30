@@ -6,10 +6,7 @@ import construct
 from construct.core import (
     Const,
     Construct,
-    Int8ul,
-    Int16ul,
     Struct,
-    Switch,
 )
 
 from mercury_engine_data_structures import game_check
@@ -19,34 +16,14 @@ from mercury_engine_data_structures.common_types import (
     VersionAdapter,
     make_vector,
 )
-from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
-from mercury_engine_data_structures.formats.collision import CollisionEntry, collision_formats
+from mercury_engine_data_structures.formats.collision import CollisionEntry, CollisionEntryConstruct
 
 if TYPE_CHECKING:
     from mercury_engine_data_structures.game_check import Game
 
-CollisionEntryData = Struct(
-    "name" / StrId,
-    "prop1" / StrId,
-    "prop2" / StrId,
-    "prop3" / StrId,
-    "flag"
-    / game_check.is_sr_or_else(
-        Int8ul,
-        Int16ul,
-    ),
-    "type" / StrId,
-    "data"
-    / Switch(
-        construct.this.type,
-        collision_formats,
-        ErrorWithMessage(lambda ctx: f"Type {ctx.type} not known, valid types are {list(collision_formats.keys())}."),
-    ),
-)
-
 CollisionLayer = Struct(
     "name" / StrId,
-    "entries" / make_vector(CollisionEntryData),
+    "entries" / make_vector(CollisionEntryConstruct),
 )
 
 PartsComponent = Struct(

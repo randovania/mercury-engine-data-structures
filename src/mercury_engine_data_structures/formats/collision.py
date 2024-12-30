@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 import construct
-from construct import Array, Container, Flag, Hex, Int16ul, Rebuild, Struct
+from construct import Array, Container, Flag, Hex, Int8ul, Int16ul, Rebuild, Struct, Switch
 
 from mercury_engine_data_structures import game_check
 from mercury_engine_data_structures.common_types import (
     CVector2D,
     CVector3D,
     Float,
+    StrId,
     UInt,
     make_vector,
 )
-from mercury_engine_data_structures.construct_extensions.misc import OptionalValue
+from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, OptionalValue
 from mercury_engine_data_structures.game_check import Game
 
 CollisionPoint = Struct(
@@ -69,6 +70,25 @@ collision_formats = {
         "binary_search_trees" / OptionalValue(make_vector(BinarySearchTree)),
     ),
 }
+
+CollisionEntryConstruct = Struct(
+    "name" / StrId,
+    "prop1" / StrId,
+    "prop2" / StrId,
+    "prop3" / StrId,
+    "flag"
+    / game_check.is_sr_or_else(
+        Int8ul,
+        Int16ul,
+    ),
+    "type" / StrId,
+    "data"
+    / Switch(
+        construct.this.type,
+        collision_formats,
+        ErrorWithMessage(lambda ctx: f"Type {ctx.type} not known, valid types are {list(collision_formats.keys())}."),
+    ),
+)
 
 
 class CollisionEntry:
