@@ -110,3 +110,11 @@ def test_cvector4d_vector(compiled: bool) -> None:
         common_types.make_vector(common_types.CVector4D),
         compiled,
     )
+
+
+def test_vec_getters():
+    v = common_types.Vec4(1, 2, 50, 23)
+    assert v.x == v.r == 1
+    assert v.y == v.g == 2
+    assert v.z == v.b == 50
+    assert v.w == v.a == 23
