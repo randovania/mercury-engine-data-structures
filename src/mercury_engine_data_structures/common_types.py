@@ -6,7 +6,7 @@ import struct
 import typing
 
 import construct
-from construct import Adapter
+from construct import Adapter, ListContainer
 
 from mercury_engine_data_structures.construct_extensions.strings import (
     CStringRobust,
@@ -520,3 +520,31 @@ def make_enum(values: list[str] | dict[str, int], *, add_invalid: bool = True):
     if add_invalid:
         mapping["Invalid"] = 0x7FFFFFFF
     return construct.Enum(construct.Int32ul, **mapping)
+
+class Vec3:
+    def __init__(self, raw: ListContainer) -> None:
+        self.raw = raw
+
+    @property
+    def x(self) -> float:
+        return self.raw[0]
+
+    @x.setter
+    def x(self, value: float) -> None:
+        self.raw[0] = value
+
+    @property
+    def y(self) -> float:
+        return self.raw[1]
+
+    @y.setter
+    def y(self, value: float) -> None:
+        self.raw[1] = value
+
+    @property
+    def z(self) -> float:
+        return self.raw[2]
+
+    @z.setter
+    def z(self, value: float) -> None:
+        self.raw[2] = value
