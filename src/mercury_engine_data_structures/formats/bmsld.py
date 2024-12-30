@@ -190,6 +190,7 @@ ARGUMENT_TYPES = {
     "i": int,
 }
 
+
 class ComponentFunction:
     def __init__(self, raw: Container) -> None:
         self._raw = raw
