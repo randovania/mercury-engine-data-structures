@@ -148,6 +148,7 @@ class Vec3:
     @property
     def x(self) -> float:
         return self.raw[0]
+
     @x.setter
     def x(self, value: float) -> None:
         self.raw[0] = value
@@ -155,6 +156,7 @@ class Vec3:
     @property
     def y(self) -> float:
         return self.raw[1]
+
     @y.setter
     def y(self, value: float) -> None:
         self.raw[1] = value
@@ -162,6 +164,7 @@ class Vec3:
     @property
     def z(self) -> float:
         return self.raw[2]
+
     @z.setter
     def z(self, value: float) -> None:
         self.raw[2] = value
@@ -174,6 +177,7 @@ class BmsldActor:
     @property
     def actor_type(self) -> str:
         return self._raw.type
+
     @actor_type.setter
     def actor_type(self, value: str) -> None:
         self._raw.type = value
@@ -181,6 +185,7 @@ class BmsldActor:
     @property
     def position(self) -> Vec3:
         return Vec3(self._raw.position)
+
     @position.setter
     def position(self, value: Vec3) -> None:
         self._raw.position = value.raw
@@ -188,6 +193,7 @@ class BmsldActor:
     @property
     def rotation(self) -> Vec3:
         return Vec3(self._raw.rotation)
+
     @rotation.setter
     def rotation(self, value: Vec3) -> None:
         self._raw.rotation = value.raw
