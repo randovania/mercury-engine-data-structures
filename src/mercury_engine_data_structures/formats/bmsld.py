@@ -177,8 +177,8 @@ class BmsldActor:
     def rotation(self, value: Vec3) -> None:
         self._raw.rotation = value.raw
 
-    def get_component(self, component_idx: int = 0) -> Container:
-        return ComponentFunction(self._raw.components[component_idx])
+    def get_component_function(self, component_idx: int = 0) -> Container:
+        return ComponentFunction(self._raw.component_functions[component_idx])
 
 
 ArgumentType = int | float | str | bool
