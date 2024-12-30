@@ -9,7 +9,15 @@ import construct
 from construct import Const, Construct, Container, Flag, Hex, Int32ul, Struct, Switch
 
 from mercury_engine_data_structures.base_resource import BaseResource
-from mercury_engine_data_structures.common_types import CVector3D, Float, StrId, VersionAdapter, Vec3, make_dict, make_vector
+from mercury_engine_data_structures.common_types import (
+    CVector3D,
+    Float,
+    StrId,
+    Vec3,
+    VersionAdapter,
+    make_dict,
+    make_vector,
+)
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.construct_extensions.strings import StaticPaddedString
 from mercury_engine_data_structures.crc import crc32
@@ -172,7 +180,9 @@ class BmsldActor:
     def get_component(self, component_idx: int = 0) -> Container:
         return ComponentFunction(self._raw.components[component_idx])
 
+
 ArgumentType = int | float | str | bool
+
 
 class ComponentFunction:
     def __init__(self, raw: Container) -> None:
