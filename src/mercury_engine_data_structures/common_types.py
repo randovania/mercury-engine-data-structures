@@ -521,6 +521,7 @@ def make_enum(values: list[str] | dict[str, int], *, add_invalid: bool = True):
         mapping["Invalid"] = 0x7FFFFFFF
     return construct.Enum(construct.Int32ul, **mapping)
 
+
 class Vec3:
     def __init__(self, raw: ListContainer) -> None:
         self.raw = raw
