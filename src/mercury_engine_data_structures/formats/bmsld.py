@@ -6,7 +6,7 @@ from enum import IntEnum
 from typing import TYPE_CHECKING
 
 import construct
-from construct import Const, Construct, Container, Flag, Hex, Int32ul, Struct, Switch
+from construct import Const, Construct, Container, Flag, Hex, Int32ul, ListContainer, Struct, Switch
 
 from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import CVector3D, Float, StrId, VersionAdapter, make_dict, make_vector
@@ -65,19 +65,6 @@ ExtraActors = Struct(
     "group" / StrId,
     "actors" / make_vector(Struct("name" / StrId)),
 )
-
-
-class ActorLayer(IntEnum):
-    TRIGGER = 0
-    ENV_TRIGGER = 2
-    SPAWNGROUP = 3
-    SPAWNPOINT = 4
-    STARTPOINT = 5
-    PASSIVE = 9
-    PLATFORM = 10
-    DOOR = 15
-    CHOZO_SEAL = 16
-    HIDDEN_POWERUP = 17
 
 
 BMSLD = Struct(
@@ -139,6 +126,82 @@ BMSLD = Struct(
     "extra_data" / construct.Optional(make_vector(ExtraActors)),
     construct.Terminated,
 ).compile()
+
+
+class ActorLayer(IntEnum):
+    TRIGGER = 0
+    ENV_TRIGGER = 2
+    SPAWNGROUP = 3
+    SPAWNPOINT = 4
+    STARTPOINT = 5
+    PASSIVE = 9
+    PLATFORM = 10
+    DOOR = 15
+    CHOZO_SEAL = 16
+    HIDDEN_POWERUP = 17
+
+
+class Vec3:
+    def __init__(self, raw: ListContainer) -> None:
+        self.raw = raw
+
+    @property
+    def x(self) -> float:
+        return self.raw[0]
+    @x.setter
+    def x(self, value: float) -> None:
+        self.raw[0] = value
+
+    @property
+    def y(self) -> float:
+        return self.raw[1]
+    @y.setter
+    def y(self, value: float) -> None:
+        self.raw[1] = value
+
+    @property
+    def z(self) -> float:
+        return self.raw[2]
+    @z.setter
+    def z(self, value: float) -> None:
+        self.raw[2] = value
+
+
+class BmsldActor:
+    def __init__(self, raw: Container) -> None:
+        self._raw = raw
+
+    @property
+    def actor_type(self) -> str:
+        return self._raw.type
+    @actor_type.setter
+    def actor_type(self, value: str) -> None:
+        self._raw.type = value
+
+    @property
+    def position(self) -> Vec3:
+        return Vec3(self._raw.position)
+    @position.setter
+    def position(self, value: Vec3) -> None:
+        self._raw.position = value.raw
+
+    @property
+    def rotation(self) -> Vec3:
+        return Vec3(self._raw.rotation)
+    @rotation.setter
+    def rotation(self, value: Vec3) -> None:
+        self._raw.rotation = value.raw
+
+    def get_component(self, component_idx: int = 0) -> Container:
+        return ComponentFunction(self._raw.components[component_idx])
+
+
+class ComponentFunction:
+    def __init__(self, raw: Container) -> None:
+        self._raw = raw
+
+    def set_argument(self, argument_idx: int, value: int | float | str | bool) -> None:
+        self._raw.arguments[argument_idx].value = value
 
 
 class Bmsld(BaseResource):
@@ -229,7 +292,7 @@ class Bmsld(BaseResource):
     def get_actor(self, layer: ActorLayer, actor_name: str) -> Container:
         """Returns an actor given a layer and an actor name"""
         self._check_if_actor_exists(layer, actor_name)
-        return self.raw.actor_layers[layer][actor_name]
+        return BmsldActor(self.raw.actor_layers[layer][actor_name])
 
     def remove_actor(self, layer: ActorLayer, actor_name: str) -> None:
         """Deletes an actor given a layer and an actor name"""
@@ -265,21 +328,3 @@ class Bmsld(BaseResource):
     def get_logic_shape(self, logic_shape: str) -> Container:
         """Returns a logic shape by name"""
         return self.raw["logic_shapes"][logic_shape]
-
-    ArgumentValue = int | float | str | bool
-
-    def set_argument(
-        self, layer: ActorLayer, actor_name: str, component_idx: int, argument_idx: int, value: ArgumentValue
-    ) -> None:
-        """
-        Modify the value of an argument for an actor's component field
-
-        param layer: the layer the actor exists in
-        param actor_name: the actor to be modified
-        param component_idx: the index for the list of components of the actor
-        param argument_idx: the index of argument for the the component
-        param value: the value of the specified argument. can be an integer, float, string, or bool
-
-        """
-        actor = self.get_actor(layer, actor_name)
-        actor["components"][component_idx]["arguments"][argument_idx]["value"] = value
