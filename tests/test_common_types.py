@@ -142,6 +142,15 @@ def test_vec_setters():
     assert v == [0.1, 0.2, 0.3, 0.4]
 
 
+def test_vec_setitem_getitem():
+    v = common_types.Vec4(0, 0, 0, 0)
+
+    v[0:4] = [1, 2, 3, 4]
+
+    assert v[0] == 1
+    assert v == [1, 2, 3, 4]
+
+
 def test_vec_repr():
     v = common_types.Vec4(2, 4, 0, 3)
 
