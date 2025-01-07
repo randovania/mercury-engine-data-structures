@@ -69,10 +69,6 @@ CollisionObject = Struct(
     ),
 )
 
-ExtraActors = Struct(
-    "actors" / make_vector(Struct("name" / StrId)),
-)
-
 
 BMSLD = Struct(
     "_magic" / Const(b"MSLD"),
@@ -124,7 +120,7 @@ BMSLD = Struct(
     # collision_cameras and groups
     "sub_areas" / make_dict(make_vector(StrId)),
     # only used in s000_mainmenu, s010_cockpit, s020_credits
-    "extra_data" / construct.Optional(make_dict(ExtraActors)),
+    "extra_data" / construct.Optional(make_dict(make_vector(StrId))),
     construct.Terminated,
 ).compile()
 
