@@ -18,7 +18,7 @@ from construct.core import (
 )
 
 from mercury_engine_data_structures.base_resource import BaseResource
-from mercury_engine_data_structures.common_types import CVector3D, StrId, VersionAdapter, make_vector
+from mercury_engine_data_structures.common_types import CVector3D, StrId, Vec3, VersionAdapter, make_dict, make_vector
 
 if TYPE_CHECKING:
     from mercury_engine_data_structures.game_check import Game
@@ -55,10 +55,7 @@ BMSBK = Struct(
     "magic" / Const(b"MSBK"),
     "version" / VersionAdapter("1.10.0"),
     "block_groups" / make_vector(BlockGroup),
-    "collision_cameras" / make_vector(Struct(
-        "name" / StrId,
-        "entries" / make_vector(Int32ul),
-    )),
+    "collision_cameras" / make_dict(make_vector(Int32ul)),
     construct.Terminated,
 )  # fmt: skip
 
@@ -74,27 +71,66 @@ class BlockType(Enum):
     WEIGHT = "weight"
 
 
+class BlockData:
+    def __init__(self, raw: Container) -> None:
+        self._raw = raw
+
+    @property
+    def position(self) -> Vec3:
+        return self._raw.position
+
+    @position.setter
+    def position(self, value: Vec3) -> None:
+        self._raw.position = value
+
+    @property
+    def respawn_time(self) -> float:
+        return self._raw.respawn_time
+
+    @respawn_time.setter
+    def respawn_time(self, value: float) -> None:
+        self._raw.respawn_time = value
+
+    @property
+    def model_name(self) -> str:
+        return self._raw.model_name
+
+    @model_name.setter
+    def model_name(self, value: str) -> None:
+        self._raw.model_name = value
+
+    @property
+    def vignette_name(self) -> str:
+        return self._raw.vignette_name
+
+    @vignette_name.setter
+    def vignette_name(self, value: str) -> None:
+        self._raw.vignette_name = value
+
+
+class BlockGroupData:
+    def __init__(self, raw: Container):
+        self._raw = raw
+
+    @property
+    def block_type(self) -> BlockType:
+        return self._raw.types[0].block_type
+
+    @block_type.setter
+    def block_type(self, block_type: BlockType) -> None:
+        self._raw.types[0].block_type = block_type
+
+    def get_block(self, block_idx: int) -> BlockData:
+        return BlockData(self._raw.types[0].blocks[block_idx])
+
+
 class Bmsbk(BaseResource):
     @classmethod
     @functools.lru_cache
     def construct_class(cls, target_game: Game) -> Construct:
         return BMSBK
 
-    def get_block_group(self, block_group: int) -> Container:
+    def get_block_group(self, block_group: int) -> BlockGroupData:
         """Returns a block group by index"""
-        return self.raw.block_groups[block_group]
-
-    def set_block_type(self, block_group: int, block_type: BlockType) -> None:
-        """Change a given block's block_type into another"""
-        assert len(self.get_block_group(block_group).types) == 1
-        self.get_block_group(block_group).types[0].block_type = block_type
-
-    def get_block(self, block_group: int, block_idx: int) -> Container:
-        """Returns a block from a block group by index"""
-        assert len(self.get_block_group(block_group).types) == 1
-        return self.get_block_group(block_group).types[0].blocks[block_idx]
-
-    def set_respawn_time(self, block_group: int, block_idx: int, respawn_time: float) -> None:
-        """Change the respawn time of a given block"""
-        block = self.get_block(block_group, block_idx)
-        block.respawn_time = respawn_time
+        assert len(self.raw.block_groups[block_group].types) == 1
+        return BlockGroupData(self.raw.block_groups[block_group])

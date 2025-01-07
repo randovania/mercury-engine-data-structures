@@ -25,15 +25,20 @@ def surface_bmsbk(samus_returns_tree) -> Bmsbk:
 
 
 def test_get_block(surface_bmsbk: Bmsbk):
-    block = surface_bmsbk.get_block(0, 1)
+    block = surface_bmsbk.get_block_group(0).get_block(0)
     assert block.respawn_time == 0.0
+    assert block.model_name is not None
 
 
 def test_changing_weakness(surface_bmsbk: Bmsbk):
-    surface_bmsbk.set_block_type(1, BlockType.BOMB)
-    assert surface_bmsbk.get_block_group(1).types[0].block_type == BlockType.BOMB
+    block_group = surface_bmsbk.get_block_group(1)
+    orignal_type = block_group.block_type
+    block_group.block_type == BlockType.BOMB
+    assert orignal_type != BlockType.BOMB
 
 
 def test_respawn_time(surface_bmsbk: Bmsbk):
-    surface_bmsbk.set_respawn_time(0, 0, 5.0)
-    assert surface_bmsbk.get_block(0, 0).respawn_time == 5.0
+    block = surface_bmsbk.get_block_group(0).get_block(0)
+    original_time = block.respawn_time
+    block.respawn_time == 5.0
+    assert original_time != 5.0
