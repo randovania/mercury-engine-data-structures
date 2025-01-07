@@ -6,7 +6,7 @@ from enum import IntEnum
 from typing import TYPE_CHECKING
 
 import construct
-from construct import Const, Construct, Container, Flag, Hex, Int32ul, ListContainer, Struct, Switch
+from construct import Const, Construct, Container, Flag, Hex, Int32ul, ListContainer, Sequence, Struct, Switch
 
 from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import (
@@ -21,7 +21,7 @@ from mercury_engine_data_structures.common_types import (
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.construct_extensions.strings import StaticPaddedString
 from mercury_engine_data_structures.crc import crc32
-from mercury_engine_data_structures.formats.collision import collision_formats
+from mercury_engine_data_structures.formats.collision import CollisionEntry, collision_formats
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -70,7 +70,6 @@ CollisionObject = Struct(
 )
 
 ExtraActors = Struct(
-    "group" / StrId,
     "actors" / make_vector(Struct("name" / StrId)),
 )
 
@@ -123,15 +122,9 @@ BMSLD = Struct(
     # layers for actors
     "actor_layers" / make_dict(ProperActor)[18],
     # collision_cameras and groups
-    "sub_areas"
-    / make_vector(
-        Struct(
-            "name" / StrId,
-            "objects" / make_vector(StrId),
-        )
-    ),
+    "sub_areas" / make_dict(make_vector(StrId)),
     # only used in s000_mainmenu, s010_cockpit, s020_credits
-    "extra_data" / construct.Optional(make_vector(ExtraActors)),
+    "extra_data" / construct.Optional(make_dict(ExtraActors)),
     construct.Terminated,
 ).compile()
 
@@ -163,21 +156,21 @@ class BmsldActor:
 
     @property
     def position(self) -> Vec3:
-        return Vec3(self._raw.position)
+        return self._raw.position
 
     @position.setter
     def position(self, value: Vec3) -> None:
-        self._raw.position = value.raw
+        self._raw.position = value
 
     @property
     def rotation(self) -> Vec3:
-        return Vec3(self._raw.rotation)
+        return self._raw.rotation
 
     @rotation.setter
     def rotation(self, value: Vec3) -> None:
-        self._raw.rotation = value.raw
+        self._raw.rotation = value
 
-    def get_component_function(self, component_idx: int = 0) -> Container:
+    def get_component_function(self, component_idx: int = 0) -> ComponentFunction:
         return ComponentFunction(self._raw.component_functions[component_idx])
 
 
@@ -195,6 +188,15 @@ class ComponentFunction:
     def __init__(self, raw: Container) -> None:
         self._raw = raw
 
+    def __repr__(self) -> str:
+        arguments = [
+            '"{arg.value}"' if isinstance(arg.value, str)
+            else arg.value
+            for arg in self._raw.arguments
+        ]
+        arg_repr = ", ".join(arguments)
+        return f"{self._raw.component_type}.{self._raw.command}({arg_repr})"
+
     def set_argument(self, argument_idx: int, value: ArgumentType) -> None:
         argument = self._raw.arguments[argument_idx]
         expected_type = ARGUMENT_TYPES[argument.type]
@@ -208,40 +210,36 @@ class Bmsld(BaseResource):
     def construct_class(cls, target_game: Game) -> Construct:
         return BMSLD
 
-    def all_actors(self) -> Iterator[tuple[int, str, construct.Container]]:
+    def all_actors(self) -> Iterator[tuple[ActorLayer, str, BmsldActor]]:
         for layer in self.raw.actor_layers:
             for actor_name, actor in layer.items():
                 yield layer, actor_name, actor
 
-    def all_actor_groups(self) -> Iterator[tuple[str, Container]]:
-        for sub_area in self.raw.sub_areas:
-            yield sub_area.name, sub_area
+    @property
+    def actor_groups(self) -> dict[str, list[str]]:
+        return self.raw.sub_areas
+
+    @actor_groups.setter
+    def actor_groups(self, value: dict[str, list[str]]) -> None:
+        self.raw.sub_areas = value
 
     def is_actor_in_group(self, group_name: str, actor_name: str) -> bool:
-        generator = (area for area in self.raw.sub_areas if area.name == group_name)
-        for area in generator:
-            return actor_name in area.objects
-        return False
+        return actor_name in self.actor_groups[group_name]
 
     def get_actor_group(self, group_name: str) -> Container:
         group = next(
-            (sub_area for sub_area_name, sub_area in self.all_actor_groups() if sub_area_name == group_name), None
+            (sub_area for sub_area in self.actor_groups if sub_area == group_name), None
         )
         if group is None:
             raise KeyError(f"No group found with name for {group_name}")
         return group
 
     def all_actor_group_names_for_actor(self, actor_name: str) -> list[str]:
-        return [
-            actor_group_name
-            for actor_group_name, actor_group in self.all_actor_groups()
-            if actor_name in actor_group.objects
-        ]
+        return [group_name for group_name, group in self.actor_groups.items() if actor_name in group]
 
     def remove_actor_from_group(self, group_name: str, actor_name: str):
         logger.debug("Remove actor %s from group %s", actor_name, group_name)
-        group = self.get_actor_group(group_name)
-        group.objects.remove(actor_name)
+        self.actor_groups[group_name].remove(actor_name)
 
     def remove_actor_from_all_groups(self, actor_name: str):
         group_names = self.all_actor_group_names_for_actor(actor_name)
@@ -267,18 +265,19 @@ class Bmsld(BaseResource):
                 return first == f"eg_SubArea_{second}"
 
         collision_camera_groups = [
-            group for group_name, group in self.all_actor_groups() if compare_func(group_name, collision_camera_name)
+            group for group in self.actor_groups if compare_func(group, collision_camera_name)
         ]
         if len(collision_camera_groups) == 0:
             raise Exception(f"No entity group found for {collision_camera_name}")
         for group in collision_camera_groups:
-            logger.debug("Add actor %s to group %s", actor_name, group.name)
+            logger.debug("Add actor %s to group %s", actor_name, group)
             self.insert_into_entity_group(group, actor_name)
 
     def insert_into_entity_group(self, sub_area: Container, name_to_add: str) -> None:
         # MSR requires to have the names in the sub area list sorted by their crc32 value
-        sub_area.objects.append(name_to_add)
-        sub_area.objects.sort(key=crc32)
+        entity_group = self.actor_groups[sub_area]
+        entity_group.append(name_to_add)
+        entity_group.sort(key=crc32)
 
     def _get_layer(self, layer: ActorLayer) -> ListContainer:
         """Returns a layer of actors"""
@@ -323,6 +322,6 @@ class Bmsld(BaseResource):
 
         return new_actor
 
-    def get_logic_shape(self, logic_shape: str) -> Container:
+    def get_logic_shape(self, logic_shape: str) -> CollisionEntry:
         """Returns a logic shape by name"""
-        return self.raw["logic_shapes"][logic_shape]
+        return CollisionEntry(self.raw["logic_shapes"][logic_shape])

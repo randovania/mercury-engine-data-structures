@@ -34,7 +34,7 @@ def test_bmsld(samus_returns_tree, bmsld_path):
 
 
 def test_all_actor_groups(surface_bmsld: Bmsld):
-    all_groups = surface_bmsld.all_actor_groups()
+    all_groups = surface_bmsld.actor_groups
     assert len(list(all_groups)) == 32
 
 
@@ -112,8 +112,8 @@ def test_get_actor(surface_bmsld: Bmsld):
     actor = surface_bmsld.get_actor(layer, "LE_Item_001")
     assert actor is not None
 
-    actor["type"] = "powerup_plasmabeam"
-    actor["position"][0] = -6000.0
+    actor.actor_type = "powerup_plasmabeam"
+    actor.position.x = -6000.0
     actor_by_layer = surface_bmsld._get_layer(layer)["LE_Item_001"]
     assert actor_by_layer["type"] == "powerup_plasmabeam"
     assert actor_by_layer["position"][0] == -6000.0
@@ -136,3 +136,14 @@ def test_remove_actor(surface_bmsld: Bmsld):
 
     with pytest.raises(KeyError):
         surface_bmsld.remove_actor(ActorLayer.SPAWNPOINT, "SP_Kraid")
+
+
+def test_get_logic_shape(surface_bmsld: Bmsld):
+    logic_shape = surface_bmsld.get_logic_shape("LS_Spikes_001")
+    assert logic_shape is not None
+
+    poly = logic_shape.get_poly(0)
+    assert poly["num_points"] == 4
+
+    point = logic_shape.get_point(0, 0)
+    assert point["x"] != point["y"]
