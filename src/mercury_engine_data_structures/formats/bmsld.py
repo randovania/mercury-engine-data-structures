@@ -6,7 +6,7 @@ from enum import IntEnum
 from typing import TYPE_CHECKING
 
 import construct
-from construct import Const, Construct, Container, Flag, Hex, Int32ul, ListContainer, Sequence, Struct, Switch
+from construct import Const, Construct, Container, Flag, Hex, Int32ul, ListContainer, Struct, Switch
 
 from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import (
@@ -189,11 +189,7 @@ class ComponentFunction:
         self._raw = raw
 
     def __repr__(self) -> str:
-        arguments = [
-            '"{arg.value}"' if isinstance(arg.value, str)
-            else arg.value
-            for arg in self._raw.arguments
-        ]
+        arguments = ['"{arg.value}"' if isinstance(arg.value, str) else arg.value for arg in self._raw.arguments]
         arg_repr = ", ".join(arguments)
         return f"{self._raw.component_type}.{self._raw.command}({arg_repr})"
 
@@ -227,9 +223,7 @@ class Bmsld(BaseResource):
         return actor_name in self.actor_groups[group_name]
 
     def get_actor_group(self, group_name: str) -> Container:
-        group = next(
-            (sub_area for sub_area in self.actor_groups if sub_area == group_name), None
-        )
+        group = next((sub_area for sub_area in self.actor_groups if sub_area == group_name), None)
         if group is None:
             raise KeyError(f"No group found with name for {group_name}")
         return group
@@ -264,9 +258,7 @@ class Bmsld(BaseResource):
             else:
                 return first == f"eg_SubArea_{second}"
 
-        collision_camera_groups = [
-            group for group in self.actor_groups if compare_func(group, collision_camera_name)
-        ]
+        collision_camera_groups = [group for group in self.actor_groups if compare_func(group, collision_camera_name)]
         if len(collision_camera_groups) == 0:
             raise Exception(f"No entity group found for {collision_camera_name}")
         for group in collision_camera_groups:
