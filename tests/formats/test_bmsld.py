@@ -147,3 +147,11 @@ def test_get_logic_shape(surface_bmsld: Bmsld):
 
     point = logic_shape.get_point(0, 0)
     assert point["x"] != point["y"]
+
+
+def test_repr(surface_bmsld: Bmsld):
+    actor = surface_bmsld.get_actor( ActorLayer.STARTPOINT, "StartPoint0").get_component_function()
+    assert (
+        repr(actor)
+        == "STARTPOINT.SetScenarioParams('CurrentScenario.OnShipStartPointTeleport', '', True, False, False)"
+    )

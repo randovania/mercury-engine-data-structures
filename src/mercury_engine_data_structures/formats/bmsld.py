@@ -189,7 +189,7 @@ class ComponentFunction:
         self._raw = raw
 
     def __repr__(self) -> str:
-        arguments = ['"{arg.value}"' if isinstance(arg.value, str) else arg.value for arg in self._raw.arguments]
+        arguments = [repr(arg.value) for arg in self._raw.arguments]
         arg_repr = ", ".join(arguments)
         return f"{self._raw.component_type}.{self._raw.command}({arg_repr})"
 
