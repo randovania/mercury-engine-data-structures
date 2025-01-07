@@ -150,7 +150,7 @@ def test_get_logic_shape(surface_bmsld: Bmsld):
 
 
 def test_repr(surface_bmsld: Bmsld):
-    actor = surface_bmsld.get_actor( ActorLayer.STARTPOINT, "StartPoint0").get_component_function()
+    actor = surface_bmsld.get_actor(ActorLayer.STARTPOINT, "StartPoint0").get_component_function()
     assert (
         repr(actor)
         == "STARTPOINT.SetScenarioParams('CurrentScenario.OnShipStartPointTeleport', '', True, False, False)"
