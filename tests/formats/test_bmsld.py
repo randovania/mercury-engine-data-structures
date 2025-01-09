@@ -65,6 +65,8 @@ def test_get_actor_group(surface_bmsld: Bmsld):
 def test_all_actors(surface_bmsld: Bmsld):
     all_actors = list(surface_bmsld.all_actors())
     assert len(all_actors) == 232
+    # Number of active layers should be 10
+    assert len(ActorLayer) == 10
 
 
 def test_all_actor_group_names_for_actor(surface_bmsld: Bmsld):

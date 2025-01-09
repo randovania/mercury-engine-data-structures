@@ -205,9 +205,7 @@ class Bmsld(BaseResource):
     def all_actors(self) -> Iterator[tuple[ActorLayer, str, BmsldActor]]:
         for layer in self.raw.actor_layers:
             for actor_name, actor in layer.items():
-                layer = ActorLayer
-                actor = BmsldActor
-                yield layer, actor_name, actor
+                yield ActorLayer, BmsldActor(actor)
 
     @property
     def actor_groups(self) -> dict[str, list[str]]:
