@@ -7,17 +7,18 @@ from mercury_engine_data_structures import game_check
 from mercury_engine_data_structures.common_types import (
     CVector2D,
     CVector3D,
+    CVector4D,
     Float,
     StrId,
     UInt,
+    Vec2,
+    Vec4,
     make_vector,
 )
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, OptionalValue
-from mercury_engine_data_structures.game_check import Game
 
 CollisionPoint = Struct(
-    "x" / Float,
-    "y" / Float,
+    "position" / CVector2D,
     "material_attribute" / UInt,
 )
 CollisionPolySR = Struct(
@@ -25,21 +26,21 @@ CollisionPolySR = Struct(
     "unk4" / Hex(construct.Byte),
     "unk5" / Hex(UInt),
     "points" / Array(construct.this.num_points, CollisionPoint),
-    "boundings" / Array(4, Float),
+    "boundings" / CVector4D,
 )
 CollisionPolyDread = Struct(
     "num_points" / Rebuild(UInt, construct.len_(construct.this.points)),
     "unk" / Hex(UInt),
     "points" / Array(construct.this.num_points, CollisionPoint),
     "loop" / Flag,
-    "boundings" / Array(4, Float),
+    "boundings" / CVector4D,
 )
-CollisionPoly = game_check.is_at_most(Game.SAMUS_RETURNS, CollisionPolySR, CollisionPolyDread)
+CollisionPoly = game_check.is_sr_or_else(CollisionPolySR, CollisionPolyDread)
 
 BinarySearchTree = Struct(
     "binary_search_index1" / Int16ul,
     "binary_search_index2" / Int16ul,
-    "boundings" / Array(4, Float),
+    "boundings" / CVector4D,
 )
 
 collision_formats = {
@@ -66,7 +67,7 @@ collision_formats = {
     "POLYCOLLECTION2D": Struct(
         "position" / CVector3D,
         "polys" / make_vector(CollisionPoly),
-        "total_boundings" / Array(4, Float),
+        "total_boundings" / CVector4D,
         "binary_search_trees" / OptionalValue(make_vector(BinarySearchTree)),
     ),
 }
@@ -107,7 +108,7 @@ class CollisionEntry:
         """Returns a specific point in a poly"""
         return self.get_poly(poly_idx).points[point_idx]
 
-    def get_total_boundings(self) -> Container:
+    def get_total_boundings(self) -> Vec4:
         """Returns the total boundary of collision/collision_camera/logic shape"""
         return self.get_data().total_boundings
 
