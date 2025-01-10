@@ -12,6 +12,7 @@ from mercury_engine_data_structures.common_types import (
     StrId,
     UInt,
     Vec2,
+    Vec3,
     Vec4,
     make_vector,
 )
@@ -92,26 +93,91 @@ CollisionEntryConstruct = Struct(
 )
 
 
+class PolyData:
+    def __init__(self, raw: Container):
+        self._raw = raw
+
+    @property
+    def num_points(self) -> int:
+        return self._raw.num_points
+
+    @num_points.setter
+    def num_points(self, value: int) -> None:
+        self._raw.num_points = value
+
+    @property
+    def boundings(self) -> Vec4:
+        return self._raw.boundings
+
+    @boundings.setter
+    def boundings(self, value: Vec4) -> None:
+        self._raw.boundings = value
+
+    def get_point(self, point_idx: int) -> PointData:
+        return PointData(self._raw.points[point_idx])
+
+
+class PointData:
+    def __init__(self, raw: Container):
+        self._raw = raw
+
+    @property
+    def position(self) -> Vec2:
+        return self._raw.position
+
+    @position.setter
+    def position(self, value: Vec2) -> None:
+        self._raw.position = value
+
+    @property
+    def material_attribute(self) -> int:
+        return self._raw.material_attribute
+
+    @material_attribute.setter
+    def material_attribute(self, value: int) -> None:
+        self._raw.material_attribute = value
+
+
 class CollisionEntry:
     def __init__(self, raw: Container):
         self._raw = raw
 
-    def get_data(self) -> Container:
-        """Returns all data of collision/collision_camera/logic shape"""
+    @property
+    def data(self) -> dict[Vec3, list[dict], Vec4, list[dict]]:
         return self._raw.data
 
-    def get_poly(self, poly_idx: int):
-        """Returns all data associated with a poly (points, boundings)"""
-        return self.get_data().polys[poly_idx]
+    @data.setter
+    def data(self, value: dict[Vec3, list[dict], Vec4, list[dict]]) -> None:
+        self._raw.data = value
 
-    def get_point(self, poly_idx: int, point_idx: int) -> Container:
-        """Returns a specific point in a poly"""
-        return self.get_poly(poly_idx).points[point_idx]
+    @property
+    def position(self) -> Vec3:
+        return self.data.position
 
-    def get_total_boundings(self) -> Vec4:
-        """Returns the total boundary of collision/collision_camera/logic shape"""
-        return self.get_data().total_boundings
+    @position.setter
+    def position(self, value: Vec3) -> None:
+        self.data.position = value
 
-    def get_poly_boundings(self, poly_idx: int) -> Container:
-        """Returns the boundary of a poly"""
-        return self.get_poly(poly_idx).boundings
+    @property
+    def total_boundings(self) -> Vec4:
+        return self.data.total_boundings
+
+    @total_boundings.setter
+    def total_boundings(self, value: Vec4) -> None:
+        self.data.total_boundings = value
+
+    @property
+    def polys(self) -> list[dict]:
+        return self.data.polys
+
+    @polys.setter
+    def polys(self, value: list[dict]) -> None:
+        self.data.polys = value
+
+    def get_poly(self, poly_idx: int) -> PolyData:
+        """Returns all data associated with a poly"""
+        return PolyData(self.polys[poly_idx])
+
+    def get_bst(self, bst_idx: int) -> Container:
+        """Returns a binary search tree"""
+        return self.data.binary_search_trees[bst_idx]
