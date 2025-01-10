@@ -100,24 +100,26 @@ def surface_bmscc(samus_returns_tree) -> Bmscc:
 
 
 def test_get_data(surface_bmscc: Bmscc):
-    data = surface_bmscc.get_entry().get_data()
-    assert len(data) == 5
+    entry = surface_bmscc.get_entry()
+    assert len(entry.data) == 5
+    assert len(entry.polys) == 17
+    assert entry.position.raw == [0.0, 0.0, 0.0]
 
 
 def test_modifying_collision(surface_bmscc: Bmscc):
-    point = surface_bmscc.get_entry().get_point(2, 9)
-    assert point["x"] == -800.0
-    assert point["y"] == -7000.0
+    poly = surface_bmscc.get_entry().get_poly(2)
+    point = poly.get_point(5)
+    assert point.position.raw == [-900.0, -7400.0]
 
 
 def test_get_boundings(surface_bmscc: Bmscc):
-    total_boundings = surface_bmscc.get_entry().get_total_boundings()
-    polys = surface_bmscc.get_entry().get_data().polys
+    total_boundings = surface_bmscc.get_entry().total_boundings
+    polys = surface_bmscc.get_entry().polys
     for i, poly in enumerate(polys):
-        poly_boundings = surface_bmscc.get_entry().get_poly_boundings(i)
-        # Boundings for polygons are in the order: x1, y1, x2, y2
+        poly_boundings = surface_bmscc.get_entry().get_poly(i).boundings
+        # Boundings for polygons are in the order: x (Left), y (Bottom), z (Right), w (Top)
         # Assert that the boundings are confined within the total bounds of the collision_camera
-        assert poly_boundings[0] >= total_boundings[0]
-        assert poly_boundings[1] >= total_boundings[1]
-        assert poly_boundings[2] <= total_boundings[2]
-        assert poly_boundings[3] <= total_boundings[3]
+        assert poly_boundings.x >= total_boundings.x
+        assert poly_boundings.y >= total_boundings.y
+        assert poly_boundings.z <= total_boundings.z
+        assert poly_boundings.w <= total_boundings.w
