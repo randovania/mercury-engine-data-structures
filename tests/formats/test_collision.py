@@ -124,9 +124,11 @@ def test_get_boundings(surface_bmscc: Bmscc):
         assert poly_boundings.z <= total_boundings.z
         assert poly_boundings.w <= total_boundings.w
 
+
 def test_get_poly(surface_bmscc: Bmscc):
     poly = surface_bmscc.get_entry().get_poly(5)
     assert poly.num_points == 12
+
 
 def test_add_point(surface_bmscc: Bmscc):
     point = (6000.0, -5400.0)
