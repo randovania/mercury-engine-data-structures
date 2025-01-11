@@ -45,11 +45,13 @@ def test_add_icon(surface_bmsmsd: Bmsmsd):
 
     tile.add_icon("LE_Test_Icon", "CollectItem", "itemsphere", IconPriority.ACTOR, Vec3(100.0, 100.0, 0.0))
 
-    new_icon = Container({
-        "actor_name": "LE_Test_Icon",
-        "clear_condition": "CollectItem",
-        "icon": "itemsphere",
-        "icon_priority": IconPriority.ACTOR,
-        "coordinates": Vec3(100.0, 100.0, 0.0)
-    })
+    new_icon = Container(
+        {
+            "actor_name": "LE_Test_Icon",
+            "clear_condition": "CollectItem",
+            "icon": "itemsphere",
+            "icon_priority": IconPriority.ACTOR,
+            "coordinates": Vec3(100.0, 100.0, 0.0),
+        }
+    )
     assert tile.get_icon(1) == new_icon

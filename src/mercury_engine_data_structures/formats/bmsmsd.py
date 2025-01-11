@@ -10,7 +10,6 @@ from construct.core import (
     Container,
     Enum,
     FlagsEnum,
-    Float32l,
     Int32sl,
     Int32ul,
     ListContainer,
@@ -145,17 +144,17 @@ class IconProperties:
     def coordinates(self, value: Vec3) -> None:
         self._raw.coordinates = value
 
-
     def _get_icon_properties(self) -> Container:
-        icon = Container({
-            "actor_name": self.actor_name,
-            "clear_condition": self.clear_condition,
-            "icon": self.icon,
-            "icon_priority": self.icon_priority,
-            "coordinates": self.coordinates,
-        })
+        icon = Container(
+            {
+                "actor_name": self.actor_name,
+                "clear_condition": self.clear_condition,
+                "icon": self.icon,
+                "icon_priority": self.icon_priority,
+                "coordinates": self.coordinates,
+            }
+        )
         return icon
-
 
 
 class TileProperties:
@@ -197,13 +196,15 @@ class TileProperties:
         icon_priority: str,
         coordinates: Vec3,
     ) -> Container:
-        new_icon = Container({
-            "actor_name": actor_name,
-            "clear_condition": clear_condition,
-            "icon": icon,
-            "icon_priority": icon_priority,
-            "coordinates": coordinates
-        })
+        new_icon = Container(
+            {
+                "actor_name": actor_name,
+                "clear_condition": clear_condition,
+                "icon": icon,
+                "icon_priority": icon_priority,
+                "coordinates": coordinates,
+            }
+        )
 
         self.icons.append(new_icon)
 
