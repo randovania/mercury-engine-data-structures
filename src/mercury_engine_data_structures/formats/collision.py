@@ -1,4 +1,5 @@
 from __future__ import annotations
+import copy
 
 import construct
 from construct import Array, Container, Flag, Hex, Int8ul, Int16ul, Rebuild, Struct, Switch
@@ -116,6 +117,17 @@ class PolyData:
     def get_point(self, point_idx: int) -> PointData:
         return PointData(self._raw.points[point_idx])
 
+    def add_point(self, position: Vec2, idx: int = 0) -> None:
+        """
+        Adds a new point by copying an existing point and inserting it at a specified index
+        param position: the x,y position of the new point
+        param idx: the index the new point will be placed in the poly
+        """
+        new_point = copy.deepcopy(self.get_point(0))
+        new_point.position = position
+        self._raw.points.insert(idx, new_point)
+        self.num_points += 1
+
 
 class PointData:
     def __init__(self, raw: Container):
@@ -134,7 +146,7 @@ class PointData:
         return self._raw.material_attribute
 
     @material_attribute.setter
-    def material_attribute(self, value: int) -> None:
+    def material_attribute(self, value: int = 1) -> None:
         self._raw.material_attribute = value
 
 
