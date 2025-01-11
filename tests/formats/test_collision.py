@@ -4,6 +4,7 @@ import pytest
 from tests.test_lib import parse_build_compare_editor_parsed
 
 from mercury_engine_data_structures import dread_data, samus_returns_data
+from mercury_engine_data_structures.common_types import Vec2, Vec3, Vec4
 from mercury_engine_data_structures.formats.bmscc import Bmscc
 
 bossrush_assets = [
@@ -105,6 +106,40 @@ def test_get_data(surface_bmscc: Bmscc):
     assert len(entry.polys) == 17
     assert entry.position.raw == [0.0, 0.0, 0.0]
 
+    entry.data = {
+        "position": Vec3(0.0, 0.0, 0.0),
+        "polys": [
+            {
+                "num_points": 4,
+                "unk4": 0x0A,
+                "unk5": 0x01B18000,
+                "points": [
+                    {
+                        "position": Vec2(5900.0, -5400.0), "material_attribute": 1
+                    },
+                    {
+                        "position": Vec2(6400.0, -5400.0), "material_attribute": 1
+                    },
+                    {
+                        "position": Vec2(6400.0, -5500.0), "material_attribute": 1
+                    },
+                    {
+                        "position": Vec2(6100.0, -5500.0), "material_attribute": 1
+                    },
+                ],
+                "boundings": Vec4(5900.0, -5600.0, 6400.0, -5400.0),
+            }
+        ],
+        "total_boundings": Vec4(-25100.0, -10600.0, 12500.0, 14103.099609375),
+        "binary_search_trees": [
+            {
+                "binary_search_index1": 2149,
+                "binary_search_index2": 0,
+                "boundings": Vec4(-25100.0, -10600.0, 12500.0, 14103.099609375),
+            }
+        ]
+    }
+
 
 def test_modifying_collision(surface_bmscc: Bmscc):
     poly = surface_bmscc.get_entry().get_poly(2)
@@ -125,6 +160,13 @@ def test_get_boundings(surface_bmscc: Bmscc):
         assert poly_boundings.w <= total_boundings.w
 
 
+def test_set_boundings(surface_bmscc: Bmscc):
+    total_boundings = surface_bmscc.get_entry().total_boundings
+    total_boundings.x = total_boundings.y = 30000.0
+    total_boundings.z = total_boundings.w = -30000.0
+    assert total_boundings == Vec4(30000.0, 30000.0, -30000.0, -30000.0)
+
+
 def test_get_poly(surface_bmscc: Bmscc):
     poly = surface_bmscc.get_entry().get_poly(5)
     assert poly.num_points == 12
@@ -134,4 +176,19 @@ def test_add_point(surface_bmscc: Bmscc):
     point = (6000.0, -5400.0)
     poly = surface_bmscc.get_entry().get_poly(3)
     poly.add_point(point)
+    num_points = poly.num_points
     assert poly.get_point(0) is not None
+    assert poly.get_point(0).position == (6000.0, -5400.0)
+    assert poly.get_point(0).material_attribute == 1
+
+    poly.num_points = 7
+    assert num_points != poly.num_points
+
+
+def test_get_bst(surface_bmscc: Bmscc):
+    bst = surface_bmscc.get_entry().get_bst(0)
+    assert bst == {
+        "binary_search_index1": 2149,
+        "binary_search_index2": 0,
+        "boundings": Vec4(-25100.0, -10600.0, 12500.0, 14103.099609375)
+    }
