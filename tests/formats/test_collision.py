@@ -114,18 +114,10 @@ def test_get_data(surface_bmscc: Bmscc):
                 "unk4": 0x0A,
                 "unk5": 0x01B18000,
                 "points": [
-                    {
-                        "position": Vec2(5900.0, -5400.0), "material_attribute": 1
-                    },
-                    {
-                        "position": Vec2(6400.0, -5400.0), "material_attribute": 1
-                    },
-                    {
-                        "position": Vec2(6400.0, -5500.0), "material_attribute": 1
-                    },
-                    {
-                        "position": Vec2(6100.0, -5500.0), "material_attribute": 1
-                    },
+                    {"position": Vec2(5900.0, -5400.0), "material_attribute": 1},
+                    {"position": Vec2(6400.0, -5400.0), "material_attribute": 1},
+                    {"position": Vec2(6400.0, -5500.0), "material_attribute": 1},
+                    {"position": Vec2(6100.0, -5500.0), "material_attribute": 1},
                 ],
                 "boundings": Vec4(5900.0, -5600.0, 6400.0, -5400.0),
             }
@@ -137,7 +129,7 @@ def test_get_data(surface_bmscc: Bmscc):
                 "binary_search_index2": 0,
                 "boundings": Vec4(-25100.0, -10600.0, 12500.0, 14103.099609375),
             }
-        ]
+        ],
     }
 
 
@@ -190,5 +182,5 @@ def test_get_bst(surface_bmscc: Bmscc):
     assert bst == {
         "binary_search_index1": 2149,
         "binary_search_index2": 0,
-        "boundings": Vec4(-25100.0, -10600.0, 12500.0, 14103.099609375)
+        "boundings": Vec4(-25100.0, -10600.0, 12500.0, 14103.099609375),
     }
