@@ -1,8 +1,8 @@
 from __future__ import annotations
+
 import copy
 
 import pytest
-from construct import Container
 from tests.test_lib import parse_build_compare_editor
 
 from mercury_engine_data_structures import samus_returns_data
@@ -25,10 +25,7 @@ def test_get_tile(surface_bmsmsd: Bmsmsd):
     assert tile.tile_coordinates == [48, 5]
 
     tile = surface_bmsmsd.get_tile(0)
-    assert tile.tile_dimensions == {
-        "bottom_left": Vec2(6400.0, -10600.0),
-        "top_right": Vec2(7000.0, -9800.0)
-    }
+    assert tile.tile_dimensions == {"bottom_left": Vec2(6400.0, -10600.0), "top_right": Vec2(7000.0, -9800.0)}
 
     tile = surface_bmsmsd.get_tile(8)
     assert tile.tile_borders == {
@@ -54,10 +51,7 @@ def test_set_tile_properties(surface_bmsmsd: Bmsmsd):
     original_tile = copy.deepcopy(tile)
 
     tile.tile_coordinates = [30, 20]
-    tile.tile_dimensions = {
-        "bottom_left": Vec2(10000.0, -1000.0),
-        "top_right": Vec2(50000.0, -29000.0)
-    }
+    tile.tile_dimensions = {"bottom_left": Vec2(10000.0, -1000.0), "top_right": Vec2(50000.0, -29000.0)}
     tile.update_tile_borders(TileBorders.OPEN_TOP, True)
     tile.tile_type = TileType.ACID_FALL
 
