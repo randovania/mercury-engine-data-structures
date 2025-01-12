@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import construct
-from construct import (
+from construct.core import (
     Const,
     Construct,
     Flag,
@@ -68,10 +68,10 @@ EnemyStruct = Struct(
 )  # fmt: skip
 
 BMDEFS = Struct(
-    _magic=Const(b"MDEF"),
-    version=VersionAdapter("1.5.0"),
-    unk1=Int32ul,
-    sounds=make_vector(
+    "_magic" / Const(b"MDEF"),
+    "version" / VersionAdapter("1.5.0"),
+    "unk1" / Int32ul,
+    "sounds" / make_vector(
         Struct(
             "sound_name" / StrId,
             "unk1" / Int32ul,
@@ -87,9 +87,9 @@ BMDEFS = Struct(
             "environment_sfx_volume" / Float32l,
         )
     ),  # fmt: skip
-    unk2=Int32ul,
-    enemies_list=make_vector(EnemyStruct),
-    rest=construct.GreedyBytes,
+    "unk2" / Int32ul,
+    "enemies_list" / make_vector(EnemyStruct),
+    construct.Terminated,
 )
 
 
