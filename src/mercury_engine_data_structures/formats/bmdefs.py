@@ -4,6 +4,7 @@ import construct
 from construct.core import (
     Const,
     Construct,
+    Container,
     Flag,
     Float32l,
     Int32ul,
@@ -87,6 +88,135 @@ BMDEFS = Struct(
 )
 
 
+class EnemyStates:
+    def __init__(self, raw: Container):
+        self._raw = raw
+
+    @property
+    def state_type(self) -> str:
+        return self._raw.type
+
+    @state_type.setter
+    def state_type(self, value: str) -> None:
+        self._raw.type = value
+
+    def get_sound_properties(self) -> Sounds:
+        return Sounds(self._raw.properties)
+
+
+class EnemyLayers:
+    def __init__(self, raw: Container):
+        self._raw = raw
+
+    @property
+    def layer_name(self) -> str:
+        return self._raw.layer_name
+
+    @layer_name.setter
+    def layer_name(self, value: str) -> None:
+        self._raw.layer_name = value
+
+    def get_state(self, state_idx: int) -> EnemyStates:
+        return EnemyStates(self._raw.states[state_idx])
+
+
+class Areas:
+    def __init__(self, raw: Container):
+        self._raw = raw
+
+    @property
+    def area_name(self) -> str:
+        return self._raw.area_name
+
+    @area_name.setter
+    def area_name(self, value: str) -> None:
+        self._raw.area_name = value
+
+    def get_layer(self, layer_idx: int) -> EnemyLayers:
+        return EnemyLayers(self._raw.layers[layer_idx])
+
+
+class EnemiesList:
+    def __init__(self, raw: Container):
+        self._raw = raw
+
+    @property
+    def enemy_name(self) -> str:
+        return self._raw.enemy_name
+
+    @enemy_name.setter
+    def enemy_name(self, value: str) -> None:
+        self._raw.enemy_name = value
+
+    def get_area(self, area_idx: int) -> Areas:
+        return Areas(self._raw.area_name[area_idx])
+
+
+class Sounds:
+    def __init__(self, raw: Container) -> None:
+        self._raw = raw
+
+    @property
+    def sound_name(self) -> str:
+        return self._raw.sound_name
+
+    @sound_name.setter
+    def sound_name(self, value: str) -> None:
+        self._raw.sound_name = value
+
+    @property
+    def file_path(self) -> str:
+        return self._raw.file_path
+
+    @file_path.setter
+    def file_path(self, value: str) -> None:
+        self._raw.file_path = value
+
+    @property
+    def fade_in(self) -> float:
+        return self._raw.fade_in
+
+    @fade_in.setter
+    def fade_in(self, value: float) -> None:
+        self._raw.fade_in = value
+
+    @property
+    def fade_out(self) -> float:
+        return self._raw.fade_out
+
+    @fade_out.setter
+    def fade_out(self, value: float) -> None:
+        self._raw.fade_out = value
+
+    @property
+    def volume(self) -> float:
+        return self._raw.volume
+
+    @volume.setter
+    def volume(self, value: float) -> None:
+        self._raw.volume = value
+
+    @property
+    def environment_sfx_volume(self) -> float:
+        return self._raw.environment_sfx_volume
+
+    @environment_sfx_volume.setter
+    def environment_sfx_volume(self, value: float) -> None:
+        self._raw.environment_sfx_volume = value
+
+    # inner_states is only used for enemies
+    @property
+    def inner_states(self) -> dict[str, float]:
+        return self._raw.inner_states
+
+    @inner_states.setter
+    def inner_states(self, relax_value: float, death_value: float) -> None:
+        self._raw.inner_states = {
+            "RELAX": relax_value,
+            "DEATH": death_value
+        }
+
+
 class Bmdefs(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
@@ -94,3 +224,9 @@ class Bmdefs(BaseResource):
             return BMDEFS
         else:
             return standard_format.game_model("sound::CMusicManager", "4.0.2")
+
+    def get_sound(self, sound_idx: int) -> Sounds:
+        return Sounds(self.raw.sounds[sound_idx])
+
+    def get_enemy(self, enemy_idx: int) -> EnemiesList:
+        return EnemiesList(self.raw.enemies_list[enemy_idx])
