@@ -66,7 +66,8 @@ BMDEFS = Struct(
     "_magic" / Const(b"MDEF"),
     "version" / VersionAdapter("1.5.0"),
     "number_of_sounds" / Int32ul,
-    "sounds" / make_vector(
+    "sounds"
+    / make_vector(
         Struct(
             "sound_name" / StrId,
             "unk1" / Int32ul,
@@ -149,7 +150,7 @@ class EnemiesList:
         self._raw.enemy_name = value
 
     def get_area(self, area_idx: int) -> Areas:
-        return Areas(self._raw.area_name[area_idx])
+        return Areas(self._raw.areas[area_idx])
 
 
 class Sounds:
@@ -163,6 +164,14 @@ class Sounds:
     @sound_name.setter
     def sound_name(self, value: str) -> None:
         self._raw.sound_name = value
+
+    @property
+    def priority(self) -> int:
+        return self._raw.priority
+
+    @priority.setter
+    def priority(self, value: str) -> None:
+        self._raw.priority = value
 
     @property
     def file_path(self) -> str:
@@ -204,17 +213,23 @@ class Sounds:
     def environment_sfx_volume(self, value: float) -> None:
         self._raw.environment_sfx_volume = value
 
-    # inner_states is only used for enemies
+    # inner_states and start_delay are only used for enemies
+    @property
+    def start_delay(self) -> float:
+        return self._raw.start_delay
+
+    @start_delay.setter
+    def start_delay(self, value: float) -> None:
+        self._raw.start_delay = value
+
     @property
     def inner_states(self) -> dict[str, float]:
         return self._raw.inner_states
 
     @inner_states.setter
-    def inner_states(self, relax_value: float, death_value: float) -> None:
-        self._raw.inner_states = {
-            "RELAX": relax_value,
-            "DEATH": death_value
-        }
+    def inner_states(self, value: dict[str, float]) -> None:
+        for name, value in value.items():
+            self._raw.inner_states[name] = value
 
 
 class Bmdefs(BaseResource):
