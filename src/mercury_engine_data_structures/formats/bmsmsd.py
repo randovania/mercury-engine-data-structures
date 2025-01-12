@@ -12,7 +12,6 @@ from construct.core import (
     FlagsEnum,
     Int32sl,
     Int32ul,
-    ListContainer,
     Struct,
 )
 
@@ -79,7 +78,7 @@ BMSMSD = Struct(
     "tiles" / make_vector(
         Struct(
             "tile_coordinates" / construct.Array(2, Int32sl),
-            "tile_dimension" / Struct(
+            "tile_dimensions" / Struct(
                 "bottom_left" / CVector2D,
                 "top_right" / CVector2D,
             ),
@@ -170,8 +169,16 @@ class TileProperties:
         self._raw.tile_coordinates = value
 
     @property
-    def dimension(self) -> dict[Vec2, Vec2]:
-        return self._raw.tile_dimension
+    def tile_dimensions(self) -> dict[Vec2, Vec2]:
+        return self._raw.tile_dimensions
+
+    @tile_dimensions.setter
+    def tile_dimensions(self, value: dict[Vec2, Vec2]) -> None:
+        self._raw.tile_dimensions = value
+
+    @property
+    def tile_borders(self) -> dict[FlagsEnum]:
+        return self._raw.tile_borders
 
     @property
     def tile_type(self) -> IntEnum:
@@ -182,8 +189,11 @@ class TileProperties:
         self._raw.tile_type = value
 
     @property
-    def icons(self) -> ListContainer:
+    def icons(self) -> list:
         return self._raw.icons
+
+    def update_tile_borders(self, border_type: FlagsEnum, value: bool) -> None:
+        self._raw.tile_borders[border_type] = value
 
     def get_icon(self, icon_idx: int = 0) -> IconProperties:
         return IconProperties._get_icon_properties(self.icons[icon_idx])
