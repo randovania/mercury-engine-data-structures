@@ -11,7 +11,7 @@ from construct.core import (
 )
 
 from mercury_engine_data_structures.base_resource import BaseResource
-from mercury_engine_data_structures.common_types import StrId, VersionAdapter, make_vector
+from mercury_engine_data_structures.common_types import StrId, VersionAdapter, make_dict, make_vector
 from mercury_engine_data_structures.formats import standard_format
 from mercury_engine_data_structures.game_check import Game
 
@@ -38,10 +38,7 @@ EnemyStruct = Struct(
                             "unk4" / Int32ul,
                             "unk_bool" / Flag,
                             "environment_sfx_volume" / Float32l,
-                            "inner_states" / make_vector(Struct(
-                                "type" / StrId,
-                                "unk1" / Float32l,
-                            ))
+                            "inner_states" / make_dict(Float32l)
                         ),
                         'DEATH': Struct(
                             "unk1" / Int32ul,
@@ -55,10 +52,7 @@ EnemyStruct = Struct(
                             "unk4" / Int32ul,
                             "unk_bool" / Flag,
                             "environment_sfx_volume" / Float32l,
-                            "inner_states" / make_vector(Struct(
-                                "type" / StrId,
-                                "unk1" / Float32l,
-                            ))
+                            "inner_states" / make_dict(Float32l)
                         ),
                     },
                 )
@@ -70,7 +64,7 @@ EnemyStruct = Struct(
 BMDEFS = Struct(
     "_magic" / Const(b"MDEF"),
     "version" / VersionAdapter("1.5.0"),
-    "unk1" / Int32ul,
+    "number_of_sounds" / Int32ul,
     "sounds" / make_vector(
         Struct(
             "sound_name" / StrId,
@@ -87,7 +81,7 @@ BMDEFS = Struct(
             "environment_sfx_volume" / Float32l,
         )
     ),  # fmt: skip
-    "unk2" / Int32ul,
+    "number_of_enemy_groups" / Int32ul,
     "enemies_list" / make_vector(EnemyStruct),
     construct.Terminated,
 )
