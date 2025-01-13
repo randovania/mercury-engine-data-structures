@@ -495,8 +495,7 @@ def make_vector(value: construct.Construct):
 
         def _emitparse(code: construct.CodeGen) -> str:
             return (
-                f"ListContainer(({value._compileparse(code)}) "
-                f"for i in range({construct.Int32ul._compileparse(code)}))"
+                f"ListContainer(({value._compileparse(code)}) for i in range({construct.Int32ul._compileparse(code)}))"
             )
 
     result._emitparse = _emitparse
