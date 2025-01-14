@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import functools
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 import construct
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from mercury_engine_data_structures.game_check import Game
 
 Block = Struct(
-    "pos" / CVector3D,
+    "position" / CVector3D,
     "unk2" / Int32ul,
     "unk3" / Int32ul,
     "respawn_time" / Float32l,
@@ -60,7 +60,7 @@ BMSBK = Struct(
 )  # fmt: skip
 
 
-class BlockType(Enum):
+class BlockType(StrEnum):
     POWER_BEAM = "power_beam"
     BOMB = "bomb"
     MISSILE = "missile"
