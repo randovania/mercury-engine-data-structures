@@ -9,7 +9,6 @@ from mercury_engine_data_structures import game_check
 from mercury_engine_data_structures.common_types import (
     CVector2D,
     CVector3D,
-    CVector4D,
     Float,
     StrId,
     UInt,
@@ -20,6 +19,25 @@ from mercury_engine_data_structures.common_types import (
 )
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage, OptionalValue
 
+
+def calculate_poly_boundings(ctx: Container) -> Container:
+    x1 = min(point.position.x for point in ctx.points)
+    y1 = min(point.position.y for point in ctx.points)
+    x2 = max(point.position.x for point in ctx.points)
+    y2 = max(point.position.y for point in ctx.points)
+    return Container({"min": Vec2(x1, y1), "max": Vec2(x2, y2)})
+
+
+def calculate_collection_boundings(ctx: Container) -> Container:
+    x1 = min(poly.boundings.min.x for poly in ctx.polys)
+    y1 = min(poly.boundings.min.y for poly in ctx.polys)
+    x2 = max(poly.boundings.max.x for poly in ctx.polys)
+    y2 = max(poly.boundings.max.y for poly in ctx.polys)
+    return Container({"min": Vec2(x1, y1), "max": Vec2(x2, y2)})
+
+
+BoundingBox2D = Struct("min" / CVector2D, "max" / CVector2D)
+
 CollisionPoint = Struct(
     "position" / CVector2D,
     "material_attribute" / UInt,
@@ -29,21 +47,21 @@ CollisionPolySR = Struct(
     "unk4" / Hex(construct.Byte),
     "unk5" / Hex(UInt),
     "points" / Array(construct.this.num_points, CollisionPoint),
-    "boundings" / CVector4D,
+    "boundings" / Rebuild(BoundingBox2D, calculate_poly_boundings),
 )
 CollisionPolyDread = Struct(
     "num_points" / Rebuild(UInt, construct.len_(construct.this.points)),
     "unk" / Hex(UInt),
     "points" / Array(construct.this.num_points, CollisionPoint),
     "loop" / Flag,
-    "boundings" / CVector4D,
+    "boundings" / Rebuild(BoundingBox2D, calculate_poly_boundings),
 )
 CollisionPoly = game_check.is_sr_or_else(CollisionPolySR, CollisionPolyDread)
 
 BinarySearchTree = Struct(
     "binary_search_index1" / Int16ul,
     "binary_search_index2" / Int16ul,
-    "boundings" / CVector4D,
+    "boundings" / BoundingBox2D,
 )
 
 collision_formats = {
@@ -70,7 +88,7 @@ collision_formats = {
     "POLYCOLLECTION2D": Struct(
         "position" / CVector3D,
         "polys" / make_vector(CollisionPoly),
-        "total_boundings" / CVector4D,
+        "total_boundings" / Rebuild(BoundingBox2D, calculate_collection_boundings),
         "binary_search_trees" / OptionalValue(make_vector(BinarySearchTree)),
     ),
 }
@@ -95,25 +113,41 @@ CollisionEntryConstruct = Struct(
 )
 
 
+class Bounds2D:
+    def __init__(self, raw: Container):
+        self._raw = raw
+
+    @property
+    def min(self) -> Vec2:
+        return self._raw.min
+
+    @min.setter
+    def min(self, value: Vec2) -> None:
+        self._raw.min = value
+
+    @property
+    def max(self) -> Vec2:
+        return self._raw.max
+
+    @max.setter
+    def max(self, value: Vec2) -> None:
+        self._raw.max = value
+
+
 class PolyData:
     def __init__(self, raw: Container):
         self._raw = raw
 
     @property
     def num_points(self) -> int:
-        return self._raw.num_points
-
-    @num_points.setter
-    def num_points(self, value: int) -> None:
-        self._raw.num_points = value
+        return len(self._raw.points)
 
     @property
     def boundings(self) -> Vec4:
         return self._raw.boundings
 
-    @boundings.setter
-    def boundings(self, value: Vec4) -> None:
-        self._raw.boundings = value
+    def get_boundings(self) -> Bounds2D:
+        return Bounds2D(calculate_poly_boundings(self._raw))
 
     def get_point(self, point_idx: int) -> PointData:
         return PointData(self._raw.points[point_idx])
@@ -127,7 +161,13 @@ class PolyData:
         new_point = copy.deepcopy(self.get_point(0))
         new_point.position = position
         self._raw.points.insert(idx, new_point)
-        self.num_points += 1
+
+    def remove_point(self, idx: int) -> None:
+        """
+        Removes a point from a poly by index
+        param idx: the index of the point to remove
+        """
+        self._raw.points.pop(idx)
 
 
 class PointData:
@@ -175,22 +215,9 @@ class CollisionEntry:
     def total_boundings(self) -> Vec4:
         return self.data.total_boundings
 
-    @total_boundings.setter
-    def total_boundings(self, value: Vec4) -> None:
-        self.data.total_boundings = value
-
-    @property
-    def polys(self) -> list[dict]:
-        return self.data.polys
-
-    @polys.setter
-    def polys(self, value: list[dict]) -> None:
-        self.data.polys = value
+    def get_total_boundings(self) -> Bounds2D:
+        return Bounds2D(calculate_collection_boundings(self._raw))
 
     def get_poly(self, poly_idx: int) -> PolyData:
         """Returns all data associated with a poly"""
-        return PolyData(self.polys[poly_idx])
-
-    def get_bst(self, bst_idx: int) -> Container:
-        """Returns a binary search tree"""
-        return self.data.binary_search_trees[bst_idx]
+        return PolyData(self._raw.data.polys[poly_idx])

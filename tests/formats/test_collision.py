@@ -103,10 +103,9 @@ def surface_bmscc(samus_returns_tree) -> Bmscc:
 def test_get_data(surface_bmscc: Bmscc):
     entry = surface_bmscc.get_entry()
     assert len(entry.data) == 5
-    assert len(entry.polys) == 17
-    assert entry.position.raw == [0.0, 0.0, 0.0]
+    assert entry.position == [0.0, 0.0, 0.0]
 
-    entry.data = {
+    assert entry.data != {
         "position": Vec3(0.0, 0.0, 0.0),
         "polys": [
             {
@@ -136,27 +135,21 @@ def test_get_data(surface_bmscc: Bmscc):
 def test_modifying_collision(surface_bmscc: Bmscc):
     poly = surface_bmscc.get_entry().get_poly(2)
     point = poly.get_point(5)
-    assert point.position.raw == [-900.0, -7400.0]
+    assert point.position == [-900.0, -7400.0]
 
 
-def test_get_boundings(surface_bmscc: Bmscc):
+def test_boundings(surface_bmscc: Bmscc):
+    poly_boundings = surface_bmscc.get_entry().get_poly(0).boundings
+    assert poly_boundings == {"min": Vec2(-25100.0, -10600.0), "max": Vec2(12500.0, 14103.099609375)}
+    poly_boundings["min"] = Vec2(30000.0, 30000.0)
+    poly_boundings["max"] = Vec2(-30000.0, -30000.0)
+    assert poly_boundings == {"min": Vec2(30000.0, 30000.0), "max": Vec2(-30000.0, -30000.0)}
+
     total_boundings = surface_bmscc.get_entry().total_boundings
-    polys = surface_bmscc.get_entry().polys
-    for i, poly in enumerate(polys):
-        poly_boundings = surface_bmscc.get_entry().get_poly(i).boundings
-        # Boundings for polygons are in the order: x (Left), y (Bottom), z (Right), w (Top)
-        # Assert that the boundings are confined within the total bounds of the collision_camera
-        assert poly_boundings.x >= total_boundings.x
-        assert poly_boundings.y >= total_boundings.y
-        assert poly_boundings.z <= total_boundings.z
-        assert poly_boundings.w <= total_boundings.w
-
-
-def test_set_boundings(surface_bmscc: Bmscc):
-    total_boundings = surface_bmscc.get_entry().total_boundings
-    total_boundings.x = total_boundings.y = 30000.0
-    total_boundings.z = total_boundings.w = -30000.0
-    assert total_boundings == Vec4(30000.0, 30000.0, -30000.0, -30000.0)
+    assert total_boundings == {"min": Vec2(-25100.0, -10600.0), "max": Vec2(12500.0, 14103.099609375)}
+    total_boundings["min"] = Vec2(30000.0, 30000.0)
+    total_boundings["max"] = Vec2(-30000.0, -30000.0)
+    assert total_boundings == {"min": Vec2(30000.0, 30000.0), "max": Vec2(-30000.0, -30000.0)}
 
 
 def test_get_poly(surface_bmscc: Bmscc):
@@ -168,19 +161,14 @@ def test_add_point(surface_bmscc: Bmscc):
     point = (6000.0, -5400.0)
     poly = surface_bmscc.get_entry().get_poly(3)
     poly.add_point(point)
-    num_points = poly.num_points
     assert poly.get_point(0) is not None
     assert poly.get_point(0).position == (6000.0, -5400.0)
     assert poly.get_point(0).material_attribute == 1
-
-    poly.num_points = 7
-    assert num_points != poly.num_points
+    assert poly.num_points == 9
 
 
-def test_get_bst(surface_bmscc: Bmscc):
-    bst = surface_bmscc.get_entry().get_bst(0)
-    assert bst == {
-        "binary_search_index1": 2149,
-        "binary_search_index2": 0,
-        "boundings": Vec4(-25100.0, -10600.0, 12500.0, 14103.099609375),
-    }
+def test_remove_point(surface_bmscc: Bmscc):
+    poly = surface_bmscc.get_entry().get_poly(0)
+    assert poly.get_point(0).position == Vec2(4300.0, -4800.0)
+    poly.remove_point(0)
+    assert poly.get_point(0).position == Vec2(3600.0, -4800.0)
