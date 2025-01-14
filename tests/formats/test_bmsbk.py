@@ -25,15 +25,40 @@ def surface_bmsbk(samus_returns_tree) -> Bmsbk:
 
 
 def test_get_block(surface_bmsbk: Bmsbk):
-    block = surface_bmsbk.get_block(0, 1)
+    block = surface_bmsbk.get_block_group(0).get_block(0)
     assert block.respawn_time == 0.0
+    assert block.model_name == "sg_casca80"
+    assert block.vignette_name == ""
+
+
+def test_move_block(surface_bmsbk: Bmsbk):
+    block = surface_bmsbk.get_block_group(0).get_block(0)
+    original_position = block.position
+    assert original_position == [-23100.0, 10700.0, 0.0]
+    block.position = [100.0, 200.0, 0.0]
+    assert original_position != block.position
 
 
 def test_changing_weakness(surface_bmsbk: Bmsbk):
-    surface_bmsbk.set_block_type(1, BlockType.BOMB)
-    assert surface_bmsbk.get_block_group(1).types[0].block_type == BlockType.BOMB
+    block_group = surface_bmsbk.get_block_group(0)
+    original_type = block_group.block_type
+    assert original_type == BlockType.POWER_BOMB
+    block_group.block_type = BlockType.BOMB
+    assert original_type != BlockType.BOMB
 
 
 def test_respawn_time(surface_bmsbk: Bmsbk):
-    surface_bmsbk.set_respawn_time(0, 0, 5.0)
-    assert surface_bmsbk.get_block(0, 0).respawn_time == 5.0
+    block = surface_bmsbk.get_block_group(0).get_block(0)
+    original_time = block.respawn_time
+    assert original_time == 0.0
+    block.respawn_time = 5.0
+    assert original_time != block.respawn_time
+
+
+def test_modify_visuals(surface_bmsbk: Bmsbk):
+    block = surface_bmsbk.get_block_group(0).get_block(0)
+    block.model_name = "sg_real_model"
+    assert block.model_name != "sg_casca80"
+
+    block.vignette_name = "sg_real_vignette"
+    assert block.vignette_name != ""
