@@ -26,10 +26,17 @@ def surface_bmsbk(samus_returns_tree) -> Bmsbk:
 
 def test_get_block(surface_bmsbk: Bmsbk):
     block = surface_bmsbk.get_block_group(0).get_block(0)
-    assert block.position == [-23100.0, 10700.0, 0.0]
     assert block.respawn_time == 0.0
     assert block.model_name == "sg_casca80"
     assert block.vignette_name == ""
+
+
+def test_move_block(surface_bmsbk: Bmsbk):
+    block = surface_bmsbk.get_block_group(0).get_block(0)
+    original_position = block.position
+    assert original_position == [-23100.0, 10700.0, 0.0]
+    block.position = [100.0, 200.0, 0.0]
+    assert original_position != block.position
 
 
 def test_changing_weakness(surface_bmsbk: Bmsbk):
