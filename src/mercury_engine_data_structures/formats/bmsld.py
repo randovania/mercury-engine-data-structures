@@ -118,9 +118,9 @@ BMSLD = Struct(
     # layers for actors
     "actor_layers" / make_dict(ProperActor)[18],
     # collision_cameras and groups
-    "sub_areas" / make_dict(make_vector(StrId)),
+    "actor_groups" / make_dict(make_vector(StrId)),
     # only used in s000_mainmenu, s010_cockpit, s020_credits
-    "extra_data" / construct.Optional(make_dict(make_vector(StrId))),
+    "extra_actor_groups" / construct.Optional(make_dict(make_vector(StrId))),
     construct.Terminated,
 ).compile()
 
@@ -209,11 +209,11 @@ class Bmsld(BaseResource):
 
     @property
     def actor_groups(self) -> dict[str, list[str]]:
-        return self.raw.sub_areas
+        return self.raw.actor_groups
 
     @actor_groups.setter
     def actor_groups(self, value: dict[str, list[str]]) -> None:
-        self.raw.sub_areas = value
+        self.raw.actor_groups = value
 
     def is_actor_in_group(self, group_name: str, actor_name: str) -> bool:
         return actor_name in self.actor_groups[group_name]
