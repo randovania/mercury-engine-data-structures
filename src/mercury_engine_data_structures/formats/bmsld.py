@@ -6,7 +6,7 @@ from enum import IntEnum
 from typing import TYPE_CHECKING, TypeAlias
 
 import construct
-from construct import Const, Construct, Container, Flag, Hex, Int32ul, ListContainer, Struct, Switch
+from construct import Const, Construct, Container, Flag, Hex, Int32ul, Struct, Switch
 
 from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import (
