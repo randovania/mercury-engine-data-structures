@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import logging
 from enum import IntEnum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeAlias
 
 import construct
 from construct import Const, Construct, Container, Flag, Hex, Int32ul, ListContainer, Struct, Switch
@@ -125,6 +125,11 @@ BMSLD = Struct(
 ).compile()
 
 
+ActorName: TypeAlias = str
+ActorGroupName: TypeAlias = str
+ActorGroup: TypeAlias = dict[str, list[str]]
+
+
 class ActorLayer(IntEnum):
     TRIGGER = 0
     ENV_TRIGGER = 2
@@ -202,41 +207,43 @@ class Bmsld(BaseResource):
     def construct_class(cls, target_game: Game) -> Construct:
         return BMSLD
 
-    def all_actors(self) -> Iterator[tuple[ActorLayer, str, BmsldActor]]:
+    def all_actors(self) -> Iterator[tuple[ActorLayer, ActorName, BmsldActor]]:
         for layer in self.raw.actor_layers:
             for actor_name, actor in layer.items():
                 yield ActorLayer, BmsldActor(actor)
 
     @property
-    def actor_groups(self) -> dict[str, list[str]]:
+    def actor_groups(self) -> ActorGroup:
         return self.raw.actor_groups
 
     @actor_groups.setter
-    def actor_groups(self, value: dict[str, list[str]]) -> None:
+    def actor_groups(self, value: ActorGroup) -> None:
         self.raw.actor_groups = value
 
-    def is_actor_in_group(self, group_name: str, actor_name: str) -> bool:
+    def is_actor_in_group(self, group_name: ActorGroupName, actor_name: ActorName) -> bool:
         return actor_name in self.actor_groups[group_name]
 
-    def get_actor_group(self, group_name: str) -> Container:
+    def get_actor_group(self, group_name: ActorGroupName) -> Container:
         group = next((sub_area for sub_area in self.actor_groups if sub_area == group_name), None)
         if group is None:
             raise KeyError(f"No group found with name for {group_name}")
         return group
 
-    def all_actor_group_names_for_actor(self, actor_name: str) -> list[str]:
+    def all_actor_group_names_for_actor(self, actor_name: ActorName) -> list[str]:
         return [group_name for group_name, group in self.actor_groups.items() if actor_name in group]
 
-    def remove_actor_from_group(self, group_name: str, actor_name: str):
+    def remove_actor_from_group(self, group_name: ActorGroupName, actor_name: ActorName) -> None:
         logger.debug("Remove actor %s from group %s", actor_name, group_name)
         self.actor_groups[group_name].remove(actor_name)
 
-    def remove_actor_from_all_groups(self, actor_name: str):
+    def remove_actor_from_all_groups(self, actor_name: ActorName) -> None:
         group_names = self.all_actor_group_names_for_actor(actor_name)
         for group_name in group_names:
             self.remove_actor_from_group(group_name, actor_name)
 
-    def add_actor_to_entity_groups(self, collision_camera_name: str, actor_name: str, all_groups: bool = False):
+    def add_actor_to_entity_groups(
+        self, collision_camera_name: ActorGroupName, actor_name: ActorName, all_groups: bool = False
+    ) -> None:
         """
         Adds an actor to either all entity groups or one entity group, which follow the name pattern of eg_SubArea_NAME.
         In case an actor needs to be added to an entity group not following this name pattern
@@ -248,7 +255,7 @@ class Bmsld(BaseResource):
                    pattern or just to one entity group matching the name pattern exactly
         """
 
-        def compare_func(first: str, second: str) -> bool:
+        def compare_func(first: ActorGroupName, second: ActorGroupName) -> bool:
             if all_groups:
                 return first.startswith(f"eg_SubArea_{second}")
             else:
@@ -261,26 +268,26 @@ class Bmsld(BaseResource):
             logger.debug("Add actor %s to group %s", actor_name, group)
             self.insert_into_entity_group(group, actor_name)
 
-    def insert_into_entity_group(self, sub_area: Container, name_to_add: str) -> None:
+    def insert_into_entity_group(self, sub_area: Container, actor_name: ActorName) -> None:
         # MSR requires to have the names in the sub area list sorted by their crc32 value
         entity_group = self.actor_groups[sub_area]
-        entity_group.append(name_to_add)
+        entity_group.append(actor_name)
         entity_group.sort(key=crc32)
 
-    def _get_layer(self, layer: ActorLayer) -> ListContainer:
+    def _get_layer(self, layer: ActorLayer) -> list[dict]:
         """Returns a layer of actors"""
         return self.raw.actor_layers[layer]
 
-    def _check_if_actor_exists(self, layer: ActorLayer, actor_name: str) -> None:
+    def _check_if_actor_exists(self, layer: ActorLayer, actor_name: ActorName) -> None:
         if actor_name not in self._get_layer(layer):
             raise KeyError(f"No actor named '{actor_name}' found in '{layer}!'")
 
-    def get_actor(self, layer: ActorLayer, actor_name: str) -> BmsldActor:
+    def get_actor(self, layer: ActorLayer, actor_name: ActorName) -> BmsldActor:
         """Returns an actor given a layer and an actor name"""
         self._check_if_actor_exists(layer, actor_name)
         return BmsldActor(self.raw.actor_layers[layer][actor_name])
 
-    def remove_actor(self, layer: ActorLayer, actor_name: str) -> None:
+    def remove_actor(self, layer: ActorLayer, actor_name: ActorName) -> None:
         """Deletes an actor given a layer and an actor name"""
         self._check_if_actor_exists(layer, actor_name)
         self._get_layer(layer).pop(actor_name)
@@ -290,7 +297,7 @@ class Bmsld(BaseResource):
         self,
         position: list[float],
         template_actor: BmsldActor,
-        new_name: str,
+        new_name: ActorName,
         layer: ActorLayer,
         offset: tuple = (0, 0, 0),
     ) -> BmsldActor:
