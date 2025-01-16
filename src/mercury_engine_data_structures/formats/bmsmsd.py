@@ -29,8 +29,8 @@ from mercury_engine_data_structures.common_types import (
 )
 
 if TYPE_CHECKING:
-
     from mercury_engine_data_structures.game_check import Game
+
 
 class TileBorder(int, Enum):
     TOP = 1
@@ -42,7 +42,9 @@ class TileBorder(int, Enum):
     OPEN_LEFT = 64
     OPEN_RIGHT = 128
 
+
 TileBorderConstruct = FlagsEnumAdapter(TileBorder, Int32sl)
+
 
 class TileType(int, Enum):
     NORMAL = 1
@@ -51,7 +53,9 @@ class TileType(int, Enum):
     ACID_RISE = 8
     ACID_FALL = 12
 
+
 TileTypeConstruct = EnumAdapter(TileType, Int32ul)
+
 
 class IconPriority(int, Enum):
     METROID = -1
@@ -61,6 +65,7 @@ class IconPriority(int, Enum):
     DOOR = 3
     CHOZO_SEAL = 4
     HIDDEN_ITEM = 5
+
 
 IconPriorityConstruct = EnumAdapter(IconPriority, Int32sl)
 

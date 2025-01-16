@@ -9,11 +9,7 @@ class FlagsEnumAdapter(Adapter):
         self._enum_class = enum_class
 
     def _decode(self, obj, context, path):
-        return {
-            self._enum_class[k]: v
-            for k, v in obj.items()
-            if k != "_flagsenum" and v is True
-        }
+        return {self._enum_class[k]: v for k, v in obj.items() if k != "_flagsenum" and v is True}
 
     def _encode(self, obj, context, path):
         return obj
