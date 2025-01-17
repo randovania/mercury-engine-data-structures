@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import functools
-from enum import StrEnum
+from enum import Enum
 from typing import TYPE_CHECKING
 
 import construct
@@ -17,6 +17,7 @@ from construct.core import (
     Struct,
 )
 
+from mercury_engine_data_structures.adapters.enum_adapter import EnumAdapter
 from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import CVector3D, StrId, Vec3, VersionAdapter, make_dict, make_vector
 
@@ -41,26 +42,7 @@ def _rebuild_types(ctx: Container) -> int:
     return len(ctx.types)
 
 
-BlockGroup = Struct(
-    "_num_blocks" / Rebuild(Int32ul, _rebuild_blocks),
-    "_num_types" / Rebuild(Int32ul, _rebuild_types),
-    "is_enabled" / Flag, # always true?
-    "types" / Array(lambda this: this._num_types, Struct(
-        "block_type" / StrId,
-        "blocks" / make_vector(Block),
-    )),
-)  # fmt: skip
-
-BMSBK = Struct(
-    "magic" / Const(b"MSBK"),
-    "version" / VersionAdapter("1.10.0"),
-    "block_groups" / make_vector(BlockGroup),
-    "collision_cameras" / make_dict(make_vector(Int32ul)),
-    construct.Terminated,
-)  # fmt: skip
-
-
-class BlockType(StrEnum):
+class BlockType(str, Enum):
     POWER_BEAM = "power_beam"
     BOMB = "bomb"
     MISSILE = "missile"
@@ -69,6 +51,27 @@ class BlockType(StrEnum):
     BABY = "baby"
     SCREW_ATTACK = "screw_attack"
     WEIGHT = "weight"
+
+
+BlockTypeConstruct = EnumAdapter(BlockType, StrId)
+
+BlockGroup = Struct(
+    "_num_blocks" / Rebuild(Int32ul, _rebuild_blocks),
+    "_num_types" / Rebuild(Int32ul, _rebuild_types),
+    "is_enabled" / Flag, # always true?
+    "types" / Array(lambda this: this._num_types, Struct(
+        "block_type" / BlockTypeConstruct,
+        "blocks" / make_vector(Block),
+    )),
+)  # fmt: skip
+
+BMSBK = Struct(
+    "_magic" / Const(b"MSBK"),
+    "version" / VersionAdapter("1.10.0"),
+    "block_groups" / make_vector(BlockGroup),
+    "collision_cameras" / make_dict(make_vector(Int32ul)),
+    construct.Terminated,
+)  # fmt: skip
 
 
 class BlockData:

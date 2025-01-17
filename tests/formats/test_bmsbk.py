@@ -4,6 +4,7 @@ import pytest
 from tests.test_lib import parse_build_compare_editor
 
 from mercury_engine_data_structures import samus_returns_data
+from mercury_engine_data_structures.common_types import Vec3
 from mercury_engine_data_structures.formats.bmsbk import BlockType, Bmsbk
 
 sr_missing = [
@@ -33,32 +34,33 @@ def test_get_block(surface_bmsbk: Bmsbk):
 
 def test_move_block(surface_bmsbk: Bmsbk):
     block = surface_bmsbk.get_block_group(0).get_block(0)
-    original_position = block.position
-    assert original_position == [-23100.0, 10700.0, 0.0]
-    block.position = [100.0, 200.0, 0.0]
-    assert original_position != block.position
+
+    assert block.position == [-23100.0, 10700.0, 0.0]
+    block.position = Vec3(100.0, 200.0, 0.0)
+    assert block.position == [100.0, 200.0, 0.0]
 
 
 def test_changing_weakness(surface_bmsbk: Bmsbk):
     block_group = surface_bmsbk.get_block_group(0)
-    original_type = block_group.block_type
-    assert original_type == BlockType.POWER_BOMB
+    assert block_group.block_type is BlockType.POWER_BOMB
     block_group.block_type = BlockType.BOMB
-    assert original_type != BlockType.BOMB
+    assert block_group.block_type is BlockType.BOMB
 
 
 def test_respawn_time(surface_bmsbk: Bmsbk):
     block = surface_bmsbk.get_block_group(0).get_block(0)
-    original_time = block.respawn_time
-    assert original_time == 0.0
+    assert block.respawn_time == 0.0
     block.respawn_time = 5.0
-    assert original_time != block.respawn_time
+    assert block.respawn_time == 5.0
 
 
 def test_modify_visuals(surface_bmsbk: Bmsbk):
     block = surface_bmsbk.get_block_group(0).get_block(0)
-    block.model_name = "sg_real_model"
-    assert block.model_name != "sg_casca80"
 
+    assert block.model_name == "sg_casca80"
+    block.model_name = "sg_real_model"
+    assert block.model_name == "sg_real_model"
+
+    assert block.vignette_name == ""
     block.vignette_name = "sg_real_vignette"
-    assert block.vignette_name != ""
+    assert block.vignette_name == "sg_real_vignette"
