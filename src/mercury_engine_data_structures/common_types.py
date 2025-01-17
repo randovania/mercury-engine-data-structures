@@ -159,6 +159,7 @@ CVector2D = CVectorConstruct(2)
 CVector3D = CVectorConstruct(3)
 CVector4D = CVectorConstruct(4)
 Transform3D = construct.Struct("position" / CVector3D, "rotation" / CVector3D, "scale" / CVector3D)
+BoundingBox2D = construct.Struct("min" / CVector2D, "max" / CVector2D)
 
 
 class VersionAdapter(Adapter):
