@@ -13,6 +13,7 @@ from construct.core import (
     Flag,
     Float32l,
     Int32ul,
+    ListContainer,
     Rebuild,
     Struct,
 )
@@ -126,6 +127,25 @@ class BlockGroupData:
     def get_block(self, block_idx: int) -> BlockData:
         return BlockData(self._raw.types[0].blocks[block_idx])
 
+    def add_block(
+        self, position: Vec3, respawn_time: float, model_name: str, vignette_name: str, unk2: int = 0
+    ) -> Container:
+        new_block = Container(
+            {
+                "position": position,
+                "unk2": unk2,
+                "unk3": 0,
+                "respawn_time": respawn_time,
+                "model_name": model_name,
+                "vignette_name": vignette_name,
+            }
+        )
+
+        self._raw.types[0].blocks.append(new_block)
+
+    def remove_block(self, block_idx: int) -> None:
+        self._raw.types[0].blocks.pop(block_idx)
+
 
 class Bmsbk(BaseResource):
     @classmethod
@@ -133,7 +153,55 @@ class Bmsbk(BaseResource):
     def construct_class(cls, target_game: Game) -> Construct:
         return BMSBK
 
+    @property
+    def collision_cameras(self) -> dict[list[int]]:
+        return self.raw.collision_cameras
+
+    @collision_cameras.setter
+    def collision_cameras(self, collision_camera: str, value: dict[list[int]]) -> None:
+        self.raw.collision_cameras[collision_camera] = value
+
     def get_block_group(self, block_group: int) -> BlockGroupData:
-        """Returns a block group by index"""
+        """
+        Returns a block group by index
+
+        param block_group: the index of the block_group
+        """
         assert len(self.raw.block_groups[block_group].types) == 1
         return BlockGroupData(self.raw.block_groups[block_group])
+
+    def add_block_group(self, collision_camera: str, type: BlockType) -> None:
+        """
+        Adds a new block group to a collision_camera
+
+        param collision_camera: the collision_camera the block_group will be added to
+        param type: the weakness of the block_group
+        """
+        new_group = Container(
+            is_enabled=True, types=ListContainer([Container(block_type=type, blocks=ListContainer([]))])
+        )
+        self.raw.block_groups.append(new_group)
+
+        all_collision_cameras = self.collision_cameras
+        if collision_camera not in all_collision_cameras:
+            all_collision_cameras[collision_camera] = Container({collision_camera: ListContainer([])})
+
+        all_collision_cameras[collision_camera].append(len(self.raw.block_groups) - 1)
+
+    def remove_block_group(self, collision_camera: str, group_idx: int) -> None:
+        """
+        Removes a block_group from a collision_camera
+
+        param collision_camera: the collision_camera the block_group is in
+        param group_idx: the index of the block group to be removed
+        """
+        self.raw.block_groups.pop(group_idx)
+        self.collision_cameras[collision_camera].pop(group_idx)
+
+    def remove_collision_camera(self, collision_camera: str) -> None:
+        """
+        Removes a collision_camera from the list of collision_cameras
+
+        param collision_camera: the collision_camera to be removed
+        """
+        self.collision_cameras.pop(collision_camera)
