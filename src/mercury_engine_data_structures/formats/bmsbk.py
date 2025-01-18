@@ -198,10 +198,17 @@ class Bmsbk(BaseResource):
         self.raw.block_groups.pop(group_idx)
         self.collision_cameras[collision_camera].pop(group_idx)
 
-    def remove_collision_camera(self, collision_camera: str) -> None:
+    def remove_collision_camera_group(self, collision_camera: str) -> None:
         """
-        Removes a collision_camera from the list of collision_cameras
+        Removes all groups in a collision_camera and the collision_camera group itself
 
         param collision_camera: the collision_camera to be removed
         """
+        camera = self.collision_cameras[collision_camera]
+        i = 0
+        for group in camera:
+            self.raw.block_groups.pop(group - i)
+            camera.pop(0)
+            i += 1
+
         self.collision_cameras.pop(collision_camera)

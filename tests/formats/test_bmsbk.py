@@ -107,7 +107,14 @@ def test_remove_block_group(surface_bmsbk: Bmsbk):
     assert surface_bmsbk.collision_cameras["bg_SubArea_collision_camera_000"] == [17, 33]
 
 
-def test_remove_collision_camera(surface_bmsbk: Bmsbk):
+def test_remove_collision_camera_group(surface_bmsbk: Bmsbk):
     assert len(surface_bmsbk.collision_cameras) == 15
-    surface_bmsbk.remove_collision_camera("bg_SubArea_collision_camera_000")
+    assert surface_bmsbk.get_block_group(0).block_type == BlockType.POWER_BOMB
+    assert surface_bmsbk.get_block_group(17).block_type == BlockType.POWER_BEAM
+    assert surface_bmsbk.get_block_group(33).block_type == BlockType.BABY
+
+    surface_bmsbk.remove_collision_camera_group("bg_SubArea_collision_camera_000")
     assert len(surface_bmsbk.collision_cameras) == 14
+    assert surface_bmsbk.get_block_group(0).block_type == BlockType.MISSILE
+    assert surface_bmsbk.get_block_group(17).block_type == BlockType.POWER_BOMB
+    assert surface_bmsbk.get_block_group(33).block_type == BlockType.POWER_BEAM
