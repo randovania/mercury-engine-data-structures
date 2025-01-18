@@ -5,7 +5,7 @@ import copy
 import pytest
 from tests.test_lib import parse_build_compare_editor
 
-from mercury_engine_data_structures.formats.bmdefs import Bmdefs
+from mercury_engine_data_structures.formats.bmdefs import Bmdefs, InnerStateType, StateType
 
 
 def test_bmdefs_dread(dread_tree_100):
@@ -56,35 +56,42 @@ def test_get_enemy(bmdefs: Bmdefs):
 
     state = layer.get_state(0)
     assert state.state_type == "COMBAT"
-
-    sound_properties = state.get_sound_properties()
-    assert sound_properties.start_delay == 0.0
-    assert sound_properties.inner_states == {"RELAX": 3.0, "DEATH": 5.0}
+    assert state.start_delay == 0.0
+    assert state.inner_states == {"RELAX": 3.0, "DEATH": 5.0}
 
 
 def test_set_enemy_properties(bmdefs: Bmdefs):
     enemy = bmdefs.get_enemy(9)
     assert enemy is not None
 
+    assert enemy.enemy_name == "queen"
     enemy.enemy_name = "kraid"
-    assert enemy.enemy_name != "queen"
+    assert enemy.enemy_name == "kraid"
 
     area = enemy.get_area(0)
+    assert area.area_name == "s100_area10"
     area.area_name = "s050_area5"
-    assert area != "s100_area10"
+    assert area.area_name == "s050_area5"
 
     layer = area.get_layer(0)
+    assert layer.layer_name == "default"
     layer.layer_name = "not_default"
-    assert layer.layer_name != "default"
+    assert layer.layer_name == "not_default"
 
     state = layer.get_state(1)
-    state.state_type = "COMBAT"
-    assert state.state_type != "DEATH"
+    assert state.state_type == StateType.DEATH
+    state.state_type = StateType.COMBAT
+    assert state.state_type == StateType.COMBAT
+
+    assert state.start_delay == 2.0
+    state.start_delay = 0.4
+    assert state.start_delay == 0.4
+
+    assert state.inner_states == {}
+    state.inner_states = {InnerStateType.RELAX: 1.0, InnerStateType.DEATH: 45.0}
+    assert state.inner_states == {InnerStateType.RELAX: 1.0, InnerStateType.DEATH: 45.0}
 
     sound_properties = state.get_sound_properties()
+    assert sound_properties.fade_out == 3.0
     sound_properties.fade_out = 10.0
-    assert sound_properties.fade_out != 3.0
-    sound_properties.start_delay = 0.4
-    assert sound_properties.start_delay != 2.0
-    sound_properties.inner_states = {"RELAX": 1.0, "DEATH": 45.0}
-    assert sound_properties.inner_states != {}
+    assert sound_properties.fade_out == 10.0

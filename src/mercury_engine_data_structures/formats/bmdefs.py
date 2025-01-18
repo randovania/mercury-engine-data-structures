@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from enum import Enum
+
 import construct
 from construct.core import (
     Const,
@@ -11,10 +13,22 @@ from construct.core import (
     Struct,
 )
 
+from mercury_engine_data_structures.adapters.enum_adapter import EnumAdapter
 from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import StrId, VersionAdapter, make_dict, make_vector
 from mercury_engine_data_structures.formats import standard_format
 from mercury_engine_data_structures.game_check import Game
+
+
+class StateType(str, Enum):
+    COMBAT = "COMBAT"
+    DEATH = "DEATH"
+
+
+class InnerStateType(str, Enum):
+    DEATH = "DEATH"
+    RELAX = "RELAX"
+
 
 EnemyStruct = Struct(
     "enemy_name" / StrId,
@@ -53,7 +67,7 @@ EnemyStruct = Struct(
                             "unk4" / Int32ul,
                             "unk_bool" / Flag,
                             "environment_sfx_volume" / Float32l,
-                            "inner_states" / make_dict(Float32l)
+                            "inner_states" / make_dict(EnumAdapter(InnerStateType, StrId), Float32l)
                         ),
                     },
                 )
@@ -65,7 +79,7 @@ EnemyStruct = Struct(
 BMDEFS = Struct(
     "_magic" / Const(b"MDEF"),
     "version" / VersionAdapter("1.5.0"),
-    "number_of_sounds" / Int32ul,
+    "_number_of_sounds" / Int32ul,
     "sounds"
     / make_vector(
         Struct(
@@ -83,7 +97,7 @@ BMDEFS = Struct(
             "environment_sfx_volume" / Float32l,
         )
     ),  # fmt: skip
-    "number_of_enemy_groups" / Int32ul,
+    "_number_of_enemy_groups" / Int32ul,
     "enemies_list" / make_vector(EnemyStruct),
     construct.Terminated,
 )
@@ -94,12 +108,29 @@ class EnemyStates:
         self._raw = raw
 
     @property
-    def state_type(self) -> str:
+    def state_type(self) -> StateType:
         return self._raw.type
 
     @state_type.setter
-    def state_type(self, value: str) -> None:
+    def state_type(self, value: StateType) -> None:
         self._raw.type = value
+
+    @property
+    def start_delay(self) -> float:
+        return self._raw.properties.start_delay
+
+    @start_delay.setter
+    def start_delay(self, value: float) -> None:
+        self._raw.properties.start_delay = value
+
+    @property
+    def inner_states(self) -> dict[InnerStateType, float]:
+        return self._raw.properties.inner_states
+
+    @inner_states.setter
+    def inner_states(self, value: dict[InnerStateType, float]) -> None:
+        for name, value in value.items():
+            self._raw.properties.inner_states[name] = value
 
     def get_sound_properties(self) -> Sounds:
         return Sounds(self._raw.properties)
@@ -149,6 +180,23 @@ class EnemiesList:
     def enemy_name(self, value: str) -> None:
         self._raw.enemy_name = value
 
+    @property
+    def start_delay(self) -> float:
+        return self._raw.start_delay
+
+    @start_delay.setter
+    def start_delay(self, value: float) -> None:
+        self._raw.start_delay = value
+
+    @property
+    def inner_states(self) -> dict[InnerStateType, float]:
+        return self._raw.inner_states
+
+    @inner_states.setter
+    def inner_states(self, value: dict[InnerStateType, float]) -> None:
+        for name, value in value.items():
+            self._raw.inner_states[name] = value
+
     def get_area(self, area_idx: int) -> Areas:
         return Areas(self._raw.areas[area_idx])
 
@@ -170,7 +218,7 @@ class Sounds:
         return self._raw.priority
 
     @priority.setter
-    def priority(self, value: str) -> None:
+    def priority(self, value: int) -> None:
         self._raw.priority = value
 
     @property
@@ -212,24 +260,6 @@ class Sounds:
     @environment_sfx_volume.setter
     def environment_sfx_volume(self, value: float) -> None:
         self._raw.environment_sfx_volume = value
-
-    # inner_states and start_delay are only used for enemies
-    @property
-    def start_delay(self) -> float:
-        return self._raw.start_delay
-
-    @start_delay.setter
-    def start_delay(self, value: float) -> None:
-        self._raw.start_delay = value
-
-    @property
-    def inner_states(self) -> dict[str, float]:
-        return self._raw.inner_states
-
-    @inner_states.setter
-    def inner_states(self, value: dict[str, float]) -> None:
-        for name, value in value.items():
-            self._raw.inner_states[name] = value
 
 
 class Bmdefs(BaseResource):
