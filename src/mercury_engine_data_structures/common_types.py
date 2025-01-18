@@ -159,6 +159,7 @@ CVector2D = CVectorConstruct(2)
 CVector3D = CVectorConstruct(3)
 CVector4D = CVectorConstruct(4)
 Transform3D = construct.Struct("position" / CVector3D, "rotation" / CVector3D, "scale" / CVector3D)
+BoundingBox2D = construct.Struct("min" / CVector2D, "max" / CVector2D)
 
 
 class VersionAdapter(Adapter):
@@ -495,8 +496,7 @@ def make_vector(value: construct.Construct):
 
         def _emitparse(code: construct.CodeGen) -> str:
             return (
-                f"ListContainer(({value._compileparse(code)}) "
-                f"for i in range({construct.Int32ul._compileparse(code)}))"
+                f"ListContainer(({value._compileparse(code)}) for i in range({construct.Int32ul._compileparse(code)}))"
             )
 
     result._emitparse = _emitparse

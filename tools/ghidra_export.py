@@ -644,7 +644,7 @@ def main(
     for key in list(process_results.keys()):
         # Something causes a type to inherit from a pointer to itself, that's wrong
         if process_results[key]["parent"] in (f"{key}Ptr", key):
-            print(f'Removing parent for {key}: {process_results[key]["parent"]}')
+            print(f"Removing parent for {key}: {process_results[key]['parent']}")
             process_results[key]["parent"] = None
 
         if process_results[key]["parent"] is not None and is_container_or_ptr(process_results[key]["parent"]):
