@@ -115,25 +115,8 @@ class EnemyStates:
     def state_type(self, value: StateType) -> None:
         self._raw.type = value
 
-    @property
-    def start_delay(self) -> float:
-        return self._raw.properties.start_delay
-
-    @start_delay.setter
-    def start_delay(self, value: float) -> None:
-        self._raw.properties.start_delay = value
-
-    @property
-    def inner_states(self) -> dict[InnerStateType, float]:
-        return self._raw.properties.inner_states
-
-    @inner_states.setter
-    def inner_states(self, value: dict[InnerStateType, float]) -> None:
-        for name, value in value.items():
-            self._raw.properties.inner_states[name] = value
-
-    def get_sound_properties(self) -> Sounds:
-        return Sounds(self._raw.properties)
+    def get_sound_properties(self) -> EnemySounds:
+        return EnemySounds(self._raw.properties)
 
 
 class EnemyLayers:
@@ -260,6 +243,28 @@ class Sounds:
     @environment_sfx_volume.setter
     def environment_sfx_volume(self, value: float) -> None:
         self._raw.environment_sfx_volume = value
+
+
+class EnemySounds(Sounds):
+    def __init__(self, raw: Container):
+        self._raw = raw
+
+    @property
+    def start_delay(self) -> float:
+        return self._raw.start_delay
+
+    @start_delay.setter
+    def start_delay(self, value: float) -> None:
+        self._raw.start_delay = value
+
+    @property
+    def inner_states(self) -> dict[InnerStateType, float]:
+        return self._raw.inner_states
+
+    @inner_states.setter
+    def inner_states(self, value: dict[InnerStateType, float]) -> None:
+        for name, value in value.items():
+            self._raw.inner_states[name] = value
 
 
 class Bmdefs(BaseResource):
