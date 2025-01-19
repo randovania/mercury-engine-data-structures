@@ -246,9 +246,6 @@ class Sounds:
 
 
 class EnemySounds(Sounds):
-    def __init__(self, raw: Container):
-        self._raw = raw
-
     @property
     def start_delay(self) -> float:
         return self._raw.start_delay
