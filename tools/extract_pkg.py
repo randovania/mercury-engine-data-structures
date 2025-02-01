@@ -25,8 +25,8 @@ def main():
     path = (
         Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures", f"{short_game}_resource_names.json")
     )
-    known_names: dict[str, int] = json.loads(path.read_text())
-    name_for_asset_id: dict[int, str] = {asset_id["crc"]: name for name, asset_id in known_names.items()}
+    known_names: dict[str, dict] = json.loads(path.read_text())
+    name_for_asset_id: dict[int, str] = {asset_dict["crc"]: name for name, asset_dict in known_names.items()}
 
     game_root: Path = args.game_root
     output: Path = args.output
