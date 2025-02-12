@@ -5,7 +5,7 @@ from tests.test_lib import parse_build_compare_editor
 
 from mercury_engine_data_structures import samus_returns_data
 from mercury_engine_data_structures.common_types import Vec3
-from mercury_engine_data_structures.formats.bmsbk import BlockType, Bmsbk
+from mercury_engine_data_structures.formats.bmsbk import BlockData, BlockType, Bmsbk
 
 sr_missing = [
     "maps/levels/c10_samus/s908_manicminerbotrun/s908_manicminerbotrun.bmsbk",
@@ -80,7 +80,8 @@ def test_add_block(surface_bmsbk: Bmsbk):
     assert surface_bmsbk.collision_cameras["bg_SubArea_collision_camera_000"] == [0, 17, 33, 43]
 
     # Add a new block to the group
-    block_group.add_block(Vec3(100.0, 500.0, 0.0), 1.0, "sg_casca_model", "sg_vignette_model")
+    block = BlockData.create(Vec3(100.0, 500.0, 0.0), 1.0, "sg_casca_model", "sg_vignette_model")
+    block_group.add_block(block)
     new_block = block_group.get_block(0)
     assert new_block is not None
     assert new_block.position == Vec3(100.0, 500.0, 0.0)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+import typing
 from enum import Enum
 from typing import TYPE_CHECKING
 
@@ -79,6 +80,23 @@ class BlockData:
     def __init__(self, raw: Container) -> None:
         self._raw = raw
 
+    @classmethod
+    def create(
+        cls, position: Vec3, respawn_time: float, model_name: str, vignette_name: str, unk2: int = 0
+    ) -> typing.Self:
+        return cls(
+            Container(
+                {
+                    "position": position,
+                    "unk2": unk2,
+                    "unk3": 0,
+                    "respawn_time": respawn_time,
+                    "model_name": model_name,
+                    "vignette_name": vignette_name,
+                }
+            )
+        )
+
     @property
     def position(self) -> Vec3:
         return self._raw.position
@@ -127,20 +145,7 @@ class BlockGroupData:
     def get_block(self, block_idx: int) -> BlockData:
         return BlockData(self._raw.types[0].blocks[block_idx])
 
-    def add_block(
-        self, position: Vec3, respawn_time: float, model_name: str, vignette_name: str, unk2: int = 0
-    ) -> Container:
-        new_block = Container(
-            {
-                "position": position,
-                "unk2": unk2,
-                "unk3": 0,
-                "respawn_time": respawn_time,
-                "model_name": model_name,
-                "vignette_name": vignette_name,
-            }
-        )
-
+    def add_block(self, new_block: BlockData) -> None:
         self._raw.types[0].blocks.append(new_block)
 
     def remove_block(self, block_idx: int) -> None:
