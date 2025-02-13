@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from construct import ListContainer
 import pytest
+from mercury_engine_data_structures.common_types import Vec3
 from tests.test_lib import parse_build_compare_editor
 
 from mercury_engine_data_structures import samus_returns_data
@@ -115,11 +117,17 @@ def test_get_actor(surface_bmsld: Bmsld):
     actor = surface_bmsld.get_actor(layer, "LE_Item_001")
     assert actor is not None
 
+    assert actor.actor_type == "item_missiletank"
     actor.actor_type = "powerup_plasmabeam"
+    assert actor.actor_type == "powerup_plasmabeam"
+
+    assert actor.position == Vec3(-5500.0, -9700.0, 0.0)
     actor.position.x = -6000.0
-    actor_by_layer = surface_bmsld._get_layer(layer)["LE_Item_001"]
-    assert actor_by_layer["type"] == "powerup_plasmabeam"
-    assert actor_by_layer["position"][0] == -6000.0
+    assert actor.position == Vec3(-6000.0, -9700.0, 0.0)
+
+    assert actor.rotation == Vec3(0.0, 0.0, 0.0)
+    actor.rotation = Vec3(0.0, 90.0, 0.0)
+    assert actor.rotation == Vec3(0.0, 90.0, 0.0)
 
     with pytest.raises(KeyError):
         surface_bmsld.get_actor(layer, "FakeActor")
