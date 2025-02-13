@@ -127,7 +127,6 @@ BMSLD = Struct(
 
 ActorName: TypeAlias = str
 ActorGroupName: TypeAlias = str
-ActorGroup: TypeAlias = dict[str, list[str]]
 
 
 class ActorLayer(IntEnum):
@@ -208,16 +207,16 @@ class Bmsld(BaseResource):
         return BMSLD
 
     def all_actors(self) -> Iterator[tuple[ActorLayer, ActorName, BmsldActor]]:
-        for layer in self.raw.actor_layers:
+        for i, layer in enumerate(self.raw.actor_layers):
             for actor_name, actor in layer.items():
-                yield ActorLayer, BmsldActor(actor)
+                yield ActorLayer(i), actor_name, BmsldActor(actor)
 
     @property
-    def actor_groups(self) -> ActorGroup:
+    def actor_groups(self) -> dict[ActorGroupName, list[ActorName]]:
         return self.raw.actor_groups
 
     @actor_groups.setter
-    def actor_groups(self, value: ActorGroup) -> None:
+    def actor_groups(self, value: dict[ActorGroupName, list[ActorName]]) -> None:
         self.raw.actor_groups = value
 
     def is_actor_in_group(self, group_name: ActorGroupName, actor_name: ActorName) -> bool:

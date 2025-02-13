@@ -67,6 +67,7 @@ def test_all_actors(surface_bmsld: Bmsld):
     assert len(all_actors) == 232
     # Number of active layers should be 10
     assert len(ActorLayer) == 10
+    assert "TG_Activation_Teleport_00_01" in all_actors[ActorLayer.TRIGGER]
 
 
 def test_all_actor_group_names_for_actor(surface_bmsld: Bmsld):
