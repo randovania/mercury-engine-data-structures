@@ -142,9 +142,9 @@ class DdsExporter:
 
     def __init__(self, raw: RawTexture) -> None:
         self.raw = raw
-        self.build_dds()
+        self._build_all_dds()
 
-    def build_dds(self):
+    def _build_all_dds(self):
         """
         Generates a list of raw DDS files in `self.dds_files`.
         Should always be one texture per BCTEX, but haven't confirmed.
@@ -249,7 +249,7 @@ class DdsExporter:
         Exports a .dds file to the given folder.
 
         If there are multiple images contained in a single BCTEX (which there aren't in vanilla),
-        they are placed in a folder with the given name.
+        an error is raised.
 
         :param folder: folder to write the dds file to
         :param name: name of the file. default is `{self.raw.name}.dds`
@@ -262,12 +262,5 @@ class DdsExporter:
         if len(self.dds_files) == 1:
             folder.joinpath(name).write_bytes(self.dds_files[0])
 
-        elif len(self.dds_files) > 1:
-            multi_export = folder.joinpath(name)
-            multi_export.mkdir(parents=True, exist_ok=True)
-
-            for i, raw in enumerate(self.dds_files):
-                multi_export.joinpath(f"image_{i}.dds").write_bytes(raw)
-
         else:
-            raise ValueError("Did not find any DDS data!")
+            raise ValueError(f"Too many images contained in one BCTEX (expected 1, got {len(self.dds_files)}")

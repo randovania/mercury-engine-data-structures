@@ -52,16 +52,16 @@ class RawTexture:
         self.bctex = texture
         self.name = texture.raw.data.name
 
-        self.parse()
+        self._parse()
 
-    def parse(self):
+    def _parse(self):
         self.textures = []
         blocks = self.bctex.raw.data.xtx.blocks
         infos = [blk for blk in blocks if blk.block_type == BlockType.TEXTURE.name]
         datas = [blk for blk in blocks if blk.block_type == BlockType.DATA.name]
-
+        print(len(infos))
         for info, data in zip(infos, datas):
-            self.textures.append(self.parse_array(info, data))
+            self.textures.append(self._parse_array(info, data))
 
     @dataclasses.dataclass
     class Mip0Data:
@@ -72,7 +72,7 @@ class RawTexture:
         block_height: int
         block_dim: py_tegra_swizzle.PyBlockDim
 
-    def parse_array(self, info: Container, data: Container) -> Array:
+    def _parse_array(self, info: Container, data: Container) -> Array:
         xtx_format = [x for x in XTX_Tegra_Format if x.name == info.data.xtx_format][0]
         width = info.data.width
         height = info.data.height
@@ -85,12 +85,12 @@ class RawTexture:
         res = Array(width, height, xtx_format, [])
         array_size = info.data.data_size // info.data.slice_size  # usually 1, but 6 for cubemaps
         for array_level in range(array_size):
-            mipped_surface = self.parse_texture2d(info, data, info.data.slice_size * array_level, mip0_data)
+            mipped_surface = self._parse_texture2d(info, data, info.data.slice_size * array_level, mip0_data)
             res.members.append(mipped_surface)
 
         return res
 
-    def parse_texture2d(self, info: Container, data: Container, array_offset: int, mip0: Mip0Data) -> Texture2D:
+    def _parse_texture2d(self, info: Container, data: Container, array_offset: int, mip0: Mip0Data) -> Texture2D:
         mips = []
 
         mip_offset = 0
@@ -113,25 +113,26 @@ class RawTexture:
 
             deswizzled = self._deswizzle(mip_width, mip_height, mip_depth, mip0, block_height_log2, mip_data)
 
-            if deswizzled is None:
-                raise ValueError(f"Deswizzle Failed, mip={mip_level}")
-
             mips.append(Surface(mip_width, mip_height, deswizzled))
             mip_offset += mip_size
 
         return Texture2D(mips)
 
-    def _deswizzle(self, width: int, height: int, depth: int, mip0: Mip0Data, heightLog2: int, data: bytes) -> bytes:
-        height_mip0 = 1 << max(min(heightLog2, 5), 0)
+    def _deswizzle(self, width: int, height: int, depth: int, mip0: Mip0Data, height_log2: int, data: bytes) -> bytes:
+        """
+        Deswizzles a swizzled surface. Can return ValueError if not enough data in `data`.
+
+        width, height, depth are for the mip level of the surface.
+        mip0 contains data of the level-0 mipmap.
+        height_log2 contains the log2 of the block height (calculated by py_tegra_swizzle)
+        data is the swizzled surface data.
+        """
+        height_mip0 = 1 << max(min(height_log2, 5), 0)
 
         width_blks = div_round_up(width, mip0.format.block_width)
         height_blks = div_round_up(height, mip0.format.block_height)
         depth_blks = div_round_up(depth, mip0.format.block_depth)
 
-        try:
-            res = py_tegra_swizzle.deswizzle_block_linear(
-                width_blks, height_blks, depth_blks, data, height_mip0, mip0.format.bytes_per_pixel
-            )
-            return res
-        except Exception:
-            return None
+        return py_tegra_swizzle.deswizzle_block_linear(
+            width_blks, height_blks, depth_blks, data, height_mip0, mip0.format.bytes_per_pixel
+        )
