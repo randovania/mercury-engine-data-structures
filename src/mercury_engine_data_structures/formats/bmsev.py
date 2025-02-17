@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import functools
 
 from construct import (
@@ -16,12 +18,16 @@ from mercury_engine_data_structures.game_check import Game
 BMSEV = Struct(
     "magic" / Const(b"MSEV"),
     "version" / VersionAdapter(),
-    "elements" / make_vector(Struct(
-        "name" / StrId,
-        "unknown_floats" / Array(59, Float32l),
-    )),
+    "elements"
+    / make_vector(
+        Struct(
+            "name" / StrId,
+            "unknown_floats" / Array(59, Float32l),
+        )
+    ),
     Terminated,
 ).compile()
+
 
 class Bmsev(BaseResource):
     @classmethod

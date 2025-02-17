@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 from tests.test_lib import parse_build_compare_editor
 
@@ -19,6 +21,7 @@ sr_missing = [
     "maps/levels/c10_samus/s911_swarmgym/s911_swarmgym.bmsev",
     "maps/levels/c10_samus/s920_traininggallery/s920_traininggallery.bmsev",
 ]
+
 
 @pytest.mark.parametrize("bmsev_path", samus_returns_data.all_files_ending_with(".bmsev", sr_missing))
 def test_bmsev(samus_returns_tree, bmsev_path):
