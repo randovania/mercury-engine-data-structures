@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import typing
 from pathlib import Path
@@ -7,8 +9,9 @@ from mercury_engine_data_structures import crc
 
 def main():
     types_file = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures", "dread_types.json")
-    properties_file = Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures",
-                                                         "dread_property_names.json")
+    properties_file = (
+        Path(__file__).parents[1].joinpath("src", "mercury_engine_data_structures", "dread_property_names.json")
+    )
 
     with types_file.open() as f:
         all_types: dict[str, dict[str, typing.Any]] = json.load(f)
@@ -22,11 +25,8 @@ def main():
                 known_hashes[field] = crc.crc64(field)
 
     with properties_file.open("w") as f:
-        json.dump({
-            key: known_hashes[key]
-            for key in sorted(known_hashes.keys())
-        }, f, indent=4)
+        json.dump({key: known_hashes[key] for key in sorted(known_hashes.keys())}, f, indent=4)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

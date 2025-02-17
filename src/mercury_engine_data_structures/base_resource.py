@@ -2,14 +2,12 @@ from __future__ import annotations
 
 import typing
 
-from construct import Construct, Container
-
-from mercury_engine_data_structures.game_check import Game
-
 if typing.TYPE_CHECKING:
     import typing_extensions
+    from construct import Construct, Container
 
     from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
+    from mercury_engine_data_structures.game_check import Game
 
 
 class BaseResource:
@@ -24,12 +22,11 @@ class BaseResource:
 
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @classmethod
     def parse(cls, data: bytes, target_game: Game, editor: FileTreeEditor | None = None) -> typing_extensions.Self:
-        return cls(cls.construct_class(target_game).parse(data, target_game=target_game),
-                   target_game, editor)
+        return cls(cls.construct_class(target_game).parse(data, target_game=target_game), target_game, editor)
 
     def build(self) -> bytes:
         return self.construct_class(self.target_game).build(self._raw, target_game=self.target_game)
@@ -41,7 +38,7 @@ class BaseResource:
 
 AssetType = str
 AssetId = int
-NameOrAssetId = typing.Union[str, AssetId]
+NameOrAssetId = str | AssetId
 
 
 def resolve_asset_id(value: NameOrAssetId, game: Game) -> AssetId:

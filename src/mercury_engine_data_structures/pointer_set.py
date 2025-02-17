@@ -1,9 +1,11 @@
 """
 Helper class to handle objects that contain a pointer to objects of varied types, usually all with the same base type.
 """
+
+from __future__ import annotations
+
 import copy
 import struct
-from typing import Dict, Type, Union
 
 import construct
 from construct import Adapter, Construct, Container, Hex, Int64ul, ListContainer, Struct, Switch
@@ -17,21 +19,21 @@ from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMe
 
 
 class PointerAdapter(Adapter):
-    types: Dict[int, Union[Construct, Type[Construct]]]
+    types: dict[int, Construct | type[Construct]]
 
-    def __init__(self, types: Dict[int, Union[Construct, Type[Construct]]], category: str):
+    def __init__(self, types: dict[int, Construct | type[Construct]], category: str):
         get_name = mercury_engine_data_structures.dread_data.all_property_id_to_name().get
         self.switch_con = Switch(
             construct.this.type,
             types,
-            ErrorWithMessage(lambda ctx: (
-                f"Property {ctx.type} ({get_name(ctx.type)}) without assigned type"
-            )),
+            ErrorWithMessage(lambda ctx: (f"Property {ctx.type} ({get_name(ctx.type)}) without assigned type")),
         )
-        super().__init__(Struct(
-            type=Hex(Int64ul),
-            ptr=self.switch_con,
-        ))
+        super().__init__(
+            Struct(
+                type=Hex(Int64ul),
+                ptr=self.switch_con,
+            )
+        )
         self.types = types
         self.category = category
 
@@ -154,7 +156,7 @@ class PointerAdapter(Adapter):
 
 
 class PointerSet:
-    types: Dict[int, Union[Construct, Type[Construct]]]
+    types: dict[int, Construct | type[Construct]]
 
     def __init__(self, category: str, *, allow_null: bool = True):
         self.category = category
@@ -163,12 +165,12 @@ class PointerSet:
             self.add_option("void", construct.Pass)
 
     @classmethod
-    def construct_pointer_for(cls, name: str, conn: Union[Construct, Type[Construct]]) -> Construct:
+    def construct_pointer_for(cls, name: str, conn: Construct | type[Construct]) -> Construct:
         ret = cls(name, allow_null=True)
         ret.add_option(name, conn)
         return ret.create_construct()
 
-    def add_option(self, name: str, value: Union[Construct, Type[Construct]]) -> None:
+    def add_option(self, name: str, value: Construct | type[Construct]) -> None:
         prop_id = mercury_engine_data_structures.dread_data.all_name_to_property_id()[name]
         if prop_id in self.types:
             raise ValueError(f"Attempting to add {name} to {self.category}, but already present.")

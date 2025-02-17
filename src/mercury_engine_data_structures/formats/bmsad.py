@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import copy
 import functools
 import typing
-from collections.abc import Sequence
 
 import construct
 from construct.core import (
@@ -12,6 +13,7 @@ from construct.core import (
     Flag,
     Float32l,
     Hex,
+    IfThenElse,
     Int8ul,
     Int16ul,
     Int32sl,
@@ -22,6 +24,7 @@ from construct.core import (
 from construct.lib.containers import Container, ListContainer
 
 from mercury_engine_data_structures import common_types, type_lib
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import (
     Char,
     CVector3D,
@@ -34,56 +37,69 @@ from mercury_engine_data_structures.common_types import (
 from mercury_engine_data_structures.construct_extensions.alignment import PrefixedAllowZeroLen
 from mercury_engine_data_structures.construct_extensions.function_complex import ComplexIf, SwitchComplexKey
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
-from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.formats.bmsas import BMSAS_SR, Bmsas
 from mercury_engine_data_structures.formats.property_enum import PropertyEnum
 from mercury_engine_data_structures.game_check import Game, GameSpecificStruct
 from mercury_engine_data_structures.type_lib import get_type_lib_dread, get_type_lib_for_game
 
+if typing.TYPE_CHECKING:
+    from collections.abc import Sequence
+
 # Functions
 FunctionArgument = Struct(
-    type=Char,
-    value=Switch(
+    "type" / Char,
+    "value"
+    / Switch(
         construct.this.type,
         {
-            's': StrId,
-            'f': Float,
-            'b': Flag,
-            'i': Int32sl,
+            "s": StrId,
+            "f": Float,
+            "b": Flag,
+            "i": Int32sl,
         },
-        ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
+        ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError),
+    ),
+)
+Functions = make_vector(
+    Struct(
+        "name" / StrId,
+        "unk1" / Flag,
+        "unk2" / Flag,
+        "params"
+        / common_types.DictAdapter(
+            common_types.make_vector(
+                common_types.DictElement(
+                    FunctionArgument,
+                    key=PropertyEnum,
+                )
+            )
+        ),
     )
 )
-Functions = make_vector(Struct(
-    name=StrId,
-    unk1=Flag,
-    unk2=Flag,
-    params=common_types.DictAdapter(common_types.make_vector(
-        common_types.DictElement(
-            FunctionArgument,
-            key=PropertyEnum,
-        )
-    )),
-))
 
 # Fields
-ExtraFields = common_types.DictAdapter(make_vector(
-    common_types.DictElement(Struct(
-        "type" / StrId,
-        "value" / Switch(
-            construct.this.type,
-            {
-                "bool": Flag,
-                "string": StrId,
-                "float": Float,
-
-                "int": Int32sl,
-                "vec3": CVector3D,
-            },
-            ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
+ExtraFields = common_types.DictAdapter(
+    make_vector(
+        common_types.DictElement(
+            Struct(
+                "type" / StrId,
+                "value"
+                / Switch(
+                    construct.this.type,
+                    {
+                        "bool": Flag,
+                        "string": StrId,
+                        "float": Float,
+                        "int": Int32sl,
+                        "vec3": CVector3D,
+                    },
+                    ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError),
+                ),
+            )
         )
-    ))
-), allow_duplicates=True)
+    ),
+    allow_duplicates=True,
+)
 
 
 @functools.cache
@@ -155,7 +171,7 @@ def DreadDependencies():
             "unk2" / make_vector(StrId),
             "unk3" / make_vector(StrId)
         )
-    }
+    }  # fmt: skip
     component_dependencies["CStandaloneFXComponent"] = component_dependencies["CFXComponent"]
 
     def component_type(this):
@@ -215,7 +231,7 @@ def SRDependencies():
             "unk2" / make_vector(StrId),
             "unk3" / make_vector(StrId)
         ),
-    }
+    }  # fmt: skip
     for dep in [
         "CTsumuriAcidDroolCollision",
         "CBillboardCollisionComponent",
@@ -232,10 +248,10 @@ def SRDependencies():
     return Switch(construct.this.type, component_dependencies)
 
 
-FieldsSwitch = construct.Switch(
+FieldsSwitch = Switch(
     lambda ctx: find_charclass_for_type(ctx._._.type),
     fieldtypes(Game.DREAD),
-    ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx._._.type}", construct.SwitchError)
+    ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx._._.type}", construct.SwitchError),
 )
 
 
@@ -248,32 +264,44 @@ FieldsSwitch._emitbuild = _not_implemented
 
 # Components
 DreadComponent = Struct(
-    type=StrId,
-    unk_1=Int32sl,
-    unk_2=Int32sl,
-    fields=PrefixedAllowZeroLen(
+    "type" / StrId,
+    "unk_1" / Int32sl,
+    "unk_2" / Int32sl,
+    "fields"
+    / PrefixedAllowZeroLen(
         Int32ul,
         Struct(
-            empty_string=PropertyEnum,
-            root=PropertyEnum,
-            fields=FieldsSwitch,
-        )
+            "empty_string" / PropertyEnum,
+            "root" / PropertyEnum,
+            "fields"
+            / IfThenElse(
+                # repairs incorrect encoding on actors/props/pf_mushr_fr/charclasses/pf_mushr_fr.bmsad
+                construct.this._parsing and construct.this._.len == 0x1C,
+                Struct(
+                    Const(1, Int32ul),
+                    Const("eDefaultCollisionMaterial", PropertyEnum),
+                    "eDefaultCollisionMaterial" / construct.Computed(0),
+                ),
+                FieldsSwitch,
+            ),
+        ),
     ),
-    extra_fields=ComplexIf(
+    "extra_fields"
+    / ComplexIf(
         lambda this: get_type_lib_dread().is_child_of(this.type, "CComponent"),
         ExtraFields,
     ),
-    functions=Functions,
-    dependencies=DreadDependencies(),
+    "functions" / Functions,
+    "dependencies" / DreadDependencies(),
 )
 
 SRComponent = Struct(
-    type=StrId,
-    unk_1=Hex(Int32ul),
-    unk_2=Float32l,
-    functions=Functions,
-    fields=ExtraFields,
-    dependencies=SRDependencies(),
+    "type" / StrId,
+    "unk_1" / Hex(Int32ul),
+    "unk_2" / Float32l,
+    "functions" / Functions,
+    "fields" / ExtraFields,
+    "dependencies" / SRDependencies(),
 )
 
 # Header
@@ -304,25 +332,25 @@ CCharClassHeader = Struct(
 )
 
 SRHeader = Struct(
-    model_name=StrId,
-    ignore_samus=Flag,
-    unk_2a=Float,
-    unk_2b=Float,
-    unk_2c=Float,
-    model_scale=Float,
-    unk_2e=Float,
-    hitbox_dimensions=CVector3D,
-    unk_2g=Float,
-    unk_3=Int8ul,
-    unk_4=Int32ul,
-    other_magic=Int32sl,
-    unk_5=Flag,
-    unk_5b=Flag,
-    unk_6=Flag,
-    category=StrId,
-    unk_7=Flag,
-    sub_actors=make_vector(StrId),
-    unk_8=Int32ul,
+    "model_name" / StrId,
+    "ignore_samus" / Flag,
+    "unk_2a" / Float,
+    "unk_2b" / Float,
+    "unk_2c" / Float,
+    "model_scale" / Float,
+    "unk_2e" / Float,
+    "hitbox_dimensions" / CVector3D,
+    "unk_2g" / Float,
+    "unk_3" / Int8ul,
+    "unk_4" / Int32ul,
+    "other_magic" / Int32sl,
+    "unk_5" / Flag,
+    "unk_5b" / Flag,
+    "unk_6" / Flag,
+    "category" / StrId,
+    "unk_7" / Flag,
+    "sub_actors" / make_vector(StrId),
+    "unk_8" / Int32ul,
 )
 
 # BMSAD
@@ -353,7 +381,7 @@ BMSAD_SR = Struct(
     ),
 
     construct.Terminated,
-)
+)  # fmt: skip
 
 BMSAD_Dread = Struct(
     "_magic" / Const(b"MSAD"),
@@ -375,7 +403,7 @@ BMSAD_Dread = Struct(
     "action_sets" / make_vector(StrId),
     "sound_fx" / make_vector(StrId >> Byte),
     construct.Terminated,
-)
+)  # fmt: skip
 
 ArgAnyType = str | float | bool | int
 
@@ -385,17 +413,13 @@ class ActorDefFunc:
         self._raw = raw
 
     @classmethod
-    def new(cls,
-            name: str,
-            unk1: bool = True,
-            unk2: bool = False,
-            ):
-        return cls(Container(
-            name=name,
-            unk1=unk1,
-            unk2=unk2,
-            params=Container()
-        ))
+    def new(
+        cls,
+        name: str,
+        unk1: bool = True,
+        unk2: bool = False,
+    ):
+        return cls(Container(name=name, unk1=unk1, unk2=unk2, params=Container()))
 
     def __eq__(self, __value: object) -> bool:
         if not isinstance(__value, ActorDefFunc):
@@ -449,10 +473,10 @@ class ActorDefFunc:
             param = self._param(param_name)
 
         types = {
-            str: 's',
-            float: 'f',
-            bool: 'b',
-            int: 'i',
+            str: "s",
+            float: "f",
+            bool: "b",
+            int: "i",
         }
         for t, s in types.items():
             if isinstance(value, t):
@@ -462,7 +486,7 @@ class ActorDefFunc:
         param.value = value
 
 
-T = typing.TypeVar('T', bound=ArgAnyType)
+T = typing.TypeVar("T", bound=ArgAnyType)
 
 
 class ActorDefFuncParam(typing.Generic[T]):
@@ -477,11 +501,11 @@ class ActorDefFuncParam(typing.Generic[T]):
 
 
 Vec3 = list
-FieldType = typing.Union[bool, str, float, int, Vec3]
+FieldType = bool | str | float | int | Vec3
 
 
 class ComponentFields:
-    def __init__(self, parent: "Component") -> None:
+    def __init__(self, parent: Component) -> None:
         self.parent = parent
 
     def _get_extra_field(self, fields: Container, name: str) -> FieldType:
@@ -517,10 +541,7 @@ class ComponentFields:
             if __name in self.parent.raw.extra_fields:
                 return self._get_extra_field(self.parent.raw.extra_fields, __name)
 
-            if (
-                    self.parent.raw.fields is not None
-                    and __name in self.parent.raw.fields.fields
-            ):
+            if self.parent.raw.fields is not None and __name in self.parent.raw.fields.fields:
                 return self.parent.raw.fields.fields[__name]
 
             cctype = self.parent.get_component_type_class()
@@ -568,8 +589,7 @@ class ComponentFields:
 
     def _get_attr_error(self, __name: str) -> AttributeError:
         return AttributeError(
-            f"'{self.parent.get_component_type()}' object has no field '{__name}'",
-            name=__name, obj=self
+            f"'{self.parent.get_component_type()}' object has no field '{__name}'", name=__name, obj=self
         )
 
 
@@ -618,9 +638,7 @@ class Component:
 
     @functions.setter
     def functions(self, value: Sequence[ActorDefFunc]):
-        self.raw.functions = ListContainer(
-            Container(func.raw) for func in value
-        )
+        self.raw.functions = ListContainer(Container(func.raw) for func in value)
 
     @property
     def dependencies(self) -> Container | ListContainer | None:
@@ -635,10 +653,13 @@ class Bmsad(BaseResource):
     @classmethod
     @functools.lru_cache
     def construct_class(cls, target_game: Game) -> Construct:
-        return GameSpecificStruct({
-                                      Game.SAMUS_RETURNS: BMSAD_SR,
-                                      Game.DREAD: BMSAD_Dread,
-                                  }[target_game], target_game).compile()
+        return GameSpecificStruct(
+            {
+                Game.SAMUS_RETURNS: BMSAD_SR,
+                Game.DREAD: BMSAD_Dread,
+            }[target_game],
+            target_game,
+        ).compile()
 
     @property
     def name(self) -> str:
@@ -670,40 +691,25 @@ class Bmsad(BaseResource):
 
     @property
     def components(self) -> dict[str, Component]:
-        return {
-            name: Component(raw, self.target_game)
-            for name, raw in self.raw.components.items()
-        }
+        return {name: Component(raw, self.target_game) for name, raw in self.raw.components.items()}
 
     @components.setter
     def components(self, value: dict[str, Component]):
-        self.raw.components = Container({
-            name: component.raw
-            for name, component in value.items()
-        })
+        self.raw.components = Container({name: component.raw for name, component in value.items()})
 
     @property
     def action_sets(self) -> list[Bmsas]:
         if self.target_game == Game.DREAD:
-            return [
-                self.editor.get_file(ref, Bmsas)
-                for ref in self.action_set_refs
-            ]
+            return [self.editor.get_file(ref, Bmsas) for ref in self.action_set_refs]
         if self.target_game == Game.SAMUS_RETURNS:
-            return [
-                Bmsas(action_set, Game.SAMUS_RETURNS)
-                for action_set in self.raw.action_sets
-            ]
+            return [Bmsas(action_set, Game.SAMUS_RETURNS) for action_set in self.raw.action_sets]
 
     @action_sets.setter
     def action_sets(self, value: typing.Iterable[Bmsas]):
         if self.target_game == Game.DREAD:
             raise AttributeError(name="action_sets", obj=self)
         if self.target_game == Game.SAMUS_RETURNS:
-            self.raw.action_sets = ListContainer([
-                action_set.raw
-                for action_set in value
-            ])
+            self.raw.action_sets = ListContainer([action_set.raw for action_set in value])
 
     @property
     def action_set_refs(self) -> list[str]:
@@ -727,8 +733,6 @@ class Bmsad(BaseResource):
 
     @sound_fx.setter
     def sound_fx(self, value: typing.Iterable[tuple[str, int]]):
-        self.raw.sound_fx = ListContainer(
-            ListContainer(sfx) for sfx in value
-        )
+        self.raw.sound_fx = ListContainer(ListContainer(sfx) for sfx in value)
         if self.target_game == Game.SAMUS_RETURNS and not self.raw.sound_fx:
             self.raw.sound_fx = None

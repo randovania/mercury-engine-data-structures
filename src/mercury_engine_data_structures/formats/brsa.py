@@ -1,18 +1,24 @@
+from __future__ import annotations
+
 import functools
-from typing import Iterator
+from typing import TYPE_CHECKING
 
-from construct import Construct, Container
-
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.formats import standard_format
-from mercury_engine_data_structures.formats.base_resource import BaseResource
-from mercury_engine_data_structures.game_check import Game
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from construct import Construct, Container
+
+    from mercury_engine_data_structures.game_check import Game
 
 
 class Brsa(BaseResource):
     @classmethod
     @functools.lru_cache
     def construct_class(cls, target_game: Game) -> Construct:
-        return standard_format.game_model('CSubAreaManager', "2.1.2")
+        return standard_format.game_model("CSubAreaManager", "2.1.2")
 
     @property
     def subarea_setups(self) -> Iterator[Container]:

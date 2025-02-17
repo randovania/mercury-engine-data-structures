@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import re
-from typing import Dict, Optional, Type, Union
 
 import construct
 
 
-def _resolve_id(type_class: Union[construct.Construct, Type[construct.Construct]]) -> int:
+def _resolve_id(type_class: construct.Construct | type[construct.Construct]) -> int:
     if isinstance(type_class, construct.Renamed):
         return _resolve_id(type_class.subcon)
     return id(type_class)
@@ -15,9 +16,9 @@ _simple_build_re = re.compile(r"^(\w+)\(obj, io, this\)$")
 
 
 def emit_switch_cases_parse(
-        code: construct.CodeGen,
-        fields: Dict[Union[str, int], Union[construct.Construct, Type[construct.Construct]]],
-        custom_table_name: Optional[str] = None,
+    code: construct.CodeGen,
+    fields: dict[str | int, construct.Construct | type[construct.Construct]],
+    custom_table_name: str | None = None,
 ) -> str:
     """Construct codegen helper for handling the switch cases dict in _emitparse."""
     table_name = custom_table_name
@@ -47,9 +48,9 @@ def emit_switch_cases_parse(
 
 
 def emit_switch_cases_build(
-        code: construct.CodeGen,
-        fields: Dict[Union[str, int], Union[construct.Construct, Type[construct.Construct]]],
-        custom_table_name: Optional[str] = None,
+    code: construct.CodeGen,
+    fields: dict[str | int, construct.Construct | type[construct.Construct]],
+    custom_table_name: str | None = None,
 ) -> str:
     """Construct codegen helper for handling the switch cases dict in _emitbuild."""
     table_name = custom_table_name
@@ -113,8 +114,10 @@ class ComplexIfThenElse(construct.IfThenElse):
         )
 
     def _emitbuild(self, code):
-        return (f"(({self.thensubcon._compilebuild(code)}) if ("
-                f"{self._insert_cond(code)}) else ({self.elsesubcon._compilebuild(code)}))")
+        return (
+            f"(({self.thensubcon._compilebuild(code)}) if ("
+            f"{self._insert_cond(code)}) else ({self.elsesubcon._compilebuild(code)}))"
+        )
 
 
 def ComplexIf(condfunc, subcon):

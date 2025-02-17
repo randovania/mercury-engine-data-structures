@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 from pathlib import Path
 
@@ -38,11 +40,13 @@ def main():
     for asset_id in toc.get_all_asset_id():
         if asset_id not in used_asset_id:
             continue
-        print("{:016x}: {}".format(
-            asset_id,
-            id_mapping.get(asset_id, ""),
-        ))
+        print(
+            "{:016x}: {}".format(
+                asset_id,
+                id_mapping.get(asset_id, ""),
+            )
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

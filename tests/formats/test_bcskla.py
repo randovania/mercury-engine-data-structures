@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 from tests.test_lib import parse_build_compare_editor
 
@@ -1199,12 +1201,14 @@ sr_missing = [
     "actors/props/menu_samus/animations/menurelax.bcskla",
     "actors/props/planet/animations/relax.bcskla",
     "maps/objects/animadorn1002/animadorn1002.bcskla",
-    "maps/objects/animplant0602b/animplant0602b.bcskla"
+    "maps/objects/animplant0602b/animplant0602b.bcskla",
 ]
 
+
 @pytest.mark.parametrize("bcskla_path", dread_data.all_files_ending_with(".bcskla"))
-def test_bcskla_dread(dread_file_tree, bcskla_path):
-    parse_build_compare_editor(Bcskla, dread_file_tree, bcskla_path)
+def test_bcskla_dread(dread_tree_100, bcskla_path):
+    parse_build_compare_editor(Bcskla, dread_tree_100, bcskla_path)
+
 
 @pytest.mark.parametrize("bcskla_path", samus_returns_data.all_files_ending_with(".bcskla", sr_missing))
 def test_bcskla_sr(samus_returns_tree, bcskla_path):

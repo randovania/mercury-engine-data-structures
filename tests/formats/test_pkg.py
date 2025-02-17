@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 from construct import Container, ListContainer
 from tests.test_lib import parse_and_build_compare
@@ -6,7 +8,7 @@ from mercury_engine_data_structures import dread_data, samus_returns_data
 from mercury_engine_data_structures.formats.pkg import Pkg
 from mercury_engine_data_structures.game_check import Game
 
-_EMPTY_DREAD_PKG = (b'\x08\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+_EMPTY_DREAD_PKG = b"\x08\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 
 wrong_build_sr = [
     # MSCU, no padding in vanilla
@@ -100,14 +102,14 @@ sr_missing = [
     "packs/maps/s920_traininggallery/subareas/subarearp9_discardables.pkg",
 ]
 
+
 @pytest.mark.parametrize("pkg_path", dread_data.all_files_ending_with(".pkg"))
-def test_compare_dread(dread_path, pkg_path):
-    parse_and_build_compare(
-        Pkg.construct_class(Game.DREAD), Game.DREAD, dread_path.joinpath(pkg_path)
-    )
+def test_compare_pkg_dread(dread_path_100, pkg_path):
+    parse_and_build_compare(Pkg.construct_class(Game.DREAD), Game.DREAD, dread_path_100.joinpath(pkg_path))
+
 
 @pytest.mark.parametrize("pkg_path", samus_returns_data.all_files_ending_with(".pkg", sr_missing))
-def test_compare_sr(samus_returns_path, pkg_path):
+def test_compare_pkg_sr(samus_returns_path, pkg_path):
     if pkg_path in wrong_build_sr:
         raw = samus_returns_path.joinpath(pkg_path).read_bytes()
         target_game = Game.SAMUS_RETURNS
@@ -129,6 +131,7 @@ def test_compare_sr(samus_returns_path, pkg_path):
             Pkg.construct_class(Game.SAMUS_RETURNS), Game.SAMUS_RETURNS, samus_returns_path.joinpath(pkg_path)
         )
 
+
 def test_build_empty_pkg():
     pkg = Pkg(Container(files=ListContainer()), Game.DREAD)
 
@@ -136,15 +139,17 @@ def test_build_empty_pkg():
 
 
 def test_remove_pkg_element():
-    single_element_pkg = (b'|\x00\x00\x00\x08\x00\x00\x00\x01\x00\x00\x00\xd2\x04\x00\x00'
-                          b'\x00\x00\x00\x00\x80\x00\x00\x00\x86\x00\x00\x00\x00\x00\x00\x00'
-                          b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-                          b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-                          b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-                          b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-                          b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-                          b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-                          b'FOOBAR\x00\x00')
+    single_element_pkg = (
+        b"|\x00\x00\x00\x08\x00\x00\x00\x01\x00\x00\x00\xd2\x04\x00\x00"
+        b"\x00\x00\x00\x00\x80\x00\x00\x00\x86\x00\x00\x00\x00\x00\x00\x00"
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        b"FOOBAR\x00\x00"
+    )
 
     pkg = Pkg.parse(single_element_pkg, Game.DREAD)
     assert pkg.build() == single_element_pkg

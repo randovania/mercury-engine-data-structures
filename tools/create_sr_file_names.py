@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 all_levels = [
     "s000_surface",
     "s010_area1",
@@ -21,8 +23,22 @@ all_levels = [
     "s904_omega",
     "s910_gym",
 ]
-extensions = [".bmsld", ".bmscd", ".bmscc", "_auto.lua", "_auto.lc", ".lua", ".lc", ".bmsld", ".bmsbk", ".bmssd",
-              ".bmsnd", ".bgph", ".bmsel", ".bmsnav"]
+extensions = [
+    ".bmsld",
+    ".bmscd",
+    ".bmscc",
+    "_auto.lua",
+    "_auto.lc",
+    ".lua",
+    ".lc",
+    ".bmsld",
+    ".bmsbk",
+    ".bmssd",
+    ".bmsnd",
+    ".bgph",
+    ".bmsel",
+    ".bmsnav",
+]
 
 
 def build(major, lvl):
@@ -32,7 +48,7 @@ def build(major, lvl):
 
 result = []
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     for s in all_levels:
         result.extend(build("c10_samus", s))
     result.extend(build("c50_gui", "s000_mainmenu"))

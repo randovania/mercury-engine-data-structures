@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import functools
 import typing
-from typing import Optional
 
 import construct
 
@@ -14,8 +15,12 @@ def _const_if_present(con: construct.Construct, value: typing.Any | None) -> con
     return construct.Const(value, con) if value is not None else con
 
 
-def create(name: Optional[str], version: Optional[int | str | tuple[int, int, int]],
-           root_name: Optional[str] = None, explicit_root: bool = False):
+def create(
+    name: str | None,
+    version: int | str | tuple[int, int, int] | None,
+    root_name: str | None = None,
+    explicit_root: bool = False,
+):
     # this maybe needs to change in the future if SR and Dread have different formats for type using this
     type_lib = get_type_lib_dread()
     if root_name is None:
@@ -25,28 +30,29 @@ def create(name: Optional[str], version: Optional[int | str | tuple[int, int, in
         root = construct.FocusedSeq(
             "root",
             "type" / construct.Rebuild(PropertyEnum, name),
-            "root" / type_lib.GetTypeConstruct(lambda this: this._.type)
+            "root" / type_lib.GetTypeConstruct(lambda this: this._.type),
         )
     else:
         root = type_lib.get_type(root_name).construct
 
-    result = GameSpecificStruct(construct.Struct(
-        _class_crc=_const_if_present(PropertyEnum, name),
-        _version=VersionAdapter(version),
-
-        root_type=construct.Const('Root', PropertyEnum),
-        Root=root,
-
-        _end=construct.Terminated,
-    ), Game.DREAD)
+    result = GameSpecificStruct(
+        construct.Struct(
+            _class_crc=_const_if_present(PropertyEnum, name),
+            _version=VersionAdapter(version),
+            root_type=construct.Const("Root", PropertyEnum),
+            Root=root,
+            _end=construct.Terminated,
+        ),
+        Game.DREAD,
+    )
     result.name = name
     return result
 
 
 @functools.lru_cache
-def _cached_game_model(name: Optional[str], version: Optional[int | str | tuple[int, int, int]]):
+def _cached_game_model(name: str | None, version: int | str | tuple[int, int, int] | None):
     return create(name, version, "gameeditor::CGameModelRoot").compile()
 
 
-def game_model(name: Optional[str], version: Optional[int | str | tuple[int, int, int]]):
+def game_model(name: str | None, version: int | str | tuple[int, int, int] | None):
     return _cached_game_model(name, version)

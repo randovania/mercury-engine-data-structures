@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 # Functions
@@ -12,6 +14,7 @@ import os
 # this is referenced by the :ref:`hook registration <hook_registration>`.
 # This function returns a list containing only the path to this
 # directory, which is the location of these hooks.
+
 
 def get_hook_dirs():
     return [os.path.dirname(__file__)]

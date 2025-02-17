@@ -33,12 +33,19 @@ class BaseType:
 
     @property
     def name_as_python_identifier(self) -> str:
-        return self.name.replace("::", "_").replace(" ", "_").replace("<", "_").replace(
-            ">", "_").replace(",", "_").replace("*", "Ptr")
+        return (
+            self.name.replace("::", "_")
+            .replace(" ", "_")
+            .replace("<", "_")
+            .replace(">", "_")
+            .replace(",", "_")
+            .replace("*", "Ptr")
+        )
 
     @property
     def construct(self) -> construct.Construct:
         from mercury_engine_data_structures.formats import dread_types
+
         return getattr(dread_types, self.name_as_python_identifier)
 
     @property
@@ -102,6 +109,7 @@ class PrimitiveKind(Enum):
     BYTES = "bytes"
     PROPERTY = "property"
 
+
 primitive_to_type = {
     PrimitiveKind.STRING: str,
     PrimitiveKind.BOOL: bool,
@@ -118,11 +126,11 @@ primitive_to_type = {
 }
 
 primitive_int_bounds = {
-    PrimitiveKind.INT:      (-2**31, 2**31 - 1),
-    PrimitiveKind.UINT_16:  (0,      2**16 - 1),
-    PrimitiveKind.UINT:     (0,      2**32 - 1),
-    PrimitiveKind.UINT_64:  (0,      2**64 - 1),
-    PrimitiveKind.PROPERTY: (0,      2**64 - 1),
+    PrimitiveKind.INT: (-(2**31), 2**31 - 1),
+    PrimitiveKind.UINT_16: (0, 2**16 - 1),
+    PrimitiveKind.UINT: (0, 2**32 - 1),
+    PrimitiveKind.UINT_64: (0, 2**64 - 1),
+    PrimitiveKind.PROPERTY: (0, 2**64 - 1),
 }
 
 primitive_vector_lengths = {
@@ -147,6 +155,7 @@ class PrimitiveType(BaseType):
     @property
     def construct(self) -> construct.Construct:
         from mercury_engine_data_structures.formats import dread_types
+
         return dread_types.primitive_to_construct[self.primitive_kind.value]
 
     def _find_type_errors(self, __value: typing.Any) -> BaseException | None:
@@ -164,14 +173,12 @@ class PrimitiveType(BaseType):
 
         if self.primitive_kind in primitive_vector_lengths:
             length = primitive_vector_lengths[self.primitive_kind]
-            if (
-                len(__value) == length
-                and all(isinstance(v, float) for v in __value)
-            ):
+            if len(__value) == length and all(isinstance(v, float) for v in __value):
                 return None
             return ValueError(f"Invalid CVector{length}D: {__value}")
 
         return None
+
 
 @dataclasses.dataclass(frozen=True)
 class StructType(BaseType):
@@ -231,9 +238,12 @@ class EnumType(BaseType):
 
     def enum_class(self) -> type[enum.IntEnum]:
         from mercury_engine_data_structures.game_check import Game
+
         if self.target_game == Game.DREAD:
-            return getattr(importlib.import_module("mercury_engine_data_structures.formats.dread_types"),
-                       self.name_as_python_identifier)
+            return getattr(
+                importlib.import_module("mercury_engine_data_structures.formats.dread_types"),
+                self.name_as_python_identifier,
+            )
         raise NotImplementedError
 
     def _find_type_errors(self, __value: typing.Any) -> BaseException | None:
@@ -287,14 +297,11 @@ class FlagsetType(BaseType):
         names = {v.name for v in expected}
 
         if isinstance(__value, dict):
-            if not all(
-                isinstance(k, str) and isinstance(v, bool)
-                for k, v in __value.items()
-            ):
+            if not all(isinstance(k, str) and isinstance(v, bool) for k, v in __value.items()):
                 return TypeError(f"Expected dict[str, bool]; got {__value}")
             invalid = [k for k in __value if k not in names]
         elif isinstance(__value, str):
-            invalid = [v for v in __value.split('|') if v not in names]
+            invalid = [v for v in __value.split("|") if v not in names]
         else:
             return TypeError(f"Expected {self.name}; got {type(__value).__name__}")
 
@@ -335,6 +342,7 @@ class PointerType(BaseType):
     @property
     def pointer_set(self) -> PointerSet:
         from mercury_engine_data_structures.formats import dread_types
+
         target = self.type_lib.get_type(self.target)
         return getattr(dread_types, f"Pointer_{target.name_as_python_identifier}")
 
@@ -381,10 +389,7 @@ class VectorType(BaseType):
     def _find_type_errors(self, __value: typing.Any) -> BaseException | None:
         if not isinstance(__value, typing.Iterable):
             return TypeError(f"{type(__value).__name__} is not iterable")
-        errors = {
-            i: self.type_lib.get_type(self.value_type)._find_type_errors(v)
-            for i, v in enumerate(__value)
-        }
+        errors = {i: self.type_lib.get_type(self.value_type)._find_type_errors(v) for i, v in enumerate(__value)}
         errors = {i: v for i, v in errors.items() if v is not None}
         if errors:
             return TypeError(*errors.items())
@@ -408,15 +413,11 @@ class DictionaryType(BaseType):
         if not isinstance(__value, dict):
             return TypeError(f"Expected dict[{self.key_type}, {self.value_type}]; got {type(__value).__name__}")
 
-        key_errors = {
-            key: self.type_lib.get_type(self.key_type)._find_type_errors(key)
-            for key in __value.keys()
-        }
+        key_errors = {key: self.type_lib.get_type(self.key_type)._find_type_errors(key) for key in __value.keys()}
         key_errors = {k: v for k, v in key_errors.items() if v is not None}
 
         value_errors = {
-            key: self.type_lib.get_type(self.value_type)._find_type_errors(value)
-            for key, value in __value.items()
+            key: self.type_lib.get_type(self.value_type)._find_type_errors(value) for key, value in __value.items()
         }
         value_errors = {k: v for k, v in value_errors.items() if v is not None}
 
@@ -443,18 +444,11 @@ class TypeLib:
 
     @functools.lru_cache
     def all_types(self) -> dict[str, BaseType]:
-        return {
-            name: decode_type(name, data, self.target_game)
-            for name, data in self.types_dict.items()
-        }
+        return {name: decode_type(name, data, self.target_game) for name, data in self.types_dict.items()}
 
     @functools.lru_cache
     def all_constructs(self) -> dict[str, construct.Construct]:
-        return {
-            name: type.construct
-            for name, type in self.all_types().items()
-        }
-
+        return {name: type.construct for name, type in self.all_types().items()}
 
     def get_type(self, type_name: str, *, follow_typedef: bool = True) -> BaseType:
         result = self.all_types()[type_name]
@@ -465,20 +459,19 @@ class TypeLib:
 
         return result
 
-
     def GetTypeConstruct(self, keyfunc, follow_typedef: bool = True) -> construct.Construct:
         return construct.FocusedSeq(
             "switch",
             "key" / construct.Computed(keyfunc),
             "type" / construct.Computed(lambda this: self.get_type(this.key, follow_typedef=follow_typedef).name),
-            "switch" / construct.Switch(
+            "switch"
+            / construct.Switch(
                 lambda this: this.type,
                 self.all_constructs(),
-                construct.Error
+                construct.Error,
                 # ErrorWithMessage(lambda this: f"Unknown type: {this.type}", construct.SwitchError)
-            )
+            ),
         )
-
 
     def get_parent_for(self, type_name: str) -> str | None:
         data = self.get_type(type_name)
@@ -488,7 +481,6 @@ class TypeLib:
             return data.parent
 
         return None
-
 
     def is_child_of(self, type_name: str | None, parent_name: str) -> bool:
         """
@@ -502,7 +494,6 @@ class TypeLib:
 
         return self.is_child_of(self.get_parent_for(type_name), parent_name)
 
-
     @functools.lru_cache
     def all_direct_children(self) -> dict[str, set[str]]:
         """
@@ -515,7 +506,6 @@ class TypeLib:
                 result[parent].add(type_name)
 
         return dict(result)
-
 
     def get_all_children_for(self, type_name: str) -> set[str]:
         """
@@ -540,6 +530,7 @@ class TypeLib:
 def get_type_lib_dread():
     from mercury_engine_data_structures import dread_data
     from mercury_engine_data_structures.game_check import Game
+
     return TypeLib(dread_data.get_raw_types(), Game.DREAD)
 
 
@@ -547,12 +538,14 @@ def get_type_lib_dread():
 def get_type_lib_samus_returns():
     from mercury_engine_data_structures import samus_returns_data
     from mercury_engine_data_structures.game_check import Game
+
     return TypeLib(samus_returns_data.get_raw_types(), Game.SAMUS_RETURNS)
 
 
 @functools.lru_cache
 def get_type_lib_for_game(game: Game):
     from mercury_engine_data_structures.game_check import Game
+
     if game == Game.DREAD:
         return get_type_lib_dread()
     if game == Game.SAMUS_RETURNS:

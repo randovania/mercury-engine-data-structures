@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from enum import Enum
 
 import construct
 from construct.core import Error
 
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import StrId, UInt
-from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game
 
 BlockType = construct.Enum(
@@ -39,7 +41,6 @@ XTX_Block = construct.Struct(
     block_type=BlockType,
     global_block_index=UInt,
     inc_block_type_index=UInt,
-
     _data_seek=construct.Seek(construct.this._start + construct.this.data_offset),
     data=construct.FixedSized(
         construct.this.data_size,
@@ -49,8 +50,8 @@ XTX_Block = construct.Struct(
                 BlockType.texture: XTX_TextureBlock,
             },
             construct.GreedyBytes,
-        )
-    )
+        ),
+    ),
 )
 
 XTX = construct.Struct(
@@ -74,16 +75,17 @@ BCTEX_Dread = construct.Struct(
             mip_count=UInt,
             texture_flag=UInt,  # unk
             name_offset=UInt,
-            name=construct.Peek(construct.FocusedSeq(
-                "value",
-                construct.Seek(construct.this._.name_offset - 8),
-                value=StrId,
-            )),
+            name=construct.Peek(
+                construct.FocusedSeq(
+                    "value",
+                    construct.Seek(construct.this._.name_offset - 8),
+                    value=StrId,
+                )
+            ),
             unk_2=UInt,
             texture_offset=UInt,  # texture xtx offset
             unk_3=UInt,
             texture_size=UInt,  # texture xtx size
-
             _xtx_bytes_seek=construct.Seek(construct.this.texture_offset - 8),
             xtx=construct.FixedSized(construct.this.texture_size, XTX),
             rest=construct.GreedyBytes,
@@ -92,6 +94,7 @@ BCTEX_Dread = construct.Struct(
         level=9,
     ),
 )
+
 
 class PICATextureFormat(Enum):
     L8 = 0
@@ -109,29 +112,30 @@ class PICATextureFormat(Enum):
     L4 = 12
     A4 = 13
 
+
 BCTEXFormat = construct.Enum(
     UInt,
-    RGB8_0   = 0x10001, # 65537
-    RGBA8_0  = 0x20001, # 65538,
-    L8_0     = 0x40001, # 65540
-    LA8_0    = 0x50001, # 65541
-    ETC1_0   = 0x10003, # 196609
-    ETC1a4_0 = 0x20003  # 196610
+    RGB8_0=0x10001,  # 65537
+    RGBA8_0=0x20001,  # 65538,
+    L8_0=0x40001,  # 65540
+    LA8_0=0x50001,  # 65541
+    ETC1_0=0x10003,  # 196609
+    ETC1a4_0=0x20003,  # 196610
 )
 
 CTPK = construct.Struct(
     _start=construct.Tell,
     _magic=construct.Const(b"CTPK"),
-    file_header = construct.Struct(
+    file_header=construct.Struct(
         version=construct.Int16ul,
         textures_count=construct.Int16ul,
         texture_data_offset=UInt,
         texture_data_size=UInt,
         hash_list_offset=UInt,
         mipmap_entries_offset=UInt,
-        _padding=construct.Int64ul
+        _padding=construct.Int64ul,
     ),
-    image_header= construct.Struct(
+    image_header=construct.Struct(
         name_offset=UInt,
         image_size=UInt,
         data_offset=UInt,
@@ -145,17 +149,17 @@ CTPK = construct.Struct(
         unix_time_stamp=UInt,
     ),
     mip_map_sizes=construct.Array(construct.this.image_header.mip_count, UInt),
-    name = StrId,
+    name=StrId,
     _hashlist_begin=construct.Seek(construct.this._start + construct.this.file_header.hash_list_offset),
-    hash = UInt,
+    hash=UInt,
     _mip_map_entries_begin=construct.Seek(construct.this._start + construct.this.file_header.mipmap_entries_offset),
-    mip_map_entry= construct.Struct(
-        texture_format = construct.Enum(construct.Byte, PICATextureFormat),
-        mip_count = construct.Byte,
-        compressed = construct.Byte,
-        etc1_quality = construct.Byte,
+    mip_map_entry=construct.Struct(
+        texture_format=construct.Enum(construct.Byte, PICATextureFormat),
+        mip_count=construct.Byte,
+        compressed=construct.Byte,
+        etc1_quality=construct.Byte,
     ),
-    image_data = construct.Bytes(construct.this.file_header.texture_data_size)
+    image_data=construct.Bytes(construct.this.file_header.texture_data_size),
 )
 
 # this and all related structures is a mixture of some own work + most parts taken from:
@@ -174,10 +178,11 @@ BCTEX_SR = construct.Struct(
     data_offset=UInt,
     ctpk_size=UInt,
     _ctpk_start=construct.Seek(construct.this.data_offset),
-    ctpk = construct.FixedSized(construct.this.ctpk_size, CTPK),
-    name = StrId,
+    ctpk=construct.FixedSized(construct.this.ctpk_size, CTPK),
+    name=StrId,
     _terminated=construct.Terminated,
 )
+
 
 class Bctex(BaseResource):
     @classmethod

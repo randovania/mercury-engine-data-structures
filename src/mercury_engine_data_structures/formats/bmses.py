@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import functools
+from typing import TYPE_CHECKING
 
 import construct
 from construct.core import (
@@ -9,9 +12,11 @@ from construct.core import (
     Struct,
 )
 
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import StrId, VersionAdapter, make_vector
-from mercury_engine_data_structures.formats.base_resource import BaseResource
-from mercury_engine_data_structures.game_check import Game
+
+if TYPE_CHECKING:
+    from mercury_engine_data_structures.game_check import Game
 
 BMSES = Struct(
     "_magic" / Const(b"MSES"),
@@ -36,7 +41,7 @@ BMSES = Struct(
             ))),
         ))),
     construct.Terminated,
-)
+)  # fmt: skip
 
 
 class Bmses(BaseResource):

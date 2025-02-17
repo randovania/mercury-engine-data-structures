@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import asyncio
 import itertools
@@ -6,12 +8,12 @@ import logging
 import typing
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
-from typing import Optional
 
 from mercury_engine_data_structures import formats
 from mercury_engine_data_structures.construct_extensions.json import convert_to_raw_python
-from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
+from mercury_engine_data_structures.file_tree_editor import FileTreeEditor, OutputFormat
 from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.romfs import ExtractedRomFs
 
 
 def game_argument_type(s: str) -> Game:
@@ -73,6 +75,22 @@ def create_parser():
     compare.add_argument("--limit", help="Limit the number of files to test", type=int)
     compare.add_argument("input_path", type=Path, help="Path to the directory to glob")
 
+    extract_files_parser = subparser.add_parser("extract-files")
+    add_game_argument(extract_files_parser)
+    extract_files_parser.add_argument(
+        "--quiet", action="store_true", default=False, help="Don't print files as they're extracted"
+    )
+    extract_files_parser.add_argument("root", type=Path, help="Path to the PKG files")
+    extract_files_parser.add_argument("output", type=Path, help="Path to where to place output files")
+
+    replace_files_parser = subparser.add_parser(
+        "replace-files", help="Adds files to all pkgs in a folder. The results are written to a different path"
+    )
+    add_game_argument(replace_files_parser)
+    replace_files_parser.add_argument("root", type=Path, help="Path to the PKG files to read from")
+    replace_files_parser.add_argument("new_files", type=Path, help="Path to where the new files are located")
+    replace_files_parser.add_argument("output", type=Path, help="Path to where to place modified pkgs")
+
     return parser
 
 
@@ -119,7 +137,7 @@ def do_decode_from_pkg(args):
     root: Path = args.root
     asset_name: str = args.asset_name
 
-    pkg_editor = FileTreeEditor(root, args.game)
+    pkg_editor = FileTreeEditor(ExtractedRomFs(root), args.game)
     asset = pkg_editor.get_parsed_asset(asset_name)
     print(asset.raw)
 
@@ -158,7 +176,7 @@ def find_pkg_for(args):
     asset_id: int = args.asset_id
     asset_name: str = args.asset_name
 
-    pkg_editor = FileTreeEditor(root, args.game)
+    pkg_editor = FileTreeEditor(ExtractedRomFs(root), args.game)
     if asset_id is not None:
         items = list(pkg_editor.find_pkgs(asset_id))
     else:
@@ -177,7 +195,7 @@ def decode_encode_compare_file(file_path: Path, game: Game, file_format: str):
         resource = resource_class.parse(raw, target_game=game)
         encoded = resource.build()
 
-        if raw != encoded and raw.rstrip(b"\xFF") != encoded:
+        if raw != encoded and raw.rstrip(b"\xff") != encoded:
             return f"{file_path}: Results differ (len(raw): {len(raw)}; len(encoded): {len(encoded)})"
         return None
 
@@ -189,7 +207,7 @@ async def compare_all_files_in_path(args):
     input_path: Path = args.input_path
     file_format: str = args.format
     game: Game = args.game
-    limit: Optional[int] = args.limit
+    limit: int | None = args.limit
 
     def apply_limit(it):
         if limit is None:
@@ -232,6 +250,35 @@ async def compare_all_files_in_path(args):
             print(m)
 
 
+def extract_files(args: argparse.Namespace) -> None:
+    root: Path = args.root
+    output_root: Path = args.output
+
+    pkg_editor = FileTreeEditor(ExtractedRomFs(root), args.game)
+
+    output_root.mkdir(parents=True, exist_ok=True)
+    for file_name in pkg_editor.all_asset_names():
+        if not args.quiet:
+            print(file_name)
+        out_path = output_root.joinpath(file_name)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_bytes(pkg_editor.get_raw_asset(file_name))
+
+
+def replace_files(args: argparse.Namespace) -> None:
+    root: Path = args.root
+    new_files: Path = args.new_files
+    output: Path = args.output
+
+    pkg_editor = FileTreeEditor(ExtractedRomFs(root), args.game)
+
+    for file_name in new_files.rglob("*"):
+        if file_name.is_file():
+            pkg_editor.replace_asset(file_name.relative_to(new_files).as_posix(), file_name.read_bytes())
+
+    pkg_editor.save_modifications(output, OutputFormat.PKG)
+
+
 def main():
     logging.basicConfig(level=logging.INFO)
     args = create_parser().parse_args()
@@ -246,5 +293,9 @@ def main():
         find_pkg_for(args)
     elif args.command == "compare-files":
         asyncio.run(compare_all_files_in_path(args))
+    elif args.command == "extract-files":
+        extract_files(args)
+    elif args.command == "replace-files":
+        replace_files(args)
     else:
         raise ValueError(f"Unknown command: {args.command}")

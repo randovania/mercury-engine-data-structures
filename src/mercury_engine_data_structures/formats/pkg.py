@@ -15,8 +15,8 @@ from construct import (
 )
 
 from mercury_engine_data_structures import dread_data, samus_returns_data
+from mercury_engine_data_structures.base_resource import AssetId, BaseResource, NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.construct_extensions.alignment import AlignTo
-from mercury_engine_data_structures.formats.base_resource import AssetId, BaseResource, NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.game_check import Game
 
 
@@ -82,10 +82,12 @@ class PkgConstruct(construct.Construct):
         for i, header in enumerate(file_headers):
             file_path = f"{path} -> file {i}"
             construct.stream_seek(stream, header.start_offset, 0, file_path)
-            files.append(construct.Container(
-                asset_id=header.asset_id,
-                data=construct.stream_read(stream, header.end_offset - header.start_offset, file_path)
-            ))
+            files.append(
+                construct.Container(
+                    asset_id=header.asset_id,
+                    data=construct.stream_read(stream, header.end_offset - header.start_offset, file_path),
+                )
+            )
 
         return construct.Container(files=files)
 
@@ -124,11 +126,13 @@ class PkgConstruct(construct.Construct):
             start_offset = construct.stream_tell(stream, path)
             construct.stream_write(stream, file.data, len(file.data), field_path)
             end_offset = construct.stream_tell(stream, path)
-            file_headers.append(construct.Container(
-                asset_id=file.asset_id,
-                start_offset=start_offset,
-                end_offset=end_offset,
-            ))
+            file_headers.append(
+                construct.Container(
+                    asset_id=file.asset_id,
+                    start_offset=start_offset,
+                    end_offset=end_offset,
+                )
+            )
             # Dread aligns to 8 bytes, Samus Returns randomly(???)
             if self.game == Game.DREAD:
                 pad = -(end_offset - start_offset) % 8
@@ -185,8 +189,7 @@ class Pkg(BaseResource):
 
     @classmethod
     def parse_stream(cls, stream: typing.BinaryIO, target_game: Game) -> Pkg:
-        return cls(cls.construct_class(target_game).parse_stream(stream, target_game=target_game),
-                   target_game)
+        return cls(cls.construct_class(target_game).parse_stream(stream, target_game=target_game), target_game)
 
     def build_stream(self, stream: typing.BinaryIO) -> bytes:
         return self.construct_class(self.target_game).build_stream(self._raw, stream, target_game=self.target_game)
@@ -219,10 +222,12 @@ class Pkg(BaseResource):
         if self.get_asset(asset_id) is not None:
             raise ValueError(f"Asset id already exists: {asset_id}")
 
-        self.raw.files.append(construct.Container(
-            asset_id=asset_id,
-            data=new_file,
-        ))
+        self.raw.files.append(
+            construct.Container(
+                asset_id=asset_id,
+                data=new_file,
+            )
+        )
 
     def remove_asset(self, asset_id: NameOrAssetId):
         asset_id = resolve_asset_id(asset_id, self.target_game)

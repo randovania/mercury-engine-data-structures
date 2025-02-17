@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import construct
 from construct.core import (
     FixedSized,
@@ -50,7 +52,7 @@ def PaddedStringRobust(length, encoding):
     macro = StringEncodedRobust(FixedSized(length, NullStripped(GreedyBytes, pad=encodingunit(encoding))), encoding)
 
     def _emitfulltype(ksy, bitwise):
-        return dict(size=length, type="strz", encoding=encoding)
+        return {"size": length, "type": "strz", "encoding": encoding}
 
     macro._emitfulltype = _emitfulltype
     return macro
@@ -86,8 +88,8 @@ def PascalStringRobust(lengthfield: construct.Construct, encoding):
 
     def _emitseq(ksy, bitwise):
         return [
-            dict(id="lengthfield", type=lengthfield._compileprimitivetype(ksy, bitwise)),
-            dict(id="data", size="lengthfield", type="str", encoding=encoding),
+            {"id": "lengthfield", "type": lengthfield._compileprimitivetype(ksy, bitwise)},
+            {"id": "data", "size": "lengthfield", "type": "str", "encoding": encoding},
         ]
 
     macro._emitseq = _emitseq
@@ -96,8 +98,10 @@ def PascalStringRobust(lengthfield: construct.Construct, encoding):
         i = code.allocateId()
         code.append(f"def add_prefix_{i}(io, obj): return {lengthfield._compilebuild(code)}")
 
-        return (f"reuse(obj.encode({repr(encoding)}),"
-                f" lambda encoded: (add_prefix_{i}(io, len(encoded)), io.write(encoded)))")
+        return (
+            f"reuse(obj.encode({repr(encoding)}),"
+            f" lambda encoded: (add_prefix_{i}(io, len(encoded)), io.write(encoded)))"
+        )
 
     macro._emitbuild = _emitbuild
 
@@ -174,7 +178,7 @@ def CStringRobust(encoding):
     macro._emitparse = _emitparse
 
     def _emitfulltype(ksy, bitwise):
-        return dict(type="strz", encoding=encoding)
+        return {"type": "strz", "encoding": encoding}
 
     macro._emitfulltype = _emitfulltype
 
@@ -208,7 +212,7 @@ def GreedyStringRobust(encoding):
     macro = StringEncodedRobust(GreedyBytes, encoding)
 
     def _emitfulltype(ksy, bitwise):
-        return dict(size_eos=True, type="str", encoding=encoding)
+        return {"size_eos": True, "type": "str", "encoding": encoding}
 
     macro._emitfulltype = _emitfulltype
     return macro
@@ -237,8 +241,10 @@ def StaticPaddedString(length: int, encoding: str) -> construct.Construct:
                 io.write(b"\\x00" * length)
         """)
 
-        return (f"reuse(obj.encode({repr(encoding)}),"
-                f" lambda encoded: (io.write(encoded), write_padding_to({length} - len(encoded), io), obj)[-1])")
+        return (
+            f"reuse(obj.encode({repr(encoding)}),"
+            f" lambda encoded: (io.write(encoded), write_padding_to({length} - len(encoded), io), obj)[-1])"
+        )
 
     macro._emitparse = _emitparse
     macro._emitbuild = _emitbuild

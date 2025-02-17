@@ -1,3 +1,14 @@
+# /// script
+# dependencies = [
+#   "numpy",
+#   "matplotlib",
+#   "shapely",
+#   "mercury-engine-data-structures",
+# ]
+# ///
+
+from __future__ import annotations
+
 import argparse
 import copy
 import hashlib
@@ -7,7 +18,6 @@ import re
 import typing
 from pathlib import Path
 
-import construct
 import numpy
 from matplotlib.patches import Polygon as mtPolygon
 from shapely.geometry import Point
@@ -17,34 +27,37 @@ from mercury_engine_data_structures import samus_returns_data
 from mercury_engine_data_structures.file_tree_editor import FileTreeEditor
 from mercury_engine_data_structures.formats import Bmscc, Bmsld
 from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.romfs import ExtractedRomFs
+
+if typing.TYPE_CHECKING:
+    import construct
+
+# ruff: noqa: PLW0603
 
 world_names = {
-    'maps/levels/c10_samus/s000_surface/s000_surface.bmsld': "Surface - East",
-    'maps/levels/c10_samus/s010_area1/s010_area1.bmsld': "Area 1",
-    'maps/levels/c10_samus/s020_area2/s020_area2.bmsld': "Area 2 - Exterior",
-    'maps/levels/c10_samus/s025_area2b/s025_area2b.bmsld': "Area 2 - Interior",
-    'maps/levels/c10_samus/s028_area2c/s028_area2c.bmsld': "Area 2 - Entrance",
-    'maps/levels/c10_samus/s030_area3/s030_area3.bmsld': "Area 3 - Exterior",
-    'maps/levels/c10_samus/s033_area3b/s033_area3b.bmsld': "Area 3 - Interior (Lower)",
-    'maps/levels/c10_samus/s036_area3c/s036_area3c.bmsld': "Area 3 - Interior (Upper)",
-    'maps/levels/c10_samus/s040_area4/s040_area4.bmsld': "Area 4 - West",
-    'maps/levels/c10_samus/s050_area5/s050_area5.bmsld': "Area 4 - East",
-    'maps/levels/c10_samus/s060_area6/s060_area6.bmsld': "Area 5 - Entrance",
-    'maps/levels/c10_samus/s065_area6b/s065_area6b.bmsld': "Area 5 - Exterior",
-    'maps/levels/c10_samus/s067_area6c/s067_area6c.bmsld': "Area 5 - Interior",
-    'maps/levels/c10_samus/s070_area7/s070_area7.bmsld': "Area 6",
-    'maps/levels/c10_samus/s090_area9/s090_area9.bmsld': "Area 7",
-    'maps/levels/c10_samus/s100_area10/s100_area10.bmsld': "Area 8",
-    'maps/levels/c10_samus/s110_surfaceb/s110_surfaceb.bmsld': "Surface - West",
+    "maps/levels/c10_samus/s000_surface/s000_surface.bmsld": "Surface - East",
+    "maps/levels/c10_samus/s010_area1/s010_area1.bmsld": "Area 1",
+    "maps/levels/c10_samus/s020_area2/s020_area2.bmsld": "Area 2 - Exterior",
+    "maps/levels/c10_samus/s025_area2b/s025_area2b.bmsld": "Area 2 - Interior",
+    "maps/levels/c10_samus/s028_area2c/s028_area2c.bmsld": "Area 2 - Entrance",
+    "maps/levels/c10_samus/s030_area3/s030_area3.bmsld": "Area 3 - Exterior",
+    "maps/levels/c10_samus/s033_area3b/s033_area3b.bmsld": "Area 3 - Interior (Lower)",
+    "maps/levels/c10_samus/s036_area3c/s036_area3c.bmsld": "Area 3 - Interior (Upper)",
+    "maps/levels/c10_samus/s040_area4/s040_area4.bmsld": "Area 4 - West",
+    "maps/levels/c10_samus/s050_area5/s050_area5.bmsld": "Area 4 - East",
+    "maps/levels/c10_samus/s060_area6/s060_area6.bmsld": "Area 5 - Entrance",
+    "maps/levels/c10_samus/s065_area6b/s065_area6b.bmsld": "Area 5 - Exterior",
+    "maps/levels/c10_samus/s067_area6c/s067_area6c.bmsld": "Area 5 - Interior",
+    "maps/levels/c10_samus/s070_area7/s070_area7.bmsld": "Area 6",
+    "maps/levels/c10_samus/s090_area9/s090_area9.bmsld": "Area 7",
+    "maps/levels/c10_samus/s100_area10/s100_area10.bmsld": "Area 8",
+    "maps/levels/c10_samus/s110_surfaceb/s110_surfaceb.bmsld": "Surface - West",
 }
-id_to_name = {
-    os.path.splitext(path.split("/")[-1])[0]: name
-    for path, name in world_names.items()
-}
+id_to_name = {os.path.splitext(path.split("/")[-1])[0]: name for path, name in world_names.items()}
 pickup_index = 0
-bmscc: typing.Optional[Bmscc] = None
+bmscc: Bmscc | None = None
 # brsa: typing.Optional[Brsa] = None
-bmsld: typing.Optional[Bmsld] = None
+bmsld: Bmsld | None = None
 bmsld_path: str = None
 events: dict[str, dict] = {}
 
@@ -79,27 +92,22 @@ _polygon_override = {
         [6300.0, -900.0],
         [8200.0, 0.0],
         [8800.0, 0.0],
-        [8800.0, 8500.0]
+        [8800.0, 8500.0],
     ],
-    ("s020_area2", "collision_camera_006"): [
-        [-3100.0, 5600.0],
-        [-3100.0, 4500.0],
-        [-850.0, 4500.0],
-        [-850.0, 5600.0]
-    ],
+    ("s020_area2", "collision_camera_006"): [[-3100.0, 5600.0], [-3100.0, 4500.0], [-850.0, 4500.0], [-850.0, 5600.0]],
     ("s028_area2c", "collision_camera_003"): [
         [13800.0, -200.0],
         [13800.0, -1500.0],
         [14300.0, -1500],
         [14300.0, -5400.0],
         [19100.0, -5400.0],
-        [19100.0, -200.0]
+        [19100.0, -200.0],
     ],
     ("s028_area2c", "collision_camera_006"): [
         [10400.0, -1600.0],
         [10400.0, -3100.0],
         [14200.0, -3100.0],
-        [14200.0,-1600.0]
+        [14200.0, -1600.0],
     ],
     ("s030_area3", "collision_camera_038"): [
         [12200.0, 17300.0],
@@ -110,7 +118,7 @@ _polygon_override = {
         [16800.0, 14100.0],
         [17000.0, 14550.0],
         [20200.0, 14550.0],
-        [20200.0, 17300.0]
+        [20200.0, 17300.0],
     ],
     ("s033_area3b", "collision_camera_026"): [
         [-1600.0, -5200.0],
@@ -127,7 +135,7 @@ _polygon_override = {
         [1200.0, -14300.0],
         [1200.0, -12400.0],
         [600.0, -11900.0],
-        [600.0, -5200.0]
+        [600.0, -5200.0],
     ],
     ("s033_area3b", "collision_camera_027"): [
         [1100.0, 500.0],
@@ -135,7 +143,7 @@ _polygon_override = {
         [3400.0, -14300.0],
         [3400.0, -7500.0],
         [3900.0, -7500.0],
-        [3900.0, 500.0]
+        [3900.0, 500.0],
     ],
     ("s033_area3b", "collision_camera_028"): [
         [3300.0, -7500.0],
@@ -143,7 +151,7 @@ _polygon_override = {
         [2900.0, -8300.0],
         [2900.0, -9100.0],
         [4900.0, -9100.0],
-        [4900.0, -7500.0]
+        [4900.0, -7500.0],
     ],
     ("s040_area4", "collision_camera_001"): [
         [6800.0, -2500.0],
@@ -160,7 +168,7 @@ _polygon_override = {
         [4500.0, -3200.0],
         [4500.0, -4000.0],
         [6600.0, -4000.0],
-        [6600.0, -2675.0]
+        [6600.0, -2675.0],
     ],
     ("s040_area4", "collision_camera_018"): [
         [-7100.0, 5300.0],
@@ -168,13 +176,13 @@ _polygon_override = {
         [-5000.0, 3900.0],
         [-3800.0, 3700.0],
         [-750.0, 3700.0],
-        [-750.0, 5300.0]
+        [-750.0, 5300.0],
     ],
     ("s050_area5", "collision_camera_008"): [
         [-11400.0, 5200.0],
         [-11400.0, 3800.0],
         [-8750.0, 3800.0],
-        [-8750.0, 5200.0]
+        [-8750.0, 5200.0],
     ],
     ("s050_area5", "collision_camera_AfterChase_001"): [
         [6100.0, -2700.0],
@@ -184,21 +192,21 @@ _polygon_override = {
         [-3500.0, -3700.0],
         [-3500.0, -6100.0],
         [7600.0, -6100.0],
-        [7600.0, -2700.0]
+        [7600.0, -2700.0],
     ],
     ("s050_area5", "collision_camera_AfterChase_002"): [
         [-3500.0, -6000.0],
         [-3500.0, -8100.0],
         [3500.0, -8100.0],
         [10300.0, -8100.0],
-        [10300.0, -6000.0]
+        [10300.0, -6000.0],
     ],
     ("s050_area5", "collision_camera_AfterChase_003"): [
         [-3900.0, -8000.0],
         [-3900.0, -9100.0],
         [9900.0, -9100.0],
         [9900.0, -7500.0],
-        [6250.0, -8000.0]
+        [6250.0, -8000.0],
     ],
     ("s060_area6", "collision_camera_015"): [
         [3150.0, -8600.0],
@@ -208,18 +216,8 @@ _polygon_override = {
         [-1600.0, -6800.0],
         [-1600.0, -8600.0],
     ],
-    ("s067_area6c", "collision_camera_017"): [
-        [3200.0, 5800.0],
-        [3200.0, 1400.0],
-        [14050.0, 1400.0],
-        [14050.0, 5800.0]
-    ],
-    ("s070_area7", "collision_camera_048"): [
-        [3950.0, 8800.0],
-        [3950.0, 7400.0],
-        [6650.0, 7400.0],
-        [6650.0, 8800.0]
-    ],
+    ("s067_area6c", "collision_camera_017"): [[3200.0, 5800.0], [3200.0, 1400.0], [14050.0, 1400.0], [14050.0, 5800.0]],
+    ("s070_area7", "collision_camera_048"): [[3950.0, 8800.0], [3950.0, 7400.0], [6650.0, 7400.0], [6650.0, 8800.0]],
     ("s090_area9", "collision_camera_018"): [
         [-18200.0, 8100.0],
         [-18200.0, 1300.0],
@@ -228,13 +226,13 @@ _polygon_override = {
         [-16400.0, 2600.0],
         [-16400.0, 3200.0],
         [-16200.0, 3200.0],
-        [-16200.0, 8100.0]
+        [-16200.0, 8100.0],
     ],
     ("s100_area10", "collision_camera_007"): [
         [-2800.0, 8900.0],
         [-200.0, 8900.0],
         [-200.0, 11200.0],
-        [-2800.0, 11200.0]
+        [-2800.0, 11200.0],
     ],
     ("s100_area10", "collision_camera_008_A"): [
         [-12400.0, 27400.0],
@@ -245,13 +243,13 @@ _polygon_override = {
         [-1000.0, 20900.0],
         [100.0, 21600.0],
         [7150.0, 21600.0],
-        [7150.0, 27400.0]
+        [7150.0, 27400.0],
     ],
     ("s100_area10", "collision_camera_022"): [
         [-7200.0, 11100.0],
         [1600.0, 11100.0],
-        [ 1600.0, 12400.0],
-        [-7200.0, 12400.0]
+        [1600.0, 12400.0],
+        [-7200.0, 12400.0],
     ],
 }
 _rooms_for_actors = {
@@ -365,12 +363,12 @@ dock_weakness = {
     "charge": "Charge Beam Door",
 }
 _weakness_table_for_def = {
-    'doorchargecharge': (dock_weakness["charge"], dock_weakness["charge"]),
-    'doorclosedcharge': (dock_weakness["closed"], dock_weakness["charge"]),
-    'doorpowerpower': (dock_weakness["power"], dock_weakness["power"]),
-    'doorclosedpower': (dock_weakness["closed"], dock_weakness["power"]),
-    'doorpowerclosed': (dock_weakness["power"], dock_weakness["closed"]),
-    'doorchargeclosed': (dock_weakness["charge"], dock_weakness["closed"]),
+    "doorchargecharge": (dock_weakness["charge"], dock_weakness["charge"]),
+    "doorclosedcharge": (dock_weakness["closed"], dock_weakness["charge"]),
+    "doorpowerpower": (dock_weakness["power"], dock_weakness["power"]),
+    "doorclosedpower": (dock_weakness["closed"], dock_weakness["power"]),
+    "doorpowerclosed": (dock_weakness["power"], dock_weakness["closed"]),
+    "doorchargeclosed": (dock_weakness["charge"], dock_weakness["closed"]),
 }
 
 
@@ -382,8 +380,14 @@ class NodeDefinition(typing.NamedTuple):
 class ActorDetails:
     actor_type: str
 
-    def __init__(self, name: str, actor: construct.Container, level_name: str, all_rooms: dict[str, Polygon],
-                 layer_name: str = "default"):
+    def __init__(
+        self,
+        name: str,
+        actor: construct.Container,
+        level_name: str,
+        all_rooms: dict[str, Polygon],
+        layer_name: str = "default",
+    ):
         self.name = name
         self.actor = actor
         self.actor_type = actor.type
@@ -395,19 +399,23 @@ class ActorDetails:
             self.rooms: list[str] = [name for name, pol in all_rooms.items() if pol.contains(self.position)]
 
         self.is_door = self.actor_type.startswith("door") and self.actor_type not in {
-            "doorshieldmissile", "doorshieldsupermissile", "doorshieldpowerbomb",
-            "doorwave", "doorspazerbeam", "doorcreature"
+            "doorshieldmissile",
+            "doorshieldsupermissile",
+            "doorshieldpowerbomb",
+            "doorwave",
+            "doorspazerbeam",
+            "doorcreature",
         }
         # self.is_start_point = "STARTPOINT" in actor.pComponents and "dooremmy" not in self.actor_type
         self.is_pickup = any(self.actor_type.startswith(prefix) for prefix in ["powerup_", "item_", "itemsphere_"])
         self.is_usable = self.actor_type == "weightactivatedplatform"
 
     def create_node_template(
-            self, node_type: str,
-            default_name: str,
-            existing_data: typing.Optional[dict[str, NodeDefinition]],
+        self,
+        node_type: str,
+        default_name: str,
+        existing_data: dict[str, NodeDefinition] | None,
     ) -> NodeDefinition:
-
         result: dict = {
             "node_type": node_type,
             "heal": False,
@@ -488,7 +496,7 @@ def _find_room_orientation(world: dict, room_a: str, room_b: str):
 
 
 def current_world_file_name():
-    return re.sub(r'[^a-zA-Z0-9\- ]', r'', world_names[bmsld_path]) + ".json"
+    return re.sub(r"[^a-zA-Z0-9\- ]", r"", world_names[bmsld_path]) + ".json"
 
 
 def get_actor_name_for_node(node: dict) -> str:
@@ -507,9 +515,7 @@ def _get_existing_node_data(world: dict, area_names: dict[str, str]) -> dict[str
 
 
 def create_door_nodes_for_actor(
-        details: ActorDetails,
-        node_data_for_area: dict[str, dict[str, NodeDefinition]],
-        world: dict
+    details: ActorDetails, node_data_for_area: dict[str, dict[str, NodeDefinition]], world: dict
 ) -> list[NodeDefinition]:
     extra = {}
     # if "LIFE" in actor.pComponents:
@@ -520,9 +526,7 @@ def create_door_nodes_for_actor(
     #         "right_shield_def": get_def_link_for_entity(actor.pComponents.LIFE.wpRightDoorShieldEntity),
     #     }
 
-    simple = {"def": details.actor_type,
-              "left": extra.get("left_shield_def"),
-              "right": extra.get("right_shield_def")}
+    simple = {"def": details.actor_type, "left": extra.get("left_shield_def"), "right": extra.get("right_shield_def")}
 
     left_room, right_room = _find_room_orientation(world, *details.rooms)
 
@@ -549,14 +553,19 @@ def create_door_nodes_for_actor(
     return doors
 
 
-def decode_world(root: Path, target_level: str, out_path: Path, only_update_existing_areas: bool = False,
-                 skip_existing_actors: bool = True):
+def decode_world(
+    root: Path,
+    target_level: str,
+    out_path: Path,
+    only_update_existing_areas: bool = False,
+    skip_existing_actors: bool = True,
+):
     # ruff: noqa: C901
     global pickup_index, bmscc, bmsld, bmsld_path
     all_names = samus_returns_data.all_asset_id_to_name()
     game = Game.SAMUS_RETURNS
 
-    pkg_editor = FileTreeEditor(root, target_game=game)
+    pkg_editor = FileTreeEditor(ExtractedRomFs(root), target_game=game)
 
     for asset_id, name in all_names.items():
         if target_level not in name:
@@ -585,21 +594,19 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             "extra": {
                 "asset_id": bmsld_path,
             },
-            "areas": {}
+            "areas": {},
         }
 
     world_unique_id = Path(bmsld_path).stem.split("_")[1]
-    area_names = {
-        entry.name: f"{entry.name} ({world_unique_id})"
-        for entry in bmscc.raw.layers[0].entries
-    }
+    area_names = {entry.name: f"{entry.name} ({world_unique_id})" for entry in bmscc.raw.layers[0].entries}
     node_data_for_area = _get_existing_node_data(world, area_names)
 
     def rand_color(s):
-        return [x / 300.0 for x in hashlib.md5(bytes(str(sorted(s)), 'ascii')).digest()[0:3]]
+        return [x / 300.0 for x in hashlib.md5(bytes(str(sorted(s)), "ascii")).digest()[0:3]]
 
     handles = []
     import matplotlib.pyplot as plt
+
     plt.figure(1, figsize=(20, 10))
     plt.title(target_level)
 
@@ -617,14 +624,15 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             continue
 
         assert len(entry.data.polys) == 1
-        raw_vertices = _polygon_override.get((target_level, entry.name),
-                                             [(v.x, v.y) for v in entry.data.polys[0].points])
+        raw_vertices = _polygon_override.get(
+            (target_level, entry.name), [(v.x, v.y) for v in entry.data.polys[0].points]
+        )
         vertices = numpy.array(raw_vertices)
 
         c = [0.2, 0.7, 0.6]
         patch = mtPolygon(vertices, linewidth=1, edgecolor=c, facecolor=(c[0], c[1], c[2], 0.1))
         plt.gca().add_patch(patch)
-        plt.text((x1 + x2) / 2, (y1 + y2) / 2, entry.name[17:], color=c, ha='center', size='x-small')
+        plt.text((x1 + x2) / 2, (y1 + y2) / 2, entry.name[17:], color=c, ha="center", size="x-small")
         handles.append(patch)
 
         all_rooms[area_name] = Polygon(vertices)
@@ -660,8 +668,10 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             if existing_name == node_def.name:
                 continue
             if get_actor_name_for_node(existing_node) == new_actor:
-                raise ValueError(f"New node {node_def.name} with actor {new_actor} conflicts "
-                                 f"with existing node {existing_name} in {target_area}")
+                raise ValueError(
+                    f"New node {node_def.name} with actor {new_actor} conflicts "
+                    f"with existing node {existing_name} in {target_area}"
+                )
 
         world["areas"][target_area]["nodes"][node_def.name] = node_def.data
 
@@ -669,7 +679,7 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
         if not any([details.is_door, details.is_pickup, details.is_usable]):
             continue
 
-        plt.annotate(name, [details.position.x, details.position.y], fontsize='xx-small', ha='center')
+        plt.annotate(name, [details.position.x, details.position.y], fontsize="xx-small", ha="center")
         plt.plot(details.position.x, details.position.y, "o", color=rand_color(details.actor_type))
 
         if details.is_door:
@@ -683,12 +693,15 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
 
         elif details.is_pickup:
             for room_name in details.rooms:
-                definition = details.create_node_template("pickup", f"Pickup ({name})",
-                                                          node_data_for_area.get(room_name))
-                definition.data.update({
-                    "pickup_index": pickup_index,
-                    "major_location": "tank" not in details.actor_type,
-                })
+                definition = details.create_node_template(
+                    "pickup", f"Pickup ({name})", node_data_for_area.get(room_name)
+                )
+                definition.data.update(
+                    {
+                        "pickup_index": pickup_index,
+                        "major_location": "tank" not in details.actor_type,
+                    }
+                )
                 add_node(room_name, definition)
 
             if len(details.rooms) != 1:
@@ -715,14 +728,11 @@ def decode_world(root: Path, target_level: str, out_path: Path, only_update_exis
             raise ValueError("What kind of actor is this?!")
 
     handles_by_label = {}
-    handles_by_label = {
-        key: value
-        for key, value in sorted(handles_by_label.items(), key=lambda it: it[0])
-    }
+    handles_by_label = dict(sorted(handles_by_label.items(), key=lambda it: it[0]))
     plt.legend(handles_by_label.values(), handles_by_label.keys())
 
     plt.plot()
-    plt.savefig(f"{target_level}.png", dpi=200, bbox_inches='tight')
+    plt.savefig(f"{target_level}.png", dpi=200, bbox_inches="tight")
     # plt.show()
     plt.close()
 
@@ -764,5 +774,5 @@ def main():
         decode_all_worlds(args.game_root, args.output)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

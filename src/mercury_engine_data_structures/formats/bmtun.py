@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import functools
+from typing import TYPE_CHECKING
 
 import construct
 from construct.core import (
@@ -10,25 +13,21 @@ from construct.core import (
     Switch,
 )
 
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import Char, CVector3D, Float, StrId, VersionAdapter, make_dict
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
-from mercury_engine_data_structures.formats.base_resource import BaseResource
-from mercury_engine_data_structures.game_check import Game
+
+if TYPE_CHECKING:
+    from mercury_engine_data_structures.game_check import Game
 
 # Functions
 TunableParam = Struct(
     type=Char,
     value=Switch(
         construct.this.type,
-        {
-            's': StrId,
-            'f': Float,
-            'b': Flag,
-            'i': Int32sl,
-            'v': CVector3D
-        },
-        ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError)
-    )
+        {"s": StrId, "f": Float, "b": Flag, "i": Int32sl, "v": CVector3D},
+        ErrorWithMessage(lambda ctx: f"Unknown argument type: {ctx.type}", construct.SwitchError),
+    ),
 )
 
 TunableClass = Struct(
@@ -41,7 +40,7 @@ BMTUN = Struct(
     "version" / VersionAdapter("1.5.0"),
     "classes" / make_dict(TunableClass),
     construct.Terminated,
-)
+)  # fmt: skip
 
 
 class Bmtun(BaseResource):
@@ -49,3 +48,20 @@ class Bmtun(BaseResource):
     @functools.lru_cache
     def construct_class(cls, target_game: Game) -> Construct:
         return BMTUN
+
+    def _check_tunable_exists(self, class_name: str, tunable_name: str) -> None:
+        classes = self.raw.classes
+        if class_name not in classes:
+            raise KeyError(f"Unknown class name: {class_name}!")
+        if tunable_name not in classes[class_name].tunables:
+            raise KeyError(f"Unknown tunable name for {class_name}: {tunable_name}!")
+
+    Tunable = str | float | bool | int | list[float]
+
+    def get_tunable(self, class_name: str, tunable_name: str) -> Tunable:
+        self._check_tunable_exists(class_name, tunable_name)
+        return self.raw.classes[class_name].tunables[tunable_name].value
+
+    def set_tunable(self, class_name: str, tunable_name: str, value: Tunable) -> None:
+        self._check_tunable_exists(class_name, tunable_name)
+        self.raw.classes[class_name].tunables[tunable_name].value = value

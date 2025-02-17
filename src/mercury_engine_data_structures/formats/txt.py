@@ -1,12 +1,13 @@
+from __future__ import annotations
+
 import functools
-from typing import Dict
 
 import construct
 from construct.core import Const, Construct, GreedyRange, Struct
 
+from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import DictAdapter, DictElement, VersionAdapter
 from mercury_engine_data_structures.construct_extensions.strings import CStringRobust
-from mercury_engine_data_structures.formats.base_resource import BaseResource
 from mercury_engine_data_structures.game_check import Game, is_sr_or_else
 
 _string_range = GreedyRange(DictElement(CStringRobust("utf-16-le")))
@@ -44,7 +45,7 @@ TXT = Struct(
     ),
     "strings" / DictAdapter(_string_range),
     "_end" / construct.Terminated,
-)
+)  # fmt: skip
 
 
 class Txt(BaseResource):
@@ -54,7 +55,7 @@ class Txt(BaseResource):
         return TXT.compile()
 
     @property
-    def strings(self) -> Dict[str, str]:
+    def strings(self) -> dict[str, str]:
         return self._raw.strings
 
     @strings.setter

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import collections
 import copy
@@ -13,10 +15,29 @@ dread_data_construct_path = meds_root.joinpath("_dread_data_construct.py")
 data_construct = construct.Container()
 exec(compile(dread_data_construct_path.read_text(), dread_data_construct_path, "exec"), data_construct)
 
+# This must be updated along with src/mercury_engine_data_structures/game_check.py!
+GAME_VERSION_BUILD_DATA = {
+    "sr": {
+        "1.0.0": 1,
+    },
+    "dread": {
+        "1.0.0": 1,
+        "1.0.1": 2,
+        "2.0.0": 4,
+        "2.1.0": 8,
+    },
+}
+
 
 def _type_name_to_python_identifier(type_name: str):
-    return type_name.replace("::", "_").replace(" ", "_").replace("<", "_").replace(
-        ">", "_").replace(",", "_").replace("*", "Ptr")
+    return (
+        type_name.replace("::", "_")
+        .replace(" ", "_")
+        .replace("<", "_")
+        .replace(">", "_")
+        .replace(",", "_")
+        .replace("*", "Ptr")
+    )
 
 
 class TypeExporter:
@@ -53,7 +74,7 @@ class TypeExporter:
         for key, value in data.values.items():
             if key == "None":
                 key = "NONE"
-            enum_definition += f'    {key} = {value}\n'
+            enum_definition += f"    {key} = {value}\n"
 
         code = f"{enum_definition}\n\nconstruct_{type_variable} = StrictEnum({type_variable})"
 
@@ -91,7 +112,7 @@ class TypeExporter:
             # We have children, create a field vars
             field_var = f"{type_variable}Fields := "
 
-        return f'Object({field_var}{fields_def})'
+        return f"Object({field_var}{fields_def})"
 
     def _export_type(self, type_name: str):
         type_data = self.all_types[type_name]
@@ -102,7 +123,7 @@ class TypeExporter:
 
         elif isinstance(type_data, self._type_lib.StructType):
             type_code = self._export_struct_type(type_variable, type_name)
-            self._type_definition_code += f'\n\n{type_variable} = {type_code}'
+            self._type_definition_code += f"\n\n{type_variable} = {type_code}"
 
         elif isinstance(type_data, self._type_lib.EnumType):
             type_variable, type_code = self._export_enum_type(type_variable, type_name)
@@ -110,27 +131,27 @@ class TypeExporter:
 
         elif isinstance(type_data, self._type_lib.FlagsetType):
             reference = self.ensure_exported_type(type_data.enum)
-            flags = f'BitMaskEnum({reference}.enum_class)'
-            self._type_definition_code += f'\n\n{type_variable} = {flags}'
+            flags = f"BitMaskEnum({reference}.enum_class)"
+            self._type_definition_code += f"\n\n{type_variable} = {flags}"
 
         elif isinstance(type_data, self._type_lib.TypedefType):
             reference = self.ensure_exported_type(type_data.alias)
-            self._type_definition_code += f'\n\n{type_variable} = {reference}'
+            self._type_definition_code += f"\n\n{type_variable} = {reference}"
 
         elif isinstance(type_data, self._type_lib.PointerType):
             inner_field = self.pointer_to_type(type_data.target)
-            self._type_definition_code += f'\n\n{type_variable} = {inner_field}.create_construct()'
+            self._type_definition_code += f"\n\n{type_variable} = {inner_field}.create_construct()"
 
         elif isinstance(type_data, self._type_lib.VectorType):
             inner_field = self.ensure_exported_type(type_data.value_type)
             type_code = f"common_types.make_vector({inner_field})"
-            self._type_definition_code += f'\n\n{type_variable} = {type_code}'
+            self._type_definition_code += f"\n\n{type_variable} = {type_code}"
 
         elif isinstance(type_data, self._type_lib.DictionaryType):
             key_field = self.ensure_exported_type(type_data.key_type)
             inner_field = self.ensure_exported_type(type_data.value_type)
             type_code = f"common_types.make_dict({inner_field}, key={key_field})"
-            self._type_definition_code += f'\n\n{type_variable} = {type_code}'
+            self._type_definition_code += f"\n\n{type_variable} = {type_code}"
 
         else:
             raise ValueError(f"Unknown type_data: {type_data}")
@@ -173,7 +194,7 @@ from mercury_engine_data_structures.formats.property_enum import PropertyEnum, P
 from mercury_engine_data_structures.construct_extensions.enum import StrictEnum, BitMaskEnum
 
 """
-        code += 'primitive_to_construct = {\n'
+        code += "primitive_to_construct = {\n"
         code += "".join(f'    "{k.value}": {v},\n' for k, v in self._primitive_to_construct.items())
         code += "}\n\n"
 
@@ -199,7 +220,7 @@ from mercury_engine_data_structures.construct_extensions.enum import StrictEnum,
             if type_name != "base::reflection::CTypedValue":
                 code += (
                     f'{self.pointer_to_type(type_name)}.add_option("{type_name}", '
-                    f'{self.ensure_exported_type(type_name)})\n'
+                    f"{self.ensure_exported_type(type_name)})\n"
                 )
             for child in sorted(self.children_for(type_name)):
                 code += f'{self.pointer_to_type(type_name)}.add_option("{child}", {self.ensure_exported_type(child)})\n'
@@ -213,20 +234,24 @@ def game_argument_type(s: str) -> str:
         raise ValueError(f"No enum named {s} found")
     return s
 
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("game", help="The game to create the class definitions for",
-                        type=game_argument_type, choices=["dread", "sr"])
+    parser.add_argument(
+        "game", help="The game to create the class definitions for", type=game_argument_type, choices=["dread", "sr"]
+    )
     args = parser.parse_args()
 
     if args.game == "dread":
         types_path = meds_root.joinpath("dread_types.json")
         output_name = "dread_types.py"
-        file_names = ["dread_resource_names", "dread_property_names"]
+        resource_name = "dread_resource_names"
+        property_name = "dread_property_names"
     else:
         types_path = meds_root.joinpath("samus_returns_types.json")
         output_name = "sr_types.py"
-        file_names =  ["sr_resource_names", "sr_property_names"]
+        resource_name = "sr_resource_names"
+        property_name = "sr_property_names"
 
     game_types = json.loads(types_path.read_text())
 
@@ -261,15 +286,18 @@ def main():
 
         output_path.write_text(type_exporter.export_code())
 
-    for file_name in file_names:
-        with meds_root.joinpath(f"{file_name}.json").open() as f:
-            file_data: dict[str, int] = json.load(f)
+    with meds_root.joinpath(f"{property_name}.json").open() as f:
+        property_data: dict[str, int] = json.load(f)
 
-        data_construct.KnownHashes.build_file(
-            file_data,
-            meds_root.joinpath(f"{file_name}.bin")
-        )
+    data_construct.KnownHashes.build_file(property_data, meds_root.joinpath(f"{property_name}.bin"))
+
+    with meds_root.joinpath(f"{resource_name}.json").open() as f:
+        resource_data: dict[str, dict] = json.load(f)
+
+    data_construct.VersionedHashes.build_file(
+        resource_data, meds_root.joinpath(f"{resource_name}.bin"), versions=GAME_VERSION_BUILD_DATA[args.game]
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

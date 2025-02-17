@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import functools
 import struct
@@ -11,14 +13,154 @@ from mercury_engine_data_structures.construct_extensions.strings import (
     StaticPaddedString,
 )
 
+
+class Vec2:
+    raw: list[float]
+
+    def __init__(self, *args: float):
+        self.raw = list(args)
+
+    def __eq__(self, value):
+        if isinstance(value, Vec2):
+            return self.raw == value.raw
+        else:
+            return self.raw == value
+
+    def __iter__(self):
+        return iter(self.raw)
+
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}({repr(self.raw)[1:-1]})"
+
+    def __getitem__(self, key: int | slice) -> float:
+        return self.raw[key]
+
+    def __setitem__(self, key: int | slice, value: float) -> None:
+        self.raw[key] = value
+
+    @property
+    def x(self) -> float:
+        return self.raw[0]
+
+    @x.setter
+    def x(self, value: float) -> None:
+        self.raw[0] = value
+
+    @property
+    def y(self) -> float:
+        return self.raw[1]
+
+    @y.setter
+    def y(self, value: float) -> None:
+        self.raw[1] = value
+
+
+class Vec3(Vec2):
+    @property
+    def z(self) -> float:
+        return self.raw[2]
+
+    @z.setter
+    def z(self, value: float) -> None:
+        self.raw[2] = value
+
+    @property
+    def r(self) -> float:
+        return self.x
+
+    @r.setter
+    def r(self, value: float) -> None:
+        self.x = value
+
+    @property
+    def g(self) -> float:
+        return self.y
+
+    @g.setter
+    def g(self, value: float) -> None:
+        self.y = value
+
+    @property
+    def b(self) -> float:
+        return self.z
+
+    @b.setter
+    def b(self, value: float) -> None:
+        self.z = value
+
+
+class Vec4(Vec3):
+    @property
+    def w(self) -> float:
+        return self.raw[3]
+
+    @w.setter
+    def w(self, value: float) -> None:
+        self.raw[3] = value
+
+    @property
+    def a(self) -> float:
+        return self.w
+
+    @a.setter
+    def a(self, value: float) -> None:
+        self.w = value
+
+
+class CVectorConstruct(construct.Adapter):
+    def __init__(self, length: int):
+        super().__init__(construct.Array(length, Float))
+        self._length = length
+        if length == 2:
+            self._vec_type = Vec2
+        elif length == 3:
+            self._vec_type = Vec3
+        elif length == 4:
+            self._vec_type = Vec4
+        else:
+            raise ValueError(f"Unsupported length: {length}")
+
+    def _decode(self, obj, context, path):
+        return self._vec_type(*obj)
+
+    def _encode(self, obj: Vec2 | Vec3 | Vec4, context, path):
+        return obj.raw
+
+    def _emitparse(self, code: construct.CodeGen) -> str:
+        """Specialized construct compile for CVector2/3/4D"""
+        code.append(f"from mercury_engine_data_structures.common_types import Vec{self._length}")
+        code.append(f"CVector{self._length}D_Format = struct.Struct('<{self._length}f')")
+        return f"Vec{self._length}(*CVector{self._length}D_Format.unpack(io.read({self._length * 4})))"
+
+    def _emitparse_vector(self, code: construct.CodeGen) -> str:
+        """Specialized construct compile for a dynamic array of CVector2/3/4D"""
+
+        code.append(f"from mercury_engine_data_structures.common_types import Vec{self._length}")
+        code.append(f"""
+        def _parse_cvector{self._length}d_array(io, this):
+            count = {construct.Int32ul._compileparse(code)}
+            raw = struct.unpack(f'<{{{self._length} * count}}f', io.read({self._length * 4} * count))
+            args = [iter(raw)] * {self._length}
+            return ListContainer(Vec{self._length}(*it) for it in zip(*args))
+        """)
+        return f"_parse_cvector{self._length}d_array(io, this)"
+
+    def _emitbuild(self, code: construct.CodeGen) -> str:
+        code.append(f"CVector{self._length}D_Format = struct.Struct('<{self._length}f')")
+        return f"(io.write(CVector{self._length}D_Format.pack(*obj)), obj)"
+
+
 StrId = CStringRobust("utf-8")
 Char = StaticPaddedString(1, "utf-8")
 Int: construct.FormatField = typing.cast(construct.FormatField, construct.Int32sl)
 UInt: construct.FormatField = typing.cast(construct.FormatField, construct.Int32ul)
 Float: construct.FormatField = typing.cast(construct.FormatField, construct.Float32l)
-CVector2D = construct.Array(2, Float)
-CVector3D = construct.Array(3, Float)
-CVector4D = construct.Array(4, Float)
+CVector2D = CVectorConstruct(2)
+CVector3D = CVectorConstruct(3)
+CVector4D = CVectorConstruct(4)
+Transform3D = construct.Struct("position" / CVector3D, "rotation" / CVector3D, "scale" / CVector3D)
+BoundingBox2D = construct.Struct("min" / CVector2D, "max" / CVector2D)
+
 
 class VersionAdapter(Adapter):
     def __init__(self, value: int | str | tuple[int, int, int] | None = None):
@@ -26,16 +168,16 @@ class VersionAdapter(Adapter):
             value = tuple([int(i) for i in value.split(".")])
         elif isinstance(value, int):
             value = struct.pack("<I", value)
-            value  = struct.unpack("<HBB", value)
+            value = struct.unpack("<HBB", value)
 
         if value is None:
             subcon = construct.Struct(major=construct.Int16ul, minor=construct.Int8ul, patch=construct.Int8ul)
         else:
             major, minor, patch = value
             subcon = construct.Struct(
-                major = construct.Const(major, construct.Int16ul),
-                minor = construct.Const(minor, construct.Int8ul),
-                patch = construct.Const(patch, construct.Int8ul)
+                major=construct.Const(major, construct.Int16ul),
+                minor=construct.Const(minor, construct.Int8ul),
+                patch=construct.Const(patch, construct.Int8ul),
             )
         super().__init__(subcon)
 
@@ -44,40 +186,7 @@ class VersionAdapter(Adapter):
 
     def _encode(self, obj, context, path):
         lst = [int(i) for i in obj.split(".")]
-        return {
-            "major": lst[0],
-            "minor": lst[1],
-            "patch": lst[2]
-        }
-
-def _cvector_emitparse(length: int, code: construct.CodeGen) -> str:
-    """Specialized construct compile for CVector2/3/4D"""
-    code.append(f"CVector{length}D_Format = struct.Struct('<{length}f')")
-    return f"ListContainer(CVector{length}D_Format.unpack(io.read({length * 4})))"
-
-
-def _vector_cvector_emitparse(length: int, code: construct.CodeGen) -> str:
-    """Specialized construct compile for a dynamic array of CVector2/3/4D"""
-
-    code.append(f"""
-    def _parse_cvector{length}d_array(io, this):
-        count = {construct.Int32ul._compileparse(code)}
-        raw = struct.unpack(f'<{{{length} * count}}f', io.read({length * 4} * count))
-        args = [iter(raw)] * {length}
-        return ListContainer(zip(*args))
-    """)
-    return f"_parse_cvector{length}d_array(io, this)"
-
-
-def _cvector_emitbuild(length: int, code: construct.CodeGen):
-    code.append(f"CVector{length}D_Format = struct.Struct('<{length}f')")
-    return f"(io.write(CVector{length}D_Format.pack(*obj)), obj)"
-
-
-for i, vec in enumerate([CVector2D, CVector3D, CVector4D]):
-    vec._emitparse = functools.partial(_cvector_emitparse, i + 2)
-    vec._emitparse_vector = functools.partial(_vector_cvector_emitparse, i + 2)
-    vec._emitbuild = functools.partial(_cvector_emitbuild, i + 2)
+        return {"major": lst[0], "minor": lst[1], "patch": lst[2]}
 
 
 def _fmtfield_vector_emitparse(fmt_field: construct.FormatField, code: construct.CodeGen) -> str:
@@ -130,8 +239,12 @@ class DictAdapter(Adapter):
         super().__init__(subcon)
         self.allow_duplicates = allow_duplicates
 
-    def _decode(self, obj: construct.ListContainer, context: construct.Container, path: str,
-                ) -> construct.ListContainer | construct.Container:
+    def _decode(
+        self,
+        obj: construct.ListContainer,
+        context: construct.Container,
+        path: str,
+    ) -> construct.ListContainer | construct.Container:
         result = construct.Container()
         for item in obj:
             key = item.key
@@ -142,14 +255,15 @@ class DictAdapter(Adapter):
             result[key] = item.value
         return result
 
-    def _encode(self, obj: construct.ListContainer | construct.Container, context: construct.Container, path: str,
-                ) -> list:
+    def _encode(
+        self,
+        obj: construct.ListContainer | construct.Container,
+        context: construct.Container,
+        path: str,
+    ) -> list:
         if self.allow_duplicates and isinstance(obj, list):
             return obj
-        return construct.ListContainer(
-            construct.Container(key=type_, value=item)
-            for type_, item in obj.items()
-        )
+        return construct.ListContainer(construct.Container(key=type_, value=item) for type_, item in obj.items())
 
     def _emitparse(self, code):
         fname = f"parse_dict_adapter_{code.allocateId()}"
@@ -200,9 +314,15 @@ class DictElement(construct.Construct):
 
     def _parse(self, stream, context, path):
         context = construct.Container(
-            _=context, _params=context._params, _root=None, _parsing=context._parsing,
-            _building=context._building, _sizing=context._sizing, _io=stream,
-            _index=context.get("_index", None))
+            _=context,
+            _params=context._params,
+            _root=None,
+            _parsing=context._parsing,
+            _building=context._building,
+            _sizing=context._sizing,
+            _io=stream,
+            _index=context.get("_index", None),
+        )
         context._root = context._.get("_root", context)
 
         key = self.key._parsereport(stream, context, path)
@@ -215,9 +335,15 @@ class DictElement(construct.Construct):
 
     def _build(self, obj, stream, context, path):
         context = construct.Container(
-            _=context, _params=context._params, _root=None, _parsing=context._parsing,
-            _building=context._building, _sizing=context._sizing, _io=stream,
-            _index=context.get("_index", None))
+            _=context,
+            _params=context._params,
+            _root=None,
+            _parsing=context._parsing,
+            _building=context._building,
+            _sizing=context._sizing,
+            _io=stream,
+            _index=context.get("_index", None),
+        )
         context._root = context._.get("_root", context)
 
         key = self.key._build(obj.key, stream, context, path)
@@ -230,9 +356,15 @@ class DictElement(construct.Construct):
 
     def _sizeof(self, context, path):
         context = construct.Container(
-            _=context, _params=context._params, _root=None, _parsing=context._parsing,
-            _building=context._building, _sizing=context._sizing, _io=None,
-            _index=context.get("_index", None))
+            _=context,
+            _params=context._params,
+            _root=None,
+            _parsing=context._parsing,
+            _building=context._building,
+            _sizing=context._sizing,
+            _io=None,
+            _index=context.get("_index", None),
+        )
         context._root = context._.get("_root", context)
 
         key = self.key._sizeof(context, path)
@@ -279,8 +411,12 @@ class DictElement(construct.Construct):
 
 
 class DictConstruct(construct.Construct):
-    def __init__(self, key_type: construct.Construct, value_type: construct.Construct,
-                 count_type: construct.Construct = construct.Int32ul):
+    def __init__(
+        self,
+        key_type: construct.Construct,
+        value_type: construct.Construct,
+        count_type: construct.Construct = construct.Int32ul,
+    ):
         super().__init__()
         self.key_type = key_type
         self.value_type = value_type
@@ -326,9 +462,11 @@ class DictConstruct(construct.Construct):
                 {self.value_type._compilebuild(code)}
         """
         code.append(block)
-        return (f"(reuse(len(obj), "
-                f"lambda obj: {self.count_type._compilebuild(code)}), "
-                f"list({fname}(key, value, io, this) for key, value in obj.items()), obj)[2]")
+        return (
+            f"(reuse(len(obj), "
+            f"lambda obj: {self.count_type._compilebuild(code)}), "
+            f"list({fname}(key, value, io, this) for key, value in obj.items()), obj)[2]"
+        )
 
 
 def make_dict(value: construct.Construct, key=StrId):
@@ -355,30 +493,30 @@ def make_vector(value: construct.Construct):
     if hasattr(value, "_emitparse_vector"):
         _emitparse = value._emitparse_vector
     else:
+
         def _emitparse(code: construct.CodeGen) -> str:
-            return (f"ListContainer(({value._compileparse(code)}) "
-                    f"for i in range({construct.Int32ul._compileparse(code)}))")
+            return (
+                f"ListContainer(({value._compileparse(code)}) for i in range({construct.Int32ul._compileparse(code)}))"
+            )
 
     result._emitparse = _emitparse
 
     def _emitbuild(code):
-        return (f"(reuse(len(obj), lambda obj: {construct.Int32ul._compilebuild(code)}),"
-                f" list({value._compilebuild(code)} for obj in obj), obj)[2]")
+        return (
+            f"(reuse(len(obj), lambda obj: {construct.Int32ul._compilebuild(code)}),"
+            f" list({value._compilebuild(code)} for obj in obj), obj)[2]"
+        )
 
     result._emitbuild = _emitbuild
 
     return result
 
 
-def make_enum(values: typing.Union[typing.List[str], typing.Dict[str, int]], *,
-              add_invalid: bool = True):
+def make_enum(values: list[str] | dict[str, int], *, add_invalid: bool = True):
     if isinstance(values, dict):
         mapping = copy.copy(values)
     else:
-        mapping = {
-            name: i
-            for i, name in enumerate(values)
-        }
+        mapping = {name: i for i, name in enumerate(values)}
     if add_invalid:
-        mapping["Invalid"] = 0x7fffffff
+        mapping["Invalid"] = 0x7FFFFFFF
     return construct.Enum(construct.Int32ul, **mapping)

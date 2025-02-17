@@ -4,7 +4,7 @@ requires = [
     "setuptools_scm[toml]>=3.4.3",
     "construct>=2.10.0",
     "randovania-lupa>=2.0.1",
-    "zstd",
+    "zstandard",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -17,6 +17,8 @@ classifiers = [
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 requires-python = ">=3.10"
 dynamic = ["version"]
@@ -24,9 +26,8 @@ dynamic = ["version"]
 dependencies = [
     "construct>=2.10.70",  # 2.10.70 includes a fix for compiled structs building
     "randovania-lupa>=2.0.1",
-    "zstd",
+    "zstandard",
 ]
-
 
 [project.readme]
 file = "README.md"
@@ -37,7 +38,7 @@ Homepage = "https://github.com/randovania/mercury-engine-data-structures"
 
 [project.optional-dependencies]
 test = [
-    "pytest<8.0.0",  # see https://github.com/pytest-dev/pytest/issues/12608
+    "pytest>=8.3.1",  # see https://github.com/pytest-dev/pytest/issues/12608
     "pytest-cov",
 ]
 
@@ -63,11 +64,34 @@ filterwarnings = [
 
 [tool.ruff]
 line-length = 120
-lint.select = ["E", "F", "W", "C90", "I", "UP"]
 src = ["src"]
 
-# Version to target for generated code.
-target-version = "py38"
+[tool.ruff.lint]
+select = [
+    "E", "F", "W", "C90", "I", "UP", "C4",
+    "RSE",
+    "TCH",
+    # "PTH",
+    "COM818", "COM819",
+    "ISC",
+    "PIE",
+    # "PT",
+
+    "PLC",
+    "PLC0208",  # iterating over set is also not deterministic, so we shouldn't do that!
+
+    "PLE",
+    "PLR0402", "PLR1711", "PLR1722", "PLR0206", "PLR0133", "PLR0124",
+    "PLW",
+    "SIM101",
+]
+extend-ignore = [
+    "ISC001",  # may cause conflicts with formatter
+    "PLW2901",  # `for` loop variable `key` overwritten by assignment target
+]
+
+[tool.ruff.lint.isort]
+required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.lint.mccabe]
 # Flag errors (`C901`) whenever the complexity level exceeds 25.

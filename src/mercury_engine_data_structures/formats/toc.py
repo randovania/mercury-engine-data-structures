@@ -1,11 +1,16 @@
+from __future__ import annotations
+
 import functools
-from typing import Iterator, Optional
+from typing import TYPE_CHECKING
 
 import construct
 
 from mercury_engine_data_structures import common_types
-from mercury_engine_data_structures.formats.base_resource import BaseResource, NameOrAssetId, resolve_asset_id
+from mercury_engine_data_structures.base_resource import BaseResource, NameOrAssetId, resolve_asset_id
 from mercury_engine_data_structures.game_check import Game
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 TOC_SR = construct.Struct(
     files=common_types.make_dict(
@@ -34,7 +39,7 @@ class Toc(BaseResource):
     def system_files_name(cls) -> str:
         return "system/files.toc"
 
-    def get_size_for(self, asset_id: NameOrAssetId) -> Optional[int]:
+    def get_size_for(self, asset_id: NameOrAssetId) -> int | None:
         asset_id = resolve_asset_id(asset_id, self.target_game)
         return self._raw.files.get(asset_id)
 
