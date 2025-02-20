@@ -48,3 +48,20 @@ class Bmtun(BaseResource):
     @functools.lru_cache
     def construct_class(cls, target_game: Game) -> Construct:
         return BMTUN
+
+    def _check_tunable_exists(self, class_name: str, tunable_name: str) -> None:
+        classes = self.raw.classes
+        if class_name not in classes:
+            raise KeyError(f"Unknown class name: {class_name}!")
+        if tunable_name not in classes[class_name].tunables:
+            raise KeyError(f"Unknown tunable name for {class_name}: {tunable_name}!")
+
+    Tunable = str | float | bool | int | list[float]
+
+    def get_tunable(self, class_name: str, tunable_name: str) -> Tunable:
+        self._check_tunable_exists(class_name, tunable_name)
+        return self.raw.classes[class_name].tunables[tunable_name].value
+
+    def set_tunable(self, class_name: str, tunable_name: str, value: Tunable) -> None:
+        self._check_tunable_exists(class_name, tunable_name)
+        self.raw.classes[class_name].tunables[tunable_name].value = value

@@ -45,8 +45,8 @@ Construct type definitions for Mercury Engine
 | BMSMSD    | &check;              | &check;               | Missing      | Missing       | Map Screen Data (?)	|
 | BMSNAV    | &check;              | &check;               | &check;      | &check;       | Navigation Meshes	|
 | BMSND     | &cross;              | &cross;               | Missing      | Missing       | Sound (?)   |
-| BMSSA     | &cross;              | &cross;               | Missing      | Missing       | SSA (?)			|
-| BMSSD     | &check;              | &check;               | &check;      | &check;       | Scene Data (scene blocks, objects, msr lighting) |
+| BMSSA     | &check;              | &check;               | Missing      | Missing       | SubArea Setups (MSR)			|
+| BMSSD     | &check;              | &check;               | &check;      | &check;       | Scene Data (scene blocks, objects, msr lighting) |	
 | BMSSH     | Missing              | Missing               | &check;      | &check;       | GUI Shape |
 | BMSSK     | Missing              | Missing               | &check;      | &check;       | GUI Skin |
 | BMSSS     | Missing              | Missing               | &check;      | &check;       | GUI SpriteSheet |
@@ -61,7 +61,7 @@ Construct type definitions for Mercury Engine
 | BRES      | Missing              | Missing               | &check;      | &check;       | Environmental Sound Presets |
 | BREV      | Missing              | Missing               | &check;      | &check;       | Environmental Visual Presets |
 | BRFLD     | Missing              | Missing               | &check;      | &check;       | Dread Scenario Entity Data |
-| BRSA      | Missing              | Missing               | &check;      | &check;       | SubArea Setups |
+| BRSA      | Missing              | Missing               | &check;      | &check;       | SubArea Setups (Dread) |
 | BRSPD     | Missing              | Missing               | &check;      | &check;       | Shot Audio Presets |
 | BSHDAT    | &cross;              | &cross;               | &cross;      | &cross;       | Shader Data	|
 | BSMAT     | Missing              | Missing               | &check;      | &check;       | Mesh Material |

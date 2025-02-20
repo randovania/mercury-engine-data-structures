@@ -245,7 +245,11 @@ class Bmssd(BaseResource):
         if isinstance(item, str):
             item = self.get_item(item, item_type)
 
-        return [sg_name for sg_name, sg_val in self.raw.scene_groups.items() if item in sg_val[item_type]]
+        return [
+            sg_name
+            for sg_name, sg_val in self.raw.scene_groups.items()
+            if sg_val.get(item_type) and item in sg_val[item_type]
+        ]
 
     def add_item(self, item: construct.Container, item_type: ItemType, scene_groups: list[str] = None):
         if item_type == ItemType.OBJECT:
@@ -267,4 +271,10 @@ class Bmssd(BaseResource):
         for sg in groups:
             self.remove_item_from_group(item, item_type, sg)
 
-        self.raw[f"_{item_type}"].remove(item)
+        raw_object = self.raw[f"_{item_type}"]
+        if isinstance(raw_object, dict):
+            self.raw[f"_{item_type}"] = {
+                iter_key: iter_item for iter_key, iter_item in raw_object.items() if iter_item != item
+            }
+        elif isinstance(raw_object, list):
+            raw_object.remove(item)
