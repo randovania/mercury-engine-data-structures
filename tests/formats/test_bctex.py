@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import hashlib
+
 import pytest
 from tests.test_lib import parse_build_compare_editor_parsed
 
 from mercury_engine_data_structures import dread_data, samus_returns_data
+from mercury_engine_data_structures.exporters.dds import DdsExporter
+from mercury_engine_data_structures.exporters.raw_texture import RawTexture
 from mercury_engine_data_structures.formats.bctex import Bctex
 
 dread_exclusions = [
@@ -1402,6 +1406,46 @@ sr_missing = [
     "system/fx/textures/wind_arc.bctex",
 ]
 
+# one of each XTX_Tegra_Format
+dread_dds_exports = [
+    (
+        "textures/actors/characters/armadigger/models/textures/armadigger_at.bctex",
+        "9a82d53345292f5e5ca43eab5611580c5ec39ac70791df040c91fb108f02522a",
+    ),
+    (
+        "textures/actors/characters/armadigger/models/textures/armadigger_nm.bctex",
+        "cbdc78010948e4a41fca4a75494eb12772ee61a83ea18e03d876ba9cfe2309e2",
+    ),
+    (
+        "textures/actors/characters/autector/fx/textures/alarmring.bctex",
+        "965d5000d9c2eb97cfea9b149a60f5291704ec78e2f2f6971d7f77b1520dfb17",
+    ),
+    (
+        "textures/actors/characters/chozocommanderx/models/textures/feathers_at.bctex",
+        "9b4b5d274eb522678f339dd82fe8a09c0d746bf63cacb15a211b724c74fdd471",
+    ),
+    (
+        "textures/actors/characters/chozowarrior/fx/textures/groundshaft.bctex",
+        "dbb36935604b96dcec060a3f9ce005af2ac0a6ccd7abe985fd0b17da2ed08a91",
+    ),
+    (
+        "textures/actors/characters/chozowarriorx/fx/textures/mudfluid04_nor.bctex",
+        "f408c524d58770f11de1ca3b1f0230db42523492cf5f696dec9da234f886da1c",
+    ),
+    (
+        "textures/actors/characters/rinka/fx/textures/explosion01.bctex",
+        "0a2707955daded5c8d96075a07a2c69a2c568a82f0e4e6721b6d6a6df0b71576",
+    ),
+    (
+        "textures/maps/cubemaps/airport_cubemapdiffusehdr.bctex",
+        "f0c8ae58d39389283fc967ba9a477c37634a21a186acae84ee9908ed90770bfa",
+    ),
+    (
+        "textures/system/minimap/icons/icons.bctex",
+        "1f20a0e812a0fee9b173f2bd73de03cfe2f2397ce8cb1d20f1dacd697ecd04d0",
+    ),
+]
+
 
 @pytest.mark.parametrize(
     "bctex_path", dread_data.all_files_ending_with(".bctex", dread_210_ignore + dread_210_only + dread_exclusions)
@@ -1418,3 +1462,14 @@ def test_compare_dread_210(dread_tree_210, bctex_path):
 @pytest.mark.parametrize("bctex_path", samus_returns_data.all_files_ending_with(".bctex", sr_missing))
 def test_compare_bctex_sr(samus_returns_tree, bctex_path):
     parse_build_compare_editor_parsed(Bctex, samus_returns_tree, bctex_path)
+
+
+@pytest.mark.parametrize(("bctex_path", "expected_hash"), dread_dds_exports)
+def test_bctex_export_dread(dread_tree_100, bctex_path, expected_hash):
+    bctex = dread_tree_100.get_parsed_asset(bctex_path, type_hint=Bctex)
+    rawtex = RawTexture(bctex)
+    exporter = DdsExporter(rawtex)
+
+    assert len(exporter.dds_files) == 1
+    sha = hashlib.sha256(exporter.dds_files[0])
+    assert sha.hexdigest() == expected_hash
