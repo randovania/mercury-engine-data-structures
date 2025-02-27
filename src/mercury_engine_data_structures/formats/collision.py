@@ -196,11 +196,11 @@ class CollisionEntry:
         self._raw = raw
 
     @property
-    def data(self) -> dict[Vec3, list[dict], Vec4, list[dict]]:
+    def data(self) -> Container:
         return self._raw.data
 
     @data.setter
-    def data(self, value: dict[Vec3, list[dict], Vec4, list[dict]]) -> None:
+    def data(self, value: Container) -> None:
         self._raw.data = value
 
     @property
