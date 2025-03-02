@@ -32,14 +32,14 @@ class Brsa(BaseResource):
 
     def get_subarea_setup(self, setup_id: str) -> Container:
         """Gets a setup
-        
+
         param setup_id: the name of the setup
         returns: the setup"""
         return next(setup for setup in self.subarea_setups if setup.sId == setup_id)
 
     def add_setup(self, setup_id: str) -> Container:
         """Adds a new setup
-        
+
         param setup_id: the name of the new setup
         returns: the newly created setup"""
         new_setup = Container({"sId": setup_id, "vSubareaConfigs": ListContainer()})
@@ -49,7 +49,7 @@ class Brsa(BaseResource):
 
     def get_subarea_config(self, subarea_id: str, setup_id: str = "Default") -> Container:
         """Gets a config for a subarea
-        
+
         param subarea_id: the name of the subarea the config is for
         param setup_id: the name of the setup the config is in
         returns: the config for the subarea"""
@@ -68,7 +68,7 @@ class Brsa(BaseResource):
         cutscene_ids: list[str] = [],
     ) -> Container:
         """Adds a config for a subarea
-        
+
         param subarea_id: the name of the subarea the config is for
         param setup_id: the name of the setup the config will be in
         returns: the newly created config"""
@@ -91,7 +91,7 @@ class Brsa(BaseResource):
 
     def set_scenario_collider(self, subarea_id: str, collider_name: str, setup_id: str = "Default") -> None:
         """Sets the scenario collider for a subarea
-        
+
         param subarea_id: the name of the subarea
         param collider_name: the name of the collider
         param setup_id: the name of the setup the subarea is in"""
@@ -99,7 +99,7 @@ class Brsa(BaseResource):
 
     def set_light_group(self, subarea_id: str, group_name: str, setup_id: str = "Default") -> None:
         """Sets the light group for a subarea
-        
+
         param subarea_id: the name of the subarea
         param group_name: the name of the group
         param setup_id: the name of the setup the subarea is in"""
@@ -107,7 +107,7 @@ class Brsa(BaseResource):
 
     def set_sound_group(self, subarea_id: str, group_name: str, setup_id: str = "Default") -> None:
         """Sets the sound group for a subarea
-        
+
         param subarea_id: the name of the subarea
         param collider_name: the name of the group
         param setup_id: the name of the setup the subarea is in"""
@@ -115,7 +115,7 @@ class Brsa(BaseResource):
 
     def set_scene_group(self, subarea_id: str, group_name: str, setup_id: str = "Default") -> None:
         """Sets the scene group for a subarea
-        
+
         param subarea_id: the name of the subarea
         param group_name: the name of the group
         param setup_id: the name of the setup the subarea is in"""
@@ -123,7 +123,7 @@ class Brsa(BaseResource):
 
     def set_entity_group(self, subarea_id: str, group_name: str, setup_id: str = "Default") -> None:
         """Sets the entity group for a subarea
-        
+
         param subarea_id: the name of the subarea
         param group_name: the name of the group
         param setup_id: the name of the setup the subarea is in"""
@@ -131,7 +131,7 @@ class Brsa(BaseResource):
 
     def set_tilegroup_group(self, subarea_id: str, group_name: str, setup_id: str = "Default") -> None:
         """Sets the tilegroup group for a subarea
-        
+
         param subarea_id: the name of the subarea
         param group_name: the name of the group
         param setup_id: the name of the setup the subarea is in"""
@@ -139,7 +139,7 @@ class Brsa(BaseResource):
 
     def set_visual_preset(self, subarea_id: str, preset_name: str, setup_id: str = "Default") -> None:
         """Sets the visual preset for a subarea
-        
+
         param subarea_id: the name of the subarea
         param preset_name: the name of the preset
         param setup_id: the name of the setup the subarea is in"""
@@ -147,7 +147,7 @@ class Brsa(BaseResource):
 
     def set_sound_preset(self, subarea_id: str, preset_name: str, setup_id: str = "Default") -> None:
         """Sets the sound preset for a subarea
-        
+
         param subarea_id: the name of the subarea
         param preset_name: the name of the preset
         param setup_id: the name of the setup the subarea is in"""
@@ -155,7 +155,7 @@ class Brsa(BaseResource):
 
     def set_music_preset(self, subarea_id: str, preset_name: str, setup_id: str = "Default") -> None:
         """Sets the music preset for a subarea
-        
+
         param subarea_id: the name of the subarea
         param preset_name: the name of the preset
         param setup_id: the name of the setup the subarea is in"""
@@ -163,14 +163,14 @@ class Brsa(BaseResource):
 
     def get_charclass_group(self, group_id: str) -> Container:
         """Gets a charclass group
-        
+
         param group_id: the name of the group
         returns: the charclass group"""
         return next(group for group in self.charclass_groups if group.sId == group_id)
 
     def add_charclass_group(self, group_id: str, charclasses: list[str] = []) -> Container:
         """Adds a new charclass group
-        
+
         param group_id: the name of the new group
         param charclasses: the charclasses in this group
         returns: the newly created charclass group"""
