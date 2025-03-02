@@ -80,9 +80,9 @@ class Brsa(BaseResource):
                 "fCameraZDistance": camera_distance,
                 "bIgnoreMetroidCameraOffsets": ignore_camera_offsets,
                 "sCharclassGroupId": charclass_group,
-                "asItemsIds": [""] * 9,
-                "vsCameraCollisionsIds": camera_ids if camera_ids else [],
-                "vsCutscenesIds": cutscene_ids if cutscene_ids else [],
+                "asItemsIds": ListContainer([""] * 9),
+                "vsCameraCollisionsIds": ListContainer(camera_ids) if camera_ids else ListContainer(),
+                "vsCutscenesIds": ListContainer(cutscene_ids) if cutscene_ids else ListContainer(),
             }
         )
         self.get_subarea_setup(setup_id).vSubareaConfigs.append(new_config)
@@ -174,7 +174,7 @@ class Brsa(BaseResource):
         param group_id: the name of the new group
         param charclasses: the charclasses in this group
         returns: the newly created charclass group"""
-        new_group = Container({"sId": group_id, "vsCharClassesIds": charclasses if charclasses else ListContainer()})
+        new_group = Container({"sId": group_id, "vsCharClassesIds": ListContainer(charclasses) if charclasses else ListContainer()})
         self.raw.Root.pSubareaManager.vCharclassGroups.append(new_group)
 
         return new_group
