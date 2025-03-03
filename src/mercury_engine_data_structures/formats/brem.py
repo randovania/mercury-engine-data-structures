@@ -26,6 +26,10 @@ class Brem(BaseResource):
         return self.raw.Root.pEnvironmentManager.pMusicPresets.dicBossPresets
 
     def set_preset_track(self, preset_id: str, track_name: str) -> None:
+        """Sets the track on a preset. If the preset contains multiple tracks, all tracks will be changed.
+
+        param preset_id: the preset to update
+        param track_name: the path to the track"""
         preset = self.presets[preset_id]
 
         for track in preset.tPreset.vTracks:
