@@ -38,12 +38,18 @@ def test_add_setup(dread_tree_100):
 
     assert len(list(subareas.subarea_setups)) == 18
 
+    with pytest.raises(ValueError, match=r"Setup .+? is already present"):
+        subareas.add_setup("Default")
+
 
 def test_add_subarea_config(dread_tree_100):
     subareas = dread_tree_100.get_file("maps/levels/c10_samus/s010_cave/s010_cave.brsa", Brsa)
     new_config = subareas.add_subarea_config("camera_test")
 
     assert len(subareas.get_subarea_setup("Default").vSubareaConfigs) == 79
+
+    with pytest.raises(ValueError, match=r"Config for .+? is already present in .+?"):
+        subareas.add_subarea_config("collision_camera_000")
 
     subareas.set_scenario_collider("camera_test", "collider_test")
     subareas.set_light_group("camera_test", "lg_test")
@@ -76,3 +82,6 @@ def test_charclasses(dread_tree_100):
     subareas.add_charclass_group("Test", ["klaida"])
 
     assert len(subareas.get_charclass_group("Test").vsCharClassesIds) == 1
+
+    with pytest.raises(ValueError, match=r"Charclass .+? is already present"):
+        subareas.add_charclass_group("No Enemies")
