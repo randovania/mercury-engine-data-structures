@@ -75,7 +75,9 @@ class Brsa(BaseResource):
         param subarea_id: the name of the subarea the config is for
         param setup_id: the name of the setup the config will be in
         returns: the newly created config"""
-        if next((config for config in self.get_subarea_setup(setup_id).vSubareaConfigs if config.sId == subarea_id), None):
+        if next(
+            (config for config in self.get_subarea_setup(setup_id).vSubareaConfigs if config.sId == subarea_id), None
+        ):
             raise ValueError(f"Config for {subarea_id} is already present in {setup_id}")
 
         new_config = Container(
@@ -183,7 +185,9 @@ class Brsa(BaseResource):
         if next((group for group in self.charclass_groups if group.sId == group_id), None):
             raise ValueError(f"Charclass {group_id} is already present")
 
-        new_group = Container({"sId": group_id, "vsCharClassesIds": ListContainer(charclasses) if charclasses else ListContainer()})
+        new_group = Container(
+            {"sId": group_id, "vsCharClassesIds": ListContainer(charclasses) if charclasses else ListContainer()}
+        )
         self.raw.Root.pSubareaManager.vCharclassGroups.append(new_group)
 
         return new_group
