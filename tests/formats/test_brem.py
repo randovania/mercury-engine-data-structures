@@ -30,3 +30,12 @@ def test_dread_brem_100(dread_tree_100, brem_path):
 @pytest.mark.parametrize("brem_path", bossrush_assets)
 def test_dread_brem_210(dread_tree_210, brem_path):
     parse_build_compare_editor(Brem, dread_tree_210, brem_path)
+
+
+def test_set_preset_track(dread_tree_100):
+    music_manager = dread_tree_100.get_file("maps/levels/c10_samus/s010_cave/s010_cave.brem", Brem)
+
+    new_track = "streams/music/s_magma_001.wav"
+    music_manager.set_preset_track("s_cave_001", new_track)
+
+    assert music_manager.presets.s_cave_001.tPreset.vTracks[0].vFiles[0].sWav == new_track
