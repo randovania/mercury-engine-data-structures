@@ -36,7 +36,7 @@ def test_properties(dread_tree_100):
     music_manager = dread_tree_100.get_file("maps/levels/c10_samus/s010_cave/s010_cave.brem", Brem)
 
     assert len(music_manager.presets) == 14
-    assert len(music_manager) == 3
+    assert len(music_manager.boss_presets) == 3
 
 
 def test_set_preset_track(dread_tree_100):
