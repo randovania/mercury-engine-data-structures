@@ -606,7 +606,7 @@ def main(
     except (FileNotFoundError, json.JSONDecodeError):
         old_data = {}
 
-    old_data = typing.cast(dict[str, typing.Any], old_data)
+    old_data = typing.cast("dict[str, typing.Any]", old_data)
 
     if ignore_container_or_ptr:
         for key in list(all_fields_functions.keys()):
