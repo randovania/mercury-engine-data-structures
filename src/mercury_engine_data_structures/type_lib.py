@@ -167,6 +167,13 @@ class PrimitiveType(BaseType):
                 return None
             return ValueError(f"{__value} is out of range of [{hex(low)}, {hex(high)}]")
 
+        if isinstance(__value, Vec2):
+            if type(__value) is primitive_to_type[self.primitive_kind] and all(
+                isinstance(v, float) for v in __value.raw
+            ):
+                return None
+            return ValueError(f"Invalid CVector{self.primitive_kind.name[-1]}D: {__value}")
+
         return None
 
 

@@ -57,10 +57,16 @@ def _dread_type_lib():
         ("unsigned_int", 2**32, ValueError("4294967296 is out of range of [0x0, 0xffffffff]")),
         ("unsigned_long", 2**64, ValueError("18446744073709551616 is out of range of [0x0, 0xffffffffffffffff]")),
         ("base::global::CName", -1, ValueError("-1 is out of range of [0x0, 0xffffffffffffffff]")),
-        ("base::math::CVector2D", ["foo", "bar"], TypeError("Expected Vec2; got list")),
-        ("base::math::CVector2D", [0.0], TypeError("Expected Vec2; got list")),
-        ("base::math::CVector3D", [0.0], TypeError("Expected Vec3; got list")),
-        ("base::math::CVector4D", [0.0], TypeError("Expected Vec4; got list")),
+        ("base::math::CVector2D", Vec2("foo", "bar"), ValueError("Invalid CVector2D: Vec2('foo', 'bar')")),
+        (
+            "base::math::CVector3D",
+            Vec3("foo", "bar", "baz"),
+            ValueError("Invalid CVector3D: Vec3('foo', 'bar', 'baz')"),
+        ),
+        ("base::math::CVector2D", Vec3(0.0, 0.0, 0.0), ValueError("Invalid CVector2D: Vec3(0.0, 0.0, 0.0)")),
+        ("base::math::CVector2D", Vec4(0.0, 0.0, 0.0, 0.0), ValueError("Invalid CVector2D: Vec4(0.0, 0.0, 0.0, 0.0)")),
+        ("base::math::CVector3D", Vec2(0.0, 0.0), TypeError("Expected Vec3; got Vec2")),
+        ("base::math::CVector4D", Vec2(0.0, 0.0), TypeError("Expected Vec4; got Vec2")),
         # struct
         (
             "base::reflection::CType",
