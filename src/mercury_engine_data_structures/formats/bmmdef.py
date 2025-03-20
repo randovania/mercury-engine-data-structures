@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from construct import Construct, Container
 
 from mercury_engine_data_structures.base_resource import BaseResource
+from mercury_engine_data_structures.common_types import Vec2
 from mercury_engine_data_structures.formats import standard_format
 
 if TYPE_CHECKING:
@@ -38,7 +39,7 @@ class Bmmdef(BaseResource):
         icon.uSpriteCol = uSpriteCol
         icon.sDisabledIconId = sDisabledIconId
         icon.sInspectorLabel = sInspectorLabel
-        icon.vAnchorOffset = list(vAnchorOffset)
+        icon.vAnchorOffset = Vec2(*vAnchorOffset)
         icon.bAutoScale = bAutoScale
         for k, v in kwargs.items():
             icon[k] = v
