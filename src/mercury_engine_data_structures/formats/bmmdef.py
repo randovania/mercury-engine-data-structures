@@ -30,16 +30,19 @@ class Bmmdef(BaseResource):
         uSpriteCol: int,
         sInspectorLabel: str,
         sDisabledIconId: str = "",
-        vAnchorOffset: tuple[int, int] = (0, 0),
+        vAnchorOffset: Vec2 | None = None,
         bAutoScale: bool = True,
         **kwargs,
     ):
+        if vAnchorOffset is None:
+            vAnchorOffset = Vec2(0.0, 0.0)
+
         icon = Container()
         icon.uSpriteRow = uSpriteRow
         icon.uSpriteCol = uSpriteCol
         icon.sDisabledIconId = sDisabledIconId
         icon.sInspectorLabel = sInspectorLabel
-        icon.vAnchorOffset = Vec2(*vAnchorOffset)
+        icon.vAnchorOffset = vAnchorOffset
         icon.bAutoScale = bAutoScale
         for k, v in kwargs.items():
             icon[k] = v
