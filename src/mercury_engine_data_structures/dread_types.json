@@ -19217,6 +19217,10 @@
             "lstChildren": "base::global::CPooledList<GUI::CDisplayObject*>"
         }
     },
+    "GUI::CDisplayObjectContainer*": {
+        "kind": "pointer",
+        "target": "GUI::CDisplayObjectContainer"
+    },
     "GUI::CDisplayObjectDef": {
         "kind": "struct",
         "parent": "base::core::CBaseObject",
@@ -19333,6 +19337,10 @@
             "mapShapes": "base::global::CRntDictionary<base::global::CStrId, base::spatial::CPolygon2D *>"
         }
     },
+    "GUI::CGUIManager::ShapeContainer*": {
+        "kind": "pointer",
+        "target": "GUI::CGUIManager::ShapeContainer"
+    },
     "GUI::CGUIManager::SkinContainer": {
         "kind": "struct",
         "parent": null,
@@ -19340,12 +19348,20 @@
             "vecSkins": "base::global::CRntVector<GUI::CSkin*>"
         }
     },
+    "GUI::CGUIManager::SkinContainer*": {
+        "kind": "pointer",
+        "target": "GUI::CGUIManager::SkinContainer"
+    },
     "GUI::CGUIManager::SpriteSheetContainer": {
         "kind": "struct",
         "parent": null,
         "fields": {
             "mapSpriteSheets": "base::global::CRntDictionary<base::global::CStrId, GUI::CSpriteSheet*>"
         }
+    },
+    "GUI::CGUIManager::SpriteSheetContainer*": {
+        "kind": "pointer",
+        "target": "GUI::CGUIManager::SpriteSheetContainer"
     },
     "GUI::CGammaAdjustComposition": {
         "kind": "struct",
