@@ -30,6 +30,7 @@ from mercury_engine_data_structures.common_types import (
     CVector3D,
     Float,
     StrId,
+    Vec3,
     VersionAdapter,
     make_dict,
     make_vector,
@@ -500,7 +501,6 @@ class ActorDefFuncParam(typing.Generic[T]):
         inst.set_param(self.index, value)
 
 
-Vec3 = list
 FieldType = bool | str | float | int | Vec3
 
 
@@ -523,11 +523,6 @@ class ComponentFields:
         elif isinstance(value, float):
             type_ = "float"
         elif isinstance(value, Vec3):
-            err = f"Invalid Vec3 {name}: {value}"
-            if len(value) != 3:
-                raise ValueError(err)
-            if not all(isinstance(v, float) for v in value):
-                raise TypeError(err)
             type_ = "vec3"
 
         fields[name].type = type_
