@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from enum import Enum
+from enum import Enum, IntEnum
 
 import construct
 from construct.core import Error
@@ -9,11 +9,38 @@ from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import StrId, UInt
 from mercury_engine_data_structures.game_check import Game
 
-BlockType = construct.Enum(
-    UInt,
-    texture=2,
-    data=3,
-)
+
+class BlockType(IntEnum):
+    TEXTURE = 2
+    DATA = 3
+
+
+class XTX_Tegra_Format(IntEnum):
+    bytes_per_pixel: int
+    block_width: int
+    block_height: int
+    block_depth: int
+
+    R8_UNORM = 0x1, 1, 1, 1, 1
+    R8G8_UNORM = 0xD, 2, 1, 1, 1
+    R8G8B8A8_UNORM = 0x25, 4, 1, 1, 1
+    BC1_UNORM = 0x42, 8, 4, 4, 1
+    BC3_UNORM = 0x44, 16, 4, 4, 1
+    BC5_UNORM = 0x4B, 16, 4, 4, 1
+    BC6H_UF16 = 0x50, 16, 4, 4, 1
+    B8G8R8A8_UNORM = 0x6D, 4, 1, 1, 1
+
+    def __new__(cls, value: int, bpp: int, bW: int, bH: int, bD: int) -> XTX_Tegra_Format:
+        member = int.__new__(cls, value)
+        member._value_ = value
+        member.bytes_per_pixel = bpp
+        member.block_width = bW
+        member.block_height = bH
+        member.block_depth = bD
+        return member
+
+
+XTXFormatConstruct = construct.Enum(UInt, XTX_Tegra_Format)
 
 XTX_TextureBlock = construct.Struct(
     data_size=construct.Int64ul,
@@ -22,7 +49,7 @@ XTX_TextureBlock = construct.Struct(
     height=UInt,
     depth=UInt,
     target=UInt,
-    xtx_format=UInt,
+    xtx_format=XTXFormatConstruct,
     mip_count=UInt,
     slice_size=UInt,
     mip_offsets=UInt[17],
@@ -38,7 +65,7 @@ XTX_Block = construct.Struct(
     block_size=UInt,
     data_size=construct.Int64ul,
     data_offset=construct.Int64sl,
-    block_type=BlockType,
+    block_type=construct.Enum(UInt, BlockType),
     global_block_index=UInt,
     inc_block_type_index=UInt,
     _data_seek=construct.Seek(construct.this._start + construct.this.data_offset),
@@ -47,7 +74,7 @@ XTX_Block = construct.Struct(
         construct.Switch(
             construct.this.block_type,
             {
-                BlockType.texture: XTX_TextureBlock,
+                BlockType.TEXTURE.name: XTX_TextureBlock,
             },
             construct.GreedyBytes,
         ),
