@@ -37501,1732 +37501,1300 @@
         "crc": 279283898
     },
     "packs/cutscenes/area2cam.pkg": {
-        "crc": 4235054718,
-        "versions": []
+        "crc": 4235054718
     },
     "packs/cutscenes/area2cam_discardables.pkg": {
-        "crc": 586122910,
-        "versions": []
+        "crc": 586122910
     },
     "packs/cutscenes/area3cam.pkg": {
-        "crc": 818400992,
-        "versions": []
+        "crc": 818400992
     },
     "packs/cutscenes/area3cam_discardables.pkg": {
-        "crc": 3174368512,
-        "versions": []
+        "crc": 3174368512
     },
     "packs/cutscenes/brokenchozostatue.pkg": {
-        "crc": 1920949860,
-        "versions": []
+        "crc": 1920949860
     },
     "packs/cutscenes/brokenchozostatue_discardables.pkg": {
-        "crc": 3460202694,
-        "versions": []
+        "crc": 3460202694
     },
     "packs/cutscenes/elevator.pkg": {
-        "crc": 1780482610,
-        "versions": []
+        "crc": 1780482610
     },
     "packs/cutscenes/elevator_discardables.pkg": {
-        "crc": 2166331161,
-        "versions": []
+        "crc": 2166331161
     },
     "packs/cutscenes/energyshield.pkg": {
-        "crc": 611784438,
-        "versions": []
+        "crc": 611784438
     },
     "packs/cutscenes/energyshield_discardables.pkg": {
-        "crc": 2192138244,
-        "versions": []
+        "crc": 2192138244
     },
     "packs/cutscenes/energywave.pkg": {
-        "crc": 2120444780,
-        "versions": []
+        "crc": 2120444780
     },
     "packs/cutscenes/energywave_discardables.pkg": {
-        "crc": 2791810109,
-        "versions": []
+        "crc": 2791810109
     },
     "packs/cutscenes/firstchozostatue.pkg": {
-        "crc": 394093188,
-        "versions": []
+        "crc": 394093188
     },
     "packs/cutscenes/firstchozostatue_discardables.pkg": {
-        "crc": 505836287,
-        "versions": []
+        "crc": 505836287
     },
     "packs/cutscenes/gravitysuit.pkg": {
-        "crc": 1117506600,
-        "versions": []
+        "crc": 1117506600
     },
     "packs/cutscenes/gravitysuit_discardables.pkg": {
-        "crc": 2532501000,
-        "versions": []
+        "crc": 2532501000
     },
     "packs/cutscenes/introalpha.pkg": {
-        "crc": 3955262563,
-        "versions": []
+        "crc": 3955262563
     },
     "packs/cutscenes/introalpha_discardables.pkg": {
-        "crc": 4094390901,
-        "versions": []
+        "crc": 4094390901
     },
     "packs/cutscenes/introdnastatue.pkg": {
-        "crc": 2463465146,
-        "versions": []
+        "crc": 2463465146
     },
     "packs/cutscenes/introdnastatue_discardables.pkg": {
-        "crc": 2704910933,
-        "versions": []
+        "crc": 2704910933
     },
     "packs/cutscenes/introgamma.pkg": {
-        "crc": 1427866757,
-        "versions": []
+        "crc": 1427866757
     },
     "packs/cutscenes/introgamma_discardables.pkg": {
-        "crc": 1177978516,
-        "versions": []
+        "crc": 1177978516
     },
     "packs/cutscenes/intromanicminerbotarea3.pkg": {
-        "crc": 88574026,
-        "versions": []
+        "crc": 88574026
     },
     "packs/cutscenes/intromanicminerbotarea3_discardables.pkg": {
-        "crc": 2988139319,
-        "versions": []
+        "crc": 2988139319
     },
     "packs/cutscenes/intromanicminerbotchase.pkg": {
-        "crc": 3418894535,
-        "versions": []
+        "crc": 3418894535
     },
     "packs/cutscenes/intromanicminerbotchase_discardables.pkg": {
-        "crc": 2781935119,
-        "versions": []
+        "crc": 2781935119
     },
     "packs/cutscenes/intromanicminerbotchaseph.pkg": {
-        "crc": 604656708,
-        "versions": []
+        "crc": 604656708
     },
     "packs/cutscenes/intromanicminerbotchaseph_discardables.pkg": {
-        "crc": 2886216684,
-        "versions": []
+        "crc": 2886216684
     },
     "packs/cutscenes/intrometroidboss.pkg": {
-        "crc": 1431494938,
-        "versions": []
+        "crc": 1431494938
     },
     "packs/cutscenes/intrometroidboss_discardables.pkg": {
-        "crc": 1759505438,
-        "versions": []
+        "crc": 1759505438
     },
     "packs/cutscenes/intrometroidlarvasurface.pkg": {
-        "crc": 366587959,
-        "versions": []
+        "crc": 366587959
     },
     "packs/cutscenes/intrometroidlarvasurface_discardables.pkg": {
-        "crc": 4046021773,
-        "versions": []
+        "crc": 4046021773
     },
     "packs/cutscenes/introomega.pkg": {
-        "crc": 723017427,
-        "versions": []
+        "crc": 723017427
     },
     "packs/cutscenes/introomega_discardables.pkg": {
-        "crc": 682647711,
-        "versions": []
+        "crc": 682647711
     },
     "packs/cutscenes/introqueen.pkg": {
-        "crc": 803003252,
-        "versions": []
+        "crc": 803003252
     },
     "packs/cutscenes/introqueen_discardables.pkg": {
-        "crc": 2787700573,
-        "versions": []
+        "crc": 2787700573
     },
     "packs/cutscenes/introspenergystatue.pkg": {
-        "crc": 3719282301,
-        "versions": []
+        "crc": 3719282301
     },
     "packs/cutscenes/introspenergystatue_discardables.pkg": {
-        "crc": 3795162875,
-        "versions": []
+        "crc": 3795162875
     },
     "packs/cutscenes/introteleporter.pkg": {
-        "crc": 1788991395,
-        "versions": []
+        "crc": 1788991395
     },
     "packs/cutscenes/introteleporter_discardables.pkg": {
-        "crc": 982803954,
-        "versions": []
+        "crc": 982803954
     },
     "packs/cutscenes/introteleporterarea01.pkg": {
-        "crc": 4197434221,
-        "versions": []
+        "crc": 4197434221
     },
     "packs/cutscenes/introteleporterarea01_discardables.pkg": {
-        "crc": 918002957,
-        "versions": []
+        "crc": 918002957
     },
     "packs/cutscenes/introzeta.pkg": {
-        "crc": 3920615435,
-        "versions": []
+        "crc": 3920615435
     },
     "packs/cutscenes/introzeta_discardables.pkg": {
-        "crc": 1582554632,
-        "versions": []
+        "crc": 1582554632
     },
     "packs/cutscenes/manicminerbotchaseend.pkg": {
-        "crc": 3250282174,
-        "versions": []
+        "crc": 3250282174
     },
     "packs/cutscenes/manicminerbotchaseend_discardables.pkg": {
-        "crc": 691051342,
-        "versions": []
+        "crc": 691051342
     },
     "packs/cutscenes/manicminerbotdeath.pkg": {
-        "crc": 3156903723,
-        "versions": []
+        "crc": 3156903723
     },
     "packs/cutscenes/manicminerbotdeath_discardables.pkg": {
-        "crc": 4199122001,
-        "versions": []
+        "crc": 4199122001
     },
     "packs/cutscenes/manicminerbotfinalbattle.pkg": {
-        "crc": 1336940704,
-        "versions": []
+        "crc": 1336940704
     },
     "packs/cutscenes/manicminerbotfinalbattle_discardables.pkg": {
-        "crc": 1667407298,
-        "versions": []
+        "crc": 1667407298
     },
     "packs/cutscenes/manicminerbotstealorb.pkg": {
-        "crc": 2734251238,
-        "versions": []
+        "crc": 2734251238
     },
     "packs/cutscenes/manicminerbotstealorb_discardables.pkg": {
-        "crc": 578223760,
-        "versions": []
+        "crc": 578223760
     },
     "packs/cutscenes/meleetuto.pkg": {
-        "crc": 3515421583,
-        "versions": []
+        "crc": 3515421583
     },
     "packs/cutscenes/meleetuto_discardables.pkg": {
-        "crc": 180054735,
-        "versions": []
+        "crc": 180054735
     },
     "packs/cutscenes/metroidhatchlingintro.pkg": {
-        "crc": 2521003438,
-        "versions": []
+        "crc": 2521003438
     },
     "packs/cutscenes/metroidhatchlingintro_discardables.pkg": {
-        "crc": 2623297914,
-        "versions": []
+        "crc": 2623297914
     },
     "packs/cutscenes/metroidqueendeath.pkg": {
-        "crc": 575069038,
-        "versions": []
+        "crc": 575069038
     },
     "packs/cutscenes/metroidqueendeath_discardables.pkg": {
-        "crc": 3862302145,
-        "versions": []
+        "crc": 3862302145
     },
     "packs/cutscenes/metroidqueendeathpowerbomb.pkg": {
-        "crc": 2830017925,
-        "versions": []
+        "crc": 2830017925
     },
     "packs/cutscenes/metroidqueendeathpowerbomb_discardables.pkg": {
-        "crc": 248300779,
-        "versions": []
+        "crc": 248300779
     },
     "packs/cutscenes/metroidqueenspit.pkg": {
-        "crc": 2480626957,
-        "versions": []
+        "crc": 2480626957
     },
     "packs/cutscenes/metroidqueenspit_discardables.pkg": {
-        "crc": 2839686405,
-        "versions": []
+        "crc": 2839686405
     },
     "packs/cutscenes/metroidqueenspitpowerbomb.pkg": {
-        "crc": 127746965,
-        "versions": []
+        "crc": 127746965
     },
     "packs/cutscenes/metroidqueenspitpowerbomb_discardables.pkg": {
-        "crc": 4105746552,
-        "versions": []
+        "crc": 4105746552
     },
     "packs/cutscenes/phasedisplacement.pkg": {
-        "crc": 1637051303,
-        "versions": []
+        "crc": 1637051303
     },
     "packs/cutscenes/phasedisplacement_discardables.pkg": {
-        "crc": 53416491,
-        "versions": []
+        "crc": 53416491
     },
     "packs/cutscenes/planetarrival.pkg": {
-        "crc": 1121156879,
-        "versions": []
+        "crc": 1121156879
     },
     "packs/cutscenes/planetarrival_discardables.pkg": {
-        "crc": 923064347,
-        "versions": []
+        "crc": 923064347
     },
     "packs/cutscenes/postcredits.pkg": {
-        "crc": 184354623,
-        "versions": []
+        "crc": 184354623
     },
     "packs/cutscenes/postcredits_discardables.pkg": {
-        "crc": 1270620603,
-        "versions": []
+        "crc": 1270620603
     },
     "packs/cutscenes/ridley1.pkg": {
-        "crc": 2202898860,
-        "versions": []
+        "crc": 2202898860
     },
     "packs/cutscenes/ridley1_discardables.pkg": {
-        "crc": 610448652,
-        "versions": []
+        "crc": 610448652
     },
     "packs/cutscenes/ridley2.pkg": {
-        "crc": 3303926652,
-        "versions": []
+        "crc": 3303926652
     },
     "packs/cutscenes/ridley2_discardables.pkg": {
-        "crc": 3471075438,
-        "versions": []
+        "crc": 3471075438
     },
     "packs/cutscenes/ridley3.pkg": {
-        "crc": 4186817228,
-        "versions": []
+        "crc": 4186817228
     },
     "packs/cutscenes/ridley3_discardables.pkg": {
-        "crc": 565632655,
-        "versions": []
+        "crc": 565632655
     },
     "packs/cutscenes/ridley4.pkg": {
-        "crc": 1269636828,
-        "versions": []
+        "crc": 1269636828
     },
     "packs/cutscenes/ridley4_discardables.pkg": {
-        "crc": 3231241451,
-        "versions": []
+        "crc": 3231241451
     },
     "packs/cutscenes/ridleydrained.pkg": {
-        "crc": 3141157022,
-        "versions": []
+        "crc": 3141157022
     },
     "packs/cutscenes/ridleydrained_discardables.pkg": {
-        "crc": 677581143,
-        "versions": []
+        "crc": 677581143
     },
     "packs/cutscenes/scaningpulse.pkg": {
-        "crc": 2081658974,
-        "versions": []
+        "crc": 2081658974
     },
     "packs/cutscenes/scaningpulse_discardables.pkg": {
-        "crc": 143016563,
-        "versions": []
+        "crc": 143016563
     },
     "packs/cutscenes/shared.pkg": {
-        "crc": 1325690123,
-        "versions": []
+        "crc": 1325690123
     },
     "packs/cutscenes/shared_discardables.pkg": {
-        "crc": 3288643430,
-        "versions": []
+        "crc": 3288643430
     },
     "packs/cutscenes/teleporter.pkg": {
-        "crc": 1214236108,
-        "versions": []
+        "crc": 1214236108
     },
     "packs/cutscenes/teleporter_discardables.pkg": {
-        "crc": 1663665789,
-        "versions": []
+        "crc": 1663665789
     },
     "packs/cutscenes/tunel.pkg": {
-        "crc": 2411727902,
-        "versions": []
+        "crc": 2411727902
     },
     "packs/cutscenes/tunel_discardables.pkg": {
-        "crc": 3071595419,
-        "versions": []
+        "crc": 3071595419
     },
     "packs/cutscenes/variasuit.pkg": {
-        "crc": 2561462537,
-        "versions": []
+        "crc": 2561462537
     },
     "packs/cutscenes/variasuit_discardables.pkg": {
-        "crc": 600824181,
-        "versions": []
+        "crc": 600824181
     },
     "packs/gui/gui.pkg": {
-        "crc": 1102484535,
-        "versions": []
+        "crc": 1102484535
     },
     "packs/gui/gui_discardables.pkg": {
-        "crc": 2580398278,
-        "versions": []
+        "crc": 2580398278
     },
     "packs/maps/s000_mainmenu/s000_mainmenu.pkg": {
-        "crc": 47217538,
-        "versions": []
+        "crc": 47217538
     },
     "packs/maps/s000_mainmenu/s000_mainmenu_discardables.pkg": {
-        "crc": 3558655916,
-        "versions": []
+        "crc": 3558655916
     },
     "packs/maps/s000_surface/s000_surface.pkg": {
-        "crc": 3420380331,
-        "versions": []
+        "crc": 3420380331
     },
     "packs/maps/s000_surface/s000_surface_discardables.pkg": {
-        "crc": 977655115,
-        "versions": []
+        "crc": 977655115
     },
     "packs/maps/s000_surface/subareas/subarearp0.pkg": {
-        "crc": 2721515949,
-        "versions": []
+        "crc": 2721515949
     },
     "packs/maps/s000_surface/subareas/subarearp0_discardables.pkg": {
-        "crc": 792066802,
-        "versions": []
+        "crc": 792066802
     },
     "packs/maps/s000_surface/subareas/subarearp1.pkg": {
-        "crc": 2673287197,
-        "versions": []
+        "crc": 2673287197
     },
     "packs/maps/s000_surface/subareas/subarearp1_discardables.pkg": {
-        "crc": 3227995155,
-        "versions": []
+        "crc": 3227995155
     },
     "packs/maps/s010_area1/s010_area1.pkg": {
-        "crc": 3935013084,
-        "versions": []
+        "crc": 3935013084
     },
     "packs/maps/s010_area1/s010_area1_discardables.pkg": {
-        "crc": 1808389996,
-        "versions": []
+        "crc": 1808389996
     },
     "packs/maps/s010_area1/subareas/subarearp0.pkg": {
-        "crc": 1632200704,
-        "versions": []
+        "crc": 1632200704
     },
     "packs/maps/s010_area1/subareas/subarearp0_discardables.pkg": {
-        "crc": 4146468958,
-        "versions": []
+        "crc": 4146468958
     },
     "packs/maps/s010_area1/subareas/subarearp1.pkg": {
-        "crc": 1546207664,
-        "versions": []
+        "crc": 1546207664
     },
     "packs/maps/s010_area1/subareas/subarearp1_discardables.pkg": {
-        "crc": 410300095,
-        "versions": []
+        "crc": 410300095
     },
     "packs/maps/s010_cockpit/s010_cockpit.pkg": {
-        "crc": 123081273,
-        "versions": []
+        "crc": 123081273
     },
     "packs/maps/s010_cockpit/s010_cockpit_discardables.pkg": {
-        "crc": 1480643126,
-        "versions": []
+        "crc": 1480643126
     },
     "packs/maps/s010_cockpit/subareas/subarearp0.pkg": {
-        "crc": 982902175,
-        "versions": []
+        "crc": 982902175
     },
     "packs/maps/s010_cockpit/subareas/subarearp0_discardables.pkg": {
-        "crc": 2128750443,
-        "versions": []
+        "crc": 2128750443
     },
     "packs/maps/s020_area2/s020_area2.pkg": {
-        "crc": 2241375539,
-        "versions": []
+        "crc": 2241375539
     },
     "packs/maps/s020_area2/s020_area2_discardables.pkg": {
-        "crc": 1967828175,
-        "versions": []
+        "crc": 1967828175
     },
     "packs/maps/s020_area2/subareas/subarearp0.pkg": {
-        "crc": 2646333164,
-        "versions": []
+        "crc": 2646333164
     },
     "packs/maps/s020_area2/subareas/subarearp0_discardables.pkg": {
-        "crc": 2231723692,
-        "versions": []
+        "crc": 2231723692
     },
     "packs/maps/s020_area2/subareas/subarearp1.pkg": {
-        "crc": 2698772316,
-        "versions": []
+        "crc": 2698772316
     },
     "packs/maps/s020_area2/subareas/subarearp1_discardables.pkg": {
-        "crc": 1784139853,
-        "versions": []
+        "crc": 1784139853
     },
     "packs/maps/s020_area2/subareas/subarearp2.pkg": {
-        "crc": 3883632012,
-        "versions": []
+        "crc": 3883632012
     },
     "packs/maps/s020_area2/subareas/subarearp2_discardables.pkg": {
-        "crc": 2161184047,
-        "versions": []
+        "crc": 2161184047
     },
     "packs/maps/s020_area2/subareas/subarearp3.pkg": {
-        "crc": 3659246652,
-        "versions": []
+        "crc": 3659246652
     },
     "packs/maps/s020_area2/subareas/subarearp3_discardables.pkg": {
-        "crc": 1870904270,
-        "versions": []
+        "crc": 1870904270
     },
     "packs/maps/s020_area2/subareas/subarearp4.pkg": {
-        "crc": 1748725804,
-        "versions": []
+        "crc": 1748725804
     },
     "packs/maps/s020_area2/subareas/subarearp4_discardables.pkg": {
-        "crc": 2393747882,
-        "versions": []
+        "crc": 2393747882
     },
     "packs/maps/s020_credits/s020_credits.pkg": {
-        "crc": 920310548,
-        "versions": []
+        "crc": 920310548
     },
     "packs/maps/s020_credits/s020_credits_discardables.pkg": {
-        "crc": 2648253340,
-        "versions": []
+        "crc": 2648253340
     },
     "packs/maps/s020_credits/subareas/subarearp0.pkg": {
-        "crc": 1148537975,
-        "versions": []
+        "crc": 1148537975
     },
     "packs/maps/s020_credits/subareas/subarearp0_discardables.pkg": {
-        "crc": 2693960522,
-        "versions": []
+        "crc": 2693960522
     },
     "packs/maps/s025_area2b/s025_area2b.pkg": {
-        "crc": 1785079986,
-        "versions": []
+        "crc": 1785079986
     },
     "packs/maps/s025_area2b/s025_area2b_discardables.pkg": {
-        "crc": 3985527355,
-        "versions": []
+        "crc": 3985527355
     },
     "packs/maps/s025_area2b/subareas/subarearp0.pkg": {
-        "crc": 983924269,
-        "versions": []
+        "crc": 983924269
     },
     "packs/maps/s025_area2b/subareas/subarearp0_discardables.pkg": {
-        "crc": 2357868310,
-        "versions": []
+        "crc": 2357868310
     },
     "packs/maps/s025_area2b/subareas/subarearp1.pkg": {
-        "crc": 130373533,
-        "versions": []
+        "crc": 130373533
     },
     "packs/maps/s025_area2b/subareas/subarearp1_discardables.pkg": {
-        "crc": 1675133431,
-        "versions": []
+        "crc": 1675133431
     },
     "packs/maps/s025_area2b/subareas/subarearp2.pkg": {
-        "crc": 1080372557,
-        "versions": []
+        "crc": 1080372557
     },
     "packs/maps/s025_area2b/subareas/subarearp2_discardables.pkg": {
-        "crc": 2304662677,
-        "versions": []
+        "crc": 2304662677
     },
     "packs/maps/s028_area2c/s028_area2c.pkg": {
-        "crc": 1948322921,
-        "versions": []
+        "crc": 1948322921
     },
     "packs/maps/s028_area2c/s028_area2c_discardables.pkg": {
-        "crc": 2122621518,
-        "versions": []
+        "crc": 2122621518
     },
     "packs/maps/s028_area2c/subareas/subarearp0.pkg": {
-        "crc": 4234855927,
-        "versions": []
+        "crc": 4234855927
     },
     "packs/maps/s028_area2c/subareas/subarearp0_discardables.pkg": {
-        "crc": 1572411628,
-        "versions": []
+        "crc": 1572411628
     },
     "packs/maps/s030_area3/s030_area3.pkg": {
-        "crc": 373732265,
-        "versions": []
+        "crc": 373732265
     },
     "packs/maps/s030_area3/s030_area3_discardables.pkg": {
-        "crc": 3387197329,
-        "versions": []
+        "crc": 3387197329
     },
     "packs/maps/s030_area3/subareas/subarearp0.pkg": {
-        "crc": 3387573064,
-        "versions": []
+        "crc": 3387573064
     },
     "packs/maps/s030_area3/subareas/subarearp0_discardables.pkg": {
-        "crc": 2870719234,
-        "versions": []
+        "crc": 2870719234
     },
     "packs/maps/s030_area3/subareas/subarearp1.pkg": {
-        "crc": 4102712056,
-        "versions": []
+        "crc": 4102712056
     },
     "packs/maps/s030_area3/subareas/subarearp1_discardables.pkg": {
-        "crc": 1145636323,
-        "versions": []
+        "crc": 1145636323
     },
     "packs/maps/s030_area3/subareas/subarearp2.pkg": {
-        "crc": 3005878312,
-        "versions": []
+        "crc": 3005878312
     },
     "packs/maps/s030_area3/subareas/subarearp2_discardables.pkg": {
-        "crc": 2932856961,
-        "versions": []
+        "crc": 2932856961
     },
     "packs/maps/s030_area3/subareas/subarearp3.pkg": {
-        "crc": 2387229080,
-        "versions": []
+        "crc": 2387229080
     },
     "packs/maps/s030_area3/subareas/subarearp3_discardables.pkg": {
-        "crc": 1100836448,
-        "versions": []
+        "crc": 1100836448
     },
     "packs/maps/s030_area3/subareas/subarearp4.pkg": {
-        "crc": 1013638536,
-        "versions": []
+        "crc": 1013638536
     },
     "packs/maps/s030_area3/subareas/subarearp4_discardables.pkg": {
-        "crc": 2696111108,
-        "versions": []
+        "crc": 2696111108
     },
     "packs/maps/s030_area3/subareas/subarearp5.pkg": {
-        "crc": 17484856,
-        "versions": []
+        "crc": 17484856
     },
     "packs/maps/s030_area3/subareas/subarearp5_discardables.pkg": {
-        "crc": 1340199653,
-        "versions": []
+        "crc": 1340199653
     },
     "packs/maps/s030_area3/subareas/subarearp6.pkg": {
-        "crc": 1185593064,
-        "versions": []
+        "crc": 1185593064
     },
     "packs/maps/s030_area3/subareas/subarearp6_discardables.pkg": {
-        "crc": 2774994823,
-        "versions": []
+        "crc": 2774994823
     },
     "packs/maps/s030_area3/subareas/subarearp7.pkg": {
-        "crc": 2076876632,
-        "versions": []
+        "crc": 2076876632
     },
     "packs/maps/s030_area3/subareas/subarearp7_discardables.pkg": {
-        "crc": 1245034854,
-        "versions": []
+        "crc": 1245034854
     },
     "packs/maps/s033_area3b/s033_area3b.pkg": {
-        "crc": 1769337805,
-        "versions": []
+        "crc": 1769337805
     },
     "packs/maps/s033_area3b/s033_area3b_discardables.pkg": {
-        "crc": 2164749217,
-        "versions": []
+        "crc": 2164749217
     },
     "packs/maps/s033_area3b/subareas/subarearp0.pkg": {
-        "crc": 2718261110,
-        "versions": []
+        "crc": 2718261110
     },
     "packs/maps/s033_area3b/subareas/subarearp0_discardables.pkg": {
-        "crc": 3260832262,
-        "versions": []
+        "crc": 3260832262
     },
     "packs/maps/s033_area3b/subareas/subarearp1.pkg": {
-        "crc": 2674226886,
-        "versions": []
+        "crc": 2674226886
     },
     "packs/maps/s033_area3b/subareas/subarearp10.pkg": {
-        "crc": 3918177511,
-        "versions": []
+        "crc": 3918177511
     },
     "packs/maps/s033_area3b/subareas/subarearp10_discardables.pkg": {
-        "crc": 3170596698,
-        "versions": []
+        "crc": 3170596698
     },
     "packs/maps/s033_area3b/subareas/subarearp1_discardables.pkg": {
-        "crc": 755952871,
-        "versions": []
+        "crc": 755952871
     },
     "packs/maps/s033_area3b/subareas/subarearp2.pkg": {
-        "crc": 3636792342,
-        "versions": []
+        "crc": 3636792342
     },
     "packs/maps/s033_area3b/subareas/subarearp2_discardables.pkg": {
-        "crc": 3347591557,
-        "versions": []
+        "crc": 3347591557
     },
     "packs/maps/s033_area3b/subareas/subarearp3.pkg": {
-        "crc": 3852805542,
-        "versions": []
+        "crc": 3852805542
     },
     "packs/maps/s033_area3b/subareas/subarearp3_discardables.pkg": {
-        "crc": 685410148,
-        "versions": []
+        "crc": 685410148
     },
     "packs/maps/s033_area3b/subareas/subarearp4.pkg": {
-        "crc": 1468398006,
-        "versions": []
+        "crc": 1468398006
     },
     "packs/maps/s033_area3b/subareas/subarearp4_discardables.pkg": {
-        "crc": 3388247296,
-        "versions": []
+        "crc": 3388247296
     },
     "packs/maps/s033_area3b/subareas/subarearp5.pkg": {
-        "crc": 1793445894,
-        "versions": []
+        "crc": 1793445894
     },
     "packs/maps/s033_area3b/subareas/subarearp5_discardables.pkg": {
-        "crc": 648428513,
-        "versions": []
+        "crc": 648428513
     },
     "packs/maps/s033_area3b/subareas/subarearp6.pkg": {
-        "crc": 759540438,
-        "versions": []
+        "crc": 759540438
     },
     "packs/maps/s033_area3b/subareas/subarearp6_discardables.pkg": {
-        "crc": 3424708227,
-        "versions": []
+        "crc": 3424708227
     },
     "packs/maps/s033_area3b/subareas/subarearp7.pkg": {
-        "crc": 270893926,
-        "versions": []
+        "crc": 270893926
     },
     "packs/maps/s033_area3b/subareas/subarearp7_discardables.pkg": {
-        "crc": 594694242,
-        "versions": []
+        "crc": 594694242
     },
     "packs/maps/s033_area3b/subareas/subarearp8.pkg": {
-        "crc": 2457146551,
-        "versions": []
+        "crc": 2457146551
     },
     "packs/maps/s033_area3b/subareas/subarearp8_discardables.pkg": {
-        "crc": 3574461450,
-        "versions": []
+        "crc": 3574461450
     },
     "packs/maps/s033_area3b/subareas/subarearp9.pkg": {
-        "crc": 2937404679,
-        "versions": []
+        "crc": 2937404679
     },
     "packs/maps/s033_area3b/subareas/subarearp9_discardables.pkg": {
-        "crc": 979321579,
-        "versions": []
+        "crc": 979321579
     },
     "packs/maps/s036_area3c/s036_area3c.pkg": {
-        "crc": 2738068822,
-        "versions": []
+        "crc": 2738068822
     },
     "packs/maps/s036_area3c/s036_area3c_discardables.pkg": {
-        "crc": 3802184989,
-        "versions": []
+        "crc": 3802184989
     },
     "packs/maps/s036_area3c/subareas/subarearp0.pkg": {
-        "crc": 2279526648,
-        "versions": []
+        "crc": 2279526648
     },
     "packs/maps/s036_area3c/subareas/subarearp0_discardables.pkg": {
-        "crc": 260645979,
-        "versions": []
+        "crc": 260645979
     },
     "packs/maps/s036_area3c/subareas/subarearp1.pkg": {
-        "crc": 3133077832,
-        "versions": []
+        "crc": 3133077832
     },
     "packs/maps/s036_area3c/subareas/subarearp1_discardables.pkg": {
-        "crc": 3772486330,
-        "versions": []
+        "crc": 3772486330
     },
     "packs/maps/s036_area3c/subareas/subarearp2.pkg": {
-        "crc": 4246635416,
-        "versions": []
+        "crc": 4246635416
     },
     "packs/maps/s036_area3c/subareas/subarearp2_discardables.pkg": {
-        "crc": 173887448,
-        "versions": []
+        "crc": 173887448
     },
     "packs/maps/s036_area3c/subareas/subarearp3.pkg": {
-        "crc": 3229526568,
-        "versions": []
+        "crc": 3229526568
     },
     "packs/maps/s036_area3c/subareas/subarearp3_discardables.pkg": {
-        "crc": 3843029305,
-        "versions": []
+        "crc": 3843029305
     },
     "packs/maps/s036_area3c/subareas/subarearp4.pkg": {
-        "crc": 1918793272,
-        "versions": []
+        "crc": 1918793272
     },
     "packs/maps/s036_area3c/subareas/subarearp4_discardables.pkg": {
-        "crc": 69333853,
-        "versions": []
+        "crc": 69333853
     },
     "packs/maps/s036_area3c/subareas/subarearp5.pkg": {
-        "crc": 1329487752,
-        "versions": []
+        "crc": 1329487752
     },
     "packs/maps/s036_area3c/subareas/subarearp5_discardables.pkg": {
-        "crc": 3950200252,
-        "versions": []
+        "crc": 3950200252
     },
     "packs/maps/s036_area3c/subareas/subarearp6.pkg": {
-        "crc": 144581976,
-        "versions": []
+        "crc": 144581976
     },
     "packs/maps/s036_area3c/subareas/subarearp6_discardables.pkg": {
-        "crc": 32872670,
-        "versions": []
+        "crc": 32872670
     },
     "packs/maps/s040_area4/s040_area4.pkg": {
-        "crc": 1539237613,
-        "versions": []
+        "crc": 1539237613
     },
     "packs/maps/s040_area4/s040_area4_discardables.pkg": {
-        "crc": 1212963721,
-        "versions": []
+        "crc": 1212963721
     },
     "packs/maps/s040_area4/subareas/subarearp0.pkg": {
-        "crc": 3207572853,
-        "versions": []
+        "crc": 3207572853
     },
     "packs/maps/s040_area4/subareas/subarearp0_discardables.pkg": {
-        "crc": 1631820616,
-        "versions": []
+        "crc": 1631820616
     },
     "packs/maps/s040_area4/subareas/subarearp1.pkg": {
-        "crc": 2186249413,
-        "versions": []
+        "crc": 2186249413
     },
     "packs/maps/s040_area4/subareas/subarearp1_discardables.pkg": {
-        "crc": 2383490473,
-        "versions": []
+        "crc": 2383490473
     },
     "packs/maps/s040_area4/subareas/subarearp2.pkg": {
-        "crc": 3320839701,
-        "versions": []
+        "crc": 3320839701
     },
     "packs/maps/s040_area4/subareas/subarearp2_discardables.pkg": {
-        "crc": 1687679179,
-        "versions": []
+        "crc": 1687679179
     },
     "packs/maps/s040_area4/subareas/subarearp3.pkg": {
-        "crc": 4170176421,
-        "versions": []
+        "crc": 4170176421
     },
     "packs/maps/s040_area4/subareas/subarearp3_discardables.pkg": {
-        "crc": 2344961578,
-        "versions": []
+        "crc": 2344961578
     },
     "packs/maps/s040_area4/subareas/subarearp4.pkg": {
-        "crc": 1252985781,
-        "versions": []
+        "crc": 1252985781
     },
     "packs/maps/s040_area4/subareas/subarearp4_discardables.pkg": {
-        "crc": 1793805390,
-        "versions": []
+        "crc": 1793805390
     },
     "packs/maps/s040_area4/subareas/subarearp5.pkg": {
-        "crc": 2010063365,
-        "versions": []
+        "crc": 2010063365
     },
     "packs/maps/s040_area4/subareas/subarearp5_discardables.pkg": {
-        "crc": 2243558063,
-        "versions": []
+        "crc": 2243558063
     },
     "packs/maps/s040_area4/subareas/subarearp6.pkg": {
-        "crc": 812603605,
-        "versions": []
+        "crc": 812603605
     },
     "packs/maps/s040_area4/subareas/subarearp6_discardables.pkg": {
-        "crc": 1866409933,
-        "versions": []
+        "crc": 1866409933
     },
     "packs/maps/s050_area5/s050_area5.pkg": {
-        "crc": 3361798263,
-        "versions": []
+        "crc": 3361798263
     },
     "packs/maps/s050_area5/s050_area5_discardables.pkg": {
-        "crc": 4108480727,
-        "versions": []
+        "crc": 4108480727
     },
     "packs/maps/s050_area5/subareas/subarearp0.pkg": {
-        "crc": 3950917841,
-        "versions": []
+        "crc": 3950917841
     },
     "packs/maps/s050_area5/subareas/subarearp0_discardables.pkg": {
-        "crc": 1331515110,
-        "versions": []
+        "crc": 1331515110
     },
     "packs/maps/s050_area5/subareas/subarearp1.pkg": {
-        "crc": 3592294753,
-        "versions": []
+        "crc": 3592294753
     },
     "packs/maps/s050_area5/subareas/subarearp1_discardables.pkg": {
-        "crc": 2685401095,
-        "versions": []
+        "crc": 2685401095
     },
     "packs/maps/s050_area5/subareas/subarearp2.pkg": {
-        "crc": 2445175729,
-        "versions": []
+        "crc": 2445175729
     },
     "packs/maps/s050_area5/subareas/subarearp2_discardables.pkg": {
-        "crc": 1250501989,
-        "versions": []
+        "crc": 1250501989
     },
     "packs/maps/s050_area5/subareas/subarearp3.pkg": {
-        "crc": 2900247041,
-        "versions": []
+        "crc": 2900247041
     },
     "packs/maps/s050_area5/subareas/subarearp3_discardables.pkg": {
-        "crc": 2782630788,
-        "versions": []
+        "crc": 2782630788
     },
     "packs/maps/s050_area5/subareas/subarearp4.pkg": {
-        "crc": 520003089,
-        "versions": []
+        "crc": 520003089
     },
     "packs/maps/s050_area5/subareas/subarearp4_discardables.pkg": {
-        "crc": 1156946400,
-        "versions": []
+        "crc": 1156946400
     },
     "packs/maps/s060_area6/s060_area6.pkg": {
-        "crc": 2809388440,
-        "versions": []
+        "crc": 2809388440
     },
     "packs/maps/s060_area6/s060_area6_discardables.pkg": {
-        "crc": 3932228468,
-        "versions": []
+        "crc": 3932228468
     },
     "packs/maps/s060_area6/subareas/subarearp0.pkg": {
-        "crc": 395085373,
-        "versions": []
+        "crc": 395085373
     },
     "packs/maps/s060_area6/subareas/subarearp0_discardables.pkg": {
-        "crc": 1031680020,
-        "versions": []
+        "crc": 1031680020
     },
     "packs/maps/s060_area6/subareas/subarearp1.pkg": {
-        "crc": 720154509,
-        "versions": []
+        "crc": 720154509
     },
     "packs/maps/s060_area6/subareas/subarearp1_discardables.pkg": {
-        "crc": 3526133493,
-        "versions": []
+        "crc": 3526133493
     },
     "packs/maps/s060_area6/subareas/subarearp2.pkg": {
-        "crc": 1833751901,
-        "versions": []
+        "crc": 1833751901
     },
     "packs/maps/s060_area6/subareas/subarearp2_discardables.pkg": {
-        "crc": 950688663,
-        "versions": []
+        "crc": 950688663
     },
     "packs/maps/s060_area6/subareas/subarearp3.pkg": {
-        "crc": 1345125613,
-        "versions": []
+        "crc": 1345125613
     },
     "packs/maps/s060_area6/subareas/subarearp3_discardables.pkg": {
-        "crc": 3623415158,
-        "versions": []
+        "crc": 3623415158
     },
     "packs/maps/s060_area6/subareas/subarearp4.pkg": {
-        "crc": 3792445693,
-        "versions": []
+        "crc": 3792445693
     },
     "packs/maps/s060_area6/subareas/subarearp4_discardables.pkg": {
-        "crc": 920053522,
-        "versions": []
+        "crc": 920053522
     },
     "packs/maps/s060_area6/subareas/subarearp5.pkg": {
-        "crc": 3748399437,
-        "versions": []
+        "crc": 3748399437
     },
     "packs/maps/s060_area6/subareas/subarearp5_discardables.pkg": {
-        "crc": 3649327603,
-        "versions": []
+        "crc": 3649327603
     },
     "packs/maps/s060_area6/subareas/subarearp6.pkg": {
-        "crc": 2563535773,
-        "versions": []
+        "crc": 2563535773
     },
     "packs/maps/s060_area6/subareas/subarearp6_discardables.pkg": {
-        "crc": 855805073,
-        "versions": []
+        "crc": 855805073
     },
     "packs/maps/s065_area6b/s065_area6b.pkg": {
-        "crc": 3244006863,
-        "versions": []
+        "crc": 3244006863
     },
     "packs/maps/s065_area6b/s065_area6b_discardables.pkg": {
-        "crc": 1314756360,
-        "versions": []
+        "crc": 1314756360
     },
     "packs/maps/s065_area6b/subareas/subarearp0.pkg": {
-        "crc": 3422268223,
-        "versions": []
+        "crc": 3422268223
     },
     "packs/maps/s065_area6b/subareas/subarearp0_discardables.pkg": {
-        "crc": 1233680382,
-        "versions": []
+        "crc": 1233680382
     },
     "packs/maps/s065_area6b/subareas/subarearp1.pkg": {
-        "crc": 4137386639,
-        "versions": []
+        "crc": 4137386639
     },
     "packs/maps/s065_area6b/subareas/subarearp1_discardables.pkg": {
-        "crc": 2799354143,
-        "versions": []
+        "crc": 2799354143
     },
     "packs/maps/s065_area6b/subareas/subarearp2.pkg": {
-        "crc": 2973497439,
-        "versions": []
+        "crc": 2973497439
     },
     "packs/maps/s065_area6b/subareas/subarearp2_discardables.pkg": {
-        "crc": 1281105021,
-        "versions": []
+        "crc": 1281105021
     },
     "packs/maps/s065_area6b/subareas/subarearp3.pkg": {
-        "crc": 2354827759,
-        "versions": []
+        "crc": 2354827759
     },
     "packs/maps/s065_area6b/subareas/subarearp3_discardables.pkg": {
-        "crc": 2735647388,
-        "versions": []
+        "crc": 2735647388
     },
     "packs/maps/s065_area6b/subareas/subarearp4.pkg": {
-        "crc": 1048251903,
-        "versions": []
+        "crc": 1048251903
     },
     "packs/maps/s065_area6b/subareas/subarearp4_discardables.pkg": {
-        "crc": 1109434616,
-        "versions": []
+        "crc": 1109434616
     },
     "packs/maps/s065_area6b/subareas/subarearp5.pkg": {
-        "crc": 52110415,
-        "versions": []
+        "crc": 52110415
     },
     "packs/maps/s065_area6b/subareas/subarearp5_discardables.pkg": {
-        "crc": 2909935129,
-        "versions": []
+        "crc": 2909935129
     },
     "packs/maps/s065_area6b/subareas/subarearp6.pkg": {
-        "crc": 1153130143,
-        "versions": []
+        "crc": 1153130143
     },
     "packs/maps/s065_area6b/subareas/subarearp6_discardables.pkg": {
-        "crc": 1207225211,
-        "versions": []
+        "crc": 1207225211
     },
     "packs/maps/s067_area6c/s067_area6c.pkg": {
-        "crc": 1318923692,
-        "versions": []
+        "crc": 1318923692
     },
     "packs/maps/s067_area6c/s067_area6c_discardables.pkg": {
-        "crc": 3617115331,
-        "versions": []
+        "crc": 3617115331
     },
     "packs/maps/s067_area6c/subareas/subarearp0.pkg": {
-        "crc": 1454716452,
-        "versions": []
+        "crc": 1454716452
     },
     "packs/maps/s067_area6c/subareas/subarearp0_discardables.pkg": {
-        "crc": 1482546373,
-        "versions": []
+        "crc": 1482546373
     },
     "packs/maps/s067_area6c/subareas/subarearp1.pkg": {
-        "crc": 1809129364,
-        "versions": []
+        "crc": 1809129364
     },
     "packs/maps/s067_area6c/subareas/subarearp1_discardables.pkg": {
-        "crc": 3071240740,
-        "versions": []
+        "crc": 3071240740
     },
     "packs/maps/s067_area6c/subareas/subarearp2.pkg": {
-        "crc": 745891140,
-        "versions": []
+        "crc": 745891140
     },
     "packs/maps/s067_area6c/subareas/subarearp2_discardables.pkg": {
-        "crc": 1569306438,
-        "versions": []
+        "crc": 1569306438
     },
     "packs/maps/s067_area6c/subareas/subarearp3.pkg": {
-        "crc": 286608628,
-        "versions": []
+        "crc": 286608628
     },
     "packs/maps/s067_area6c/subareas/subarearp3_discardables.pkg": {
-        "crc": 3000697255,
-        "versions": []
+        "crc": 3000697255
     },
     "packs/maps/s067_area6c/subareas/subarearp4.pkg": {
-        "crc": 2738196708,
-        "versions": []
+        "crc": 2738196708
     },
     "packs/maps/s067_area6c/subareas/subarearp4_discardables.pkg": {
-        "crc": 1408568259,
-        "versions": []
+        "crc": 1408568259
     },
     "packs/maps/s067_area6c/subareas/subarearp5.pkg": {
-        "crc": 2656418132,
-        "versions": []
+        "crc": 2656418132
     },
     "packs/maps/s067_area6c/subareas/subarearp5_discardables.pkg": {
-        "crc": 3165109538,
-        "versions": []
+        "crc": 3165109538
     },
     "packs/maps/s067_area6c/subareas/subarearp6.pkg": {
-        "crc": 3656762244,
-        "versions": []
+        "crc": 3656762244
     },
     "packs/maps/s067_area6c/subareas/subarearp6_discardables.pkg": {
-        "crc": 1445027904,
-        "versions": []
+        "crc": 1445027904
     },
     "packs/maps/s067_area6c/subareas/subarearp7.pkg": {
-        "crc": 3835030068,
-        "versions": []
+        "crc": 3835030068
     },
     "packs/maps/s067_area6c/subareas/subarearp7_discardables.pkg": {
-        "crc": 3111376545,
-        "versions": []
+        "crc": 3111376545
     },
     "packs/maps/s070_area7/s070_area7.pkg": {
-        "crc": 883802882,
-        "versions": []
+        "crc": 883802882
     },
     "packs/maps/s070_area7/s070_area7_discardables.pkg": {
-        "crc": 1456414762,
-        "versions": []
+        "crc": 1456414762
     },
     "packs/maps/s070_area7/subareas/subarearp0.pkg": {
-        "crc": 1138561945,
-        "versions": []
+        "crc": 1138561945
     },
     "packs/maps/s070_area7/subareas/subarearp0_discardables.pkg": {
-        "crc": 325117370,
-        "versions": []
+        "crc": 325117370
     },
     "packs/maps/s070_area7/subareas/subarearp1.pkg": {
-        "crc": 2126330409,
-        "versions": []
+        "crc": 2126330409
     },
     "packs/maps/s070_area7/subareas/subarearp1_discardables.pkg": {
-        "crc": 4231156571,
-        "versions": []
+        "crc": 4231156571
     },
     "packs/maps/s070_area7/subareas/subarearp2.pkg": {
-        "crc": 958218489,
-        "versions": []
+        "crc": 958218489
     },
     "packs/maps/s070_area7/subareas/subarearp2_discardables.pkg": {
-        "crc": 380931641,
-        "versions": []
+        "crc": 380931641
     },
     "packs/maps/s070_area7/subareas/subarearp3.pkg": {
-        "crc": 75327817,
-        "versions": []
+        "crc": 75327817
     },
     "packs/maps/s070_area7/subareas/subarearp3_discardables.pkg": {
-        "crc": 4192614616,
-        "versions": []
+        "crc": 4192614616
     },
     "packs/maps/s070_area7/subareas/subarearp4.pkg": {
-        "crc": 3059594585,
-        "versions": []
+        "crc": 3059594585
     },
     "packs/maps/s070_area7/subareas/subarearp4_discardables.pkg": {
-        "crc": 415773372,
-        "versions": []
+        "crc": 415773372
     },
     "packs/maps/s070_area7/subareas/subarearp5.pkg": {
-        "crc": 2336070889,
-        "versions": []
+        "crc": 2336070889
     },
     "packs/maps/s070_area7/subareas/subarearp5_discardables.pkg": {
-        "crc": 4154098781,
-        "versions": []
+        "crc": 4154098781
     },
     "packs/maps/s070_area7/subareas/subarearp6.pkg": {
-        "crc": 3432900153,
-        "versions": []
+        "crc": 3432900153
     },
     "packs/maps/s070_area7/subareas/subarearp6_discardables.pkg": {
-        "crc": 488397119,
-        "versions": []
+        "crc": 488397119
     },
     "packs/maps/s070_area7/subareas/subarearp7.pkg": {
-        "crc": 4059942793,
-        "versions": []
+        "crc": 4059942793
     },
     "packs/maps/s070_area7/subareas/subarearp7_discardables.pkg": {
-        "crc": 4065259486,
-        "versions": []
+        "crc": 4065259486
     },
     "packs/maps/s070_area7/subareas/subarearp8.pkg": {
-        "crc": 1940740184,
-        "versions": []
+        "crc": 1940740184
     },
     "packs/maps/s070_area7/subareas/subarearp8_discardables.pkg": {
-        "crc": 70339510,
-        "versions": []
+        "crc": 70339510
     },
     "packs/maps/s070_area7/subareas/subarearp9.pkg": {
-        "crc": 1322086888,
-        "versions": []
+        "crc": 1322086888
     },
     "packs/maps/s070_area7/subareas/subarearp9_discardables.pkg": {
-        "crc": 3949198679,
-        "versions": []
+        "crc": 3949198679
     },
     "packs/maps/s090_area9/s090_area9.pkg": {
-        "crc": 2942134666,
-        "versions": []
+        "crc": 2942134666
     },
     "packs/maps/s090_area9/s090_area9_discardables.pkg": {
-        "crc": 2398068315,
-        "versions": []
+        "crc": 2398068315
     },
     "packs/maps/s090_area9/subareas/subarearp0.pkg": {
-        "crc": 2924924899,
-        "versions": []
+        "crc": 2924924899
     },
     "packs/maps/s090_area9/subareas/subarearp0_discardables.pkg": {
-        "crc": 1554101103,
-        "versions": []
+        "crc": 1554101103
     },
     "packs/maps/s090_area9/subareas/subarearp1.pkg": {
-        "crc": 2469848659,
-        "versions": []
+        "crc": 2469848659
     },
     "packs/maps/s090_area9/subareas/subarearp1_discardables.pkg": {
-        "crc": 3019048334,
-        "versions": []
+        "crc": 3019048334
     },
     "packs/maps/s090_area9/subareas/subarearp2.pkg": {
-        "crc": 3566640259,
-        "versions": []
+        "crc": 3566640259
     },
     "packs/maps/s090_area9/subareas/subarearp2_discardables.pkg": {
-        "crc": 1500895468,
-        "versions": []
+        "crc": 1500895468
     },
     "packs/maps/s090_area9/subareas/subarearp3.pkg": {
-        "crc": 3925259571,
-        "versions": []
+        "crc": 3925259571
     },
     "packs/maps/s090_area9/subareas/subarearp3_discardables.pkg": {
-        "crc": 3056037389,
-        "versions": []
+        "crc": 3056037389
     },
     "packs/maps/s090_area9/subareas/subarearp4.pkg": {
-        "crc": 1540778275,
-        "versions": []
+        "crc": 1540778275
     },
     "packs/maps/s090_area9/subareas/subarearp4_discardables.pkg": {
-        "crc": 1460233321,
-        "versions": []
+        "crc": 1460233321
     },
     "packs/maps/s090_area9/subareas/subarearp5.pkg": {
-        "crc": 1723220115,
-        "versions": []
+        "crc": 1723220115
     },
     "packs/maps/s090_area9/subareas/subarearp5_discardables.pkg": {
-        "crc": 3093025416,
-        "versions": []
+        "crc": 3093025416
     },
     "packs/maps/s090_area9/subareas/subarearp6.pkg": {
-        "crc": 555104835,
-        "versions": []
+        "crc": 555104835
     },
     "packs/maps/s090_area9/subareas/subarearp6_discardables.pkg": {
-        "crc": 1390219242,
-        "versions": []
+        "crc": 1390219242
     },
     "packs/maps/s090_area9/subareas/subarearp7.pkg": {
-        "crc": 477500403,
-        "versions": []
+        "crc": 477500403
     },
     "packs/maps/s090_area9/subareas/subarearp7_discardables.pkg": {
-        "crc": 3180312843,
-        "versions": []
+        "crc": 3180312843
     },
     "packs/maps/s090_area9/subareas/subarearp8.pkg": {
-        "crc": 2653324322,
-        "versions": []
+        "crc": 2653324322
     },
     "packs/maps/s090_area9/subareas/subarearp8_discardables.pkg": {
-        "crc": 1274027363,
-        "versions": []
+        "crc": 1274027363
     },
     "packs/maps/s090_area9/subareas/subarearp9.pkg": {
-        "crc": 2739318162,
-        "versions": []
+        "crc": 2739318162
     },
     "packs/maps/s090_area9/subareas/subarearp9_discardables.pkg": {
-        "crc": 2762124162,
-        "versions": []
+        "crc": 2762124162
     },
     "packs/maps/s100_area10/s100_area10.pkg": {
-        "crc": 539242244,
-        "versions": []
+        "crc": 539242244
     },
     "packs/maps/s100_area10/s100_area10_discardables.pkg": {
-        "crc": 2572983062,
-        "versions": []
+        "crc": 2572983062
     },
     "packs/maps/s100_area10/subareas/subarearp0.pkg": {
-        "crc": 1922655823,
-        "versions": []
+        "crc": 1922655823
     },
     "packs/maps/s100_area10/subareas/subarearp0_discardables.pkg": {
-        "crc": 1194089870,
-        "versions": []
+        "crc": 1194089870
     },
     "packs/maps/s100_area10/subareas/subarearp1.pkg": {
-        "crc": 1341739007,
-        "versions": []
+        "crc": 1341739007
     },
     "packs/maps/s100_area10/subareas/subarearp1_discardables.pkg": {
-        "crc": 2826890095,
-        "versions": []
+        "crc": 2826890095
     },
     "packs/maps/s100_area10/subareas/subarearp2.pkg": {
-        "crc": 140064047,
-        "versions": []
+        "crc": 140064047
     },
     "packs/maps/s100_area10/subareas/subarearp2_discardables.pkg": {
-        "crc": 1123563021,
-        "versions": []
+        "crc": 1123563021
     },
     "packs/maps/s100_area10/subareas/subarearp3.pkg": {
-        "crc": 892935327,
-        "versions": []
+        "crc": 892935327
     },
     "packs/maps/s100_area10/subareas/subarearp3_discardables.pkg": {
-        "crc": 2913632492,
-        "versions": []
+        "crc": 2913632492
     },
     "packs/maps/s100_area10/subareas/subarearp4.pkg": {
-        "crc": 2266611855,
-        "versions": []
+        "crc": 2266611855
     },
     "packs/maps/s100_area10/subareas/subarearp4_discardables.pkg": {
-        "crc": 1283754632,
-        "versions": []
+        "crc": 1283754632
     },
     "packs/maps/s100_area10/subareas/subarearp5.pkg": {
-        "crc": 3128551743,
-        "versions": []
+        "crc": 3128551743
     },
     "packs/maps/s100_area10/subareas/subarearp5_discardables.pkg": {
-        "crc": 2748726377,
-        "versions": []
+        "crc": 2748726377
     },
     "packs/maps/s100_area10/subareas/subarearp6.pkg": {
-        "crc": 4258894831,
-        "versions": []
+        "crc": 4258894831
     },
     "packs/maps/s100_area10/subareas/subarearp6_discardables.pkg": {
-        "crc": 1230037259,
-        "versions": []
+        "crc": 1230037259
     },
     "packs/maps/s110_surfaceb/s110_surfaceb.pkg": {
-        "crc": 3084072397,
-        "versions": []
+        "crc": 3084072397
     },
     "packs/maps/s110_surfaceb/s110_surfaceb_discardables.pkg": {
-        "crc": 1720631712,
-        "versions": []
+        "crc": 1720631712
     },
     "packs/maps/s110_surfaceb/subareas/subarearp0.pkg": {
-        "crc": 3791609641,
-        "versions": []
+        "crc": 3791609641
     },
     "packs/maps/s110_surfaceb/subareas/subarearp0_discardables.pkg": {
-        "crc": 4064754441,
-        "versions": []
+        "crc": 4064754441
     },
     "packs/maps/s110_surfaceb/subareas/subarearp1.pkg": {
-        "crc": 3701438105,
-        "versions": []
+        "crc": 3701438105
     },
     "packs/maps/s110_surfaceb/subareas/subarearp1_discardables.pkg": {
-        "crc": 487951848,
-        "versions": []
+        "crc": 487951848
     },
     "packs/maps/s110_surfaceb/subareas/subarearp2.pkg": {
-        "crc": 2604600393,
-        "versions": []
+        "crc": 2604600393
     },
     "packs/maps/s110_surfaceb/subareas/subarearp2_discardables.pkg": {
-        "crc": 4153626762,
-        "versions": []
+        "crc": 4153626762
     },
     "packs/maps/s901_alpha/s901_alpha.pkg": {
-        "crc": 1325700287,
-        "versions": []
+        "crc": 1325700287
     },
     "packs/maps/s901_alpha/s901_alpha_discardables.pkg": {
-        "crc": 2055913805,
-        "versions": []
+        "crc": 2055913805
     },
     "packs/maps/s902_gamma/s902_gamma.pkg": {
-        "crc": 3421187469,
-        "versions": []
+        "crc": 3421187469
     },
     "packs/maps/s902_gamma/s902_gamma_discardables.pkg": {
-        "crc": 2949317702,
-        "versions": []
+        "crc": 2949317702
     },
     "packs/maps/s903_zeta/s903_zeta.pkg": {
-        "crc": 2590817936,
-        "versions": []
+        "crc": 2590817936
     },
     "packs/maps/s903_zeta/s903_zeta_discardables.pkg": {
-        "crc": 1336762212,
-        "versions": []
+        "crc": 1336762212
     },
     "packs/maps/s904_omega/s904_omega.pkg": {
-        "crc": 2009321624,
-        "versions": []
+        "crc": 2009321624
     },
     "packs/maps/s904_omega/s904_omega_discardables.pkg": {
-        "crc": 1951726416,
-        "versions": []
+        "crc": 1951726416
     },
     "packs/maps/s905_arachnus/s905_arachnus.pkg": {
-        "crc": 631087940,
-        "versions": []
+        "crc": 631087940
     },
     "packs/maps/s905_arachnus/s905_arachnus_discardables.pkg": {
-        "crc": 2213782430,
-        "versions": []
+        "crc": 2213782430
     },
     "packs/maps/s905_queen/s905_queen.pkg": {
-        "crc": 480960271,
-        "versions": []
+        "crc": 480960271
     },
     "packs/maps/s905_queen/s905_queen_discardables.pkg": {
-        "crc": 1832957582,
-        "versions": []
+        "crc": 1832957582
     },
     "packs/maps/s905_queen/subareas/subarearp0.pkg": {
-        "crc": 1455950869,
-        "versions": []
+        "crc": 1455950869
     },
     "packs/maps/s905_queen/subareas/subarearp0_discardables.pkg": {
-        "crc": 1226451454,
-        "versions": []
+        "crc": 1226451454
     },
     "packs/maps/s906_metroid/s906_metroid.pkg": {
-        "crc": 251050002,
-        "versions": []
+        "crc": 251050002
     },
     "packs/maps/s906_metroid/s906_metroid_discardables.pkg": {
-        "crc": 2472471451,
-        "versions": []
+        "crc": 2472471451
     },
     "packs/maps/s906_metroid/subareas/subarearp0.pkg": {
-        "crc": 3387216027,
-        "versions": []
+        "crc": 3387216027
     },
     "packs/maps/s906_metroid/subareas/subarearp0_discardables.pkg": {
-        "crc": 4127635008,
-        "versions": []
+        "crc": 4127635008
     },
     "packs/maps/s907_manicminerbot/s907_manicminerbot.pkg": {
-        "crc": 3100886803,
-        "versions": []
+        "crc": 3100886803
     },
     "packs/maps/s907_manicminerbot/s907_manicminerbot_discardables.pkg": {
-        "crc": 1815475312,
-        "versions": []
+        "crc": 1815475312
     },
     "packs/maps/s907_manicminerbot/subareas/subarearp0.pkg": {
-        "crc": 1341056482,
-        "versions": []
+        "crc": 1341056482
     },
     "packs/maps/s907_manicminerbot/subareas/subarearp0_discardables.pkg": {
-        "crc": 1314496762,
-        "versions": []
+        "crc": 1314496762
     },
     "packs/maps/s908_manicminerbotrun/s908_manicminerbotrun.pkg": {
-        "crc": 3730238821,
-        "versions": []
+        "crc": 3730238821
     },
     "packs/maps/s908_manicminerbotrun/s908_manicminerbotrun_discardables.pkg": {
-        "crc": 1584236890,
-        "versions": []
+        "crc": 1584236890
     },
     "packs/maps/s908_manicminerbotrun/subareas/subarearp0.pkg": {
-        "crc": 3239852114,
-        "versions": []
+        "crc": 3239852114
     },
     "packs/maps/s908_manicminerbotrun/subareas/subarearp0_discardables.pkg": {
-        "crc": 37403615,
-        "versions": []
+        "crc": 37403615
     },
     "packs/maps/s909_ridley/s909_ridley.pkg": {
-        "crc": 1910851344,
-        "versions": []
+        "crc": 1910851344
     },
     "packs/maps/s909_ridley/s909_ridley_discardables.pkg": {
-        "crc": 4115485546,
-        "versions": []
+        "crc": 4115485546
     },
     "packs/maps/s909_ridley/subareas/subarearp0.pkg": {
-        "crc": 2620296135,
-        "versions": []
+        "crc": 2620296135
     },
     "packs/maps/s909_ridley/subareas/subarearp0_discardables.pkg": {
-        "crc": 887422768,
-        "versions": []
+        "crc": 887422768
     },
     "packs/maps/s910_gym/s910_gym.pkg": {
-        "crc": 2217164247,
-        "versions": []
+        "crc": 2217164247
     },
     "packs/maps/s910_gym/s910_gym_discardables.pkg": {
-        "crc": 1409571447,
-        "versions": []
+        "crc": 1409571447
     },
     "packs/maps/s910_gym/subareas/subarearp0.pkg": {
-        "crc": 407216541,
-        "versions": []
+        "crc": 407216541
     },
     "packs/maps/s910_gym/subareas/subarearp0_discardables.pkg": {
-        "crc": 1764500985,
-        "versions": []
+        "crc": 1764500985
     },
     "packs/maps/s911_swarmgym/s911_swarmgym.pkg": {
-        "crc": 1631075070,
-        "versions": []
+        "crc": 1631075070
     },
     "packs/maps/s911_swarmgym/s911_swarmgym_discardables.pkg": {
-        "crc": 4172416221,
-        "versions": []
+        "crc": 4172416221
     },
     "packs/maps/s911_swarmgym/subareas/subarearp0.pkg": {
-        "crc": 276062337,
-        "versions": []
+        "crc": 276062337
     },
     "packs/maps/s911_swarmgym/subareas/subarearp0_discardables.pkg": {
-        "crc": 1990425231,
-        "versions": []
+        "crc": 1990425231
     },
     "packs/maps/s911_swarmgym/subareas/subarearp1.pkg": {
-        "crc": 756304177,
-        "versions": []
+        "crc": 756304177
     },
     "packs/maps/s911_swarmgym/subareas/subarearp1_discardables.pkg": {
-        "crc": 2582760558,
-        "versions": []
+        "crc": 2582760558
     },
     "packs/maps/s920_traininggallery/s920_traininggallery.pkg": {
-        "crc": 2223002088,
-        "versions": []
+        "crc": 2223002088
     },
     "packs/maps/s920_traininggallery/s920_traininggallery_discardables.pkg": {
-        "crc": 2165566511,
-        "versions": []
+        "crc": 2165566511
     },
     "packs/maps/s920_traininggallery/subareas/subarearp0.pkg": {
-        "crc": 3227952037,
-        "versions": []
+        "crc": 3227952037
     },
     "packs/maps/s920_traininggallery/subareas/subarearp0_discardables.pkg": {
-        "crc": 2346033999,
-        "versions": []
+        "crc": 2346033999
     },
     "packs/maps/s920_traininggallery/subareas/subarearp1.pkg": {
-        "crc": 4245064213,
-        "versions": []
+        "crc": 4245064213
     },
     "packs/maps/s920_traininggallery/subareas/subarearp10.pkg": {
-        "crc": 4130489461,
-        "versions": []
+        "crc": 4130489461
     },
     "packs/maps/s920_traininggallery/subareas/subarearp10_discardables.pkg": {
-        "crc": 3014789015,
-        "versions": []
+        "crc": 3014789015
     },
     "packs/maps/s920_traininggallery/subareas/subarearp1_discardables.pkg": {
-        "crc": 1686574510,
-        "versions": []
+        "crc": 1686574510
     },
     "packs/maps/s920_traininggallery/subareas/subarearp2.pkg": {
-        "crc": 3131502789,
-        "versions": []
+        "crc": 3131502789
     },
     "packs/maps/s920_traininggallery/subareas/subarearp2_discardables.pkg": {
-        "crc": 2382481612,
-        "versions": []
+        "crc": 2382481612
     },
     "packs/maps/s920_traininggallery/subareas/subarearp3.pkg": {
-        "crc": 2277955957,
-        "versions": []
+        "crc": 2277955957
     },
     "packs/maps/s920_traininggallery/subareas/subarearp3_discardables.pkg": {
-        "crc": 1632861741,
-        "versions": []
+        "crc": 1632861741
     },
     "packs/maps/s920_traininggallery/subareas/subarearp4.pkg": {
-        "crc": 904267109,
-        "versions": []
+        "crc": 904267109
     },
     "packs/maps/s920_traininggallery/subareas/subarearp4_discardables.pkg": {
-        "crc": 2155705417,
-        "versions": []
+        "crc": 2155705417
     },
     "packs/maps/s920_traininggallery/subareas/subarearp5.pkg": {
-        "crc": 143011029,
-        "versions": []
+        "crc": 143011029
     },
     "packs/maps/s920_traininggallery/subareas/subarearp5_discardables.pkg": {
-        "crc": 1865401000,
-        "versions": []
+        "crc": 1865401000
     },
     "packs/maps/s920_traininggallery/subareas/subarearp6.pkg": {
-        "crc": 1327912453,
-        "versions": []
+        "crc": 1327912453
     },
     "packs/maps/s920_traininggallery/subareas/subarearp6_discardables.pkg": {
-        "crc": 2242453450,
-        "versions": []
+        "crc": 2242453450
     },
     "packs/maps/s920_traininggallery/subareas/subarearp7.pkg": {
-        "crc": 1917222837,
-        "versions": []
+        "crc": 1917222837
     },
     "packs/maps/s920_traininggallery/subareas/subarearp7_discardables.pkg": {
-        "crc": 1794877739,
-        "versions": []
+        "crc": 1794877739
     },
     "packs/maps/s920_traininggallery/subareas/subarearp8.pkg": {
-        "crc": 4028033124,
-        "versions": []
+        "crc": 4028033124
     },
     "packs/maps/s920_traininggallery/subareas/subarearp8_discardables.pkg": {
-        "crc": 2625899843,
-        "versions": []
+        "crc": 2625899843
     },
     "packs/maps/s920_traininggallery/subareas/subarearp9.pkg": {
-        "crc": 3447112148,
-        "versions": []
+        "crc": 3447112148
     },
     "packs/maps/s920_traininggallery/subareas/subarearp9_discardables.pkg": {
-        "crc": 1943452578,
-        "versions": []
+        "crc": 1943452578
     },
     "packs/maps_loading/s000_mainmenu.pkg": {
-        "crc": 1237956820,
-        "versions": []
+        "crc": 1237956820
     },
     "packs/maps_loading/s000_mainmenu_discardables.pkg": {
-        "crc": 3920110585,
-        "versions": []
+        "crc": 3920110585
     },
     "packs/maps_loading/s010_cockpit.pkg": {
-        "crc": 766794054,
-        "versions": []
+        "crc": 766794054
     },
     "packs/maps_loading/s010_cockpit_discardables.pkg": {
-        "crc": 2735988998,
-        "versions": []
+        "crc": 2735988998
     },
     "packs/maps_loading/s020_credits.pkg": {
-        "crc": 3599829419,
-        "versions": []
+        "crc": 3599829419
     },
     "packs/maps_loading/s020_credits_discardables.pkg": {
-        "crc": 1773826246,
-        "versions": []
+        "crc": 1773826246
     },
     "packs/players/common.pkg": {
-        "crc": 4262275581,
-        "versions": []
+        "crc": 4262275581
     },
     "packs/players/common_discardables.pkg": {
-        "crc": 1466131237,
-        "versions": []
+        "crc": 1466131237
     },
     "packs/players/common_fusion.pkg": {
-        "crc": 2994862899,
-        "versions": []
+        "crc": 2994862899
     },
     "packs/players/common_fusion_discardables.pkg": {
-        "crc": 4187500588,
-        "versions": []
+        "crc": 4187500588
     },
     "packs/players/gravity.pkg": {
-        "crc": 1777511632,
-        "versions": []
+        "crc": 1777511632
     },
     "packs/players/gravity_discardables.pkg": {
-        "crc": 1645826148,
-        "versions": []
+        "crc": 1645826148
     },
     "packs/players/gravity_fusion.pkg": {
-        "crc": 3093641365,
-        "versions": []
+        "crc": 3093641365
     },
     "packs/players/gravity_fusion_discardables.pkg": {
-        "crc": 3986541343,
-        "versions": []
+        "crc": 3986541343
     },
     "packs/players/power.pkg": {
-        "crc": 2789489571,
-        "versions": []
+        "crc": 2789489571
     },
     "packs/players/power_discardables.pkg": {
-        "crc": 1139460689,
-        "versions": []
+        "crc": 1139460689
     },
     "packs/players/power_fusion.pkg": {
-        "crc": 3559905084,
-        "versions": []
+        "crc": 3559905084
     },
     "packs/players/power_fusion_discardables.pkg": {
-        "crc": 3156317721,
-        "versions": []
+        "crc": 3156317721
     },
     "packs/players/samus.pkg": {
-        "crc": 2002517503,
-        "versions": []
+        "crc": 2002517503
     },
     "packs/players/samus_discardables.pkg": {
-        "crc": 3802066257,
-        "versions": []
+        "crc": 3802066257
     },
     "packs/players/varia.pkg": {
-        "crc": 3262010005,
-        "versions": []
+        "crc": 3262010005
     },
     "packs/players/varia_discardables.pkg": {
-        "crc": 3987922275,
-        "versions": []
+        "crc": 3987922275
     },
     "packs/players/varia_fusion.pkg": {
-        "crc": 257052215,
-        "versions": []
+        "crc": 257052215
     },
     "packs/players/varia_fusion_discardables.pkg": {
-        "crc": 953809533,
-        "versions": []
+        "crc": 953809533
     },
     "packs/system/system.pkg": {
-        "crc": 3377532531,
-        "versions": []
+        "crc": 3377532531
     },
     "packs/system/system_discardables.pkg": {
-        "crc": 2580393559,
-        "versions": []
+        "crc": 2580393559
     },
     "sounds/actors/alpha/alpha_attack_01.bcwav": {
         "crc": 1097176969
