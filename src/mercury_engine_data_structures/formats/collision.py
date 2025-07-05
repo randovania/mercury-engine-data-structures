@@ -1,7 +1,20 @@
 from __future__ import annotations
 
 import construct
-from construct import Array, BitsInteger, BitStruct, ByteSwapped, Container, Flag, Hex, Int8ul, Int16ul, Rebuild, Struct, Switch
+from construct import (
+    Array,
+    BitsInteger,
+    BitStruct,
+    ByteSwapped,
+    Container,
+    Flag,
+    Hex,
+    Int8ul,
+    Int16ul,
+    Rebuild,
+    Struct,
+    Switch,
+)
 
 from mercury_engine_data_structures import game_check
 from mercury_engine_data_structures.common_types import (
