@@ -1,6 +1,8 @@
 # Mercury Engine Data Structures
 Construct type definitions for Mercury Engine
 
+## Format Support
+
 | Format    | Samus Returns (Read) | Samus Returns (Write) | Dread (Read) | Dread (Write) | Purpose     |
 |-----------|----------------------|-----------------------|--------------|---------------|-------------|
 | BAPD      | Missing              | Missing               | &check;      | &check;       | Audio Preset (positional audio data) |
@@ -19,13 +21,13 @@ Construct type definitions for Mercury Engine
 | BFSTM     | Missing              | Missing               | &cross;      | &cross;       | Common Switch audio format |
 | BGSNDS    | Missing              | Missing               | &check;      | &check;       | BackGround Sounds (?) |
 | BLDEF     | Missing              | Missing               | &check;      | &check;       | Actor Lighting Definition |
-| BLSND     | &check;              | &check;               | &check;      | &check;       | Sounds (?) |	
+| BLSND     | &check;              | &check;               | &check;      | &check;       | Sounds (?) |
 | BLUT      | Missing              | Missing               | &check;      | &check;       | LookUp Table (used for ADAM animation) |
 | BMBLS     | Missing              | Missing               | &check;      | &check;       | Blend Space |
 | BMDEFS    | &check;              | &check;               | &check;      | &check;       | Music Track Definitions & Properties	|
 | BMMAP     | Missing              | Missing               | &check;      | &check;       | MiniMap |
 | BMMDEF    | Missing              | Missing               | &check;      | &check;       | MiniMap Definitions (?) |
-| BMSAD     | &check;              | &check;               | &check;      | &check;       | Actor Definitions	| 
+| BMSAD     | &check;              | &check;               | &check;      | &check;       | Actor Definitions	|
 | BMSAS     | Missing              | Missing               | &check;      | &check;       | Action Sets |
 | BMSAT     | &cross;              | &cross;               | &check;      | &check;       | Animation Tree |
 | BMSBK     | &check;              | &check;               | Missing      | Missing       | Blocks, per Scenario |
@@ -43,7 +45,7 @@ Construct type definitions for Mercury Engine
 | BMSMSD    | &check;              | &check;               | Missing      | Missing       | Map Screen Data (?)	|
 | BMSNAV    | &check;              | &check;               | &check;      | &check;       | Navigation Meshes	|
 | BMSND     | &cross;              | &cross;               | Missing      | Missing       | Sound (?)   |
-| BMSSA     | &cross;              | &cross;               | Missing      | Missing       | SSA (?)			|
+| BMSSA     | &check;              | &check;               | Missing      | Missing       | SubArea Setups (MSR)			|
 | BMSSD     | &check;              | &check;               | &check;      | &check;       | Scene Data (scene blocks, objects, msr lighting) |	
 | BMSSH     | Missing              | Missing               | &check;      | &check;       | GUI Shape |
 | BMSSK     | Missing              | Missing               | &check;      | &check;       | GUI Skin |
@@ -59,10 +61,10 @@ Construct type definitions for Mercury Engine
 | BRES      | Missing              | Missing               | &check;      | &check;       | Environmental Sound Presets |
 | BREV      | Missing              | Missing               | &check;      | &check;       | Environmental Visual Presets |
 | BRFLD     | Missing              | Missing               | &check;      | &check;       | Dread Scenario Entity Data |
-| BRSA      | Missing              | Missing               | &check;      | &check;       | SubArea Setups |
+| BRSA      | Missing              | Missing               | &check;      | &check;       | SubArea Setups (Dread) |
 | BRSPD     | Missing              | Missing               | &check;      | &check;       | Shot Audio Presets |
 | BSHDAT    | &cross;              | &cross;               | &cross;      | &cross;       | Shader Data	|
-| BSMAT     | Missing              | Missing               | &check;      | &check;       | Mesh Material |	
+| BSMAT     | Missing              | Missing               | &check;      | &check;       | Mesh Material |
 | BTUNDA    | Missing              | Missing               | &check;      | &check;       | Tunable Data |
 | BUCT      | &check;              | &check;               | &check;      | &check;       | Font Glyph Data (?) |
 | INI       | Missing              | Missing               | &check;      | &check;       | Standard INI |
@@ -93,3 +95,23 @@ Metroid Dread uses the following annotations in text to change color:
 | {c5} | Blue        |              |
 | {c6} | UI Active   | (Light blue) |
 | {c7} | UI Inactive | (Dim blue)   |
+
+
+## Tests
+
+For running the full test suite, the following environment variables must be set.
+
+| Variable           | Purpose                                        |
+|--------------------|------------------------------------------------|
+| SAMUS_RETURNS_PATH | Path to a Samus Returns extracted RomFS        |
+| DREAD_1_0_0_PATH   | Path to a Metroid Dread v1.0.0 extracted RomFS |
+| DREAD_2_1_0_PATH   | Path to a Metroid Dread v2.1.0 extracted RomFS |
+
+If any of these variables are not set, the associated tests are skipped.
+
+### Running
+
+```bash
+export SAMUS_RETURNS_PATH=D:/RomFS/Samus Returns
+python -m pytest
+```
