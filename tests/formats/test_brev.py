@@ -30,3 +30,9 @@ def test_dread_brev_100(dread_tree_100, brev_path):
 @pytest.mark.parametrize("brev_path", bossrush_assets)
 def test_dread_brev_210(dread_tree_210, brev_path):
     parse_build_compare_editor(Brev, dread_tree_210, brev_path)
+
+
+def test_properties(dread_tree_100):
+    visual_manager = dread_tree_100.get_file("maps/levels/c10_samus/s010_cave/s010_cave.brev", Brev)
+
+    assert len(visual_manager.presets) == 201

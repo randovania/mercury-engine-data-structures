@@ -152,9 +152,9 @@ class CVectorConstruct(construct.Adapter):
 
 StrId = CStringRobust("utf-8")
 Char = StaticPaddedString(1, "utf-8")
-Int: construct.FormatField = typing.cast(construct.FormatField, construct.Int32sl)
-UInt: construct.FormatField = typing.cast(construct.FormatField, construct.Int32ul)
-Float: construct.FormatField = typing.cast(construct.FormatField, construct.Float32l)
+Int: construct.FormatField = typing.cast("construct.FormatField", construct.Int32sl)
+UInt: construct.FormatField = typing.cast("construct.FormatField", construct.Int32ul)
+Float: construct.FormatField = typing.cast("construct.FormatField", construct.Float32l)
 CVector2D = CVectorConstruct(2)
 CVector3D = CVectorConstruct(3)
 CVector4D = CVectorConstruct(4)
