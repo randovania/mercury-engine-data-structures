@@ -72,7 +72,8 @@ CollisionPolyDread = Struct(
 CollisionPoly = game_check.is_sr_or_else(CollisionPolySR, CollisionPolyDread)
 
 BinarySearchTree = Struct(
-    "search_result" / ByteSwapped(
+    "search_result"
+    / ByteSwapped(
         BitStruct(
             "is_leaf" / Flag,
             "pass" / BitsInteger(15),
