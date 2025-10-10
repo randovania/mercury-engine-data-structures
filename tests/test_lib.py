@@ -46,7 +46,8 @@ def _parse_build_compare(module: type[BaseResource], editor: FileTreeEditor, fil
 
 def parse_build_compare_editor(module: type[BaseResource], editor: FileTreeEditor, file_name: str, print_data=False):
     raw, encoded, _ = _parse_build_compare(module, editor, file_name, print_data)
-
+    print(" ".join(f"{c:02X}" for c in encoded))
+    print(f"{len(encoded):X}")
     assert encoded == raw
 
 
