@@ -50,7 +50,7 @@ Construct type definitions for Mercury Engine
 | BMSSH     | Missing              | Missing               | &check;      | &check;       | GUI Shape |
 | BMSSK     | Missing              | Missing               | &check;      | &check;       | GUI Skin |
 | BMSSS     | Missing              | Missing               | &check;      | &check;       | GUI SpriteSheet |
-| BMSSTOC   | Missing              | Missing               | &cross;      | &cross;       | Sound Table of Contents (links BFSAR sfx to BFGRP files) |
+| BMSSTOC   | Missing              | Missing               | &check;      | &check;       | Sound Table of Contents (links BFSAR sfx to BFGRP files) |
 | BMTRE     | &cross;              | &cross;               | &check;      | &check;       | Behavior Tree; entitity AI)|
 | BMTUN     | &check;              | &check;               | Missing      | Missing       | Tunables; exposed variables	|
 | BNVIB     | Missing              | Missing               | &check;      | &check;       | Vibration Data |
