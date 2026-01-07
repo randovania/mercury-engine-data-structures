@@ -1,17 +1,27 @@
 from __future__ import annotations
 
+import copy
 import logging
-from typing import TYPE_CHECKING
+from enum import IntEnum
+from typing import TYPE_CHECKING, TypeAlias
 
 import construct
-from construct import Const, Construct, Container, Flag, Float32l, Hex, Int32ul, Struct, Switch
+from construct import Const, Construct, Container, Flag, Hex, Int32ul, Struct, Switch
 
 from mercury_engine_data_structures.base_resource import BaseResource
-from mercury_engine_data_structures.common_types import CVector3D, Float, StrId, VersionAdapter, make_dict, make_vector
+from mercury_engine_data_structures.common_types import (
+    CVector3D,
+    Float,
+    StrId,
+    Vec3,
+    VersionAdapter,
+    make_dict,
+    make_vector,
+)
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 from mercury_engine_data_structures.construct_extensions.strings import StaticPaddedString
 from mercury_engine_data_structures.crc import crc32
-from mercury_engine_data_structures.formats.collision import collision_formats
+from mercury_engine_data_structures.formats.collision import CollisionEntry, collision_formats
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -21,8 +31,9 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 FunctionArgument = Struct(
-    type=StaticPaddedString(4, "ascii"),
-    value=construct.Switch(
+    "type" / StaticPaddedString(4, "ascii"),
+    "value"
+    / construct.Switch(
         construct.this.type,
         {
             "s": StrId,
@@ -34,116 +45,160 @@ FunctionArgument = Struct(
     ),
 )
 
-Components = {
-    "TRIGGER": Struct(
-        command=StrId,
-        arguments=make_vector(FunctionArgument),
-    ),
-    "SPAWNGROUP": Struct(
-        command=StrId,
-        arguments=make_vector(FunctionArgument),
-    ),
-    "SPAWNPOINT": Struct(
-        command=StrId,
-        arguments=make_vector(FunctionArgument),
-    ),
-    "STARTPOINT": Struct(
-        command=StrId,
-        arguments=make_vector(FunctionArgument),
-    ),
-    "MODELUPDATER": Struct(
-        command=StrId,
-        arguments=make_vector(FunctionArgument),
-    ),
-}
-
 ProperActor = Struct(
-    type=StrId,
-    position=CVector3D,
-    rotation=CVector3D,
-    components=make_vector(
+    "type" / StrId,
+    "position" / CVector3D,
+    "rotation" / CVector3D,
+    "component_functions"
+    / make_vector(
         Struct(
-            component_type=StrId,
-            command=StrId,
-            arguments=make_vector(FunctionArgument),
-            # data=construct.Switch(
-            #     construct.this.component_type,
-            #     Components,
-            #     ErrorWithMessage(lambda ctx: f"Unknown component type: {ctx.component_type}", construct.SwitchError),
-            # ),
+            "component_type" / StrId,
+            "command" / StrId,
+            "arguments" / make_vector(FunctionArgument),
         )
     ),
 )
 
 CollisionObject = Struct(
-    object_type=StrId,
-    data=Switch(
+    "object_type" / StrId,
+    "data"
+    / Switch(
         construct.this.object_type,
         collision_formats,
         ErrorWithMessage(lambda ctx: f"Type {ctx.type} not known, valid types are {list(collision_formats.keys())}."),
     ),
 )
 
+
 BMSLD = Struct(
-    _magic=Const(b"MSLD"),
-    version=VersionAdapter("1.20.0"),
-    unk1=Int32ul,
-    unk2=Int32ul,
-    unk3=Int32ul,
-    unk4=Int32ul,
-    objects_a=make_vector(
+    "_magic" / Const(b"MSLD"),
+    "version" / VersionAdapter("1.20.0"),
+    "unk1" / CVector3D,
+    "unk2" / Float,
+    # locations where Samus gets repositioned after a cutscene/collecting dna, etc
+    "landmarks"
+    / make_vector(
         Struct(
-            name=StrId,
-            unk1=Hex(Int32ul),
-            unk2=Hex(Int32ul),
-            unk3=Hex(Int32ul),
-            unk4=Hex(Int32ul),
-            unk5=Hex(Int32ul),
-            unk6=Hex(Int32ul),
+            "name" / StrId,
+            "position" / CVector3D,
+            "rotation" / CVector3D,
         )
     ),
-    object_b=make_vector(
+    # paths that enemies follow (could be bounds?)
+    "enemy_paths"
+    / make_vector(
         Struct(
-            name=StrId,
-            unk01=Hex(Int32ul),
-            unk02=make_vector(
-                Struct(
-                    x=Float32l,
-                    y=Float32l,
-                    z=Float32l,
-                )
-            ),
+            "name" / StrId,
+            "unk01" / Hex(Int32ul),
+            "coordinates" / make_vector(CVector3D),
         )
     ),
-    objects_c=make_dict(CollisionObject),
-    objects_d=make_dict(CollisionObject),
-    objects_e=make_vector(
+    # areas of influence for enemies
+    "logic_shapes" / make_dict(CollisionObject),
+    # areas for spawngroups
+    "spawn_groups" / make_dict(CollisionObject),
+    # boss camera data
+    "boss_cameras"
+    / make_vector(
         Struct(
-            name=StrId,
-            unk01=StrId,
-            unk02=Hex(Int32ul),
-            unk03=Hex(Int32ul),
-            unk04=Hex(Int32ul),
-            unk05=Hex(Int32ul),
-            unk06=Hex(Int32ul),
-            unk07=Hex(Int32ul),
-            unk08=Hex(Int32ul),
-            unk09=Float,
-            unk10=Float,
-            unk11=Hex(Int32ul),
-            unk13=StrId,
-            unk14=Hex(Int32ul),
+            "name" / StrId,
+            "unk01" / StrId,
+            "unk02" / Hex(Int32ul),
+            "unk03" / Hex(Int32ul),
+            "unk04" / Hex(Int32ul),
+            "unk05" / Hex(Int32ul),
+            "unk06" / Hex(Int32ul),
+            "unk07" / Hex(Int32ul),
+            "unk08" / Hex(Int32ul),
+            "position" / CVector3D,
+            "type" / StrId,
+            "unk14" / Hex(Int32ul),
         )
     ),
-    actors=make_dict(ProperActor)[18],
-    sub_areas=make_vector(
-        Struct(
-            name=StrId,
-            names=make_vector(StrId),
-        )
-    ),
-    rest=construct.GreedyBytes,
+    # layers for actors
+    "actor_layers" / make_dict(ProperActor)[18],
+    # collision_cameras and groups
+    "actor_groups" / make_dict(make_vector(StrId)),
+    # only used in s000_mainmenu, s010_cockpit, s020_credits
+    "extra_actor_groups" / construct.Optional(make_dict(make_vector(StrId))),
+    construct.Terminated,
 ).compile()
+
+
+ActorName: TypeAlias = str
+ActorGroupName: TypeAlias = str
+
+
+class ActorLayer(IntEnum):
+    TRIGGER = 0
+    ENV_TRIGGER = 2
+    SPAWNGROUP = 3
+    SPAWNPOINT = 4
+    STARTPOINT = 5
+    PASSIVE = 9
+    PLATFORM = 10
+    DOOR = 15
+    CHOZO_SEAL = 16
+    HIDDEN_POWERUP = 17
+
+
+class BmsldActor:
+    def __init__(self, raw: Container) -> None:
+        self._raw = raw
+
+    @property
+    def actor_type(self) -> str:
+        return self._raw.type
+
+    @actor_type.setter
+    def actor_type(self, value: str) -> None:
+        self._raw.type = value
+
+    @property
+    def position(self) -> Vec3:
+        return self._raw.position
+
+    @position.setter
+    def position(self, value: Vec3) -> None:
+        self._raw.position = value
+
+    @property
+    def rotation(self) -> Vec3:
+        return self._raw.rotation
+
+    @rotation.setter
+    def rotation(self, value: Vec3) -> None:
+        self._raw.rotation = value
+
+    def get_component_function(self, component_idx: int = 0) -> ComponentFunction:
+        return ComponentFunction(self._raw.component_functions[component_idx])
+
+
+ArgumentType = int | float | str | bool
+
+ARGUMENT_TYPES = {
+    "s": str,
+    "f": float,
+    "b": bool,
+    "i": int,
+}
+
+
+class ComponentFunction:
+    def __init__(self, raw: Container) -> None:
+        self._raw = raw
+
+    def __repr__(self) -> str:
+        arguments = [repr(arg.value) for arg in self._raw.arguments]
+        arg_repr = ", ".join(arguments)
+        return f"{self._raw.component_type}.{self._raw.command}({arg_repr})"
+
+    def set_argument(self, argument_idx: int, value: ArgumentType) -> None:
+        argument = self._raw.arguments[argument_idx]
+        expected_type = ARGUMENT_TYPES[argument.type]
+        if not isinstance(value, expected_type):
+            raise TypeError(f"Invalid argument type: expected {expected_type}, got {type(value)} ({value})")
+        argument.value = value
 
 
 class Bmsld(BaseResource):
@@ -151,47 +206,43 @@ class Bmsld(BaseResource):
     def construct_class(cls, target_game: Game) -> Construct:
         return BMSLD
 
-    def all_actors(self) -> Iterator[tuple[int, str, construct.Container]]:
-        for layer in self.raw.actors:
+    def all_actors(self) -> Iterator[tuple[ActorLayer, ActorName, BmsldActor]]:
+        for i, layer in enumerate(self.raw.actor_layers):
             for actor_name, actor in layer.items():
-                yield layer, actor_name, actor
+                yield ActorLayer(i), actor_name, BmsldActor(actor)
 
-    def all_actor_groups(self) -> Iterator[tuple[str, Container]]:
-        for sub_area in self.raw.sub_areas:
-            yield sub_area.name, sub_area
+    @property
+    def actor_groups(self) -> dict[ActorGroupName, list[ActorName]]:
+        return self.raw.actor_groups
 
-    def is_actor_in_group(self, group_name: str, actor_name: str) -> bool:
-        generator = (area for area in self.raw.sub_areas if area.name == group_name)
-        for area in generator:
-            return actor_name in area.names
-        return False
+    @actor_groups.setter
+    def actor_groups(self, value: dict[ActorGroupName, list[ActorName]]) -> None:
+        self.raw.actor_groups = value
 
-    def get_actor_group(self, group_name: str) -> Container:
-        group = next(
-            (sub_area for sub_area_name, sub_area in self.all_actor_groups() if sub_area_name == group_name), None
-        )
+    def is_actor_in_group(self, group_name: ActorGroupName, actor_name: ActorName) -> bool:
+        return actor_name in self.actor_groups[group_name]
+
+    def get_actor_group(self, group_name: ActorGroupName) -> Container:
+        group = next((sub_area for sub_area in self.actor_groups if sub_area == group_name), None)
         if group is None:
             raise KeyError(f"No group found with name for {group_name}")
         return group
 
-    def all_actor_group_names_for_actor(self, actor_name: str) -> list[str]:
-        return [
-            actor_group_name
-            for actor_group_name, actor_group in self.all_actor_groups()
-            if actor_name in actor_group.names
-        ]
+    def all_actor_group_names_for_actor(self, actor_name: ActorName) -> list[str]:
+        return [group_name for group_name, group in self.actor_groups.items() if actor_name in group]
 
-    def remove_actor_from_group(self, group_name: str, actor_name: str):
+    def remove_actor_from_group(self, group_name: ActorGroupName, actor_name: ActorName) -> None:
         logger.debug("Remove actor %s from group %s", actor_name, group_name)
-        group = self.get_actor_group(group_name)
-        group.names.remove(actor_name)
+        self.actor_groups[group_name].remove(actor_name)
 
-    def remove_actor_from_all_groups(self, actor_name: str):
+    def remove_actor_from_all_groups(self, actor_name: ActorName) -> None:
         group_names = self.all_actor_group_names_for_actor(actor_name)
         for group_name in group_names:
             self.remove_actor_from_group(group_name, actor_name)
 
-    def add_actor_to_entity_groups(self, collision_camera_name: str, actor_name: str, all_groups: bool = False):
+    def add_actor_to_entity_groups(
+        self, collision_camera_name: ActorGroupName, actor_name: ActorName, all_groups: bool = False
+    ) -> None:
         """
         Adds an actor to either all entity groups or one entity group, which follow the name pattern of eg_SubArea_NAME.
         In case an actor needs to be added to an entity group not following this name pattern
@@ -203,22 +254,68 @@ class Bmsld(BaseResource):
                    pattern or just to one entity group matching the name pattern exactly
         """
 
-        def compare_func(first: str, second: str) -> bool:
+        def compare_func(first: ActorGroupName, second: ActorGroupName) -> bool:
             if all_groups:
                 return first.startswith(f"eg_SubArea_{second}")
             else:
                 return first == f"eg_SubArea_{second}"
 
-        collision_camera_groups = [
-            group for group_name, group in self.all_actor_groups() if compare_func(group_name, collision_camera_name)
-        ]
+        collision_camera_groups = [group for group in self.actor_groups if compare_func(group, collision_camera_name)]
         if len(collision_camera_groups) == 0:
             raise Exception(f"No entity group found for {collision_camera_name}")
         for group in collision_camera_groups:
-            logger.debug("Add actor %s to group %s", actor_name, group.name)
+            logger.debug("Add actor %s to group %s", actor_name, group)
             self.insert_into_entity_group(group, actor_name)
 
-    def insert_into_entity_group(self, sub_area: Container, name_to_add: str) -> None:
+    def insert_into_entity_group(self, sub_area: Container, actor_name: ActorName) -> None:
         # MSR requires to have the names in the sub area list sorted by their crc32 value
-        sub_area.names.append(name_to_add)
-        sub_area.names.sort(key=crc32)
+        entity_group = self.actor_groups[sub_area]
+        entity_group.append(actor_name)
+        entity_group.sort(key=crc32)
+
+    def _get_layer(self, layer: ActorLayer) -> list[dict]:
+        """Returns a layer of actors"""
+        return self.raw.actor_layers[layer]
+
+    def _check_if_actor_exists(self, layer: ActorLayer, actor_name: ActorName) -> None:
+        if actor_name not in self._get_layer(layer):
+            raise KeyError(f"No actor named '{actor_name}' found in '{layer}!'")
+
+    def get_actor(self, layer: ActorLayer, actor_name: ActorName) -> BmsldActor:
+        """Returns an actor given a layer and an actor name"""
+        self._check_if_actor_exists(layer, actor_name)
+        return BmsldActor(self.raw.actor_layers[layer][actor_name])
+
+    def remove_actor(self, layer: ActorLayer, actor_name: ActorName) -> None:
+        """Deletes an actor given a layer and an actor name"""
+        self._check_if_actor_exists(layer, actor_name)
+        self._get_layer(layer).pop(actor_name)
+        self.remove_actor_from_all_groups(actor_name)
+
+    def copy_actor(
+        self,
+        position: list[float],
+        template_actor: BmsldActor,
+        new_name: ActorName,
+        layer: ActorLayer,
+        offset: tuple = (0, 0, 0),
+    ) -> BmsldActor:
+        """
+        Copies an actor to a new position
+
+        param position: the x, y, z position for the copied actor
+        param template_actor: the actor being copied
+        param new_name: the name for the copied actor
+        param layer: the layer the copied actor will be added to
+        param offset: adds an additional offset the copied actor's coordinates
+
+        """
+        new_actor = BmsldActor(copy.deepcopy(template_actor))
+        self.raw.actor_layers[layer][new_name] = new_actor._raw
+        new_actor.position = Vec3([p + o for p, o in zip(position, offset)])
+
+        return new_actor
+
+    def get_logic_shape(self, logic_shape: str) -> CollisionEntry:
+        """Returns a logic shape by name"""
+        return CollisionEntry(self.raw["logic_shapes"][logic_shape])
