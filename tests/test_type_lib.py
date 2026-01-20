@@ -4,6 +4,7 @@ import contextlib
 
 import pytest
 
+from mercury_engine_data_structures.common_types import Vec2, Vec3, Vec4
 from mercury_engine_data_structures.formats import dread_types
 from mercury_engine_data_structures.game_check import Game
 from mercury_engine_data_structures.type_lib import TypeLib, get_type_lib_for_game
@@ -31,9 +32,9 @@ def _dread_type_lib():
         ("unsigned_int", 2**32 - 1, None),
         ("unsigned_long", 2**64 - 1, None),
         ("float", 0.0, None),
-        ("base::math::CVector2D", [0.0, 0.0], None),
-        ("base::math::CVector3D", [0.0, 0.0, 0.0], None),
-        ("base::math::CVector4D", [0.0, 0.0, 0.0, 0.0], None),
+        ("base::math::CVector2D", Vec2(0.0, 0.0), None),
+        ("base::math::CVector3D", Vec3(0.0, 0.0, 0.0), None),
+        ("base::math::CVector4D", Vec4(0.0, 0.0, 0.0, 0.0), None),
         ("base::global::CRntFile", b"\x24\x03", None),
         ("base::global::CName", "", None),
         ("base::global::CName", 2**64 - 1, None),
@@ -44,9 +45,9 @@ def _dread_type_lib():
         ("unsigned_int", None, TypeError("Expected int; got NoneType")),
         ("unsigned_long", None, TypeError("Expected int; got NoneType")),
         ("float", None, TypeError("Expected float; got NoneType")),
-        ("base::math::CVector2D", None, TypeError("Expected typing.Sequence; got NoneType")),
-        ("base::math::CVector3D", None, TypeError("Expected typing.Sequence; got NoneType")),
-        ("base::math::CVector4D", None, TypeError("Expected typing.Sequence; got NoneType")),
+        ("base::math::CVector2D", None, TypeError("Expected Vec2; got NoneType")),
+        ("base::math::CVector3D", None, TypeError("Expected Vec3; got NoneType")),
+        ("base::math::CVector4D", None, TypeError("Expected Vec4; got NoneType")),
         ("base::global::CRntFile", None, TypeError("Expected bytes; got NoneType")),
         ("base::global::CName", None, TypeError("Expected str | int; got NoneType")),
         ("base::global::CName", None, TypeError("Expected str | int; got NoneType")),
@@ -56,10 +57,16 @@ def _dread_type_lib():
         ("unsigned_int", 2**32, ValueError("4294967296 is out of range of [0x0, 0xffffffff]")),
         ("unsigned_long", 2**64, ValueError("18446744073709551616 is out of range of [0x0, 0xffffffffffffffff]")),
         ("base::global::CName", -1, ValueError("-1 is out of range of [0x0, 0xffffffffffffffff]")),
-        ("base::math::CVector2D", ["foo", "bar"], ValueError("Invalid CVector2D: ['foo', 'bar']")),
-        ("base::math::CVector2D", [0.0], ValueError("Invalid CVector2D: [0.0]")),
-        ("base::math::CVector3D", [0.0], ValueError("Invalid CVector3D: [0.0]")),
-        ("base::math::CVector4D", [0.0], ValueError("Invalid CVector4D: [0.0]")),
+        ("base::math::CVector2D", Vec2("foo", "bar"), ValueError("Invalid CVector2D: Vec2('foo', 'bar')")),
+        (
+            "base::math::CVector3D",
+            Vec3("foo", "bar", "baz"),
+            ValueError("Invalid CVector3D: Vec3('foo', 'bar', 'baz')"),
+        ),
+        ("base::math::CVector2D", Vec3(0.0, 0.0, 0.0), ValueError("Invalid CVector2D: Vec3(0.0, 0.0, 0.0)")),
+        ("base::math::CVector2D", Vec4(0.0, 0.0, 0.0, 0.0), ValueError("Invalid CVector2D: Vec4(0.0, 0.0, 0.0, 0.0)")),
+        ("base::math::CVector3D", Vec2(0.0, 0.0), TypeError("Expected Vec3; got Vec2")),
+        ("base::math::CVector4D", Vec2(0.0, 0.0), TypeError("Expected Vec4; got Vec2")),
         # struct
         (
             "base::reflection::CType",
@@ -156,7 +163,7 @@ def _dread_type_lib():
             {
                 "@type": "game::logic::collision::CCircleShape2D",
                 "@value": {
-                    "vPos": [0.0, 0.0, 0.0],
+                    "vPos": Vec3(0.0, 0.0, 0.0),
                     "bIsSolid": False,
                     "fRadius": 1.0,
                 },
