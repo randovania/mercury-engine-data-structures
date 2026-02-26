@@ -8,7 +8,8 @@ from mercury_engine_data_structures.version_validation import identify_version
 
 # ignores unsupported dread versions
 GAME_VERSIONS_TESTS = [
-    ("samus_returns_path", GameVersion.MSR),
+    ("samus_returns_path", GameVersion.MSR_US),
+    ("samus_returns_jp_path", GameVersion.MSR_JP),
     ("dread_path_100", GameVersion.DREAD_1_0_0),
     # ("dread_path_101", GameVersion.DREAD_1_0_1),
     # ("dread_path_200", GameVersion.DREAD_2_0_0),
