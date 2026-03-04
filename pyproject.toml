@@ -89,6 +89,7 @@ select = [
 extend-ignore = [
     "ISC001",  # may cause conflicts with formatter
     "PLW2901",  # `for` loop variable `key` overwritten by assignment target
+    "PLC0415",  # `import` should be at the top-level of a file
 ]
 
 [tool.ruff.lint.isort]

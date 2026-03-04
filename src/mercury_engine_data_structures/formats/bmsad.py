@@ -421,6 +421,8 @@ class ActorDefFunc:
     ):
         return cls(Container(name=name, unk1=unk1, unk2=unk2, params=Container()))
 
+    __hash__ = None
+
     def __eq__(self, __value: object) -> bool:
         if not isinstance(__value, ActorDefFunc):
             return False

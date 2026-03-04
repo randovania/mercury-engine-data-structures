@@ -20,6 +20,8 @@ class Vec2:
     def __init__(self, *args: float):
         self.raw = list(args)
 
+    __hash__ = None
+
     def __eq__(self, value):
         if isinstance(value, Vec2):
             return self.raw == value.raw
