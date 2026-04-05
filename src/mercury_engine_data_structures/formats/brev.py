@@ -7,6 +7,7 @@ from mercury_engine_data_structures.formats import standard_format
 
 if TYPE_CHECKING:
     import construct
+    from construct import Container
 
     from mercury_engine_data_structures.game_check import Game
 
@@ -15,3 +16,7 @@ class Brev(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> construct.Construct:
         return standard_format.game_model("CEnvironmentVisualPresets", "4.2.2")
+
+    @property
+    def presets(self) -> Container:
+        return self.raw.Root.pEnvironmentManager.pVisualPresets.dicPresets

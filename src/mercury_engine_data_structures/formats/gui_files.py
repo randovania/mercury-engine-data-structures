@@ -10,10 +10,12 @@ if TYPE_CHECKING:
 
     from mercury_engine_data_structures.game_check import Game
 
-BMSCP = standard_format.create("GUI::CDisplayObjectContainer", "1.2.2", explicit_root=True)
-BMSSH = standard_format.create("GUI::CGUIManager::ShapeContainer", "1.2.2", explicit_root=True)
-BMSSK = standard_format.create("GUI::CGUIManager::SkinContainer", "1.2.2", explicit_root=True)
-BMSSS = standard_format.create("GUI::CGUIManager::SpriteSheetContainer", "1.2.2", explicit_root=True)
+BMSCP = standard_format.create("GUI::CDisplayObjectContainer", "1.2.2", "GUI::CDisplayObjectContainer*")
+BMSSH = standard_format.create("GUI::CGUIManager::ShapeContainer", "1.2.2", "GUI::CGUIManager::ShapeContainer*")
+BMSSK = standard_format.create("GUI::CGUIManager::SkinContainer", "1.2.2", "GUI::CGUIManager::SkinContainer*")
+BMSSS = standard_format.create(
+    "GUI::CGUIManager::SpriteSheetContainer", "1.2.2", "GUI::CGUIManager::SpriteSheetContainer*"
+)
 
 
 class Bmscp(BaseResource):

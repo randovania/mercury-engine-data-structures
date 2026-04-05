@@ -28,7 +28,9 @@ from mercury_engine_data_structures.formats.bmslink import Bmslink
 from mercury_engine_data_structures.formats.bmsmd import Bmsmd
 from mercury_engine_data_structures.formats.bmsmsd import Bmsmsd
 from mercury_engine_data_structures.formats.bmsnav import Bmsnav
+from mercury_engine_data_structures.formats.bmssa import Bmssa
 from mercury_engine_data_structures.formats.bmssd import Bmssd
+from mercury_engine_data_structures.formats.bmsstoc import Bmsstoc
 from mercury_engine_data_structures.formats.bmtre import Bmtre
 from mercury_engine_data_structures.formats.bmtun import Bmtun
 from mercury_engine_data_structures.formats.bnvib import Bnvib
@@ -68,6 +70,7 @@ ALL_FORMATS = {
     "BMMDEF": Bmmdef,
     "BMSBK": Bmsbk,
     "BMSCP": Bmscp,
+    "BMSSA": Bmssa,
     "BMSSD": Bmssd,
     "BMSSH": Bmssh,
     "BMSSK": Bmssk,
@@ -89,6 +92,7 @@ ALL_FORMATS = {
     "BMSLGROUP": Bmslgroup,
     "BMSLINK": Bmslink,
     "BMSMD": Bmsmd,
+    "BMSSTOC": Bmsstoc,
     "BPSI": Bpsi,
     "BPTDAT": Bptdat,
     "BPTDEF": Bptdef,

@@ -22,7 +22,7 @@ pytest==8.3.1
     #   pytest-cov
 pytest-cov==5.0.0
     # via mercury-engine-data-structures (setup.py)
-randovania-lupa==2.0.1
+randovania-lupa==2.0.2
     # via mercury-engine-data-structures (setup.py)
 zstandard==0.23.0
     # via mercury-engine-data-structures (setup.py)

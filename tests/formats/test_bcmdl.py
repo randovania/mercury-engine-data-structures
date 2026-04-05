@@ -259,7 +259,7 @@ def test_change_material(dread_tree_100):
     encoded = construct_class.build(model.raw, target_game=dread_tree_100.target_game)
 
     assert encoded[0x5845:0x58A0] == (
-        b"actors/props/doorshieldsupermissile/models/imats/" b"doorshieldsupermissile_mp_opaque_69.bsmat\0"
+        b"actors/props/doorshieldsupermissile/models/imats/doorshieldsupermissile_mp_opaque_69.bsmat\0"
     )
 
     # ensure replacing it with a shorter length works
@@ -268,7 +268,7 @@ def test_change_material(dread_tree_100):
     encoded2 = construct_class.build(model.raw, target_game=dread_tree_100.target_game)
 
     assert encoded2[0x5845:0x58A0] == (
-        b"actors/props/doorshieldsupermiss/models/imats/" b"doorshieldsupermiss_mp_opaque_01.bsmat\0\0\0\0\0\0\0"
+        b"actors/props/doorshieldsupermiss/models/imats/doorshieldsupermiss_mp_opaque_01.bsmat\0\0\0\0\0\0\0"
     )
 
     long_path = "actors/props/doorshieldsupermissile/models/imats/doorshieldsupermissile_mp_opaque_420.bsmat"

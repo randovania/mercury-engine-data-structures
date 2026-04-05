@@ -30,3 +30,9 @@ def test_dread_bres_100(dread_tree_100, bres_path):
 @pytest.mark.parametrize("bres_path", bossrush_assets)
 def test_dread_bres_210(dread_tree_210, bres_path):
     parse_build_compare_editor(Bres, dread_tree_210, bres_path)
+
+
+def test_properties(dread_tree_100):
+    sound_manager = dread_tree_100.get_file("maps/levels/c10_samus/s010_cave/s010_cave.bres", Bres)
+
+    assert len(sound_manager.presets) == 1

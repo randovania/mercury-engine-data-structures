@@ -62,7 +62,7 @@ class PkgConstruct(construct.Construct):
 
     def __init__(self, target_game: Game):
         super().__init__()
-        self.int_size = typing.cast(construct.FormatField, Int32ul)
+        self.int_size = typing.cast("construct.FormatField", Int32ul)
         self._file_entry = _file_entry(target_game)
         self.file_headers_type = PrefixedArray(self.int_size, self._file_entry).compile()
         self.game = target_game

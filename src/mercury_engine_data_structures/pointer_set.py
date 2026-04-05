@@ -26,7 +26,7 @@ class PointerAdapter(Adapter):
         self.switch_con = Switch(
             construct.this.type,
             types,
-            ErrorWithMessage(lambda ctx: (f"Property {ctx.type} ({get_name(ctx.type)}) without assigned type")),
+            ErrorWithMessage(lambda ctx: f"Property {ctx.type} ({get_name(ctx.type)}) without assigned type"),
         )
         super().__init__(
             Struct(
