@@ -168,9 +168,8 @@ class TileProperties:
     def tile_borders(self) -> dict[TileBorder, bool]:
         return self._raw.tile_borders
 
-    @tile_borders.setter
-    def tile_borders(self, border_type: dict[TileBorder, bool], value: bool) -> None:
-        self._raw.tile_borders[border_type] = value
+    def set_tile_border_type(self, border_type: TileBorder, value: bool) -> None:
+        self.tile_borders[border_type] = value
 
     @property
     def tile_type(self) -> TileType:
