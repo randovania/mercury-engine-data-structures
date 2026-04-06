@@ -14,7 +14,7 @@ from construct.core import (
 )
 
 from mercury_engine_data_structures.base_resource import BaseResource
-from mercury_engine_data_structures.common_types import Char, CVector3D, Float, StrId, VersionAdapter, make_dict
+from mercury_engine_data_structures.common_types import Char, CVector3D, Float, StrId, Vec3, VersionAdapter, make_dict
 from mercury_engine_data_structures.construct_extensions.misc import ErrorWithMessage
 
 if TYPE_CHECKING:
@@ -56,7 +56,7 @@ class Bmtun(BaseResource):
         if tunable_name not in classes[class_name].tunables:
             raise KeyError(f"Unknown tunable name for {class_name}: {tunable_name}!")
 
-    Tunable = str | float | bool | int | list[float]
+    Tunable = str | float | bool | int | Vec3
 
     def get_tunable(self, class_name: str, tunable_name: str) -> Tunable:
         self._check_tunable_exists(class_name, tunable_name)

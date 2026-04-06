@@ -90,6 +90,14 @@ def test_add_block(surface_bmsbk: Bmsbk):
     assert new_block.vignette_name == "sg_vignette_model"
 
 
+def test_add_block_non_existing_cc(surface_bmsbk: Bmsbk):
+    surface_bmsbk.add_block_group("FOO_CC", BlockType.SCREW_ATTACK)
+    block_group = surface_bmsbk.get_block_group(43)
+    assert block_group is not None
+    assert block_group.block_type is BlockType.SCREW_ATTACK
+    assert surface_bmsbk.collision_cameras["FOO_CC"] == [43]
+
+
 def test_remove_block(surface_bmsbk: Bmsbk):
     block_group = surface_bmsbk.get_block_group(0)
     assert block_group.get_block(0).model_name == "sg_casca80"
