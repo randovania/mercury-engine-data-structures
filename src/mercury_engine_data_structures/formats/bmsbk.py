@@ -162,8 +162,8 @@ class Bmsbk(BaseResource):
     def collision_cameras(self) -> dict[str, list[int]]:
         return self.raw.collision_cameras
 
-    def set_collision_camera(self, collision_camera: str, value: dict[str, list[int]]) -> None:
-        self.raw.collision_cameras[collision_camera] = value
+    def set_collision_camera(self, collision_camera: str, value: list[int]) -> None:
+        self.collision_cameras[collision_camera] = value
 
     def get_block_group(self, block_group: int) -> BlockGroupData:
         """
