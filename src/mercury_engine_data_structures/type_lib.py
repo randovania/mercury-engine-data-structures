@@ -110,20 +110,25 @@ class PrimitiveKind(Enum):
     PROPERTY = "property"
 
 
-primitive_to_type = {
-    PrimitiveKind.STRING: str,
-    PrimitiveKind.BOOL: bool,
-    PrimitiveKind.INT: int,
-    PrimitiveKind.UINT: int,
-    PrimitiveKind.UINT_16: int,
-    PrimitiveKind.UINT_64: int,
-    PrimitiveKind.FLOAT: float,
-    PrimitiveKind.VECTOR_2: typing.Sequence,
-    PrimitiveKind.VECTOR_3: typing.Sequence,
-    PrimitiveKind.VECTOR_4: typing.Sequence,
-    PrimitiveKind.BYTES: bytes,
-    PrimitiveKind.PROPERTY: str | int,
-}
+@functools.cache
+def _get_primitive_to_type() -> dict:
+    from mercury_engine_data_structures.common_types import Vec2, Vec3, Vec4
+
+    return {
+        PrimitiveKind.STRING: str,
+        PrimitiveKind.BOOL: bool,
+        PrimitiveKind.INT: int,
+        PrimitiveKind.UINT: int,
+        PrimitiveKind.UINT_16: int,
+        PrimitiveKind.UINT_64: int,
+        PrimitiveKind.FLOAT: float,
+        PrimitiveKind.VECTOR_2: Vec2,
+        PrimitiveKind.VECTOR_3: Vec3,
+        PrimitiveKind.VECTOR_4: Vec4,
+        PrimitiveKind.BYTES: bytes,
+        PrimitiveKind.PROPERTY: str | int,
+    }
+
 
 primitive_int_bounds = {
     PrimitiveKind.INT: (-(2**31), 2**31 - 1),
@@ -131,12 +136,6 @@ primitive_int_bounds = {
     PrimitiveKind.UINT: (0, 2**32 - 1),
     PrimitiveKind.UINT_64: (0, 2**64 - 1),
     PrimitiveKind.PROPERTY: (0, 2**64 - 1),
-}
-
-primitive_vector_lengths = {
-    PrimitiveKind.VECTOR_2: 2,
-    PrimitiveKind.VECTOR_3: 3,
-    PrimitiveKind.VECTOR_4: 4,
 }
 
 
@@ -159,6 +158,9 @@ class PrimitiveType(BaseType):
         return dread_types.primitive_to_construct[self.primitive_kind.value]
 
     def _find_type_errors(self, __value: typing.Any) -> BaseException | None:
+        from mercury_engine_data_structures.common_types import Vec2
+
+        primitive_to_type = _get_primitive_to_type()
         expected_type = primitive_to_type[self.primitive_kind]
         if not isinstance(__value, expected_type):
             if isinstance(expected_type, type):
@@ -171,11 +173,12 @@ class PrimitiveType(BaseType):
                 return None
             return ValueError(f"{__value} is out of range of [{hex(low)}, {hex(high)}]")
 
-        if self.primitive_kind in primitive_vector_lengths:
-            length = primitive_vector_lengths[self.primitive_kind]
-            if len(__value) == length and all(isinstance(v, float) for v in __value):
+        if isinstance(__value, Vec2):
+            if type(__value) is primitive_to_type[self.primitive_kind] and all(
+                isinstance(v, float) for v in __value.raw
+            ):
                 return None
-            return ValueError(f"Invalid CVector{length}D: {__value}")
+            return ValueError(f"Invalid CVector{self.primitive_kind.name[-1]}D: {__value}")
 
         return None
 

@@ -6,6 +6,7 @@ import pytest
 from tests.test_lib import parse_build_compare_editor, parse_build_compare_editor_parsed
 
 from mercury_engine_data_structures import dread_data, samus_returns_data
+from mercury_engine_data_structures.common_types import Vec2, Vec3
 from mercury_engine_data_structures.formats import dread_types
 from mercury_engine_data_structures.formats.bmsad import ActorDefFunc, Bmsad
 
@@ -518,12 +519,12 @@ def test_api_sr(samus_returns_tree: FileTreeEditor):
     modelupdater.functions[1].set_param(1, "foo")
 
     assert modelupdater.fields.vInitPosWorldOffset == [0.0, 0.0, 0.0]
-    modelupdater.fields.vInitPosWorldOffset = [1.0, 2.0, 3.0]
+    modelupdater.fields.vInitPosWorldOffset = Vec3(1.0, 2.0, 3.0)
     assert modelupdater.fields.vInitPosWorldOffset == [1.0, 2.0, 3.0]
     with pytest.raises(TypeError):
         modelupdater.fields.vInitPosWorldOffset = [1, True, False]
-    with pytest.raises(ValueError):
-        modelupdater.fields.vInitPosWorldOffset = [0.0, 0.0]
+    with pytest.raises(TypeError):
+        modelupdater.fields.vInitPosWorldOffset = Vec2(0.0, 0.0)
     with pytest.raises(TypeError):
         modelupdater.fields.vInitPosWorldOffset = {"foo": "bar"}
 
