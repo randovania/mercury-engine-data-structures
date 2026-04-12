@@ -159,12 +159,11 @@ class Bmsbk(BaseResource):
         return BMSBK
 
     @property
-    def collision_cameras(self) -> dict[list[int]]:
+    def collision_cameras(self) -> dict[str, list[int]]:
         return self.raw.collision_cameras
 
-    @collision_cameras.setter
-    def collision_cameras(self, collision_camera: str, value: dict[list[int]]) -> None:
-        self.raw.collision_cameras[collision_camera] = value
+    def set_collision_camera(self, collision_camera: str, value: list[int]) -> None:
+        self.collision_cameras[collision_camera] = value
 
     def get_block_group(self, block_group: int) -> BlockGroupData:
         """
@@ -189,7 +188,7 @@ class Bmsbk(BaseResource):
 
         all_collision_cameras = self.collision_cameras
         if collision_camera not in all_collision_cameras:
-            all_collision_cameras[collision_camera] = Container({collision_camera: ListContainer([])})
+            all_collision_cameras[collision_camera] = ListContainer([])
 
         all_collision_cameras[collision_camera].append(len(self.raw.block_groups) - 1)
 
