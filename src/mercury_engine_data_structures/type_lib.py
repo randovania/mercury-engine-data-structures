@@ -11,8 +11,6 @@ from typing import TYPE_CHECKING
 
 import construct
 
-from mercury_engine_data_structures.common_types import Vec2, Vec3, Vec4
-
 if TYPE_CHECKING:
     from mercury_engine_data_structures.game_check import Game
     from mercury_engine_data_structures.pointer_set import PointerSet
@@ -112,20 +110,25 @@ class PrimitiveKind(Enum):
     PROPERTY = "property"
 
 
-primitive_to_type = {
-    PrimitiveKind.STRING: str,
-    PrimitiveKind.BOOL: bool,
-    PrimitiveKind.INT: int,
-    PrimitiveKind.UINT: int,
-    PrimitiveKind.UINT_16: int,
-    PrimitiveKind.UINT_64: int,
-    PrimitiveKind.FLOAT: float,
-    PrimitiveKind.VECTOR_2: Vec2,
-    PrimitiveKind.VECTOR_3: Vec3,
-    PrimitiveKind.VECTOR_4: Vec4,
-    PrimitiveKind.BYTES: bytes,
-    PrimitiveKind.PROPERTY: str | int,
-}
+@functools.cache
+def _get_primitive_to_type() -> dict:
+    from mercury_engine_data_structures.common_types import Vec2, Vec3, Vec4
+
+    return {
+        PrimitiveKind.STRING: str,
+        PrimitiveKind.BOOL: bool,
+        PrimitiveKind.INT: int,
+        PrimitiveKind.UINT: int,
+        PrimitiveKind.UINT_16: int,
+        PrimitiveKind.UINT_64: int,
+        PrimitiveKind.FLOAT: float,
+        PrimitiveKind.VECTOR_2: Vec2,
+        PrimitiveKind.VECTOR_3: Vec3,
+        PrimitiveKind.VECTOR_4: Vec4,
+        PrimitiveKind.BYTES: bytes,
+        PrimitiveKind.PROPERTY: str | int,
+    }
+
 
 primitive_int_bounds = {
     PrimitiveKind.INT: (-(2**31), 2**31 - 1),
@@ -155,6 +158,9 @@ class PrimitiveType(BaseType):
         return dread_types.primitive_to_construct[self.primitive_kind.value]
 
     def _find_type_errors(self, __value: typing.Any) -> BaseException | None:
+        from mercury_engine_data_structures.common_types import Vec2
+
+        primitive_to_type = _get_primitive_to_type()
         expected_type = primitive_to_type[self.primitive_kind]
         if not isinstance(__value, expected_type):
             if isinstance(expected_type, type):
