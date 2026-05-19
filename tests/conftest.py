@@ -27,6 +27,11 @@ def samus_returns_path():
 
 
 @pytest.fixture(scope="session")
+def samus_returns_jp_path():
+    return Path(get_env_or_skip("SAMUS_RETURNS_JP_PATH"))
+
+
+@pytest.fixture(scope="session")
 def dread_path_100():
     return Path(get_env_or_skip("DREAD_1_0_0_PATH"))
 
@@ -39,6 +44,11 @@ def dread_path_210():
 @pytest.fixture(scope="session")
 def samus_returns_tree(samus_returns_path):
     return FileTreeEditor(ExtractedRomFs(samus_returns_path), Game.SAMUS_RETURNS)
+
+
+@pytest.fixture(scope="session")
+def samus_returns_jp_tree(samus_returns_jp_path):
+    return FileTreeEditor(ExtractedRomFs(samus_returns_jp_path), Game.SAMUS_RETURNS)
 
 
 @pytest.fixture(scope="session")
