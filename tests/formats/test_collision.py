@@ -4,6 +4,7 @@ import pytest
 from tests.test_lib import parse_build_compare_editor_parsed
 
 from mercury_engine_data_structures import dread_data, samus_returns_data
+from mercury_engine_data_structures.common_types import Vec2, Vec3, Vec4
 from mercury_engine_data_structures.formats.bmscc import Bmscc
 
 bossrush_assets = [
@@ -100,24 +101,74 @@ def surface_bmscc(samus_returns_tree) -> Bmscc:
 
 
 def test_get_data(surface_bmscc: Bmscc):
-    data = surface_bmscc.get_entry().get_data()
-    assert len(data) == 5
+    entry = surface_bmscc.get_entry()
+    assert len(entry.data) == 5
+    assert entry.position == [0.0, 0.0, 0.0]
+
+    assert entry.data != {
+        "position": Vec3(0.0, 0.0, 0.0),
+        "polys": [
+            {
+                "num_points": 4,
+                "unk4": 0x0A,
+                "unk5": 0x01B18000,
+                "points": [
+                    {"position": Vec2(5900.0, -5400.0), "material_attribute": 1},
+                    {"position": Vec2(6400.0, -5400.0), "material_attribute": 1},
+                    {"position": Vec2(6400.0, -5500.0), "material_attribute": 1},
+                    {"position": Vec2(6100.0, -5500.0), "material_attribute": 1},
+                ],
+                "boundings": Vec4(5900.0, -5600.0, 6400.0, -5400.0),
+            }
+        ],
+        "total_boundings": Vec4(-25100.0, -10600.0, 12500.0, 14103.099609375),
+        "binary_search_trees": [
+            {
+                "binary_search_index1": 2149,
+                "binary_search_index2": 0,
+                "boundings": Vec4(-25100.0, -10600.0, 12500.0, 14103.099609375),
+            }
+        ],
+    }
 
 
 def test_modifying_collision(surface_bmscc: Bmscc):
-    point = surface_bmscc.get_entry().get_point(2, 9)
-    assert point["x"] == -800.0
-    assert point["y"] == -7000.0
+    poly = surface_bmscc.get_entry().get_poly(2)
+    point = poly.get_point(5)
+    assert point.position == [-900.0, -7400.0]
 
 
-def test_get_boundings(surface_bmscc: Bmscc):
-    total_boundings = surface_bmscc.get_entry().get_total_boundings()
-    polys = surface_bmscc.get_entry().get_data().polys
-    for i, poly in enumerate(polys):
-        poly_boundings = surface_bmscc.get_entry().get_poly_boundings(i)
-        # Boundings for polygons are in the order: x1, y1, x2, y2
-        # Assert that the boundings are confined within the total bounds of the collision_camera
-        assert poly_boundings[0] >= total_boundings[0]
-        assert poly_boundings[1] >= total_boundings[1]
-        assert poly_boundings[2] <= total_boundings[2]
-        assert poly_boundings[3] <= total_boundings[3]
+def test_boundings(surface_bmscc: Bmscc):
+    poly_boundings = surface_bmscc.get_entry().get_poly(0).boundings
+    assert poly_boundings == {"min": Vec2(-25100.0, -10600.0), "max": Vec2(12500.0, 14103.099609375)}
+    poly_boundings["min"] = Vec2(30000.0, 30000.0)
+    poly_boundings["max"] = Vec2(-30000.0, -30000.0)
+    assert poly_boundings == {"min": Vec2(30000.0, 30000.0), "max": Vec2(-30000.0, -30000.0)}
+
+    total_boundings = surface_bmscc.get_entry().total_boundings
+    assert total_boundings == {"min": Vec2(-25100.0, -10600.0), "max": Vec2(12500.0, 14103.099609375)}
+    total_boundings["min"] = Vec2(30000.0, 30000.0)
+    total_boundings["max"] = Vec2(-30000.0, -30000.0)
+    assert total_boundings == {"min": Vec2(30000.0, 30000.0), "max": Vec2(-30000.0, -30000.0)}
+
+
+def test_get_poly(surface_bmscc: Bmscc):
+    poly = surface_bmscc.get_entry().get_poly(5)
+    assert poly.num_points == 12
+
+
+def test_add_point(surface_bmscc: Bmscc):
+    point = (6000.0, -5400.0)
+    poly = surface_bmscc.get_entry().get_poly(3)
+    poly.add_point(point)
+    assert poly.get_point(0) is not None
+    assert poly.get_point(0).position == (6000.0, -5400.0)
+    assert poly.get_point(0).material_attribute == 1
+    assert poly.num_points == 9
+
+
+def test_remove_point(surface_bmscc: Bmscc):
+    poly = surface_bmscc.get_entry().get_poly(0)
+    assert poly.get_point(0).position == Vec2(4300.0, -4800.0)
+    poly.remove_point(0)
+    assert poly.get_point(0).position == Vec2(3600.0, -4800.0)
