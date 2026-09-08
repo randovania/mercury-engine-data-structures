@@ -101,11 +101,12 @@ Metroid Dread uses the following annotations in text to change color:
 
 For running the full test suite, the following environment variables must be set.
 
-| Variable           | Purpose                                        |
-|--------------------|------------------------------------------------|
-| SAMUS_RETURNS_PATH | Path to a Samus Returns extracted RomFS        |
-| DREAD_1_0_0_PATH   | Path to a Metroid Dread v1.0.0 extracted RomFS |
-| DREAD_2_1_0_PATH   | Path to a Metroid Dread v2.1.0 extracted RomFS |
+| Variable              | Purpose                                        |
+|-----------------------|------------------------------------------------|
+| SAMUS_RETURNS_PATH    | Path to a Samus Returns extracted RomFS        |
+| SAMUS_RETURNS_JP_PATH | Path to a Samus Returns JP extracted RomFS     |
+| DREAD_1_0_0_PATH      | Path to a Metroid Dread v1.0.0 extracted RomFS |
+| DREAD_2_1_0_PATH      | Path to a Metroid Dread v2.1.0 extracted RomFS |
 
 If any of these variables are not set, the associated tests are skipped.
 
