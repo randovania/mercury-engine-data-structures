@@ -4,7 +4,8 @@ import pytest
 from tests.test_lib import parse_build_compare_editor
 
 from mercury_engine_data_structures import samus_returns_data
-from mercury_engine_data_structures.formats.bmsld import Bmsld
+from mercury_engine_data_structures.common_types import Vec3
+from mercury_engine_data_structures.formats.bmsld import ActorLayer, Bmsld
 
 sr_missing = [
     "maps/levels/c10_samus/s901_alpha/s901_alpha.bmsld",
@@ -34,7 +35,7 @@ def test_bmsld(samus_returns_tree, bmsld_path):
 
 
 def test_all_actor_groups(surface_bmsld: Bmsld):
-    all_groups = surface_bmsld.all_actor_groups()
+    all_groups = surface_bmsld.actor_groups
     assert len(list(all_groups)) == 32
 
 
@@ -65,6 +66,9 @@ def test_get_actor_group(surface_bmsld: Bmsld):
 def test_all_actors(surface_bmsld: Bmsld):
     all_actors = list(surface_bmsld.all_actors())
     assert len(all_actors) == 232
+    # Number of active layers should be 10
+    assert len(ActorLayer) == 10
+    assert "TG_Activation_Teleport_00_01" in all_actors[ActorLayer.TRIGGER]
 
 
 def test_all_actor_group_names_for_actor(surface_bmsld: Bmsld):
@@ -100,3 +104,64 @@ def test_remove_actor_from_all_groups(surface_bmsld: Bmsld):
     surface_bmsld.remove_actor_from_all_groups("Moheek_026")
     groups = surface_bmsld.all_actor_group_names_for_actor("Moheek_026")
     assert len(groups) == 0
+
+
+def test_get_layer(surface_bmsld: Bmsld):
+    layer = surface_bmsld._get_layer(ActorLayer.HIDDEN_POWERUP)
+    assert len(layer) == 1
+
+
+def test_get_actor(surface_bmsld: Bmsld):
+    layer = ActorLayer.PASSIVE
+    actor = surface_bmsld.get_actor(layer, "LE_Item_001")
+    assert actor is not None
+
+    assert actor.actor_type == "item_missiletank"
+    actor.actor_type = "powerup_plasmabeam"
+    assert actor.actor_type == "powerup_plasmabeam"
+
+    assert actor.position == Vec3(-5500.0, -9700.0, 0.0)
+    actor.position.x = -6000.0
+    assert actor.position == Vec3(-6000.0, -9700.0, 0.0)
+
+    assert actor.rotation == Vec3(0.0, 0.0, 0.0)
+    actor.rotation = Vec3(0.0, 90.0, 0.0)
+    assert actor.rotation == Vec3(0.0, 90.0, 0.0)
+
+    with pytest.raises(KeyError):
+        surface_bmsld.get_actor(layer, "FakeActor")
+
+
+def test_copy_actor(surface_bmsld: Bmsld):
+    actor = surface_bmsld.get_actor(ActorLayer.PASSIVE, "LE_Item_001")
+    surface_bmsld.copy_actor([1000.0, 340.0, 0.0], actor, "CopiedActor", ActorLayer.PASSIVE)
+    surface_bmsld.add_actor_to_entity_groups("collision_camera_000", "CopiedActor")
+    assert surface_bmsld.is_actor_in_group("eg_SubArea_collision_camera_000", "CopiedActor") is True
+
+
+def test_remove_actor(surface_bmsld: Bmsld):
+    actor = "SP_Moheekwall_B_006"
+    surface_bmsld.remove_actor(ActorLayer.SPAWNPOINT, actor)
+    assert surface_bmsld.is_actor_in_group("eg_SubArea_collision_camera_000", actor) is False
+
+    with pytest.raises(KeyError):
+        surface_bmsld.remove_actor(ActorLayer.SPAWNPOINT, "SP_Kraid")
+
+
+def test_get_logic_shape(surface_bmsld: Bmsld):
+    logic_shape = surface_bmsld.get_logic_shape("LS_Spikes_001")
+    assert logic_shape is not None
+
+    poly = logic_shape.get_poly(0)
+    assert poly["num_points"] == 4
+
+    point = logic_shape.get_point(0, 0)
+    assert point["x"] != point["y"]
+
+
+def test_repr(surface_bmsld: Bmsld):
+    actor = surface_bmsld.get_actor(ActorLayer.STARTPOINT, "StartPoint0").get_component_function()
+    assert (
+        repr(actor)
+        == "STARTPOINT.SetScenarioParams('CurrentScenario.OnShipStartPointTeleport', '', True, False, False)"
+    )
