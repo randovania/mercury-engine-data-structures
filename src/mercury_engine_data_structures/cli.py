@@ -10,7 +10,6 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 from mercury_engine_data_structures import formats
-from mercury_engine_data_structures.common_types import Vec2
 from mercury_engine_data_structures.construct_extensions.json import convert_to_raw_python
 from mercury_engine_data_structures.file_tree_editor import FileTreeEditor, OutputFormat
 from mercury_engine_data_structures.game_check import Game
@@ -101,8 +100,6 @@ def dump_to(path: Path, decoded):
             o = o()
         if isinstance(o, bytes):
             return len(o)
-        if isinstance(o, Vec2):
-            return o.__repr__()
 
         raise TypeError(f"Object of type {o.__class__.__name__} is not JSON serializable")
 

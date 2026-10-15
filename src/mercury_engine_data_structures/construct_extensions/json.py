@@ -5,6 +5,8 @@ from typing import Any
 from construct import EnumIntegerString
 from construct.lib import Container, ListContainer
 
+from mercury_engine_data_structures.common_types import Vec2
+
 
 def convert_to_raw_python(value) -> Any:
     if callable(value):
@@ -18,5 +20,8 @@ def convert_to_raw_python(value) -> Any:
 
     if isinstance(value, EnumIntegerString):
         return str(value)
+
+    if isinstance(value, Vec2):
+        return value.raw
 
     return value
