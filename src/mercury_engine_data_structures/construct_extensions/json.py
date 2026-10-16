@@ -19,4 +19,7 @@ def convert_to_raw_python(value) -> Any:
     if isinstance(value, EnumIntegerString):
         return str(value)
 
+    if callable(getattr(value, "to_json", None)):
+        return value.to_json()
+
     return value

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from enum import Enum
+from enum import IntEnum
 from typing import TYPE_CHECKING
 
 import construct
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 # Standard switch format. https://switchbrew.org/wiki/BNVIB#Normal_Vibration
 
 
-class VibrationType(Enum):
+class VibrationType(IntEnum):
     NORMAL = 4
     LOOP = 12
     LOOPWAIT = 16
