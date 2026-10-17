@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import construct
 from construct.core import (
     Array,
@@ -22,9 +20,7 @@ from construct.core import (
 from mercury_engine_data_structures.base_resource import BaseResource
 from mercury_engine_data_structures.common_types import CVectorConstruct, Float, StrId
 from mercury_engine_data_structures.formats.msapi.msapi import LinkedList, MsapiPointer, StandardModelMsapi
-
-if TYPE_CHECKING:
-    from mercury_engine_data_structures.game_check import Game
+from mercury_engine_data_structures.game_check import Game
 
 
 def JointMap(this):
@@ -197,13 +193,14 @@ BcmdlHeader = Struct(
     "lookup_tables" / MsapiPointer(Pass, nullable=True),  # TODO implement Struct9
 )
 
-BCMDL = StandardModelMsapi(b"MMDL", "1.58.0", BcmdlHeader)
-
 
 class Bcmdl(BaseResource):
     @classmethod
     def construct_class(cls, target_game: Game) -> Construct:
-        return BCMDL
+        if target_game == Game.DREAD:
+            return StandardModelMsapi(b"MMDL", "1.58.0", BcmdlHeader, target_game)
+        else:
+            raise NotImplementedError(f"BCMDL format has not been implemented for game {target_game}")
 
     def change_material_path(self, mat_name: str, new_path: str) -> None:
         for mat in self.raw.root.materials.vals:

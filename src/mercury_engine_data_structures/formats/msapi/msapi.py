@@ -4,6 +4,7 @@ import construct
 from construct.core import (
     Const,
     Construct,
+    Int32ul,
     Int64ul,
     Struct,
     Subconstruct,
@@ -12,6 +13,7 @@ from construct.core import (
 from construct.lib.containers import Container, ListContainer
 
 from mercury_engine_data_structures.common_types import StrId, VersionAdapter
+from mercury_engine_data_structures.game_check import Game
 
 
 class MsapiPointer(Subconstruct):
@@ -22,10 +24,11 @@ class MsapiPointer(Subconstruct):
 
     def _parse(self, stream, context, path):
         context._root = context._.get("_root", context)
+
         assert hasattr(context._root, "_structures")
         structures = context._root._structures
 
-        offset = self.subcon._parse(stream, context, path)
+        offset = context._root._pointer_subcon._parse(stream, context, path)
 
         if offset == 0:
             if self.nullable:
@@ -41,17 +44,17 @@ class MsapiPointer(Subconstruct):
         return structures[offset][1]
 
     def _build(self, obj, stream, context, path):
-        root = context.get("_root", context)
+        context._root = context.get("_root", context)
 
-        assert hasattr(root, "_build_order")
-        build_order = root._build_order
+        assert hasattr(context._root, "_build_order")
+        build_order = context._root._build_order
 
-        assert hasattr(root, "_pointers")
-        pointers = root._pointers
+        assert hasattr(context._root, "_pointers")
+        pointers = context._root._pointers
 
         if obj is None:
             if self.nullable:
-                self.subcon._build(0, stream, context, path)
+                context._root._pointer_subcon._build(0, stream, context, path)
                 return
             else:
                 raise ValueError(
@@ -64,20 +67,34 @@ class MsapiPointer(Subconstruct):
             build_order.append((obj, construct.evaluate(self.inner_type, context)))
 
         pointers[curr] = obj
-        self.subcon._build(0, stream, context, path)
+        context._root._pointer_subcon._build(0, stream, context, path)
 
         return curr
 
 
 class StandardModelMsapi(Subconstruct):
-    def __init__(self, magic: bytes, version: int | str | tuple[int, int, int] | None, root: Construct):
+    def __init__(
+        self, magic: bytes, version: int | str | tuple[int, int, int] | None, root: Construct, target_game: Game
+    ):
         super().__init__(root)
         self.magic = magic
         self.version = version
 
+        if target_game == Game.SAMUS_RETURNS:
+            self.padding_byte = b"\x00"
+            self.alignment = 4
+            self.pointer_subcon = Int32ul
+            self.pad_strings = True
+        elif target_game == Game.DREAD:
+            self.padding_byte = b"\xff"
+            self.alignment = 8
+            self.pointer_subcon = Int64ul
+            self.pad_strings = False
+
     def _parse(self, stream, context, path):
         context._root = context
         root = context._root
+        root._pointer_subcon = self.pointer_subcon
 
         structures: dict[int, tuple[Construct, Container]] = {}
         root._structures = structures
@@ -115,6 +132,7 @@ class StandardModelMsapi(Subconstruct):
     def _build(self, obj, stream, context, path):
         context._root = context
         root = context._root
+        root._pointer_subcon = self.pointer_subcon
 
         build_order: list[tuple[Container, Construct]] = []
         root._build_order = build_order
@@ -137,8 +155,8 @@ class StandardModelMsapi(Subconstruct):
             (val, con) = build_order[current_struct]
 
             # non-strings are aligned to 8 with padding bytes
-            if con is not StrId and (cur := stream.tell() % 8) != 0:
-                Const(b"\xff" * (8 - cur))._build(None, stream, context, path)
+            if (cur := stream.tell() % self.alignment) != 0 and (con is not StrId or self.pad_strings):
+                Const(self.padding_byte * (self.alignment - cur))._build(None, stream, context, path)
 
             # add this struct's starting position to offsets
             offsets[id(val)] = stream.tell()
@@ -151,7 +169,7 @@ class StandardModelMsapi(Subconstruct):
         # seek to the pointers we have collected and write the final locations
         for off, val in pointers.items():
             stream.seek(off)
-            Int64ul._build(offsets[id(val)], stream, context, path)
+            self.pointer_subcon._build(offsets[id(val)], stream, context, path)
 
         return context
 
