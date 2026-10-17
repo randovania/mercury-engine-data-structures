@@ -48,6 +48,7 @@ from mercury_engine_data_structures.formats.gui_files import Bmscp, Bmssh, Bmssk
 from mercury_engine_data_structures.formats.ini import Ini
 from mercury_engine_data_structures.formats.lua import Lua
 from mercury_engine_data_structures.formats.msapi.bcmdl import Bcmdl
+from mercury_engine_data_structures.formats.msapi.bfont import Bfont
 from mercury_engine_data_structures.formats.pkg import Pkg
 from mercury_engine_data_structures.formats.toc import Toc
 from mercury_engine_data_structures.formats.txt import Txt
@@ -61,6 +62,7 @@ ALL_FORMATS = {
     "BCMDL": Bcmdl,
     "BCSKLA": Bcskla,
     "BCTEX": Bctex,
+    "BFONT": Bfont,
     "BGSNDS": Bgsnds,
     "BLDEF": Bldef,
     "BLSND": Blsnd,
