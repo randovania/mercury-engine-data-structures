@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mercury_engine_data_structures.formats.bapd import Bapd
-from mercury_engine_data_structures.formats.bcmdl import Bcmdl
 from mercury_engine_data_structures.formats.bcskla import Bcskla
 from mercury_engine_data_structures.formats.bctex import Bctex
 from mercury_engine_data_structures.formats.bgsnds import Bgsnds
@@ -48,6 +47,7 @@ from mercury_engine_data_structures.formats.buct import Buct
 from mercury_engine_data_structures.formats.gui_files import Bmscp, Bmssh, Bmssk, Bmsss
 from mercury_engine_data_structures.formats.ini import Ini
 from mercury_engine_data_structures.formats.lua import Lua
+from mercury_engine_data_structures.formats.msapi.bcmdl import Bcmdl
 from mercury_engine_data_structures.formats.pkg import Pkg
 from mercury_engine_data_structures.formats.toc import Toc
 from mercury_engine_data_structures.formats.txt import Txt

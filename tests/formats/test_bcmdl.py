@@ -6,7 +6,7 @@ import pytest
 from tests.test_lib import parse_build_compare_editor
 
 from mercury_engine_data_structures import dread_data
-from mercury_engine_data_structures.formats.bcmdl import Bcmdl
+from mercury_engine_data_structures.formats.msapi.bcmdl import Bcmdl
 
 # these models are copied into the pkg from the original scenarios, confirmed to bytematch
 dread_bcmdl_duplicate = [
@@ -239,7 +239,7 @@ dread_bcmdl_expected_failure = [
 @pytest.mark.parametrize("bcmdl_path", dread_data.all_files_ending_with(".bcmdl", dread_bcmdl_duplicate))
 def test_compare_bcmdl_dread(dread_tree_100, bcmdl_path):
     if bcmdl_path in dread_bcmdl_expected_failure:
-        expectation = pytest.raises(AssertionError)
+        expectation = pytest.raises(TypeError)
     else:
         expectation = contextlib.nullcontext()
 
@@ -267,11 +267,13 @@ def test_change_material(dread_tree_100):
     model.change_material_path("mp_opaque_01", replace)
     encoded2 = construct_class.build(model.raw, target_game=dread_tree_100.target_game)
 
-    assert encoded2[0x5845:0x58A0] == (
-        b"actors/props/doorshieldsupermiss/models/imats/doorshieldsupermiss_mp_opaque_01.bsmat\0\0\0\0\0\0\0"
+    assert encoded2[0x5845:0x589A] == (
+        b"actors/props/doorshieldsupermiss/models/imats/doorshieldsupermiss_mp_opaque_01.bsmat\0"
     )
 
-    long_path = "actors/props/doorshieldsupermissile/models/imats/doorshieldsupermissile_mp_opaque_420.bsmat"
-    expectation = pytest.raises(ValueError)
-    with expectation:
-        model.change_material_path("mp_opaque_01", long_path)
+    replace = "actors/props/doorshieldsupermissile/models/imats/doorshieldsupermissile_mp_opaque_123456789.bsmat"
+    model.change_material_path("mp_opaque_01", replace)
+    encoded3 = construct_class.build(model.raw, target_game=dread_tree_100.target_game)
+
+    assert len(encoded3) == 23300  # validate by making sure the whole file got 8b longer
+    assert encoded3[0x5845:0x58A7] == replace.encode("utf-8") + b"\x00"
