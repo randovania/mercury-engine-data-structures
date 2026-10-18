@@ -35,7 +35,7 @@ class MsapiPointer(Subconstruct):
                 return None
             else:
                 raise ValueError(
-                    f"MsapiPointer of type {self.inner_type} is not nullable but encountered a null value! {{path}}"
+                    f"MsapiPointer of type {self.inner_type} is not nullable but encountered a null value! {path}"
                 )
 
         if offset not in structures.keys():
@@ -95,6 +95,8 @@ class StandardModelMsapi(Subconstruct):
         context._root = context
         root = context._root
         root._pointer_subcon = self.pointer_subcon
+        root._padding_byte = self.padding_byte
+        root._alignment = self.alignment
 
         structures: dict[int, tuple[Construct, Container]] = {}
         root._structures = structures
@@ -133,6 +135,8 @@ class StandardModelMsapi(Subconstruct):
         context._root = context
         root = context._root
         root._pointer_subcon = self.pointer_subcon
+        root._padding_byte = self.padding_byte
+        root._alignment = self.alignment
 
         build_order: list[tuple[Container, Construct]] = []
         root._build_order = build_order
@@ -174,20 +178,24 @@ class StandardModelMsapi(Subconstruct):
         return context
 
 
-class LinkedList(Subconstruct):
+class LinkedList(Construct):
     """
     A linked-list of Int64ul pointers that is frequently used in the msapi formats
     """
 
+    def node(self, subcon):
+        return Struct("val" / MsapiPointer(self.el_type), "next" / subcon)
+
     def __init__(self, element_type):
-        super().__init__(Struct("val" / MsapiPointer(element_type), "next" / Int64ul))
+        super().__init__()
         self.el_type = element_type
 
     def _parse(self, stream, context, path):
+        subcon = self.node(context._root._pointer_subcon)
         res = []
 
         while True:
-            node = self.subcon._parse(stream, context, path)
+            node = subcon._parse(stream, context, path)
             res.append(node["val"])
 
             if node["next"] == 0:
@@ -197,8 +205,36 @@ class LinkedList(Subconstruct):
                 raise ValueError(f"Linked List goes out of order: expected {node[1]}, got {stream.tell()}")
 
     def _build(self, obj, stream, context, path):
-        for val in obj.vals[:-1]:
-            node = {"val": val, "next": stream.tell() + 0x10}
-            self.subcon._build(node, stream, context, path)
+        subcon = self.node(context._root._pointer_subcon)
 
-        self.subcon._build({"val": obj.vals[-1], "next": 0}, stream, context, path)
+        for val in obj.vals[:-1]:
+            node = {"val": val, "next": stream.tell() + 2 * context._root._pointer_subcon.sizeof()}
+            subcon._build(node, stream, context, path)
+
+        subcon._build({"val": obj.vals[-1], "next": 0}, stream, context, path)
+
+
+class MsapiAlign(Construct):
+    """
+    Applies alignment in-line, using the game's standard padding byte and alignment
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.flagbuildnone = True
+
+    def _parse(self, stream, context, path):
+        context._root = context._.get("_root", context)
+        padding = context._root._padding_byte
+        alignment = context._root._alignment
+
+        if (cur := stream.tell() % alignment) != 0:
+            Const(padding * (alignment - cur))._parse(stream, context, path)
+
+    def _build(self, obj, stream, context, path):
+        context._root = context._.get("_root", context)
+        padding = context._root._padding_byte
+        alignment = context._root._alignment
+
+        if (cur := stream.tell() % alignment) != 0:
+            Const(padding * (alignment - cur))._build(None, stream, context, path)
