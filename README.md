@@ -8,7 +8,7 @@ Construct type definitions for Mercury Engine
 | BAPD      | Missing              | Missing               | &check;      | &check;       | Audio Preset (positional audio data) |
 | BCCAM     | &cross;              | &cross;               | &cross;      | &cross;       | Camera Animation (used exclusively for cutscene takes) |
 | BCLGT     | &cross;              | &cross;               | Missing      | Missing       | Lighting (?) |
-| BCMDL     | &cross;              | &cross;               | &check;      | &cross;       | 3D Models	  |
+| BCMDL     | &cross;              | &cross;               | &check;      | &check;       | 3D Models	  |
 | BCPTL     | &cross;              | &cross;               | &cross;      | &cross;       | Particle Effect |
 | BCSKLA    | &check;              | &check;               | &check;      | &check;       | Skeleton Animation |
 | BCTEX     | &cross;              | &cross;               | &check;      | &cross;       | Texture File |
@@ -16,7 +16,7 @@ Construct type definitions for Mercury Engine
 | BCUT      | &cross;              | &cross;               | Missing      | Missing       |	Related to cutscene files |
 | BCWAV     | &cross;              | &cross;               | Missing      | Missing       | Cafe/Citra Wave (common AAL audio format) |
 | BFGRP     | Missing              | Missing               | &cross;      | &cross;       | Sound WaveGroup (common AAL audio format) |
-| BFONT     | &cross;              | &cross;               | &cross;      | &cross;       | Font File |
+| BFONT     | &check;              | &check;               | &check;      | &check;       | Font File |
 | BFSAR     | Missing              | Missing               | &cross;      | &cross;       | FSAR (?) |
 | BFSTM     | Missing              | Missing               | &cross;      | &cross;       | Common Switch audio format |
 | BGSNDS    | Missing              | Missing               | &check;      | &check;       | BackGround Sounds (?) |
