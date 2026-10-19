@@ -34,6 +34,9 @@ class Vec2:
     def __repr__(self) -> str:
         return f"{type(self).__name__}({repr(self.raw)[1:-1]})"
 
+    def to_json(self):
+        return self.raw
+
     def __getitem__(self, key: int | slice) -> float:
         return self.raw[key]
 
